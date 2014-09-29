@@ -14,7 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core.plugins import IndicoPlugin
+from indico.web.forms.base import IndicoForm
+from wtforms.fields.simple import TextField
+
+
+class SettingsForm(IndicoForm):
+    server = TextField('XMPP server')
+    muc_server = TextField('XMPP MUC server (conference.*)')
 
 
 class ChatPlugin(IndicoPlugin):
@@ -22,3 +31,5 @@ class ChatPlugin(IndicoPlugin):
 
     Provides an XMPP based chat for events.
     """
+
+    settings_form = SettingsForm
