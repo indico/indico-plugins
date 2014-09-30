@@ -40,7 +40,6 @@ class ChatImporter(Importer):
         with ChatPlugin.instance.plugin_context():
             self.migrate_settings()
             self.migrate_chatrooms()
-        self.fix_sequences(schema='plugin_chat')
 
     def migrate_settings(self):
         print cformat('%{white!}migrating settings')
@@ -64,8 +63,7 @@ class ChatImporter(Importer):
             if room:
                 print cformat('- %{cyan}{}   %{yellow!}DUPLICATE%{reset}').format(room.name)
             else:
-                room = Chatroom(id=int(old_room._id),
-                                name=convert_to_unicode(old_room._name),
+                room = Chatroom(name=convert_to_unicode(old_room._name),
                                 description=convert_to_unicode(old_room._description),
                                 password=convert_to_unicode(old_room._password),
                                 custom_server=custom_server,
