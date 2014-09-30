@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from flask_pluginengine import current_plugin
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -25,6 +24,8 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
+
+from indico_chat.plugin import ChatPlugin
 
 
 class Chatroom(db.Model):
@@ -95,7 +96,7 @@ class Chatroom(db.Model):
 
         Usually the default one unless a custom one is set.
         """
-        return self.custom_server or current_plugin.settings.get('muc_server')
+        return self.custom_server or ChatPlugin.settings.get('muc_server')
 
     @return_ascii
     def __repr__(self):
