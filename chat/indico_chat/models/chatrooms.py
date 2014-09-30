@@ -59,12 +59,15 @@ class Chatroom(db.Model):
     )
     #: Custom Jabber MUC server hostname
     custom_server = db.Column(
-        db.String
+        db.String,
+        nullable=False,
+        default=''
     )
     #: ID of the creator
     created_by_id = db.Column(
         db.Integer,
-        nullable=False
+        nullable=False,
+        index=True
     )
     #: Creation timestamp of the chatroom
     created_dt = db.Column(
@@ -96,7 +99,10 @@ class Chatroom(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<Chatroom({}, {}@{})>'.format(self.id, self.name, self.server)
+        server = self.server
+        if self.custom_server:
+            server = '!' + server
+        return '<Chatroom({}, {}, {})>'.format(self.id, self.name, server)
 
 
 class ChatroomEventAssociation(db.Model):
@@ -145,4 +151,4 @@ class ChatroomEventAssociation(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<ChatroomEventAssociation({}, {}, {})>'.format(self.event_id, self.chatroom)
+        return '<ChatroomEventAssociation({}, {})>'.format(self.event_id, self.chatroom)
