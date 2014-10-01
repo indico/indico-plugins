@@ -1,7 +1,12 @@
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
+from .views import WPStatistics
+
 
 class RHStatisticsView(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._params = params
 
     def _process(self):
-        return 'statistics'
+        return WPStatistics.render_template('test.html', self._conf, **self._params)
