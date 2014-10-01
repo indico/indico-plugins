@@ -114,7 +114,8 @@ class ChatroomEventAssociation(db.Model):
     event_id = db.Column(
         db.Integer,
         primary_key=True,
-        index=True
+        index=True,
+        autoincrement=False
     )
     #: ID of the chatroom
     chatroom_id = db.Column(
