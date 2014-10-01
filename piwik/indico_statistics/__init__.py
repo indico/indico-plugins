@@ -27,6 +27,10 @@ class StatisticsPlugin(IndicoPlugin):
     def get_blueprints(self):
         return blueprint
 
+    def register_assets(self):
+        self.register_css_bundle('statistics_css', 'css/statistics.css')
+        self.register_js_bundle('statistics_js', 'js/statistics.js')
+
 
 blueprint = IndicoPluginBlueprint('statistics', __name__)
 blueprint.add_url_rule('/event/<confId>/manage/statistics_new', 'view', RHStatisticsView)
