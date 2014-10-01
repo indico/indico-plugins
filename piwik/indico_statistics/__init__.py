@@ -21,7 +21,8 @@ class StatisticsPlugin(IndicoPlugin):
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
 
     def add_sidemenu_item(self, event):
-        return (SideMenuItem(_("Statistics (new)"), url_for_plugin('statistics.view', event)),)
+        menu_item = SideMenuItem(_("Statistics (new)"), url_for_plugin('statistics.view', event))
+        return ('statistics', menu_item)
 
     def get_blueprints(self):
         return blueprint
