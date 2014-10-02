@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='indico_statistics',
+    name='indico_piwik',
     version='0.1',
     packages=find_packages(),
     zip_safe=False,
@@ -11,5 +11,5 @@ setup(
     install_requires=[
         'indico>=1.9.1'
     ],
-    entry_points={'indico.plugins': {'statistics = indico_statistics:StatisticsPlugin'}}
+    entry_points={'indico.plugins': {'piwik = indico_piwik:PiwikPlugin'}}
 )
