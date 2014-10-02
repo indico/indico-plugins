@@ -16,14 +16,33 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import render_plugin_template
+from wtforms import ValidationError
+from wtforms.fields.simple import TextField, TextAreaField
+
 from indico.core.plugins import IndicoPlugin
 from indico.web.forms.base import IndicoForm
-from wtforms.fields.simple import TextField
+from indico.web.forms.fields import MultipleItemsField
+from indico.web.forms.widgets import CKEditorWidget
+from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
+
+from indico_chat.blueprint import blueprint
+from indico_chat.models.chatrooms import ChatroomEventAssociation
 
 
 class SettingsForm(IndicoForm):
     server = TextField('XMPP server')
-    muc_server = TextField('XMPP MUC server (conference.*)')
+    muc_server = TextField('XMPP MUC server', description='Usually conference.XMPPSERVER')
+    how_to_connect = TextAreaField('How to connect', widget=CKEditorWidget(),
+                                   description='Text shown below the chatrooms on an event page')
+    chat_links = MultipleItemsField('Chatroom links', fields=(('title', 'Title'), ('link', 'Link')),
+                                    description='Links to join the chatroom. You can use the placeholders {room} and '
+                                                '{server}.')
+
+    def validate_chat_links(self, field):
+        for item in field.data:
+            if not all(item.values()):
+                raise ValidationError('All fields must contain a value.')
 
 
 class ChatPlugin(IndicoPlugin):
@@ -33,3 +52,31 @@ class ChatPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
+
+    @property
+    def default_settings(self):
+        return {'how_to_connect': render_plugin_template('how_to_connect.html'),
+                'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
+
+    def init(self):
+        super(ChatPlugin, self).init()
+        self.template_hook('event-header', self.inject_event_header)
+        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay):
+            self.inject_css('chat_css', wp)
+            self.inject_js('chat_js', wp)
+
+    def get_blueprints(self):
+        return blueprint
+
+    def register_assets(self):
+        self.register_css_bundle('chat_css', 'css/chat.scss')
+        self.register_js_bundle('chat_js', 'js/chat.js')
+
+    def inject_event_header(self, event, **kwargs):
+        chatrooms = ChatroomEventAssociation.find_all(ChatroomEventAssociation.event_id == event.id,
+                                                      ~ChatroomEventAssociation.hidden)
+        if not chatrooms:
+            return ''
+        how_to_connect = self.settings.get('how_to_connect')
+        return render_plugin_template('event_header.html', event=event, event_chatrooms=chatrooms,
+                                      how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))

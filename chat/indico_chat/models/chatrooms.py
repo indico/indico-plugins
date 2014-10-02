@@ -25,8 +25,6 @@ from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
-from indico_chat.plugin import ChatPlugin
-
 
 class Chatroom(db.Model):
     __tablename__ = 'chatrooms'
@@ -96,6 +94,8 @@ class Chatroom(db.Model):
 
         Usually the default one unless a custom one is set.
         """
+        from indico_chat.plugin import ChatPlugin
+
         return self.custom_server or ChatPlugin.settings.get('muc_server')
 
     @return_ascii

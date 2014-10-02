@@ -1,0 +1,28 @@
+@import 'base/palette';
+
+.plugin-chat {
+    .chat-toggle-details {
+        color: #0B63A5;
+        text-decoration: none;
+    }
+
+    .chatroom + .chatroom {
+        margin-top: 5px;
+    }
+
+    dl.chat-details {
+        clear: left;
+        font-size: 90%;
+        margin: 5px 0 0 0;
+
+        dt {
+            float: left;
+            color: $light-black;
+        }
+
+        dd {
+            margin-left: 100px;
+            display: block;
+        }
+    }
+}

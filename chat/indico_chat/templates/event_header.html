@@ -1,0 +1,57 @@
+<tr class="plugin-chat" id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}">
+    <td class="leftCol">Chat rooms</td>
+    <td>
+        <div>
+            {% for event_chatroom in event_chatrooms %}
+                {% set chatroom = event_chatroom.chatroom %}
+                {% set server = chatroom.server %}
+                <div class="chatroom">
+                    <span>{{ chatroom.name }}</span>
+                    <span style="margin-left: 20px;"></span>
+                    <a class="chat-toggle-details" href="#">{% trans %}More Info{% endtrans %}</a>
+                    {% if chat_links %}
+                        <span style="margin-left: 8px; margin-right: 8px;">|</span>
+                        <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.name }}">{% trans %}Join now!{% endtrans %}</a></strong>
+                    {% endif %}
+                    <dl class="js-chat-details chat-details" style="display: none;">
+                        <dt>{% trans %}Name{% endtrans %}:</dt>
+                        <dd>{{ chatroom.name }}</dd>
+                        <dt>{% trans %}Server{% endtrans %}:</dt>
+                        <dd>{{ chatroom.server }}</dd>
+                        {% if chatroom.description %}
+                            <dt>{% trans %}Description{% endtrans %}:</dt>
+                            <dd>{{ chatroom.description }}</dd>
+                        {% endif %}
+                        {% if chatroom.password %}
+                            <dt>{% trans %}Password{% endtrans %}:</dt>
+                            <dd>
+                                {% if event_chatroom.show_password %}
+                                    {{ chatroom.password }}
+                                {% else %}
+                                    <i>{% trans %}Hidden{% endtrans %}</i>
+                                {% endif %}
+                            </dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            {% endfor %}
+            <script>
+                eventChatInfo();
+            </script>
+        </div>
+    </td>
+</tr>
+{% if how_to_connect %}
+    <tr class="plugin-chat">
+        <td colspan="2">
+            <table width="100%" align="center" border="0">
+                <tr>
+                    <td class="groupTitle">{% trans %}How to connect to the chat{% endtrans %}</td>
+                </tr>
+                <tr>
+                    <td>{{ how_to_connect | safe }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+{% endif %}

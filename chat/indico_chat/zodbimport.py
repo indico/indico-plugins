@@ -44,10 +44,17 @@ class ChatImporter(Importer):
     def migrate_settings(self):
         print cformat('%{white!}migrating settings')
         ChatPlugin.settings.delete_all()
+        type_opts = self.zodb_root['plugins']['InstantMessaging']._PluginBase__options
         opts = self.zodb_root['plugins']['InstantMessaging']._PluginType__plugins['XMPP']._PluginBase__options
         host = convert_to_unicode(opts['chatServerHost'].getValue())
         ChatPlugin.settings.set('server', host)
         ChatPlugin.settings.set('muc_server', 'conference.{}'.format(host))
+        ChatPlugin.settings.set('how_to_connect', opts['ckEditor'].getValue().strip())
+        chat_links = []
+        for item in type_opts['customLinks'].getValue():
+            link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
+            chat_links.append({'title': item['name'], 'link': link})
+        ChatPlugin.settings.set('chat_links', chat_links)
         # TODO: migrate other settings
         db.session.commit()
 
