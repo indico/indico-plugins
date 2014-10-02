@@ -28,6 +28,7 @@ from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLCo
 
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
+from indico_chat.views import WPChatEventPage
 
 
 class SettingsForm(IndicoForm):
@@ -61,7 +62,7 @@ class ChatPlugin(IndicoPlugin):
     def init(self):
         super(ChatPlugin, self).init()
         self.template_hook('event-header', self.inject_event_header)
-        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay):
+        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage):
             self.inject_css('chat_css', wp)
             self.inject_js('chat_js', wp)
 

@@ -1,0 +1,54 @@
+<h2 class="page-title">{% trans %}Chat Rooms{% endtrans %}</h2>
+
+<table class="infoTable" width="100%" align="center" border="0" cellspacing="0">
+    <thead>
+        <tr>
+            <td class="tableHeader">{% trans %}Room{% endtrans %}</td>
+            <td class="tableHeader">{% trans %}Server{% endtrans %}</td>
+            {% if 'description' in cols -%}
+                <td class="tableHeader">{% trans %}Description{% endtrans %}</td>
+            {% endif %}
+            {% if 'password' in cols -%}
+                <td class="tableHeader">{% trans %}Password{% endtrans %}</td>
+            {% endif %}
+            {% if chat_links %}
+                <td class="tableHeader">{% trans %}Actions{% endtrans %}</td>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}">
+        {% for event_chatroom in event_chatrooms %}
+            {% set chatroom = event_chatroom.chatroom %}
+            {% set server = chatroom.server %}
+
+            <tr class="infoTR" style="vertical-align: baseline;">
+                <td class="infoTD">{{ chatroom.name }}</td>
+                <td class="infoTD">{{ server }}</td>
+                {% if 'description' in cols -%}
+                    <td class="infoTD">{{ chatroom.description }}</td>
+                {% endif %}
+                {% if 'password' in cols %}
+                    <td class="infoTD">
+                        {% if chatroom.password %}
+                            {% if event_chatroom.show_password %}
+                                {{ chatroom.password }}
+                            {% else %}
+                                <i>{% trans %}Hidden{% endtrans %}</i>
+                            {% endif %}
+                        {% else %}
+                            <i>{% trans %}None{% endtrans %}</i>
+                        {% endif %}
+                    </td>
+                {% endif %}
+                {% if chat_links %}
+                    <td style="white-space: nowrap;">
+                        <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.name }}">{% trans %}Join now!{% endtrans %}</a></strong>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    eventChatInfo();
+</script>

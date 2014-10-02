@@ -16,9 +16,15 @@
 
 from __future__ import unicode_literals
 
-from indico.core.plugins import IndicoPluginBlueprint
+from indico.core.plugins import WPJinjaMixinPlugin
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
-from indico_chat.controllers import RHChatEventPage
 
-blueprint = IndicoPluginBlueprint('chat', 'indico_chat')
-blueprint.add_url_rule('/event/<confId>/chat-new', 'event-page', RHChatEventPage)
+class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
+    def __init__(self, rh, conf, **kwargs):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
+        self._conf = conf
+        self._aw = rh.getAW()
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
