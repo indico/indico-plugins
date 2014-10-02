@@ -28,8 +28,10 @@ class StatisticsPlugin(IndicoPlugin):
         return blueprint
 
     def register_assets(self):
-        self.register_css_bundle('statistics_css', 'css/statistics.css')
         self.register_js_bundle('statistics_js', 'js/statistics.js')
+        self.register_css_bundle('statistics_css', 'css/statistics.css')
+        self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
+        self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
 
 blueprint = IndicoPluginBlueprint('statistics', __name__)
