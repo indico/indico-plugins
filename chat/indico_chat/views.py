@@ -28,3 +28,7 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
+
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('chat-event-page'))

@@ -20,10 +20,12 @@ from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
 from wtforms.fields.simple import TextField, TextAreaField
 
+from indico.core import signals
 from indico.core.plugins import IndicoPlugin
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.widgets import CKEditorWidget
+from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
 
 from indico_chat.blueprint import blueprint
@@ -61,6 +63,7 @@ class ChatPlugin(IndicoPlugin):
 
     def init(self):
         super(ChatPlugin, self).init()
+        self.connect(signals.event_sidemenu, self.extend_event_menu)
         self.template_hook('event-header', self.inject_event_header)
         for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage):
             self.inject_css('chat_css', wp)
@@ -81,3 +84,11 @@ class ChatPlugin(IndicoPlugin):
         how_to_connect = self.settings.get('how_to_connect')
         return render_plugin_template('event_header.html', event=event, event_chatrooms=chatrooms,
                                       how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))
+
+    def _has_visible_chatrooms(self, event):
+        return bool(ChatroomEventAssociation.find(ChatroomEventAssociation.event_id == event.id,
+                                                  ~ChatroomEventAssociation.hidden).count())
+
+    def extend_event_menu(self, sender, **kwargs):
+        return EventMenuEntry('chat.event-page', 'Chat Rooms', name='chat-event-page', plugin=True,
+                              visible=self._has_visible_chatrooms)
