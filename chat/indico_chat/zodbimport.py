@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from indico.core.db import db
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
@@ -55,6 +57,8 @@ class ChatImporter(Importer):
         chat_links = []
         for item in type_opts['customLinks'].getValue():
             link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
+            link = re.sub(r'(?<!conference\.)\{server}', host, link)
+            link = link.replace('conference.{server}', '{server}')  # {server} is now the MUC server
             chat_links.append({'title': item['name'], 'link': link})
         ChatPlugin.settings.set('chat_links', chat_links)
         db.session.commit()
