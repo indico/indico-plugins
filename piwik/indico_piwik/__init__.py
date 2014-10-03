@@ -5,8 +5,8 @@ from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plu
 from MaKaC.i18n import _
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
-from controllers import RHStatistics
-from forms import SettingsForm
+from .controllers import RHStatistics
+from .forms import SettingsForm
 
 
 class PiwikPlugin(IndicoPlugin):
