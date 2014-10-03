@@ -23,7 +23,7 @@ from wtforms.fields.simple import TextField, TextAreaField
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import MultipleItemsField
+from indico.web.forms.fields import PrincipalField, MultipleItemsField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
@@ -34,6 +34,7 @@ from indico_chat.views import WPChatEventPage
 
 
 class SettingsForm(IndicoForm):
+    admins = PrincipalField('Administrators')
     server = TextField('XMPP server')
     muc_server = TextField('XMPP MUC server', description='Usually conference.XMPPSERVER')
     how_to_connect = TextAreaField('How to connect', widget=CKEditorWidget(),
@@ -58,7 +59,8 @@ class ChatPlugin(IndicoPlugin):
 
     @property
     def default_settings(self):
-        return {'how_to_connect': render_plugin_template('how_to_connect.html'),
+        return {'admins': [],
+                'how_to_connect': render_plugin_template('how_to_connect.html'),
                 'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
 
     def init(self):

@@ -22,7 +22,7 @@ from indico.util.struct.iterables import committing_iterator
 
 from indico_chat.models.chatrooms import Chatroom, ChatroomEventAssociation
 from indico_chat.plugin import ChatPlugin
-from indico_zodbimport import Importer, convert_to_unicode
+from indico_zodbimport import Importer, convert_to_unicode, convert_principal_list
 
 
 class ChatImporter(Importer):
@@ -50,12 +50,13 @@ class ChatImporter(Importer):
         ChatPlugin.settings.set('server', host)
         ChatPlugin.settings.set('muc_server', 'conference.{}'.format(host))
         ChatPlugin.settings.set('how_to_connect', opts['ckEditor'].getValue().strip())
+        ChatPlugin.settings.set('admins', convert_principal_list(opts['admins']))
+        # TODO: migrate other settings
         chat_links = []
         for item in type_opts['customLinks'].getValue():
             link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
             chat_links.append({'title': item['name'], 'link': link})
         ChatPlugin.settings.set('chat_links', chat_links)
-        # TODO: migrate other settings
         db.session.commit()
 
     def migrate_chatrooms(self):
