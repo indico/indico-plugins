@@ -26,12 +26,23 @@ class PiwikPlugin(IndicoPlugin):
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
-        self.template_hook('footer-extra', self.add_event_tracking)
+        self.template_hook('page-header', self.inject_page_header)
+        self.template_hook('page-footer', self.inject_page_footer)
 
-    def add_event_tracking(self):
+    def inject_page_header(self, template, **kwargs):
+        server_url = self.settings.get('server_url')
+
+        if not self.settings.get('enabled') or not server_url:
+            return ""
+        else:
+            return render_plugin_template('site_tracking.html',
+                                          site_id=self.settings.get('site_id_general'),
+                                          server_url=server_url)
+
+    def inject_page_footer(self):
         params = {'tracking_active': True,
                   'url': self._get_query_url(),
-                  'site_id': PiwikPlugin.settings.get('site_id')}
+                  'site_id': PiwikPlugin.settings.get('site_id_events')}
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contribId')
