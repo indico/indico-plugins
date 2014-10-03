@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
+from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextField, TextAreaField
+from wtforms.validators import DataRequired
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalField, MultipleItemsField
+from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, UnsafePasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
@@ -34,14 +36,22 @@ from indico_chat.views import WPChatEventPage
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalField('Administrators')
-    server = TextField('XMPP server')
-    muc_server = TextField('XMPP MUC server', description='Usually conference.XMPPSERVER')
-    how_to_connect = TextAreaField('How to connect', widget=CKEditorWidget(),
-                                   description='Text shown below the chatrooms on an event page')
+    admins = PrincipalField('Administrators', description='Users who can manage chatrooms for all events')
+    server = TextField('XMPP server', [DataRequired()], description='The hostname of the XMPP server')
+    muc_server = TextField('XMPP MUC server', [DataRequired()], description="The hostname of the XMPP MUC server")
+    bot_jid = TextField('Bot JID', [DataRequired()],
+                        description="Jabber ID of the XMPP bot. Can be just a username (in that case the default "
+                                    "server is assumed) or a username@server.")
+    bot_password = UnsafePasswordField('Bot Password', [DataRequired()], description="Password for the bot")
+    notify_admins = BooleanField('Notify admins', description="Should chat administrators receive email notifications?")
+    notify_emails = EmailListField('Notification emails',
+                                   description="Additional email addresses to sent notifications to (one per line)")
+    # TODO: log retrieval URL
     chat_links = MultipleItemsField('Chatroom links', fields=(('title', 'Title'), ('link', 'Link')),
-                                    description='Links to join the chatroom. You can use the placeholders {room} and '
-                                                '{server}.')
+                                    description="Links to join the chatroom. You can use the placeholders {room} for "
+                                                "the room name and {server} for the MUC server.")
+    how_to_connect = TextAreaField('How to connect', widget=CKEditorWidget(),
+                                   description="Text shown below the chatrooms on an event page")
 
     def validate_chat_links(self, field):
         for item in field.data:
@@ -56,6 +66,13 @@ class ChatPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
+    settings_form_field_opts = {
+        'server': {'placeholder': 'jabber.server.tld'},
+        'muc_server': {'placeholder': 'conference.jabber.server.tld'},
+        'notify_emails': {'rows': 3, 'cols': 40, 'style': 'width: auto; height: auto;'},
+        'bot_jid': {'autocomplete': 'off'},
+        'bot_password': {'autocomplete': 'off'}
+    }
 
     @property
     def default_settings(self):

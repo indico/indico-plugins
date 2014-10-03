@@ -20,6 +20,7 @@ import re
 
 from indico.core.db import db
 from indico.util.console import cformat
+from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator
 
 from indico_chat.models.chatrooms import Chatroom, ChatroomEventAssociation
@@ -49,11 +50,23 @@ class ChatImporter(Importer):
         type_opts = self.zodb_root['plugins']['InstantMessaging']._PluginBase__options
         opts = self.zodb_root['plugins']['InstantMessaging']._PluginType__plugins['XMPP']._PluginBase__options
         host = convert_to_unicode(opts['chatServerHost'].getValue())
+        ChatPlugin.settings.set('admins', convert_principal_list(opts['admins']))
         ChatPlugin.settings.set('server', host)
         ChatPlugin.settings.set('muc_server', 'conference.{}'.format(host))
-        ChatPlugin.settings.set('how_to_connect', opts['ckEditor'].getValue().strip())
-        ChatPlugin.settings.set('admins', convert_principal_list(opts['admins']))
-        # TODO: migrate other settings
+        settings_map = {
+            'sendMailNotifications': 'notify_admins',
+            'additionalEmails': 'notify_emails',
+            'indicoUsername': 'bot_jid',
+            'indicoPassword': 'bot_password',
+            'ckEditor': 'how_to_connect'
+        }
+        for old, new in settings_map.iteritems():
+            value = opts[old].getValue()
+            if isinstance(value, basestring):
+                value = convert_to_unicode(value).strip()
+            elif new == 'notify_emails':
+                value = [email for email in value if is_valid_mail(email, multi=False)]
+            ChatPlugin.settings.set(new, value)
         chat_links = []
         for item in type_opts['customLinks'].getValue():
             link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
