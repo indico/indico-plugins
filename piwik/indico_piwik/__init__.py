@@ -1,10 +1,16 @@
+from urlparse import urlparse
+
+from flask import request
+from flask_pluginengine import render_plugin_template
+
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
+from MaKaC.conference import ConferenceHolder
 from MaKaC.i18n import _
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
-from controllers import RHStatistics
-from forms import SettingsForm
+from .controllers import RHStatistics
+from .forms import SettingsForm
 
 
 class PiwikPlugin(IndicoPlugin):
@@ -15,14 +21,28 @@ class PiwikPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
+    query_script = 'piwik.php'
 
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
+        self.template_hook('footer-extra', self.add_event_tracking)
+
+    def add_event_tracking(self):
+        params = {'tracking_active': True,
+                  'url': self._get_query_url(),
+                  'site_id': PiwikPlugin.settings.get('site_id')}
+        if request.blueprint == 'event':
+            params['event_id'] = request.view_args['confId']
+            contrib_id = request.view_args.get('contribId')
+            if contrib_id:
+                contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
+                params['contrib_id'] = contribution.getUniqueId()
+        return render_plugin_template('event_statistics_hook.html', **params)
 
     def add_sidemenu_item(self, event):
         menu_item = SideMenuItem(_("Piwik Statistics"), url_for_plugin('piwik.view', event))
-        return ('statistics', menu_item)
+        return 'statistics', menu_item
 
     def get_blueprints(self):
         return blueprint
@@ -32,6 +52,37 @@ class PiwikPlugin(IndicoPlugin):
         self.register_css_bundle('statistics_css', 'css/statistics.css')
         self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
+
+    def _get_api_path(self, use_primary_server=True):
+        if PiwikPlugin.settings.get('use_only_server_url') or use_primary_server:
+            path = PiwikPlugin.settings.get('server_url')
+        else:
+            path = PiwikPlugin.settings.get('server_api_url')
+        if path is None:
+            return
+        if not path.endswith('/'):
+            path += '/'
+        url = urlparse(path)
+        return url.netloc + url.path
+
+    def _get_query_url(self, http=False, https=False, with_script=False):
+        """
+        Returns the API path, which is considered to be the locatable
+        address of the server hosting the tracking software. May
+        designate HTTP or HTTPS prefix, or neither.
+        If both defined, HTTPS takes priority.
+        """
+        path = self._get_api_path()
+
+        if with_script:
+            path += PiwikPlugin.query_script + "?"
+
+        if https:
+            return 'https://' + path
+        elif http:
+            return 'http://' + path
+        else:
+            return path
 
 
 blueprint = IndicoPluginBlueprint('piwik', __name__)
