@@ -24,6 +24,19 @@ class PiwikPlugin(IndicoPlugin):
     settings_form = SettingsForm
     query_script = 'piwik.php'
 
+    default_settings = {
+        'enabled': True,
+        'cache_enabled': True,
+        'cache_ttl': 3600,
+        'js_hook_enabled': True,
+        'download_tracking_enabled': True,
+        'server_url': '//127.0.0.1/piwik/',
+        'server_api_url': '//127.0.0.1/piwik/',
+        'use_only_server_url': True,
+        'site_id_general': 1,
+        'site_id_events': 2
+    }
+
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
