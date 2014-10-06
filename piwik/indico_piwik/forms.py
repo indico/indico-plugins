@@ -6,11 +6,10 @@ from MaKaC.i18n import _
 
 class SettingsForm(IndicoForm):
     enabled = BooleanField(_("Enable general statistics tracking"))
-    enabled_for_events = BooleanField(_("Enable statistics tracking for events"))
+    enabled_for_events = BooleanField(_("Enable statistics tracking for events and contributions"))
+    enabled_for_downloads = BooleanField(_("Enable material download tracking"))
     cache_enabled = BooleanField(_("Enable report caching"))
     cache_ttl = IntegerField(_("Report caching TTL (seconds)"))
-    js_hook_enabled = BooleanField(_("Enable conference and contribution view tracking"))
-    download_tracking_enabled = BooleanField(_("Enable material download tracking"))
     server_url = StringField(_("Piwik general server URL (piwik.php)"))
     server_api_url = StringField(_("Piwik API server URL (index.php)"))
     use_only_server_url = BooleanField(_("Use only the general URL for all requests"))

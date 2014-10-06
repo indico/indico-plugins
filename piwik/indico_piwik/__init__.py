@@ -27,10 +27,9 @@ class PiwikPlugin(IndicoPlugin):
     default_settings = {
         'enabled': True,
         'enabled_for_events': True,
+        'enabled_for_downloads': True,
         'cache_enabled': True,
         'cache_ttl': 3600,
-        'js_hook_enabled': True,
-        'download_tracking_enabled': True,
         'server_url': '//127.0.0.1/piwik/',
         'server_api_url': '//127.0.0.1/piwik/',
         'use_only_server_url': True,
