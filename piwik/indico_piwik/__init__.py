@@ -4,6 +4,7 @@ from flask import request
 from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from MaKaC.conference import ConferenceHolder
 from MaKaC.i18n import _
@@ -57,6 +58,9 @@ class PiwikPlugin(IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
+
+    def get_logger(self):
+        return Logger.get('plugin.piwik')
 
     def register_assets(self):
         self.register_js_bundle('statistics_js', 'js/statistics.js')
