@@ -65,7 +65,7 @@ class PiwikPlugin(IndicoPlugin):
             if contrib_id:
                 contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
                 params['contrib_id'] = contribution.getUniqueId()
-        return render_plugin_template('event_statistics_hook.html', **params)
+        return render_plugin_template('events_tracking.html', **params)
 
     def add_sidemenu_item(self, event):
         menu_item = SideMenuItem(_("Piwik Statistics"), url_for_plugin('piwik.view', event))
