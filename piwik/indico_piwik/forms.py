@@ -5,7 +5,8 @@ from MaKaC.i18n import _
 
 
 class SettingsForm(IndicoForm):
-    enabled = BooleanField(_("Enable statistics collection"))
+    enabled = BooleanField(_("Enable general statistics tracking"))
+    enabled_for_events = BooleanField(_("Enable statistics tracking for events"))
     cache_enabled = BooleanField(_("Enable report caching"))
     cache_ttl = IntegerField(_("Report caching TTL (seconds)"))
     js_hook_enabled = BooleanField(_("Enable conference and contribution view tracking"))

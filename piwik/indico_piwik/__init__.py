@@ -26,6 +26,7 @@ class PiwikPlugin(IndicoPlugin):
 
     default_settings = {
         'enabled': True,
+        'enabled_for_events': True,
         'cache_enabled': True,
         'cache_ttl': 3600,
         'js_hook_enabled': True,
@@ -45,18 +46,19 @@ class PiwikPlugin(IndicoPlugin):
 
     def inject_page_header(self, template, **kwargs):
         server_url = self.settings.get('server_url')
-
-        if not self.settings.get('enabled') or not server_url:
-            return ""
-        else:
-            return render_plugin_template('site_tracking.html',
-                                          site_id=self.settings.get('site_id_general'),
-                                          server_url=server_url)
+        site_id_general = self.settings.get('site_id_general')
+        if not self.settings.get('enabled') or not server_url or not site_id_general:
+            return ''
+        return render_plugin_template('site_tracking.html',
+                                      site_id=site_id_general,
+                                      server_url=server_url)
 
     def inject_page_footer(self):
-        params = {'tracking_active': True,
-                  'url': self._get_query_url(),
-                  'site_id': PiwikPlugin.settings.get('site_id_events')}
+        site_id_events = PiwikPlugin.settings.get('site_id_events')
+        if not self.settings.get('enabled_for_events') or not site_id_events:
+            return ''
+        params = {'url': self._get_query_url(),
+                  'site_id': site_id_events}
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contribId')
