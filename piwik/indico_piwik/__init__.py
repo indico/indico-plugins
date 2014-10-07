@@ -6,12 +6,13 @@ from flask_pluginengine import render_plugin_template
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
-from MaKaC.conference import ConferenceHolder
+from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.i18n import _
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from .controllers import RHStatistics
 from .forms import SettingsForm
+from .queries import PiwikQueryTrackDownload
 
 
 class PiwikPlugin(IndicoPlugin):
@@ -40,6 +41,7 @@ class PiwikPlugin(IndicoPlugin):
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
+        self.connect(signals.material_downloaded, self.track_download)
         self.template_hook('page-header', self.inject_page_header)
         self.template_hook('page-footer', self.inject_page_footer)
 
@@ -82,36 +84,12 @@ class PiwikPlugin(IndicoPlugin):
         self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
-    def _get_api_path(self, use_primary_server=True):
-        if PiwikPlugin.settings.get('use_only_server_url') or use_primary_server:
-            path = PiwikPlugin.settings.get('server_url')
-        else:
-            path = PiwikPlugin.settings.get('server_api_url')
-        if path is None:
-            return
-        if not path.endswith('/'):
-            path += '/'
-        url = urlparse(path)
-        return url.netloc + url.path
-
-    def _get_query_url(self, http=False, https=False, with_script=False):
-        """
-        Returns the API path, which is considered to be the locatable
-        address of the server hosting the tracking software. May
-        designate HTTP or HTTPS prefix, or neither.
-        If both defined, HTTPS takes priority.
-        """
-        path = self._get_api_path()
-
-        if with_script:
-            path += PiwikPlugin.query_script + "?"
-
-        if https:
-            return 'https://' + path
-        elif http:
-            return 'http://' + path
-        else:
-            return path
+    def track_download(self, resource):
+        tracker = PiwikQueryTrackDownload()
+        resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
+        resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
+        log_title = 'Download - {}'.format(resource_title)
+        tracker.trackDownload(resource_url, log_title)
 
 
 blueprint = IndicoPluginBlueprint('piwik', __name__)
