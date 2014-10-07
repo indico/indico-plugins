@@ -46,6 +46,7 @@ def create_room(room):
 def update_room(room):
     """Updates a MUC room on the XMPP server."""
     Logger.get('plugin.chat').info('Updating room {}'.format(room.jid))
+    # XXX: This could be improved to get the current config first instead of overwriting everything
     return _execute_xmpp(lambda x: _save_room(x, room))
 
 
@@ -58,6 +59,30 @@ def delete_room(jid, reason=''):
 
     Logger.get('plugin.chat').info('Deleting room {}'.format(jid))
     return _execute_xmpp(_delete_room)
+
+
+def get_room_config(jid):
+    """Retrieves basic data of a MUC room from the XMPP server.
+
+    :return: dict containing name, description and password of the room
+    """
+
+    mapping = {
+        'name': 'muc#roomconfig_roomname',
+        'description': 'muc#roomconfig_roomdesc',
+        'password': 'muc#roomconfig_roomsecret'
+    }
+
+    def _get_room_config(xmpp):
+        muc = xmpp.plugin['xep_0045']
+        try:
+            form = muc.getRoomConfig(jid)
+        except ValueError:  # probably the room doesn't exist
+            return None
+        fields = form.values['fields']
+        return {key: fields[muc_key].values['value'] for key, muc_key in mapping.iteritems()}
+
+    return _execute_xmpp(_get_room_config)
 
 
 def room_exists(jid):
