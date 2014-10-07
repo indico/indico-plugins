@@ -25,7 +25,7 @@
 
         $('.chat-toggle-details').on('click', function(e) {
             e.preventDefault();
-            $(this).siblings('.js-chat-details').slideToggle();
+            $(this).siblings('.chat-details').slideToggle();
         });
 
         $('.js-chat-join').on('click', function(e) {
@@ -50,5 +50,26 @@
             var pos = $this.offset();
             menu.open(pos.left - 3, pos.top + $this.height());
         });
-    }
+    };
+
+    global.eventManageChat = function eventManageChat() {
+        $('.js-chat-remove-room').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var msg = $T('Do you really want to delete this chatroom?');
+            if ($this.data('numEvents') == 1) {
+                msg += '<br>' + $T('Since it is only used in this event, it will be deleted from the Jabber server, too!');
+            }
+            new ConfirmPopup($T('Delete this chatroom?'), msg, function(confirmed) {
+                if (!confirmed) {
+                    return;
+                }
+
+                $('<form>', {
+                    action: $this.data('href'),
+                    method: 'post'
+                }).appendTo('body').submit();
+            }).open();
+        });
+    };
 })(window);

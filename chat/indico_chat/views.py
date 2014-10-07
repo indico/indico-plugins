@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
 class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
@@ -32,3 +32,8 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('chat-event-page'))
+
+
+class WPChatEventMgmt(WPJinjaMixinPlugin, WPConferenceModifBase):
+    def _setActiveSideMenuItem(self):
+        self._pluginMenuItems['chat-management'].setActive(True)

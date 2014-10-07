@@ -7,13 +7,13 @@
                 {% set server = chatroom.server %}
                 <div class="chatroom">
                     <span>{{ chatroom.name }}</span>
-                    <span style="margin-left: 20px;"></span>
+                    -
                     <a class="chat-toggle-details" href="#">{% trans %}More Info{% endtrans %}</a>
                     {% if chat_links %}
-                        <span style="margin-left: 8px; margin-right: 8px;">|</span>
+                        -
                         <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.name }}">{% trans %}Join now!{% endtrans %}</a></strong>
                     {% endif %}
-                    <dl class="js-chat-details chat-details" style="display: none;">
+                    <dl class="chat-details" style="display: none;">
                         <dt>{% trans %}Name{% endtrans %}:</dt>
                         <dd>{{ chatroom.name }}</dd>
                         <dt>{% trans %}Server{% endtrans %}:</dt>

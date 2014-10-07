@@ -13,7 +13,7 @@
     dl.chat-details {
         clear: left;
         font-size: 90%;
-        margin: 5px 0 0 0;
+        margin: 5px 0 0 10px;
 
         dt {
             float: left;
@@ -23,6 +23,21 @@
         dd {
             margin-left: 100px;
             display: block;
+        }
+    }
+
+    // Management
+    &.chat-mgmt {
+        .chat-custom-server {
+            font-weight: bold;
+        }
+        dl.chat-details {
+            dd {
+                margin-left: 150px;
+            }
+        }
+        .chatroom + .chatroom {
+            margin-top: 1em;
         }
     }
 }

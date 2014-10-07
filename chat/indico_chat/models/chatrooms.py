@@ -39,6 +39,7 @@ class Chatroom(db.Model):
         db.Integer,
         primary_key=True
     )
+    # TODO: jid column
     #: Name of the chatroom
     name = db.Column(
         db.String,
@@ -78,6 +79,10 @@ class Chatroom(db.Model):
     modified_dt = db.Column(
         UTCDateTime
     )
+
+    @property
+    def locator(self):
+        return {'chatroom_id': self.id}
 
     @property
     def created_by_user(self):
@@ -142,6 +147,10 @@ class ChatroomEventAssociation(db.Model):
         lazy=False,
         backref='events'
     )
+
+    @property
+    def locator(self):
+        return dict(self.event.getLocator(), **self.chatroom.locator)
 
     @property
     def event(self):

@@ -23,16 +23,17 @@ from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, UnsafePasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
+from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
-from indico_chat.views import WPChatEventPage
+from indico_chat.views import WPChatEventPage, WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
@@ -83,8 +84,9 @@ class ChatPlugin(IndicoPlugin):
     def init(self):
         super(ChatPlugin, self).init()
         self.connect(signals.event_sidemenu, self.extend_event_menu)
+        self.connect(signals.event_management_sidemenu, self.extend_event_management_menu)
         self.template_hook('event-header', self.inject_event_header)
-        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage):
+        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage, WPChatEventMgmt):
             self.inject_css('chat_css', wp)
             self.inject_js('chat_js', wp)
 
@@ -109,5 +111,8 @@ class ChatPlugin(IndicoPlugin):
                                                   ~ChatroomEventAssociation.hidden).count())
 
     def extend_event_menu(self, sender, **kwargs):
-        return EventMenuEntry('chat.event-page', 'Chat Rooms', name='chat-event-page', plugin=True,
+        return EventMenuEntry('chat.event_page', 'Chat Rooms', name='chat-event-page', plugin=True,
                               visible=self._has_visible_chatrooms)
+
+    def extend_event_management_menu(self, event, **kwargs):
+        return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
