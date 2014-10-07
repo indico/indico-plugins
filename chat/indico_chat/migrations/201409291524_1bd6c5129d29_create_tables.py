@@ -21,6 +21,7 @@ def upgrade():
     op.execute(CreateSchema('plugin_chat'))
     op.create_table('chatrooms',
                     sa.Column('id', sa.Integer(), nullable=False),
+                    sa.Column('jid_node', sa.String(), nullable=False),
                     sa.Column('name', sa.String(), nullable=False),
                     sa.Column('description', sa.Text(), nullable=False),
                     sa.Column('password', sa.String(), nullable=False),
@@ -29,8 +30,7 @@ def upgrade():
                     sa.Column('created_dt', UTCDateTime(), nullable=False),
                     sa.Column('modified_dt', UTCDateTime(), nullable=True),
                     sa.PrimaryKeyConstraint('id'),
-                    schema='plugin_chat')
-    op.create_index('ix_chatrooms_name_lower', 'chatrooms', [sa.text('lower(plugin_chat.chatrooms.name)')], unique=True,
+                    sa.UniqueConstraint('jid_node', 'custom_server'),
                     schema='plugin_chat')
     op.create_table('chatroom_events',
                     sa.Column('event_id', sa.Integer(), nullable=False, primary_key=True, index=True,

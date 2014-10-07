@@ -11,7 +11,7 @@
                     <a class="chat-toggle-details" href="#">{% trans %}More Info{% endtrans %}</a>
                     {% if chat_links %}
                         -
-                        <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.name }}">{% trans %}Join now!{% endtrans %}</a></strong>
+                        <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a></strong>
                     {% endif %}
                     <dl class="chat-details" style="display: none;">
                         <dt>{% trans %}Name{% endtrans %}:</dt>

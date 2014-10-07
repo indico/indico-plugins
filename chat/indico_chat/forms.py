@@ -18,10 +18,13 @@ from __future__ import unicode_literals
 
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.web.forms.base import IndicoForm
 from indico.util.string import strip_whitespace
+
+from indico_chat.models.chatrooms import Chatroom
+from indico_chat.xmpp import generate_jid
 
 
 class EditChatroomForm(IndicoForm):
@@ -38,5 +41,14 @@ class EditChatroomForm(IndicoForm):
 
 
 class AddChatroomForm(EditChatroomForm):
-    custom_server = TextField('Server', filters=[strip_whitespace],
+    custom_server = TextField('Server', filters=[strip_whitespace, lambda x: x.lower() if x else x],
                               description='External Jabber server. Should be left empty in most cases.')
+
+    def validate_name(self, field):
+        jid = generate_jid(field.data)
+        if not jid:
+            # This error is not very helpful to a user, but it is extremely unlikely - only if he uses a name
+            # which does not contain a single char usable in a JID
+            raise ValidationError('Could not convert name to a jabber ID')
+        if Chatroom.find_first(jid_node=jid, custom_server=self.custom_server.data):
+            raise ValidationError('A room with this name already exists')

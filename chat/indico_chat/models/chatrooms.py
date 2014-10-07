@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
@@ -24,6 +23,7 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
+from indico_chat.xmpp import generate_jid
 
 
 class Chatroom(db.Model):
@@ -31,7 +31,7 @@ class Chatroom(db.Model):
 
     @declared_attr
     def __table_args__(cls):
-        return (db.Index('ix_chatrooms_name_lower', func.lower(cls.name), unique=True),
+        return (db.UniqueConstraint(cls.jid_node, cls.custom_server),
                 {'schema': 'plugin_chat'})
 
     #: Chatroom ID
@@ -39,7 +39,11 @@ class Chatroom(db.Model):
         db.Integer,
         primary_key=True
     )
-    # TODO: jid column
+    #: Node of the chatroom's JID (the part before `@domain`)
+    jid_node = db.Column(
+        db.String,
+        nullable=False
+    )
     #: Name of the chatroom
     name = db.Column(
         db.String,
@@ -108,7 +112,12 @@ class Chatroom(db.Model):
         server = self.server
         if self.custom_server:
             server = '!' + server
-        return '<Chatroom({}, {}, {})>'.format(self.id, self.name, server)
+        return '<Chatroom({}, {}, {}, {})>'.format(self.id, self.name, self.jid_node, server)
+
+    def generate_jid(self):
+        """Generates the JID based on the room name"""
+        assert self.jid_node is None
+        self.jid_node = generate_jid(self.name)
 
 
 class ChatroomEventAssociation(db.Model):

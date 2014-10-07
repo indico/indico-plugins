@@ -56,7 +56,7 @@
         $('.js-chat-remove-room').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            var msg = $T('Do you really want to delete this chatroom?');
+            var msg = $T('Do you really want to remove this chatroom from the event?');
             if ($this.data('numEvents') == 1) {
                 msg += '<br>' + $T('Since it is only used in this event, it will be deleted from the Jabber server, too!');
             }

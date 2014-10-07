@@ -16,10 +16,16 @@
 
 from __future__ import unicode_literals
 
+import re
+
+from indico.util.string import unicode_to_ascii
+
+
+INVALID_JID_CHARS = re.compile(r'[^-!#()*+,.=^_a-z0-9]')
+WHITESPACE = re.compile(r'\s+')
+
 
 # TODO: implement the XMPP gateway
-
-
 def create_room(room):
     """Creates a `Chatroom` on the XMPP server."""
     print 'create_room / not implemented yet'
@@ -33,3 +39,11 @@ def update_room(room):
 def delete_room(room):
     """Deletes a `Chatroom` from the XMPP server."""
     print 'delete_room / not implemented yet'
+
+
+def generate_jid(name):
+    """Generates a valid JID node identifier from a name"""
+    jid = unicode_to_ascii(name).lower()
+    jid = WHITESPACE.sub('-', jid)
+    jid = INVALID_JID_CHARS.sub('', jid)
+    return jid.strip()[:256]

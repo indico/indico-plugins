@@ -88,7 +88,8 @@ class ChatImporter(Importer):
             if room:
                 print cformat('- %{cyan}{}   %{yellow!}DUPLICATE%{reset}').format(room.name)
             else:
-                room = Chatroom(name=convert_to_unicode(old_room._name),
+                room = Chatroom(jid_node=convert_to_unicode(old_room._name.lower()),
+                                name=convert_to_unicode(old_room._name),
                                 description=convert_to_unicode(old_room._description),
                                 password=convert_to_unicode(old_room._password),
                                 custom_server=custom_server,
