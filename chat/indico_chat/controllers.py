@@ -39,11 +39,9 @@ class RHChatEventPage(RHConferenceBaseDisplay):
 
     def _process(self):
         try:
-            event_id = int(self._conf.id)
+            chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
         except ValueError:
             raise IndicoError('This page is not available for legacy events.')
-        chatrooms = ChatroomEventAssociation.find_all(ChatroomEventAssociation.event_id == event_id,
-                                                      ~ChatroomEventAssociation.hidden)
         cols = set()
         if any(c.chatroom.description for c in chatrooms):
             cols.add('description')
@@ -71,8 +69,7 @@ class RHChatManageEvent(RHChatManageEventBase):
     """Lists the chatrooms of an event"""
 
     def _process(self):
-        chatrooms = ChatroomEventAssociation.find_all(ChatroomEventAssociation.event_id == self.event_id,
-                                                      _eager='chatroom.events')
+        chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True, _eager='chatroom.events')
         chatroom_filter = (~Chatroom.id.in_(x.chatroom_id for x in chatrooms)) if chatrooms else True
         available_chatrooms = Chatroom.find_all(Chatroom.created_by_id == int(session.user.id), chatroom_filter)
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,

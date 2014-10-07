@@ -172,3 +172,16 @@ class ChatroomEventAssociation(db.Model):
     @return_ascii
     def __repr__(self):
         return '<ChatroomEventAssociation({}, {})>'.format(self.event_id, self.chatroom)
+
+    @classmethod
+    def find_for_event(cls, event, include_hidden=False, **kwargs):
+        """Returns a Query that retrieves the chatrooms for an event
+
+        :param event: an indico event (with a numeric ID)
+        :param include_hidden: if hidden chatrooms should be included, too
+        :param kwargs: extra kwargs to pass to ``find()``
+        """
+        query = cls.find(event_id=int(event.id), **kwargs)
+        if not include_hidden:
+            query = query.filter(~cls.hidden)
+        return query

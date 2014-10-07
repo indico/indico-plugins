@@ -98,8 +98,7 @@ class ChatPlugin(IndicoPlugin):
         self.register_js_bundle('chat_js', 'js/chat.js')
 
     def inject_event_header(self, event, **kwargs):
-        chatrooms = ChatroomEventAssociation.find_all(ChatroomEventAssociation.event_id == event.id,
-                                                      ~ChatroomEventAssociation.hidden)
+        chatrooms = ChatroomEventAssociation.find_for_event(event).all()
         if not chatrooms:
             return ''
         how_to_connect = self.settings.get('how_to_connect')
@@ -107,8 +106,7 @@ class ChatPlugin(IndicoPlugin):
                                       how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))
 
     def _has_visible_chatrooms(self, event):
-        return bool(ChatroomEventAssociation.find(ChatroomEventAssociation.event_id == event.id,
-                                                  ~ChatroomEventAssociation.hidden).count())
+        return bool(ChatroomEventAssociation.find_for_event(event).count())
 
     def extend_event_menu(self, sender, **kwargs):
         return EventMenuEntry('chat.event_page', 'Chat Rooms', name='chat-event-page', plugin=True,
