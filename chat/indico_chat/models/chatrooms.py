@@ -107,6 +107,10 @@ class Chatroom(db.Model):
 
         return self.custom_server or ChatPlugin.settings.get('muc_server')
 
+    @property
+    def jid(self):
+        return '{}@{}'.format(self.jid_node, self.server)
+
     @return_ascii
     def __repr__(self):
         server = self.server

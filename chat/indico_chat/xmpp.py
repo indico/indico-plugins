@@ -18,27 +18,63 @@ from __future__ import unicode_literals
 
 import re
 
+from flask import current_app
+from sleekxmpp import ClientXMPP
+from sleekxmpp.exceptions import IqError
+
+from indico.core.logger import Logger
 from indico.util.string import unicode_to_ascii
+from indico_chat.util import check_config
 
 
 INVALID_JID_CHARS = re.compile(r'[^-!#()*+,.=^_a-z0-9]')
 WHITESPACE = re.compile(r'\s+')
 
 
-# TODO: implement the XMPP gateway
+def _save_room(xmpp, room):
+    muc = xmpp.plugin['xep_0045']
+    muc.joinMUC(room.jid, xmpp.requested_jid.user)
+    muc.configureRoom(room.jid, _make_form(xmpp, room))
+
+
 def create_room(room):
-    """Creates a `Chatroom` on the XMPP server."""
-    print 'create_room / not implemented yet'
+    """Creates a MUC room on the XMPP server."""
+    Logger.get('plugin.chat').info('Creating room {}'.format(room.jid))
+    return _execute_xmpp(lambda x: _save_room(x, room))
 
 
 def update_room(room):
-    """Updates a `Chatroom` on the XMPP server."""
-    print 'update_room / not implemented yet'
+    """Updates a MUC room on the XMPP server."""
+    Logger.get('plugin.chat').info('Updating room {}'.format(room.jid))
+    return _execute_xmpp(lambda x: _save_room(x, room))
 
 
-def delete_room(room):
-    """Deletes a `Chatroom` from the XMPP server."""
-    print 'delete_room / not implemented yet'
+def delete_room(jid, reason=''):
+    """Deletes a MUC room from the XMPP server."""
+
+    def _delete_room(xmpp):
+        muc = xmpp.plugin['xep_0045']
+        muc.destroy(jid, reason=reason)
+
+    Logger.get('plugin.chat').info('Deleting room {}'.format(jid))
+    return _execute_xmpp(_delete_room)
+
+
+def room_exists(jid):
+    """Checks if a MUC room exists on the server."""
+
+    def _room_exists(xmpp):
+        disco = xmpp.plugin['xep_0030']
+        try:
+            disco.get_info(jid)
+        except IqError as e:
+            if e.condition == 'item-not-found':
+                return False
+            raise
+        else:
+            return True
+
+    return _execute_xmpp(_room_exists)
 
 
 def generate_jid(name):
@@ -47,3 +83,84 @@ def generate_jid(name):
     jid = WHITESPACE.sub('-', jid)
     jid = INVALID_JID_CHARS.sub('', jid)
     return jid.strip()[:256]
+
+
+def _make_form(xmpp, room):
+    """Creates an XMPP room config form"""
+    form = xmpp.plugin['xep_0004'].make_form(ftype='submit')
+    form.add_field('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
+    form.add_field('muc#roomconfig_publicroom', value='1')
+    form.add_field('muc#roomconfig_whois', value='moderators')
+    form.add_field('muc#roomconfig_membersonly', value='0')
+    form.add_field('muc#roomconfig_moderatedroom', value='1')
+    form.add_field('muc#roomconfig_changesubject', value='1')
+    form.add_field('muc#roomconfig_allowinvites', value='1')
+    form.add_field('muc#roomconfig_allowvisitorstatus', value='1')
+    form.add_field('muc#roomconfig_allowvisitornickchange', value='1')
+    form.add_field('muc#roomconfig_enablelogging', value='1')
+    form.add_field('public_list', value='1')
+    form.add_field('members_by_default', value='1')
+    form.add_field('allow_private_messages', value='1')
+    form.add_field('allow_query_users', value='1')
+    form.add_field('muc#roomconfig_persistentroom', value='1')
+    form.add_field('muc#roomconfig_roomname', value=room.name)
+    form.add_field('muc#roomconfig_passwordprotectedroom', value='1' if room.password else '0')
+    if room.description:
+        form.add_field('muc#roomconfig_roomdesc', value=room.description)
+    if room.password:
+        form.add_field('muc#roomconfig_roomsecret', value=room.password)
+    return form
+
+
+def _execute_xmpp(connected_callback):
+    """Connects to the XMPP server and executes custom code
+
+    :param connected_callback: function to execute after connecting
+    :return: return value of the callback
+    """
+    from indico_chat.plugin import ChatPlugin
+
+    check_config()
+    jid = ChatPlugin.settings.get('bot_jid')
+    password = ChatPlugin.settings.get('bot_password')
+    if '@' not in jid:
+        jid = '{}@{}'.format(jid, ChatPlugin.settings.get('server'))
+
+    result = [None, None]  # result, exception
+    app = current_app._get_current_object()  # callback runs in another thread
+
+    def _session_start(event):
+        try:
+            with app.app_context():
+                result[0] = connected_callback(xmpp)
+        except Exception as e:
+            result[1] = e
+            if isinstance(e, IqError):
+                Logger.get('plugin.chat').exception('XMPP callback failed: {}'.format(e.condition))
+            else:
+                Logger.get('plugin.chat').exception('XMPP callback failed')
+        finally:
+            xmpp.disconnect(wait=0)
+
+    xmpp = ClientXMPP(jid, password)
+    xmpp.register_plugin('xep_0045')
+    xmpp.register_plugin('xep_0004')
+    xmpp.register_plugin('xep_0030')
+    xmpp.add_event_handler('session_start', _session_start)
+
+    try:
+        xmpp.connect()
+    except Exception:
+        Logger.get('plugin.chat').exception('XMPP connection failed')
+        xmpp.disconnect()
+        raise
+
+    try:
+        xmpp.process(threaded=False)
+    finally:
+        xmpp.disconnect(wait=0)
+
+    if result[1] is not None:
+        raise result[1]
+
+    return result[0]

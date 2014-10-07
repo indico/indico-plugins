@@ -15,8 +15,23 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+from indico.core.errors import IndicoError
 
 from indico.util.user import retrieve_principals
+
+
+def check_config(quiet=False):
+    """Checks if all required config options are set
+
+    :param quiet: if True, return the result as a bool, otherwise
+                  raise `IndicoError` if any setting is missing
+    """
+    from indico_chat.plugin import ChatPlugin
+    settings = ChatPlugin.settings.get_all()
+    missing = not all(settings[x] for x in ('server', 'muc_server', 'bot_jid', 'bot_password'))
+    if missing and not quiet:
+        raise IndicoError('Chat plugin is not configured properly')
+    return not missing
 
 
 def get_chat_admins():
