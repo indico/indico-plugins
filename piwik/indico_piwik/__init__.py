@@ -1,5 +1,3 @@
-from urlparse import urlparse
-
 from flask import request
 from flask_pluginengine import render_plugin_template
 
@@ -12,6 +10,7 @@ from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from .controllers import RHStatistics
 from .forms import SettingsForm
+from .piwik import Piwik
 from .queries import PiwikQueryTrackDownload
 
 
@@ -23,7 +22,6 @@ class PiwikPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
-    query_script = 'piwik.php'
 
     default_settings = {
         'enabled': True,
@@ -58,7 +56,7 @@ class PiwikPlugin(IndicoPlugin):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
         if not self.settings.get('enabled_for_events') or not site_id_events:
             return ''
-        params = {'url': self._get_query_url(),
+        params = {'url': Piwik._get_query_url(),
                   'site_id': site_id_events}
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']
