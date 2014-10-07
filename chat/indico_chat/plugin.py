@@ -23,10 +23,13 @@ from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
+from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, UnsafePasswordField
 from indico.web.forms.widgets import CKEditorWidget
+from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
 from MaKaC.webinterface.wcomponents import SideMenuItem
@@ -85,6 +88,7 @@ class ChatPlugin(IndicoPlugin):
         super(ChatPlugin, self).init()
         self.connect(signals.event_sidemenu, self.extend_event_menu)
         self.connect(signals.event_management_sidemenu, self.extend_event_management_menu)
+        self.connect(signals.event_management_clone, self.extend_event_management_clone)
         self.template_hook('event-header', self.inject_event_header)
         for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage, WPChatEventMgmt):
             self.inject_css('chat_css', wp)
@@ -114,3 +118,23 @@ class ChatPlugin(IndicoPlugin):
 
     def extend_event_management_menu(self, event, **kwargs):
         return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
+
+    def extend_event_management_clone(self, event, **kwargs):
+        return ChatroomCloner(self, event)
+
+
+class ChatroomCloner(EventCloner):
+    def get_options(self):
+        enabled = bool(ChatroomEventAssociation.find_for_event(self.event, include_hidden=True).count())
+        return {'chatrooms': (_('Chatrooms'), enabled)}
+
+    def clone(self, new_event, options):
+        """Called when the event is being cloned"""
+        if 'chatrooms' not in options:
+            return
+        for old_event_chatroom in ChatroomEventAssociation.find_for_event(self.event, include_hidden=True):
+            event_chatroom = ChatroomEventAssociation(chatroom=old_event_chatroom.chatroom,
+                                                      event_id=int(new_event.id),
+                                                      hidden=old_event_chatroom.hidden,
+                                                      show_password=old_event_chatroom.show_password)
+            db.session.add(event_chatroom)
