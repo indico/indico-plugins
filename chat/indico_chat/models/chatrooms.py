@@ -114,11 +114,6 @@ class Chatroom(db.Model):
             server = '!' + server
         return '<Chatroom({}, {}, {}, {})>'.format(self.id, self.name, self.jid_node, server)
 
-    def __committed__(self, change):
-        super(Chatroom, self).__committed__(change)
-        if change == 'delete':
-            delete_room(self)
-
     def generate_jid(self):
         """Generates the JID based on the room name"""
         assert self.jid_node is None
@@ -201,5 +196,7 @@ class ChatroomEventAssociation(db.Model):
         db.session.flush()
         if not self.chatroom.events:
             db.session.delete(self.chatroom)
+            db.session.flush()
+            delete_room(self.chatroom.jid)
             return True
         return False
