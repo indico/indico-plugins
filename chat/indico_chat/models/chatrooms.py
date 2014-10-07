@@ -23,7 +23,7 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
-from indico_chat.xmpp import generate_jid
+from indico_chat.xmpp import generate_jid, delete_room
 
 
 class Chatroom(db.Model):
@@ -114,6 +114,11 @@ class Chatroom(db.Model):
             server = '!' + server
         return '<Chatroom({}, {}, {}, {})>'.format(self.id, self.name, self.jid_node, server)
 
+    def __committed__(self, change):
+        super(Chatroom, self).__committed__(change)
+        if change == 'delete':
+            delete_room(self)
+
     def generate_jid(self):
         """Generates the JID based on the room name"""
         assert self.jid_node is None
@@ -154,7 +159,7 @@ class ChatroomEventAssociation(db.Model):
     chatroom = db.relationship(
         'Chatroom',
         lazy=False,
-        backref='events'
+        backref=db.backref('events', cascade='all, delete-orphan')
     )
 
     @property
@@ -185,3 +190,16 @@ class ChatroomEventAssociation(db.Model):
         if not include_hidden:
             query = query.filter(~cls.hidden)
         return query
+
+    def delete(self):
+        """Deletes the event chatroom and if necessary the chatroom, too.
+
+        :return: True if the associated chatroom was also
+                 deleted, otherwise False
+        """
+        db.session.delete(self)
+        db.session.flush()
+        if not self.chatroom.events:
+            db.session.delete(self.chatroom)
+            return True
+        return False

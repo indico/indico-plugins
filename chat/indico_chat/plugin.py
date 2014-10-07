@@ -89,6 +89,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_sidemenu, self.extend_event_menu)
         self.connect(signals.event_management_sidemenu, self.extend_event_management_menu)
         self.connect(signals.event_management_clone, self.extend_event_management_clone)
+        self.connect(signals.event_deleted, self.event_deleted)
         self.template_hook('event-header', self.inject_event_header)
         for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage, WPChatEventMgmt):
             self.inject_css('chat_css', wp)
@@ -121,6 +122,10 @@ class ChatPlugin(IndicoPlugin):
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(self, event)
+
+    def event_deleted(self, event, **kwargs):
+        for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
+            event_chatroom.delete()
 
 
 class ChatroomCloner(EventCloner):

@@ -31,7 +31,7 @@ from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
 from indico_chat.util import is_chat_admin
 from indico_chat.views import WPChatEventPage, WPChatEventMgmt
-from indico_chat.xmpp import create_room, update_room, delete_room
+from indico_chat.xmpp import create_room, update_room
 
 
 class RHChatEventPage(RHConferenceBaseDisplay):
@@ -69,7 +69,8 @@ class RHChatManageEvent(RHChatManageEventBase):
     """Lists the chatrooms of an event"""
 
     def _process(self):
-        chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True, _eager='chatroom.events')
+        chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True,
+                                                            _eager='chatroom.events').all()
         chatroom_filter = (~Chatroom.id.in_(x.chatroom_id for x in chatrooms)) if chatrooms else True
         available_chatrooms = Chatroom.find_all(Chatroom.created_by_id == int(session.user.id), chatroom_filter)
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
@@ -145,12 +146,9 @@ class RHChatManageEventRemove(RHChatManageEventBase):
         self.chatroom = self.event_chatroom.chatroom
 
     def _process(self):
-        db.session.delete(self.event_chatroom)
-        db.session.flush()
-        if self.chatroom.events:
-            flash('Chatroom removed from event', 'success')
-        else:
-            db.session.delete(self.chatroom)
-            delete_room(self.chatroom)
+        chatroom_deleted = self.event_chatroom.delete()
+        if chatroom_deleted:
             flash('Chatroom deleted', 'success')
+        else:
+            flash('Chatroom removed from event', 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
