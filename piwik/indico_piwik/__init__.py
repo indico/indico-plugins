@@ -22,6 +22,8 @@ class PiwikPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
+    report_script = 'index.php'
+    track_script = 'piwik.php'
 
     default_settings = {
         'enabled': True,
@@ -86,8 +88,8 @@ class PiwikPlugin(IndicoPlugin):
         tracker = PiwikQueryTrackDownload()
         resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
-        log_title = 'Download - {}'.format(resource_title)
-        tracker.trackDownload(resource_url, log_title)
+        resource_title = 'Download - {}'.format(resource_title)
+        tracker.call(resource_url, resource_title)
 
 
 blueprint = IndicoPluginBlueprint('piwik', __name__)
