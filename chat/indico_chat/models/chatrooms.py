@@ -23,7 +23,8 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
-from indico_chat.xmpp import generate_jid, delete_room
+
+from indico_chat.xmpp import delete_room
 
 
 class Chatroom(db.Model):
@@ -117,11 +118,6 @@ class Chatroom(db.Model):
         if self.custom_server:
             server = '!' + server
         return '<Chatroom({}, {}, {}, {})>'.format(self.id, self.name, self.jid_node, server)
-
-    def generate_jid(self):
-        """Generates the JID based on the room name"""
-        assert self.jid_node is None
-        self.jid_node = generate_jid(self.name)
 
 
 class ChatroomEventAssociation(db.Model):

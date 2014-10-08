@@ -23,7 +23,7 @@
         </div>
     {% endif %}
 
-    <form method="post" action="">
+    <form method="post" action="" id="chatroom-form">
         <table>
             {% for field in form.visible_fields if field.short_name not in form.event_specific_fields %}
                 <tr>
@@ -37,6 +37,11 @@
                 </tr>
             {% endfor %}
         </table>
-        <input class="i-button" type="submit" value="{% trans %}Save{% endtrans %}">
+        <input class="i-button" id="save-chatroom" type="submit" value="{% trans %}Save{% endtrans %}">
     </form>
+    <script>
+        $('#chatroom-form').on('submit', function() {
+            $('#save-chatroom').prop('disabled', true).blur();
+        });
+    </script>
 </div>

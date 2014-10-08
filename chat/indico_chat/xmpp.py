@@ -102,12 +102,22 @@ def room_exists(jid):
     return _execute_xmpp(_room_exists)
 
 
-def generate_jid(name):
-    """Generates a valid JID node identifier from a name"""
-    jid = unicode_to_ascii(name).lower()
+def sanitize_jid(s):
+    """Generates a valid JID node identifier from a string"""
+    jid = unicode_to_ascii(s).lower()
     jid = WHITESPACE.sub('-', jid)
     jid = INVALID_JID_CHARS.sub('', jid)
     return jid.strip()[:256]
+
+
+def generate_jid(name, append_date=None):
+    """Generates a v alid JID based on the room name.
+
+    :param append_date: appends the given date to the JID
+    """
+    if not append_date:
+        return sanitize_jid(name)
+    return '{}-{}'.format(sanitize_jid(name), append_date.strftime('%Y-%m-%d'))
 
 
 def _make_form(xmpp, room):

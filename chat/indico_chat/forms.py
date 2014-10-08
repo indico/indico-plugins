@@ -20,11 +20,11 @@ from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
 from indico.util.string import strip_whitespace
 
 from indico_chat.models.chatrooms import Chatroom
-from indico_chat.xmpp import generate_jid
+from indico_chat.xmpp import generate_jid, room_exists
 
 
 class EditChatroomForm(IndicoForm):
@@ -44,11 +44,24 @@ class AddChatroomForm(EditChatroomForm):
     custom_server = TextField('Server', filters=[strip_whitespace, lambda x: x.lower() if x else x],
                               description='External Jabber server. Should be left empty in most cases.')
 
+    def __init__(self, *args, **kwargs):
+        self._date = kwargs.pop('date')
+        super(AddChatroomForm, self).__init__(*args, **kwargs)
+
     def validate_name(self, field):
-        jid = generate_jid(field.data)
+        jid = generate_jid(field.data, self._date)
         if not jid:
             # This error is not very helpful to a user, but it is extremely unlikely - only if he uses a name
             # which does not contain a single char usable in a JID
             raise ValidationError('Could not convert name to a jabber ID')
         if Chatroom.find_first(jid_node=jid, custom_server=self.custom_server.data):
             raise ValidationError('A room with this name already exists')
+        tmp_room = Chatroom(jid_node=jid, custom_server=self.custom_server.data)
+        if room_exists(tmp_room.jid):
+            raise ValidationError('A room with this name/JID already exists on the Jabber server ({})'.format(
+                tmp_room.jid
+            ))
+
+    @generated_data
+    def jid_node(self):
+        return generate_jid(self.name.data, self._date)

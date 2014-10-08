@@ -135,13 +135,14 @@ class RHChatManageEventCreate(RHChatManageEventBase):
     """Creates a new chatroom for an event"""
 
     def _process(self):
-        form = AddChatroomForm()
+        form = AddChatroomForm(obj=FormDefaults(name=unicode(self.event.title, 'utf-8')),
+                               date=self.event.getAdjustedStartDate())
         if form.validate_on_submit():
             chatroom = Chatroom(created_by_user=session.user)
             event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=chatroom)
             form.populate_obj(event_chatroom, fields=form.event_specific_fields)
             form.populate_obj(chatroom, skip=form.event_specific_fields)
-            chatroom.generate_jid()
+            chatroom.jid_node = form.jid_node.data
             db.session.add_all((chatroom, event_chatroom))
             db.session.flush()
             create_room(chatroom)
