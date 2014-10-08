@@ -24,25 +24,24 @@ from indico_chat.controllers.event_mgmt import (RHChatManageEvent, RHChatManageE
                                                 RHChatManageEventAttach, RHChatManageEventLogs,
                                                 RHChatManageEventShowLogs, RHChatManageEventAttachLogs)
 
-# TODO: s/chat-new/chat/
 blueprint = IndicoPluginBlueprint('chat', 'indico_chat', url_prefix='/event/<confId>')
 
 # Event
-blueprint.add_url_rule('/chat-new', 'event_page', RHChatEventPage)
+blueprint.add_url_rule('/chat', 'event_page', RHChatEventPage)
 
 # Event management
-blueprint.add_url_rule('/manage/chat-new/', 'manage_rooms', RHChatManageEvent)
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/', 'manage_rooms_modify', RHChatManageEventModify,
+blueprint.add_url_rule('/manage/chat/', 'manage_rooms', RHChatManageEvent)
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/', 'manage_rooms_modify', RHChatManageEventModify,
                        methods=('GET', 'POST'))
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/logs/', 'manage_rooms_logs', RHChatManageEventLogs)
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/logs/show', 'manage_rooms_show_logs',
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/logs/', 'manage_rooms_logs', RHChatManageEventLogs)
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/logs/show', 'manage_rooms_show_logs',
                        RHChatManageEventShowLogs)
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/logs/attach', 'manage_rooms_attach_logs',
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/logs/attach', 'manage_rooms_attach_logs',
                        RHChatManageEventAttachLogs, methods=('POST',))
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/refresh', 'manage_rooms_refresh', RHChatManageEventRefresh,
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/refresh', 'manage_rooms_refresh', RHChatManageEventRefresh,
                        methods=('POST',))
-blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/remove', 'manage_rooms_remove', RHChatManageEventRemove,
+blueprint.add_url_rule('/manage/chat/<int:chatroom_id>/remove', 'manage_rooms_remove', RHChatManageEventRemove,
                        methods=('POST',))
-blueprint.add_url_rule('/manage/chat-new/create', 'manage_rooms_create', RHChatManageEventCreate,
+blueprint.add_url_rule('/manage/chat/create', 'manage_rooms_create', RHChatManageEventCreate,
                        methods=('GET', 'POST'))
-blueprint.add_url_rule('/manage/chat-new/attach', 'manage_rooms_attach', RHChatManageEventAttach, methods=('POST',))
+blueprint.add_url_rule('/manage/chat/attach', 'manage_rooms_attach', RHChatManageEventAttach, methods=('POST',))
