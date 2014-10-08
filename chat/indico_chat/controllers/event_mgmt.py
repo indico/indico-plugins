@@ -32,31 +32,13 @@ from indico.util.date_time import now_utc
 from indico.web.forms.base import FormDefaults
 from MaKaC.common.log import ModuleNames
 from MaKaC.conference import LocalFile
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
 from indico_chat.util import is_chat_admin
-from indico_chat.views import WPChatEventPage, WPChatEventMgmt
+from indico_chat.views import WPChatEventMgmt
 from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists, retrieve_logs
-
-
-class RHChatEventPage(RHConferenceBaseDisplay):
-    """Lists the public chatrooms in a conference"""
-
-    def _process(self):
-        try:
-            chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
-        except ValueError:
-            raise IndicoError('This page is not available for legacy events.')
-        cols = set()
-        if any(c.chatroom.description for c in chatrooms):
-            cols.add('description')
-        if any(c.chatroom.password for c in chatrooms):
-            cols.add('password')
-        return WPChatEventPage.render_template('event_page.html', self._conf, event_chatrooms=chatrooms, cols=cols,
-                                               chat_links=current_plugin.settings.get('chat_links'))
 
 
 class RHChatManageEventBase(RHConferenceModifBase):

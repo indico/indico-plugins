@@ -18,14 +18,19 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_chat.controllers import (RHChatEventPage, RHChatManageEvent, RHChatManageEventModify,
-                                     RHChatManageEventRefresh, RHChatManageEventRemove, RHChatManageEventCreate,
-                                     RHChatManageEventAttach, RHChatManageEventLogs, RHChatManageEventShowLogs,
-                                     RHChatManageEventAttachLogs)
+from indico_chat.controllers.event import RHChatEventPage
+from indico_chat.controllers.event_mgmt import (RHChatManageEvent, RHChatManageEventModify, RHChatManageEventRefresh,
+                                                RHChatManageEventRemove, RHChatManageEventCreate,
+                                                RHChatManageEventAttach, RHChatManageEventLogs,
+                                                RHChatManageEventShowLogs, RHChatManageEventAttachLogs)
 
 # TODO: s/chat-new/chat/
 blueprint = IndicoPluginBlueprint('chat', 'indico_chat', url_prefix='/event/<confId>')
+
+# Event
 blueprint.add_url_rule('/chat-new', 'event_page', RHChatEventPage)
+
+# Event management
 blueprint.add_url_rule('/manage/chat-new/', 'manage_rooms', RHChatManageEvent)
 blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/', 'manage_rooms_modify', RHChatManageEventModify,
                        methods=('GET', 'POST'))
