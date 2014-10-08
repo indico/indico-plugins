@@ -29,6 +29,7 @@ from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from MaKaC.common.log import ModuleNames
 from MaKaC.conference import LocalFile
@@ -47,7 +48,7 @@ class RHChatManageEventBase(RHConferenceModifBase):
         try:
             self.event_id = int(self._conf.id)
         except ValueError:
-            raise IndicoError('This page is not available for legacy events.')
+            raise IndicoError(_('This page is not available for legacy events.'))
         self.event = self._conf
 
     def _checkProtection(self):
@@ -93,7 +94,7 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             self.chatroom.modified_dt = now_utc()
             if attrs_changed(self.chatroom, 'name', 'description', 'password'):
                 update_room(self.chatroom)
-            flash('Chatroom updated', 'success')
+            flash(_('Chatroom updated'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
                                                event_chatroom=self.event_chatroom)
@@ -111,7 +112,7 @@ class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
         if config is None:
             if not room_exists(self.chatroom.jid):
                 return jsonify(result='not-found')
-            raise IndicoError('Unexpected result from Jabber server')
+            raise IndicoError(_('Unexpected result from Jabber server'))
         changed = False
         for key, value in config.iteritems():
             if getattr(self.chatroom, key) != value:
@@ -135,7 +136,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             db.session.add_all((chatroom, event_chatroom))
             db.session.flush()
             create_room(chatroom)
-            flash('Chatroom created', 'success')
+            flash(_('Chatroom created'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form)
 
@@ -150,7 +151,7 @@ class RHChatManageEventAttach(RHChatManageEventBase):
     def _process(self):
         event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=self.chatroom)
         db.session.add(event_chatroom)
-        flash('Chatroom added', 'success')
+        flash(_('Chatroom added'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
@@ -165,9 +166,9 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
         reason = '{} has requested to delete this room.'.format(unicode(session.user.getStraightFullName(), 'utf-8'))
         chatroom_deleted = self.event_chatroom.delete(reason)
         if chatroom_deleted:
-            flash('Chatroom deleted', 'success')
+            flash(_('Chatroom deleted'), 'success')
         else:
-            flash('Chatroom removed from event', 'success')
+            flash(_('Chatroom removed from event'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
@@ -180,7 +181,7 @@ class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
 
     def _process(self):
         if not retrieve_logs(self.chatroom):
-            flash('There are no logs available for this room.', 'warning')
+            flash(_('There are no logs available for this room.'), 'warning')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_logs.html', self._conf, event_chatroom=self.event_chatroom,
                                                start_date=self.event.getAdjustedStartDate(),
@@ -213,9 +214,9 @@ class RHChatManageEventShowLogs(RHChatManageEventRetrieveLogsBase):
         logs = self._get_logs()
         if not logs:
             if self.date_filter:
-                msg = 'Could not find any logs for the given timeframe.'
+                msg = _('Could not find any logs for the given timeframe.')
             else:
-                msg = 'Could not find any logs for the chatroom.'
+                msg = _('Could not find any logs for the chatroom.')
             return jsonify(success=False, msg=msg)
         return jsonify(success=True, html=logs, params=request.args.to_dict())
 
@@ -231,7 +232,7 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
     def _process(self):
         logs = self._get_logs()
         if not logs:
-            return jsonify(success=False, msg='No logs found')
+            return jsonify(success=False, msg=_('No logs found'))
         self._create_material(logs)
         return jsonify(success=True)
 

@@ -21,6 +21,7 @@ from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.web.forms.base import IndicoForm, generated_data
+from indico.util.i18n import _
 from indico.util.string import strip_whitespace
 
 from indico_chat.models.chatrooms import Chatroom
@@ -31,18 +32,19 @@ class EditChatroomForm(IndicoForm):
     event_specific_fields = {'hidden', 'show_password'}
 
     # Room-wide options
-    name = TextField('Name', [DataRequired()], filters=[strip_whitespace], description='The name of the room')
-    description = TextAreaField('Description', filters=[strip_whitespace], description='The description of the room')
-    password = TextField('Password', filters=[strip_whitespace],
-                         description='An optional password required to join the room')
+    name = TextField(_('Name'), [DataRequired()], filters=[strip_whitespace], description=_('The name of the room'))
+    description = TextAreaField(_('Description'), filters=[strip_whitespace],
+                                description=_('The description of the room'))
+    password = TextField(_('Password'), filters=[strip_whitespace],
+                         description=_('An optional password required to join the room'))
     # Event-specific options
-    hidden = BooleanField('Hidden', description='Hides the room on public event pages.')
-    show_password = BooleanField('Show password', description='Shows the room password on public event pages.')
+    hidden = BooleanField(_('Hidden'), description=_('Hides the room on public event pages.'))
+    show_password = BooleanField(_('Show password'), description=_('Shows the room password on public event pages.'))
 
 
 class AddChatroomForm(EditChatroomForm):
-    custom_server = TextField('Server', filters=[strip_whitespace, lambda x: x.lower() if x else x],
-                              description='External Jabber server. Should be left empty in most cases.')
+    custom_server = TextField(_('Server'), filters=[strip_whitespace, lambda x: x.lower() if x else x],
+                              description=_('External Jabber server. Should be left empty in most cases.'))
 
     def __init__(self, *args, **kwargs):
         self._date = kwargs.pop('date')
@@ -53,12 +55,12 @@ class AddChatroomForm(EditChatroomForm):
         if not jid:
             # This error is not very helpful to a user, but it is extremely unlikely - only if he uses a name
             # which does not contain a single char usable in a JID
-            raise ValidationError('Could not convert name to a jabber ID')
+            raise ValidationError(_('Could not convert name to a jabber ID'))
         if Chatroom.find_first(jid_node=jid, custom_server=self.custom_server.data):
-            raise ValidationError('A room with this name already exists')
+            raise ValidationError(_('A room with this name already exists'))
         tmp_room = Chatroom(jid_node=jid, custom_server=self.custom_server.data)
         if room_exists(tmp_room.jid):
-            raise ValidationError('A room with this name/JID already exists on the Jabber server ({})'.format(
+            raise ValidationError(_('A room with this name/JID already exists on the Jabber server ({0})').format(
                 tmp_room.jid
             ))
 

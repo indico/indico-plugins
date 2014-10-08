@@ -41,30 +41,31 @@ from indico_chat.views import WPChatEventPage, WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalField('Administrators', description='Users who can manage chatrooms for all events')
-    server = TextField('XMPP server', [DataRequired()], description='The hostname of the XMPP server')
-    muc_server = TextField('XMPP MUC server', [DataRequired()], description="The hostname of the XMPP MUC server")
-    bot_jid = TextField('Bot JID', [DataRequired()],
-                        description="Jabber ID of the XMPP bot. Can be just a username (in that case the default "
-                                    "server is assumed) or a username@server.")
-    bot_password = UnsafePasswordField('Bot Password', [DataRequired()], description="Password for the bot")
-    notify_admins = BooleanField('Notify admins', description="Should chat administrators receive email notifications?")
-    notify_emails = EmailListField('Notification emails',
-                                   description="Additional email addresses to sent notifications to (one per line)")
-    log_url = URLField('Log URL', description='You can set this to the URL of the '
-                                              '<a href="https://github.com/indico/jabber-logs/">jabber-logs app</a>, '
-                                              'running on the jabber server to let event managers can retrieve chat '
-                                              'logs for rooms on that server.')
-    chat_links = MultipleItemsField('Chatroom links', fields=(('title', 'Title'), ('link', 'Link')),
-                                    description="Links to join the chatroom. You can use the placeholders {room} for "
-                                                "the room name and {server} for the MUC server.")
-    how_to_connect = TextAreaField('How to connect', widget=CKEditorWidget(),
-                                   description="Text shown below the chatrooms on an event page")
+    admins = PrincipalField(_('Administrators'), description=_('Users who can manage chatrooms for all events'))
+    server = TextField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
+    muc_server = TextField(_('XMPP MUC server'), [DataRequired()], description=_("The hostname of the XMPP MUC server"))
+    bot_jid = TextField(_('Bot JID'), [DataRequired()],
+                        description=_("Jabber ID of the XMPP bot. Can be just a username (in that case the default "
+                                      "server is assumed) or a username@server."))
+    bot_password = UnsafePasswordField(_('Bot Password'), [DataRequired()], description=_("Password for the bot"))
+    notify_admins = BooleanField(_('Notify admins'),
+                                 description=_("Should chat administrators receive email notifications?"))
+    notify_emails = EmailListField(_('Notification emails'),
+                                   description=_("Additional email addresses to sent notifications to (one per line)"))
+    log_url = URLField(_('Log URL'), description=_('You can set this to the URL of the '
+                                                   '<a href="https://github.com/indico/jabber-logs/">jabber-logs '
+                                                   'app</a>, running on the jabber server to let event managers can '
+                                                   'retrieve chat logs for rooms on that server.'))
+    chat_links = MultipleItemsField(_('Chatroom links'), fields=(('title', 'Title'), ('link', 'Link')),
+                                    description=_("Links to join the chatroom. You can use the placeholders {room} for "
+                                                  "the room name and {server} for the MUC server."))
+    how_to_connect = TextAreaField(_('How to connect'), widget=CKEditorWidget(),
+                                   description=_("Text shown below the chatrooms on an event page"))
 
     def validate_chat_links(self, field):
         for item in field.data:
             if not all(item.values()):
-                raise ValidationError('All fields must contain a value.')
+                raise ValidationError(_('All fields must contain a value.'))
 
 
 class ChatPlugin(IndicoPlugin):
