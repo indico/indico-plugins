@@ -254,9 +254,7 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
         return jsonify(success=True)
 
     def _create_material(self, logs):
-        tmpfile = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir(),
-                                     delete=False)
-        self._tempFilesToDelete.append(tmpfile.name)
+        tmpfile = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir())
         tmpfile.write(logs)
         tmpfile.flush()
         filename = secure_filename('{}.html'.format(self.material_name))
