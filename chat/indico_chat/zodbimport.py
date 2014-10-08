@@ -67,6 +67,8 @@ class ChatImporter(Importer):
             elif new == 'notify_emails':
                 value = [email for email in value if is_valid_mail(email, multi=False)]
             ChatPlugin.settings.set(new, value)
+        if opts['activateLogs'].getValue():
+            ChatPlugin.settings.set('log_url', 'https://{}/logs/'.format(host))
         chat_links = []
         for item in type_opts['customLinks'].getValue():
             link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
