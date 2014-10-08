@@ -39,5 +39,24 @@
         .chatroom + .chatroom {
             margin-top: 1em;
         }
+        #chat-log-form {
+            margin-right: 2em;
+            float: left;
+        }
+        #chat-log-material {
+            display: none;
+            float: left;
+        }
+        #chat-log-display-container {
+            display: none;
+            margin-top: 2em;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            margin-top: 1em;
+            display: block;
+            border: none;
+        }
     }
 }

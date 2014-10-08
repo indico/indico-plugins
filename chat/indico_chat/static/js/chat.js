@@ -77,6 +77,7 @@
             $.ajax({
                 url: $(this).data('href'),
                 type: 'POST',
+                dataType: 'json',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 success: function(data) {
                     if (handleAjaxError(data)) {
@@ -91,6 +92,82 @@
                     }
                 }
             });
+        });
+    };
+
+    global.eventManageChatLogs = function eventManageChatLogs() {
+        var container = $('#chat-log-display-container');
+        var iframe = $('#chat-log-display');
+        var materialWidget = $('#chat-log-material');
+        var killProgress;
+        var logParams;
+
+        $('#chat-log-form').ajaxForm({
+            dataType: 'json',
+            beforeSubmit: function() {
+                container.hide();
+                materialWidget.hide();
+                killProgress = IndicoUI.Dialogs.Util.progress();
+            },
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
+                }
+                else if (!data.success) {
+                    new AlertPopup($T('No logs available'), data.msg).open();
+                    return;
+                }
+                var doc = iframe[0].contentWindow.document;
+                doc.write(data.html);
+                doc.close();
+                logParams = data.params;
+                $('#chat-log-material').find('input, button').prop('disabled', false);
+                container.show();
+                materialWidget.show();
+            },
+            complete: function() {
+                killProgress();
+            }
+        });
+
+        $('#chat-create-material').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var materialName = $('#chat-material-name').val().trim();
+            if (!materialName) {
+                return;
+            }
+            var params = $.extend({}, logParams, {
+                material_name: materialName
+            });
+            $.ajax({
+                url: $this.data('href'),
+                type: 'POST',
+                data: params,
+                dataType: 'json',
+                success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    else if (!data.success) {
+                        new AlertPopup($T('Could not create material'), data.msg).open();
+                        return;
+                    }
+                    $('#chat-log-material').find('input, button').prop('disabled', true).blur();
+                    new AlertPopup($T('Material created'), $T('The chat logs have been attached to the event.')).open();
+                }
+            });
+        });
+
+        var rangeWidget = $('#chat-log-range');
+        rangeWidget.daterange({
+            allowPast: true,
+            fieldNames: ['start_date', 'end_date'],
+            startDate: rangeWidget.data('startDate'),
+            endDate: rangeWidget.data('endDate'),
+            pickerOptions: {
+                yearRange: 'c-1:c+1'
+            }
         });
     };
 })(window);

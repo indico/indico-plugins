@@ -11,6 +11,8 @@
             -
             <a class="chat-toggle-details" href="#">{% trans %}Show Details{% endtrans %}</a>
             -
+            <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}">{% trans %}Logs{% endtrans %}</a>
+            -
             <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}">{% trans %}Edit{% endtrans %}</a>
             -
             <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>

@@ -229,7 +229,7 @@ def retrieve_logs(room, start_date=None, end_date=None):
     if start_date:
         params['sdate'] = start_date.strftime('%Y-%m-%d')
     if end_date:
-        params['sdate'] = end_date.strftime('%Y-%m-%d')
+        params['edate'] = end_date.strftime('%Y-%m-%d')
 
     try:
         response = requests.get(base_url, params=params)
