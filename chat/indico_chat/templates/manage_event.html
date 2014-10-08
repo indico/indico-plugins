@@ -13,6 +13,8 @@
             -
             <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}">{% trans %}Edit{% endtrans %}</a>
             -
+            <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>
+            -
             <a class="js-chat-remove-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}">{% trans %}Remove{% endtrans %}</a>
             {% if chat_links %}
                 -

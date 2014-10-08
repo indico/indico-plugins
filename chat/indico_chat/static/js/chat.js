@@ -71,5 +71,26 @@
                 }).appendTo('body').submit();
             }).open();
         });
+
+        $('.js-chat-refresh-room').on('click', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: $(this).data('href'),
+                type: 'POST',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    if (data.result == 'not-found') {
+                        new AlertPopup($T('Chatroom not found'), $T('The chatroom does noe exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
+                    } else if (data.result == 'changed') {
+                        new AlertPopup($T('Chatroom updated'), $T('The chatroom data has been updated.'), function() {
+                            window.location.href = window.location.href;
+                        }).open();
+                    }
+                }
+            });
+        });
     };
 })(window);

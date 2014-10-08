@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.core.plugins import IndicoPluginBlueprint
 
 from indico_chat.controllers import (RHChatEventPage, RHChatManageEvent, RHChatManageEventModify,
-                                     RHChatManageEventRemove, RHChatManageEventCreate, RHChatManageEventAttach)
+                                     RHChatManageEventRefresh, RHChatManageEventRemove, RHChatManageEventCreate,
+                                     RHChatManageEventAttach)
 
 # TODO: s/chat-new/chat/
 blueprint = IndicoPluginBlueprint('chat', 'indico_chat', url_prefix='/event/<confId>')
@@ -27,6 +28,8 @@ blueprint.add_url_rule('/chat-new', 'event_page', RHChatEventPage)
 blueprint.add_url_rule('/manage/chat-new/', 'manage_rooms', RHChatManageEvent)
 blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/', 'manage_rooms_modify', RHChatManageEventModify,
                        methods=('GET', 'POST'))
+blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/refresh', 'manage_rooms_refresh', RHChatManageEventRefresh,
+                       methods=('POST',))
 blueprint.add_url_rule('/manage/chat-new/<int:chatroom_id>/remove', 'manage_rooms_remove', RHChatManageEventRemove,
                        methods=('POST',))
 blueprint.add_url_rule('/manage/chat-new/create', 'manage_rooms_create', RHChatManageEventCreate,

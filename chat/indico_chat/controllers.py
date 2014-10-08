@@ -16,13 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request, flash, redirect
+from flask import session, request, flash, redirect, jsonify
 from flask_pluginengine import current_plugin
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
+from indico.util.date_time import now_utc
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -31,7 +32,7 @@ from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
 from indico_chat.util import is_chat_admin
 from indico_chat.views import WPChatEventPage, WPChatEventMgmt
-from indico_chat.xmpp import create_room, update_room
+from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists
 
 
 class RHChatEventPage(RHConferenceBaseDisplay):
@@ -65,6 +66,13 @@ class RHChatManageEventBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
+class RHEventChatroomMixin:
+    def _checkParams(self):
+        self.event_chatroom = ChatroomEventAssociation.find_one(event_id=self.event_id,
+                                                                chatroom_id=request.view_args['chatroom_id'])
+        self.chatroom = self.event_chatroom.chatroom
+
+
 class RHChatManageEvent(RHChatManageEventBase):
     """Lists the chatrooms of an event"""
 
@@ -78,14 +86,12 @@ class RHChatManageEvent(RHChatManageEventBase):
                                                available_chatrooms=available_chatrooms)
 
 
-class RHChatManageEventModify(RHChatManageEventBase):
+class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
     """Modifies an existing chatroom"""
 
     def _checkParams(self, params):
         RHChatManageEventBase._checkParams(self, params)
-        self.event_chatroom = ChatroomEventAssociation.find_one(event_id=self.event_id,
-                                                                chatroom_id=request.view_args['chatroom_id'])
-        self.chatroom = self.event_chatroom.chatroom
+        RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
         defaults = FormDefaults(self.chatroom)
@@ -95,12 +101,34 @@ class RHChatManageEventModify(RHChatManageEventBase):
         if form.validate_on_submit():
             form.populate_obj(self.event_chatroom, fields=form.event_specific_fields)
             form.populate_obj(self.chatroom, skip=form.event_specific_fields)
+            self.chatroom.modified_dt = now_utc()
             if attrs_changed(self.chatroom, 'name', 'description', 'password'):
                 update_room(self.chatroom)
             flash('Chatroom updated', 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
                                                event_chatroom=self.event_chatroom)
+
+
+class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
+    """Synchronizes the local chatroom data with the XMPP server"""
+
+    def _checkParams(self, params):
+        RHChatManageEventBase._checkParams(self, params)
+        RHEventChatroomMixin._checkParams(self)
+
+    def _process(self):
+        config = get_room_config(self.chatroom.jid)
+        if config is None:
+            if not room_exists(self.chatroom.jid):
+                return jsonify(result='not-found')
+            raise IndicoError('Unexpected result from Jabber server')
+        changed = False
+        for key, value in config.iteritems():
+            if getattr(self.chatroom, key) != value:
+                changed = True
+                setattr(self.chatroom, key, value)
+        return jsonify(result='changed' if changed else '')
 
 
 class RHChatManageEventCreate(RHChatManageEventBase):
@@ -136,14 +164,12 @@ class RHChatManageEventAttach(RHChatManageEventBase):
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
-class RHChatManageEventRemove(RHChatManageEventBase):
+class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
     """Removes a chatroom from an event (and if necessary from the server)"""
 
     def _checkParams(self, params):
         RHChatManageEventBase._checkParams(self, params)
-        self.event_chatroom = ChatroomEventAssociation.find_one(event_id=self.event_id,
-                                                                chatroom_id=request.view_args['chatroom_id'])
-        self.chatroom = self.event_chatroom.chatroom
+        RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
         chatroom_deleted = self.event_chatroom.delete()
