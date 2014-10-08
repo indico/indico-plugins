@@ -71,9 +71,10 @@ class RHChatManageEvent(RHChatManageEventBase):
                                                             _eager='chatroom.events').all()
         chatroom_filter = (~Chatroom.id.in_(x.chatroom_id for x in chatrooms)) if chatrooms else True
         available_chatrooms = Chatroom.find_all(Chatroom.created_by_id == int(session.user.id), chatroom_filter)
+        logs_enabled = current_plugin.settings.get('log_url')
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
                                                event=self.event, chat_links=current_plugin.settings.get('chat_links'),
-                                               available_chatrooms=available_chatrooms)
+                                               available_chatrooms=available_chatrooms, logs_enabled=logs_enabled)
 
 
 class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
@@ -108,16 +109,21 @@ class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
         RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
+        if self.chatroom.custom_server:
+            return jsonify(result='')
+
         config = get_room_config(self.chatroom.jid)
         if config is None:
             if not room_exists(self.chatroom.jid):
                 return jsonify(result='not-found')
             raise IndicoError(_('Unexpected result from Jabber server'))
+
         changed = False
         for key, value in config.iteritems():
             if getattr(self.chatroom, key) != value:
                 changed = True
                 setattr(self.chatroom, key, value)
+
         return jsonify(result='changed' if changed else '')
 
 

@@ -10,14 +10,20 @@
             <span><strong>{{ chatroom.name }}</strong></span>
             -
             <a class="chat-toggle-details" href="#">{% trans %}Show Details{% endtrans %}</a>
-            -
-            <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}">{% trans %}Logs{% endtrans %}</a>
+            {% if logs_enabled and not chatroom.custom_server %}
+                -
+                <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}">{% trans %}Logs{% endtrans %}</a>
+            {% endif %}
             -
             <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}">{% trans %}Edit{% endtrans %}</a>
+            {% if not chatroom.custom_server %}
+                -
+                <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>
+            {% endif %}
             -
-            <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>
-            -
-            <a class="js-chat-remove-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}">{% trans %}Remove{% endtrans %}</a>
+            <a class="js-chat-remove-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}">
+                {%- trans %}Remove{% endtrans -%}
+            </a>
             {% if chat_links %}
                 -
                 <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a></strong>

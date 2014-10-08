@@ -58,7 +58,12 @@
             var $this = $(this);
             var msg = $T('Do you really want to remove this chatroom from the event?');
             if ($this.data('numEvents') == 1) {
-                msg += '<br>' + $T('Since it is only used in this event, it will be deleted from the Jabber server, too!');
+                msg += '<br>';
+                if ($this.data('customServer')) {
+                    msg += $T('Since it is on an external server, it will not be deleted on that server.');
+                } else {
+                    msg += $T('Since it is only used in this event, it will be deleted from the Jabber server, too!');
+                }
             }
             new ConfirmPopup($T('Delete this chatroom?'), msg, function(confirmed) {
                 if (!confirmed) {

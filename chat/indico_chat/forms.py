@@ -58,11 +58,12 @@ class AddChatroomForm(EditChatroomForm):
             raise ValidationError(_('Could not convert name to a jabber ID'))
         if Chatroom.find_first(jid_node=jid, custom_server=self.custom_server.data):
             raise ValidationError(_('A room with this name already exists'))
-        tmp_room = Chatroom(jid_node=jid, custom_server=self.custom_server.data)
-        if room_exists(tmp_room.jid):
-            raise ValidationError(_('A room with this name/JID already exists on the Jabber server ({0})').format(
-                tmp_room.jid
-            ))
+        if not self.custom_server.data:
+            tmp_room = Chatroom(jid_node=jid)
+            if room_exists(tmp_room.jid):
+                raise ValidationError(_('A room with this name/JID already exists on the Jabber server ({0})').format(
+                    tmp_room.jid
+                ))
 
     @generated_data
     def jid_node(self):

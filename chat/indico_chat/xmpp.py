@@ -37,6 +37,9 @@ WHITESPACE = re.compile(r'\s+')
 def create_room(room):
     """Creates a MUC room on the XMPP server."""
 
+    if room.custom_server:
+        return
+
     def _create_room(xmpp):
         muc = xmpp.plugin['xep_0045']
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
@@ -49,6 +52,9 @@ def create_room(room):
 def update_room(room):
     """Updates a MUC room on the XMPP server."""
 
+    if room.custom_server:
+        return
+
     def _update_room(xmpp):
         muc = xmpp.plugin['xep_0045']
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
@@ -60,6 +66,9 @@ def update_room(room):
 
 def delete_room(room, reason=''):
     """Deletes a MUC room from the XMPP server."""
+
+    if room.custom_server:
+        return
 
     def _delete_room(xmpp):
         muc = xmpp.plugin['xep_0045']
