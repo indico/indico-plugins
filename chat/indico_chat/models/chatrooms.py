@@ -198,6 +198,6 @@ class ChatroomEventAssociation(db.Model):
         if not self.chatroom.events:
             db.session.delete(self.chatroom)
             db.session.flush()
-            delete_room(self.chatroom.jid, reason)
+            delete_room(self.chatroom, reason)
             return True
         return False

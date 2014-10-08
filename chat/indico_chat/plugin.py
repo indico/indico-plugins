@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
 from wtforms.fields.core import BooleanField
+from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired
 
@@ -50,7 +51,10 @@ class SettingsForm(IndicoForm):
     notify_admins = BooleanField('Notify admins', description="Should chat administrators receive email notifications?")
     notify_emails = EmailListField('Notification emails',
                                    description="Additional email addresses to sent notifications to (one per line)")
-    # TODO: log retrieval URL
+    log_url = URLField('Log URL', description='You can set this to the URL of the '
+                                              '<a href="https://github.com/indico/jabber-logs/">jabber-logs app</a>, '
+                                              'running on the jabber server to let event managers can retrieve chat '
+                                              'logs for rooms on that server.')
     chat_links = MultipleItemsField('Chatroom links', fields=(('title', 'Title'), ('link', 'Link')),
                                     description="Links to join the chatroom. You can use the placeholders {room} for "
                                                 "the room name and {server} for the MUC server.")

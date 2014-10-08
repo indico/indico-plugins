@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+import posixpath
 import re
 
+import requests
 from flask import current_app
+from requests.exceptions import RequestException
 from sleekxmpp import ClientXMPP
 from sleekxmpp.exceptions import IqError
 
@@ -40,7 +43,7 @@ def create_room(room):
         muc.configureRoom(room.jid, _set_form_values(xmpp, room))
 
     Logger.get('plugin.chat').info('Creating room {}'.format(room.jid))
-    return _execute_xmpp(_create_room)
+    _execute_xmpp(_create_room)
 
 
 def update_room(room):
@@ -52,18 +55,19 @@ def update_room(room):
         muc.configureRoom(room.jid, _set_form_values(xmpp, room, muc.getRoomConfig(room.jid)))
 
     Logger.get('plugin.chat').info('Updating room {}'.format(room.jid))
-    return _execute_xmpp(_update_room)
+    _execute_xmpp(_update_room)
 
 
-def delete_room(jid, reason=''):
+def delete_room(room, reason=''):
     """Deletes a MUC room from the XMPP server."""
 
     def _delete_room(xmpp):
         muc = xmpp.plugin['xep_0045']
-        muc.destroy(jid, reason=reason)
+        muc.destroy(room.jid, reason=reason)
 
-    Logger.get('plugin.chat').info('Deleting room {}'.format(jid))
-    return _execute_xmpp(_delete_room)
+    Logger.get('plugin.chat').info('Deleting room {}'.format(room.jid))
+    _execute_xmpp(_delete_room)
+    delete_logs(room)
 
 
 def get_room_config(jid):
@@ -205,3 +209,52 @@ def _execute_xmpp(connected_callback):
         raise result[1]
 
     return result[0]
+
+
+def retrieve_logs(room, start_date=None, end_date=None):
+    """Retrieves chat logs
+
+    :param room: the `Chatroom`
+    :param start_date: the earliest date to get logs for
+    :param end_date: the latest date to get logs for
+    :return: logs in html format
+    """
+    from indico_chat.plugin import ChatPlugin
+
+    base_url = ChatPlugin.settings.get('log_url')
+    if not base_url or room.custom_server:
+        return None
+
+    params = {'cr': room.jid}
+    if start_date:
+        params['sdate'] = start_date.strftime('%Y-%m-%d')
+    if end_date:
+        params['sdate'] = end_date.strftime('%Y-%m-%d')
+
+    try:
+        response = requests.get(base_url, params=params)
+    except RequestException:
+        Logger.get('plugin.chat').exception('Could not retrieve logs for {}'.format(room.jid))
+        return None
+    if response.headers.get('content-type') == 'application/json':
+        Logger.get('plugin.chat').warning('Could not retrieve logs for {}: {}'.format(room.jid,
+                                                                                      response.json().get('error')))
+        return None
+    return response.text
+
+
+def delete_logs(room):
+    """Deletes chat logs"""
+    from indico_chat.plugin import ChatPlugin
+
+    base_url = ChatPlugin.settings.get('log_url')
+    if not base_url or room.custom_server:
+        return
+
+    try:
+        response = requests.get(posixpath.join(base_url, 'delete'), params={'cr': room.jid}).json()
+    except (RequestException, ValueError):
+        Logger.get('plugin.chat').exception('Could not delete logs for {}'.format(room.jid))
+        return
+    if not response.get('success'):
+        Logger.get('plugin.chat').warning('Could not delete logs for {}: {}'.format(room.jid), response.get('error'))
