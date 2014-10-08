@@ -31,23 +31,28 @@ INVALID_JID_CHARS = re.compile(r'[^-!#()*+,.=^_a-z0-9]')
 WHITESPACE = re.compile(r'\s+')
 
 
-def _save_room(xmpp, room):
-    muc = xmpp.plugin['xep_0045']
-    muc.joinMUC(room.jid, xmpp.requested_jid.user)
-    muc.configureRoom(room.jid, _make_form(xmpp, room))
-
-
 def create_room(room):
     """Creates a MUC room on the XMPP server."""
+
+    def _create_room(xmpp):
+        muc = xmpp.plugin['xep_0045']
+        muc.joinMUC(room.jid, xmpp.requested_jid.user)
+        muc.configureRoom(room.jid, _set_form_values(xmpp, room))
+
     Logger.get('plugin.chat').info('Creating room {}'.format(room.jid))
-    return _execute_xmpp(lambda x: _save_room(x, room))
+    return _execute_xmpp(_create_room)
 
 
 def update_room(room):
     """Updates a MUC room on the XMPP server."""
+
+    def _update_room(xmpp):
+        muc = xmpp.plugin['xep_0045']
+        muc.joinMUC(room.jid, xmpp.requested_jid.user)
+        muc.configureRoom(room.jid, _set_form_values(xmpp, room, muc.getRoomConfig(room.jid)))
+
     Logger.get('plugin.chat').info('Updating room {}'.format(room.jid))
-    # XXX: This could be improved to get the current config first instead of overwriting everything
-    return _execute_xmpp(lambda x: _save_room(x, room))
+    return _execute_xmpp(_update_room)
 
 
 def delete_room(jid, reason=''):
@@ -120,23 +125,24 @@ def generate_jid(name, append_date=None):
     return '{}-{}'.format(sanitize_jid(name), append_date.strftime('%Y-%m-%d'))
 
 
-def _make_form(xmpp, room):
-    """Creates an XMPP room config form"""
-    form = xmpp.plugin['xep_0004'].make_form(ftype='submit')
-    form.add_field('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
-    form.add_field('muc#roomconfig_publicroom', value='1')
-    form.add_field('muc#roomconfig_whois', value='moderators')
-    form.add_field('muc#roomconfig_membersonly', value='0')
-    form.add_field('muc#roomconfig_moderatedroom', value='1')
-    form.add_field('muc#roomconfig_changesubject', value='1')
-    form.add_field('muc#roomconfig_allowinvites', value='1')
-    form.add_field('muc#roomconfig_allowvisitorstatus', value='1')
-    form.add_field('muc#roomconfig_allowvisitornickchange', value='1')
-    form.add_field('muc#roomconfig_enablelogging', value='1')
-    form.add_field('public_list', value='1')
-    form.add_field('members_by_default', value='1')
-    form.add_field('allow_private_messages', value='1')
-    form.add_field('allow_query_users', value='1')
+def _set_form_values(xmpp, room, form=None):
+    """Creates/Updates an XMPP room config form"""
+    if form is None:
+        form = xmpp.plugin['xep_0004'].make_form(ftype='submit')
+        form.add_field('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
+        form.add_field('muc#roomconfig_publicroom', value='1')
+        form.add_field('muc#roomconfig_whois', value='moderators')
+        form.add_field('muc#roomconfig_membersonly', value='0')
+        form.add_field('muc#roomconfig_moderatedroom', value='1')
+        form.add_field('muc#roomconfig_changesubject', value='1')
+        form.add_field('muc#roomconfig_allowinvites', value='1')
+        form.add_field('muc#roomconfig_allowvisitorstatus', value='1')
+        form.add_field('muc#roomconfig_allowvisitornickchange', value='1')
+        form.add_field('muc#roomconfig_enablelogging', value='1')
+        form.add_field('public_list', value='1')
+        form.add_field('members_by_default', value='1')
+        form.add_field('allow_private_messages', value='1')
+        form.add_field('allow_query_users', value='1')
     form.add_field('muc#roomconfig_persistentroom', value='1')
     form.add_field('muc#roomconfig_roomname', value=room.name)
     form.add_field('muc#roomconfig_passwordprotectedroom', value='1' if room.password else '0')
