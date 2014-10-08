@@ -83,7 +83,7 @@
                         return;
                     }
                     if (data.result == 'not-found') {
-                        new AlertPopup($T('Chatroom not found'), $T('The chatroom does noe exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
+                        new AlertPopup($T('Chatroom not found'), $T('The chatroom does not exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
                     } else if (data.result == 'changed') {
                         new AlertPopup($T('Chatroom updated'), $T('The chatroom data has been updated.'), function() {
                             window.location.href = window.location.href;
