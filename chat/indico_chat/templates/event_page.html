@@ -3,7 +3,8 @@
 <table class="infoTable" width="100%" align="center" border="0" cellspacing="0">
     <thead>
         <tr>
-            <td class="tableHeader">{% trans %}Room{% endtrans %}</td>
+            <td class="tableHeader">{% trans %}Name{% endtrans %}</td>
+            <td class="tableHeader">{% trans %}JID{% endtrans %}</td>
             <td class="tableHeader">{% trans %}Server{% endtrans %}</td>
             {% if 'description' in cols -%}
                 <td class="tableHeader">{% trans %}Description{% endtrans %}</td>
@@ -23,6 +24,7 @@
 
             <tr class="infoTR" style="vertical-align: baseline;">
                 <td class="infoTD">{{ chatroom.name }}</td>
+                <td class="infoTD">{{ chatroom.jid_node }}</td>
                 <td class="infoTD">{{ server }}</td>
                 {% if 'description' in cols -%}
                     <td class="infoTD">{{ chatroom.description }}</td>
