@@ -173,7 +173,8 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
         RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
-        chatroom_deleted = self.event_chatroom.delete()
+        reason = '{} has requested to delete this room.'.format(unicode(session.user.getStraightFullName(), 'utf-8'))
+        chatroom_deleted = self.event_chatroom.delete(reason)
         if chatroom_deleted:
             flash('Chatroom deleted', 'success')
         else:

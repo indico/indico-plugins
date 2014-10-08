@@ -186,9 +186,10 @@ class ChatroomEventAssociation(db.Model):
             query = query.filter(~cls.hidden)
         return query
 
-    def delete(self):
+    def delete(self, reason=''):
         """Deletes the event chatroom and if necessary the chatroom, too.
 
+        :param reason: reason for the deletion
         :return: True if the associated chatroom was also
                  deleted, otherwise False
         """
@@ -197,6 +198,6 @@ class ChatroomEventAssociation(db.Model):
         if not self.chatroom.events:
             db.session.delete(self.chatroom)
             db.session.flush()
-            delete_room(self.chatroom.jid)
+            delete_room(self.chatroom.jid, reason)
             return True
         return False
