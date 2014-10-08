@@ -16,14 +16,9 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
-from tempfile import NamedTemporaryFile
-
 from flask import session, request, flash, redirect, jsonify
 from flask_pluginengine import current_plugin
-from werkzeug.utils import secure_filename
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
@@ -31,36 +26,12 @@ from indico.core.plugins import url_for_plugin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
-from MaKaC.common.log import ModuleNames
-from MaKaC.conference import LocalFile
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
+from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
 from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
-from indico_chat.util import is_chat_admin
 from indico_chat.views import WPChatEventMgmt
-from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists, retrieve_logs
-
-
-class RHChatManageEventBase(RHConferenceModifBase):
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        try:
-            self.event_id = int(self._conf.id)
-        except ValueError:
-            raise IndicoError(_('This page is not available for legacy events.'))
-        self.event = self._conf
-
-    def _checkProtection(self):
-        if not is_chat_admin(session.user):
-            RHConferenceModifBase._checkProtection(self)
-
-
-class RHEventChatroomMixin:
-    def _checkParams(self):
-        self.event_chatroom = ChatroomEventAssociation.find_one(event_id=self.event_id,
-                                                                chatroom_id=request.view_args['chatroom_id'])
-        self.chatroom = self.event_chatroom.chatroom
+from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists
 
 
 class RHChatManageEvent(RHChatManageEventBase):
@@ -176,101 +147,3 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
         else:
             flash(_('Chatroom removed from event'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
-
-
-class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
-    """UI to retrieve logs for a chatroom"""
-
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
-
-    def _process(self):
-        if not retrieve_logs(self.chatroom):
-            flash(_('There are no logs available for this room.'), 'warning')
-            return redirect(url_for_plugin('.manage_rooms', self.event))
-        return WPChatEventMgmt.render_template('manage_event_logs.html', self._conf, event_chatroom=self.event_chatroom,
-                                               start_date=self.event.getAdjustedStartDate(),
-                                               end_date=self.event.getAdjustedEndDate())
-
-
-class RHChatManageEventRetrieveLogsBase(RHEventChatroomMixin, RHChatManageEventBase):
-    """Retrieves logs for a chatroom"""
-
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
-
-        if 'get_all_logs' not in request.values:
-            self.start_date = datetime.strptime(request.values['start_date'], '%d/%m/%Y').date()
-            self.end_date = datetime.strptime(request.values['end_date'], '%d/%m/%Y').date()
-            self.date_filter = True
-        else:
-            self.start_date = self.end_date = None
-            self.date_filter = False
-
-    def _get_logs(self):
-        return retrieve_logs(self.chatroom, self.start_date, self.end_date)
-
-
-class RHChatManageEventShowLogs(RHChatManageEventRetrieveLogsBase):
-    """Shows the logs for a chatroom"""
-
-    def _process(self):
-        logs = self._get_logs()
-        if not logs:
-            if self.date_filter:
-                msg = _('Could not find any logs for the given timeframe.')
-            else:
-                msg = _('Could not find any logs for the chatroom.')
-            return jsonify(success=False, msg=msg)
-        return jsonify(success=True, html=logs, params=request.args.to_dict())
-
-
-class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
-    """Attachs the logs for a chatroom to the event"""
-
-    def _checkParams(self, params):
-        RHChatManageEventRetrieveLogsBase._checkParams(self, params)
-        self.material_name = request.form['material_name'].strip()
-        self.file_repo_id = None
-
-    def _process(self):
-        logs = self._get_logs()
-        if not logs:
-            return jsonify(success=False, msg=_('No logs found'))
-        self._create_material(logs)
-        return jsonify(success=True)
-
-    def _create_material(self, logs):
-        tmpfile = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir())
-        tmpfile.write(logs)
-        tmpfile.flush()
-        filename = secure_filename('{}.html'.format(self.material_name))
-        registry = self.event.getMaterialRegistry()
-
-        # Create the material type. The ID must match the title besides casing or we end up
-        # creating new types all the time...
-        mf = registry.getById(b'chat logs')
-        mat = mf.get(self.event)
-        if mat is None:
-            mat = mf.create(self.event)
-            mat.setProtection(1)
-            mat.setTitle(b'Chat Logs')
-            mat.setDescription(b'Chat logs for this event')
-
-        # Create the actual material
-        resource = LocalFile()
-        resource.setName(filename)
-        resource.setDescription("Chat logs for the chat room '{}'".format(self.chatroom.name).encode('utf-8'))
-        resource.setFileName(filename)
-        resource.setFilePath(tmpfile.name)
-        resource.setProtection(0)
-
-        # Store the file in the file repository. self.file_repo_id is set in case of a retry
-        mat.addResource(resource, forcedFileId=self.file_repo_id)
-        self.file_repo_id = resource.getRepositoryId()
-
-        # Log the action
-        log_info = {b'subject': b"Added file {} (chat logs)".format(filename)}
-        self.event.getLogHandler().logAction(log_info, ModuleNames.MATERIAL)
