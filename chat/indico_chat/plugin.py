@@ -97,6 +97,7 @@ class ChatPlugin(IndicoPlugin):
 
     def init(self):
         super(ChatPlugin, self).init()
+        self.connect(signals.indico_help, self.extend_indico_help)
         self.connect(signals.event_sidemenu, self.extend_event_menu)
         self.connect(signals.event_management_sidemenu, self.extend_event_management_menu)
         self.connect(signals.event_management_clone, self.extend_event_management_clone)
@@ -121,6 +122,16 @@ class ChatPlugin(IndicoPlugin):
         how_to_connect = self.settings.get('how_to_connect')
         return render_plugin_template('event_header.html', event=event, event_chatrooms=chatrooms,
                                       how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))
+
+    def extend_indico_help(self, sender):
+        return {
+            _('Chat Guides'): {
+                _('Chat User Guide'): ('ihelp/html/Chat/ChatUserGuide.html',
+                                       'ihelp/pdf/IndicoChatUserGuide.pdf'),
+                _('Recommended Chat Clients'): ('ihelp/html/Chat/XMPPClients.html',
+                                                'ihelp/pdf/IndicoChatXMPPClients.pdf')
+            }
+        }
 
     def _has_visible_chatrooms(self, event):
         return bool(ChatroomEventAssociation.find_for_event(event).count())
