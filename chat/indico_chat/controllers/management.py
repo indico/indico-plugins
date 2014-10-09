@@ -30,6 +30,7 @@ from indico.web.forms.base import FormDefaults
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
 from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
+from indico_chat.notifications import notify_created, notify_attached, notify_modified, notify_deleted
 from indico_chat.views import WPChatEventMgmt
 from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists
 
@@ -66,6 +67,7 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             self.chatroom.modified_dt = now_utc()
             if attrs_changed(self.chatroom, 'name', 'description', 'password'):
                 update_room(self.chatroom)
+            notify_modified(self.chatroom, self.event, session.user)
             flash(_('Chatroom updated'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
@@ -113,6 +115,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             db.session.add_all((chatroom, event_chatroom))
             db.session.flush()
             create_room(chatroom)
+            notify_created(chatroom, self.event, session.user)
             flash(_('Chatroom created'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form)
@@ -128,6 +131,7 @@ class RHChatManageEventAttach(RHChatManageEventBase):
     def _process(self):
         event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=self.chatroom)
         db.session.add(event_chatroom)
+        notify_attached(self.chatroom, self.event, session.user)
         flash(_('Chatroom added'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
@@ -142,6 +146,7 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
     def _process(self):
         reason = '{} has requested to delete this room.'.format(unicode(session.user.getStraightFullName(), 'utf-8'))
         chatroom_deleted = self.event_chatroom.delete(reason)
+        notify_deleted(self.chatroom, self.event, session.user, chatroom_deleted)
         if chatroom_deleted:
             flash(_('Chatroom deleted'), 'success')
         else:

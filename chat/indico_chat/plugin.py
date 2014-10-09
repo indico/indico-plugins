@@ -37,6 +37,7 @@ from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
+from indico_chat.notifications import notify_deleted
 from indico_chat.views import WPChatEventPage, WPChatEventMgmt
 
 
@@ -86,6 +87,8 @@ class ChatPlugin(IndicoPlugin):
     @property
     def default_settings(self):
         return {'admins': [],
+                'notify_admins': False,
+                'notify_emails': [],
                 'how_to_connect': render_plugin_template('how_to_connect.html'),
                 'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
 
@@ -130,7 +133,8 @@ class ChatPlugin(IndicoPlugin):
 
     def event_deleted(self, event, **kwargs):
         for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
-            event_chatroom.delete()
+            chatroom_deleted = event_chatroom.delete()
+            notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
 
 
 class ChatroomCloner(EventCloner):
