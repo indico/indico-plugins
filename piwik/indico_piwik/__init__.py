@@ -1,3 +1,5 @@
+from urllib2 import urlparse
+
 from flask import request
 from flask_pluginengine import render_plugin_template
 
@@ -10,7 +12,6 @@ from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from .controllers import RHStatistics
 from .forms import SettingsForm
-from .piwik import PiwikRequest
 from .queries.tracking import PiwikQueryTrackDownload
 
 
@@ -38,6 +39,10 @@ class PiwikPlugin(IndicoPlugin):
         'site_id_events': 2
     }
 
+    @staticmethod
+    def get_logger(self):
+        return Logger.get('plugin.piwik')
+
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
@@ -46,7 +51,7 @@ class PiwikPlugin(IndicoPlugin):
         self.template_hook('page-footer', self.inject_page_footer)
 
     def inject_page_header(self, template, **kwargs):
-        server_url = self.settings.get('server_url')
+        server_url = self._get_tracking_url()
         site_id_general = self.settings.get('site_id_general')
         if not self.settings.get('enabled') or not server_url or not site_id_general:
             return ''
@@ -58,7 +63,7 @@ class PiwikPlugin(IndicoPlugin):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
         if not self.settings.get('enabled_for_events') or not site_id_events:
             return ''
-        params = {'url': PiwikRequest._get_query_url(),
+        params = {'url': self._get_tracking_url(),
                   'site_id': site_id_events}
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']
@@ -75,9 +80,6 @@ class PiwikPlugin(IndicoPlugin):
     def get_blueprints(self):
         return blueprint
 
-    def get_logger(self):
-        return Logger.get('plugin.piwik')
-
     def register_assets(self):
         self.register_js_bundle('statistics_js', 'js/statistics.js')
         self.register_css_bundle('statistics_css', 'css/statistics.css')
@@ -90,6 +92,12 @@ class PiwikPlugin(IndicoPlugin):
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = 'Download - {}'.format(resource_title)
         tracker.call(resource_url, resource_title)
+
+    def _get_tracking_url(self):
+        url = self.settings.get('server_url')
+        url = url if url.endswith('/') else url + '/'
+        url = urlparse.urlparse(url)
+        return url.netloc + url.path
 
 
 blueprint = IndicoPluginBlueprint('piwik', __name__)

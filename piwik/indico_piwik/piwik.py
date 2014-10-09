@@ -22,7 +22,7 @@ class PiwikRequest(object):
 
     @property
     def api_url(self):
-        url = urlparse(self.server_url)
+        url = urlparse.urlparse(self.server_url)
         return url.netloc + url.path + self.query_script
 
     def call(self, default_response=None, **query_params):
