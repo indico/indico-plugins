@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import session
 from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
 from wtforms.fields.core import BooleanField
@@ -30,6 +31,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, UnsafePasswordField
 from indico.web.forms.widgets import CKEditorWidget
+from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
@@ -38,6 +40,7 @@ from MaKaC.webinterface.wcomponents import SideMenuItem
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.notifications import notify_deleted
+from indico_chat.util import is_chat_admin
 from indico_chat.views import WPChatEventPage, WPChatEventMgmt
 
 
@@ -98,6 +101,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_management_sidemenu, self.extend_event_management_menu)
         self.connect(signals.event_management_clone, self.extend_event_management_clone)
         self.connect(signals.event_deleted, self.event_deleted)
+        self.connect(signals.event_management_url, self.get_event_management_url)
         self.template_hook('event-header', self.inject_event_header)
         for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage, WPChatEventMgmt):
             self.inject_css('chat_css', wp)
@@ -126,10 +130,15 @@ class ChatPlugin(IndicoPlugin):
                               visible=self._has_visible_chatrooms)
 
     def extend_event_management_menu(self, event, **kwargs):
-        return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
+        if event.canModify(AccessWrapper(session.user)) or is_chat_admin(session.user):
+            return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(self, event)
+
+    def get_event_management_url(self, event, **kwargs):
+        if is_chat_admin(session.user):
+            return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):
         for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
