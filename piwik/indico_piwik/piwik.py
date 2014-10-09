@@ -1,6 +1,5 @@
 from logging import Logger
-from urllib2 import urlopen, URLError
-from urllib2.urlparse import urlparse
+from urllib2 import urlopen, urlparse, URLError
 
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 

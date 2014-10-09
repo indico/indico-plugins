@@ -2,13 +2,13 @@ from datetime import datetime
 from urllib2 import quote
 
 from . import PiwikQueryBase
-from indico_piwik import PiwikPlugin
 
 
 class PiwikQueryTrackBase(PiwikQueryBase):
     """Base class for action-tracking queries"""
 
     def __init__(self):
+        from indico_piwik import PiwikPlugin
         super(PiwikQueryTrackBase, self).__init__(query_script=PiwikPlugin.track_script)
 
     def call(self, action_url, action_name, **query_params):

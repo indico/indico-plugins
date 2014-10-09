@@ -10,8 +10,8 @@ from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from .controllers import RHStatistics
 from .forms import SettingsForm
-from .piwik import Piwik
-from .queries import PiwikQueryTrackDownload
+from .piwik import PiwikRequest
+from .queries.tracking import PiwikQueryTrackDownload
 
 
 class PiwikPlugin(IndicoPlugin):
@@ -58,7 +58,7 @@ class PiwikPlugin(IndicoPlugin):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
         if not self.settings.get('enabled_for_events') or not site_id_events:
             return ''
-        params = {'url': Piwik._get_query_url(),
+        params = {'url': PiwikRequest._get_query_url(),
                   'site_id': site_id_events}
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']

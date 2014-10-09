@@ -1,7 +1,5 @@
 import json
 
-from indico_piwik import PiwikPlugin
-
 
 def get_json_from_remote_server(func, default={}, **kwargs):
     """
@@ -12,6 +10,7 @@ def get_json_from_remote_server(func, default={}, **kwargs):
         rawjson = func(kwargs)
         return json.loads(rawjson)
     except Exception:
+        from indico_piwik import PiwikPlugin
         PiwikPlugin.get_logger().exception('Unable to load JSON from source {}'.format(str(rawjson)))
         return default
 

@@ -1,7 +1,7 @@
 from __future__ import division
 
 from . import PiwikQueryReportEventBase
-from .util import get_json_from_remote_server, reduce_json, stringify_seconds
+from .utils import get_json_from_remote_server, reduce_json, stringify_seconds
 
 
 class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):

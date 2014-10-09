@@ -7,7 +7,6 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
 
-from . import PiwikPlugin
 from queries.metrics import (PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
                              PiwikQueryReportEventMetricVisits, PiwikQueryReportEventMetricVisitDuration,
                              PiwikQueryReportEventMetricPeakDateAndVisitors)
@@ -135,6 +134,7 @@ class CachedReport(object):
         """
         Ascertain if live updating first, if so disregard and continue.
         """
+        from . import PiwikPlugin
 
         if not PiwikPlugin.settings.get('cache_enabled'):
             return self._function(*args, **kwargs)

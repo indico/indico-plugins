@@ -1,4 +1,3 @@
-from indico_piwik import PiwikPlugin
 from indico_piwik.piwik import PiwikRequest
 
 
@@ -6,6 +5,7 @@ class PiwikQueryBase(object):
     """Base Piwik query"""
 
     def __init__(self, query_script):
+        from indico_piwik import PiwikPlugin
         self.request = PiwikRequest(server_url=PiwikPlugin.settings.get('server_api_url'),
                                     site_id=PiwikPlugin.settings.get('site_id_events'),
                                     query_script=query_script)
@@ -18,6 +18,7 @@ class PiwikQueryReportBase(PiwikQueryBase):
     """Base Piwik query to request reports"""
 
     def __init__(self):
+        from indico_piwik import PiwikPlugin
         super(PiwikQueryReportBase, self).__init__(query_script=PiwikPlugin.report_script)
 
     def call(self, date=('last7',), period='day', **query_params):
