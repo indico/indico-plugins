@@ -86,7 +86,7 @@ class PiwikPlugin(IndicoPlugin):
         self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
-    def track_download(self, resource):
+    def track_download(self, event, resource):
         tracker = PiwikQueryTrackDownload()
         resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
