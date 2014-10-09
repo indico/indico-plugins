@@ -30,12 +30,12 @@ class PiwikQueryReportBase(PiwikQueryBase):
 class PiwikQueryReportEventBase(PiwikQueryReportBase):
     """Base Piwik query to request reports of events and contributions"""
 
-    def __init__(self, start_date, end_date, event_id, contrib_id=None):
+    def __init__(self, event_id, start_date, end_date, contrib_id=None):
         super(PiwikQueryReportEventBase, self).__init__()
+        self.event_id = event_id
+        self.contrib_id = contrib_id
         self.start_date = start_date
         self.end_date = end_date
-        self.conf_id = event_id
-        self.contrib_id = contrib_id
 
     def call(self, **query_params):
         return super(PiwikQueryReportEventBase, self).call(module='API', date=[self.start_date, self.end_date],
