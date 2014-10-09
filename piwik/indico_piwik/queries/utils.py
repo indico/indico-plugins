@@ -8,8 +8,8 @@ def get_json_from_remote_server(func, default={}, **kwargs):
     Safely manage calls to the remote server by encapsulating JSON creation
     from Piwik data.
     """
+    rawjson = func(**kwargs)
     try:
-        rawjson = func(kwargs)
         return json.loads(rawjson)
     except Exception:
         current_plugin.get_logger().exception('Unable to load JSON from source {}'.format(str(rawjson)))
@@ -17,7 +17,7 @@ def get_json_from_remote_server(func, default={}, **kwargs):
 
 
 def reduce_json(data):
-    """Reduce a JSON object."""
+    """Reduce a JSON object"""
     return reduce(lambda x, y: int(x) + int(y), data.values())
 
 

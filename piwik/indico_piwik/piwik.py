@@ -45,7 +45,7 @@ class PiwikRequest(object):
             query += '{}={}&'.format(str(key), str(value))
         return query[:-1]
 
-    def get_query_url(self, query_params={}):
+    def get_query_url(self, **query_params):
         """Return the url for a Piwik API query"""
         return '{}?{}'.format(self.api_url, self.get_query(query_params))
 

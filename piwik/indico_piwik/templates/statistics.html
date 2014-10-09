@@ -11,7 +11,7 @@
     <div class="statsWidget full edge">
         <div class="statsWidgetTitle">
             {% trans %}Selection Information{% endtrans %}
-            {% trans start=report.startDate, end=report.endDate %}({{ start }} to {{ end }}){% endtrans %}
+            {% trans start=report.start_date, end=report.end_date %}({{ start }} to {{ end }}){% endtrans %}
             <span style="float:right;padding-right:5px;">
                 <span id="statsModify" class="fakeLink">
                     {{ str_modif_query }}
@@ -34,16 +34,17 @@
                                id="statsFilterEndDate"
                                data-default="{{ report.endDate }}"
                                value="{{ report.endDate }}">
-                        <input type="hidden" id="confId" value="{{ report.confId }}">
-                        <input type="hidden" id="contribId" value="{{ report.contribId }}">
+                        <input type="hidden" id="confId" value="{{ report.event_id }}">
+                        <input type="hidden" id="contribId" value="{{ report.contrib_id }}">
                     </div>
                     <div class="statsFilterOption">
-                    {% if report.contributions %}
-                        {% trans %}Choose Conference / Contribution{% endtrans %}
+                    {% if report.contributions_info %}
+                        {% trans %}Choose Event / Contribution{% endtrans %}
                         <select id="updateContribution">
-                            {% for id, title in report.contributions %}
+                            <option value="None">{% trans %}Event{% endtrans %}:</option>
+                            {% for id, title in report.contributions_info.itervalues() %}
                                 <option value="{{ id }}" {{ 'selected' if selected == id }}>
-                                    {{ title }}
+                                    {% trans %}Contribution{% endtrans %}: {{ title }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -203,7 +204,7 @@
     </div>
 
     <div id="statsGenerated">
-        {% trans dt=report.dateGenerated | format_datetime('long') -%}
+        {% trans dt=report.timestamp | format_datetime('long') -%}
             This report was generated at: {{ dt }}
         {%- endtrans %}
     </div>

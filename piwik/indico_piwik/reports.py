@@ -16,16 +16,13 @@ class Report(Serializer):
 
     default_report_interval = 14
 
-    __public__ = ['event_id', 'contrib_id' 'start_date', 'end_date', 'metrics', 'contributions_info', 'timestamp']
+    __public__ = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
 
     def __init__(self, event_id, contrib_id=None, start_date=None, end_date=None):
         self.metrics = {}
-        self.contributions_info = []
+        self.contributions = {}
 
         self.event = ConferenceHolder().getById(event_id)
-        if self.event is None:
-            raise Exception("The event does not exists")
-
         self.event_id = event_id
         self.contrib_id = contrib_id
         self._init_date_range(start_date, end_date)
@@ -41,25 +38,22 @@ class Report(Serializer):
                          'referrers': PiwikQueryReportEventMetricReferrers(**params),
                          'peakDate': PiwikQueryReportEventMetricPeakDateAndVisitors(**params)}
 
-        self._build_report()
-        self._build_contributions_info()
+        self._fetch_report()
+        self._fetch_contribution_info()
         self.timestamp = utc2server(nowutc(), naive=False)
 
-    def _build_contributions_info(self):
+    def _fetch_contribution_info(self):
         """Build the list of information entries for contributions of the event"""
         contributions = self.event.getContributionList()
-        if contributions:
-            header = ('None', 'Event: {}'.format(self.event.getTitle()))
-            self._contributions.append(header)
         for contribution in contributions:
             if not contribution.isScheduled():
                 continue
             time = format_time(contribution.getStartDate())
-            info = 'Contribution: {} ({})'.format(contribution.getTitle(), time)
-            entry = (contribution.getUniqueId(), info)
-            self.contributions_info.append(entry)
+            info = '{} ({})'.format(contribution.getTitle(), time)
+            contrib_id = contribution.getUniqueId()
+            self.contributions[contrib_id] = info
 
-    def _build_report(self):
+    def _fetch_report(self):
         """Build the report by performing queries to Piwik"""
         for query_name, query in self._queries.iteritems():
             self.metrics[query_name] = query.get_result()
@@ -73,7 +67,7 @@ class Report(Serializer):
             end_date = self.event.getEndDate().date()
             self.end_date = end_date if end_date < today else today
         if self.start_date is None:
-            self.start_date = self.end_date - timedelta(days=self.default_report_interval)
+            self.start_date = self.end_date - timedelta(days=Report.default_report_interval)
 
 
 class CachedReport(object):
@@ -87,10 +81,7 @@ class CachedReport(object):
 
     def __init__(self, function):
         self._function = function
-
-        # Cache bucket per implementation
-        plugin = function.__module__.split('.')[3]
-        self._cache = GenericCache(plugin + 'StatisticsCache')
+        self._cache = GenericCache('Piwik.ReportCache')
 
     def getReport(self, *args, **kwargs):
         """
@@ -136,8 +127,8 @@ def memoize_report(function):
 
 
 @memoize_report
-def obtain_report(start_date, end_date, event_id, contrib_id=None):
+def obtain_report(event_id, contrib_id=None, start_date=None, end_date=None):
     """Query the Piwik server and return the serialized event report"""
     if event_id is None:
         raise Exception("The event ID can't be None")
-    return Report(start_date, end_date, event_id, contrib_id).to_serializable()
+    return Report(event_id, contrib_id, start_date, end_date).to_serializable()

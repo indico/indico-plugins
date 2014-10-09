@@ -23,7 +23,6 @@ class PiwikQueryReportBase(PiwikQueryBase):
 
     def call(self, date=('last7',), period='day', **query_params):
         date = ','.join(map(unicode, date))
-        query_params.update(self.get_type_params)
         return super(PiwikQueryReportBase, self).call(date=date, period=period, **query_params)
 
 
