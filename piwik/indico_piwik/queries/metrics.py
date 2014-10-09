@@ -9,9 +9,8 @@ from .utils import get_json_from_remote_server, reduce_json, stringify_seconds
 class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):
     """Base Piwik query for retrieving metrics in JSON format"""
 
-    def call(self, method, apiModule, **query_params):
-        return super(PiwikQueryReportEventMetricBase, self).call(method=method, apiModule=apiModule,
-                                                                 format='JSON', **query_params)
+    def call(self, method, **query_params):
+        return super(PiwikQueryReportEventMetricBase, self).call(method=method, format='JSON', **query_params)
 
     def get_result(self, return_json=False):
         """Perform the call and return the sum of all unique values"""
