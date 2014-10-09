@@ -2,7 +2,7 @@ from datetime import timedelta
 from functools import wraps
 
 from indico.util.date_time import format_time
-from indico.util.fossilize import IFossil, fossilizes, Fossilizable
+from indico.util.serializer import Serializer
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
@@ -12,60 +12,22 @@ from queries.metrics import (PiwikQueryReportEventMetricReferrers, PiwikQueryRep
                              PiwikQueryReportEventMetricPeakDateAndVisitors)
 
 
-class IPiwikReportFossil(IFossil):
-    """
-    The design of this fossil, and any which inherit from it, is that there
-    should be at least 3 distinct groups of what is stored for view logic and
-    for caching. 'images' refers to base64 encoded image data.
-    """
+class Report(Serializer):
 
-    def getImagesSources(self):
-        pass
-    getImagesSources.name = 'images'
-
-    def getWidgetSources(self):
-        pass
-    getWidgetSources.name = 'widgets'
-
-    def getValueSources(self):
-        pass
-    getValueSources.name = 'metrics'
-
-    def getStartDate(self):
-        pass
-
-    def getEndDate(self):
-        pass
-
-    def getDateGenerated(self):
-        pass
-
-    def _getContributions(self):
-        pass
-    _getContributions.name = 'contributions'
-
-    def getContributionId(self):
-        pass
-    getContributionId.name = 'contribId'
-
-    def getConferenceId(self):
-        pass
-    getConferenceId.name = 'confId'
-
-
-class Report(Fossilizable, object):
-
-    fossilizes(IPiwikReportFossil)
     default_report_interval = 14
 
+    __public__ = ['event_id', 'contrib_id' 'start_date', 'end_date', 'metrics', 'contributions_info', 'timestamp']
+
     def __init__(self, event_id, contrib_id=None, start_date=None, end_date=None):
-        self.value_sources = {}
+        self.metrics = {}
         self.contributions_info = []
 
         self.event = ConferenceHolder().getById(event_id)
         if self.event is None:
             raise Exception("The event does not exists")
 
+        self.event_id = event_id
+        self.contrib_id = contrib_id
         self._init_date_range(start_date, end_date)
 
         params = {'start_date': self.start_date,
@@ -100,7 +62,7 @@ class Report(Fossilizable, object):
     def _build_report(self):
         """Build the report by performing queries to Piwik"""
         for query_name, query in self._queries.iteritems():
-            self.value_sources[query_name] = query.get_result()
+            self.metrics[query_name] = query.get_result()
 
     def _init_date_range(self, start_date=None, end_date=None):
         """Set date range defaults if no dates are passed"""
@@ -178,4 +140,4 @@ def obtain_report(start_date, end_date, event_id, contrib_id=None):
     """Query the Piwik server and return the serialized event report"""
     if event_id is None:
         raise Exception("The event ID can't be None")
-    return Report(start_date, end_date, event_id, contrib_id).fossilize()
+    return Report(start_date, end_date, event_id, contrib_id).to_serializable()
