@@ -1,5 +1,7 @@
 from __future__ import division
 
+from operator import attrgetter, itemgetter
+
 from . import PiwikQueryReportEventBase
 from .utils import get_json_from_remote_server, reduce_json, stringify_seconds
 
@@ -11,12 +13,12 @@ class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):
         return super(PiwikQueryReportEventMetricBase, self).call(method=method, apiModule=apiModule,
                                                                  format='JSON', **query_params)
 
-    def get_result(self, returnJSON=False):
+    def get_result(self, return_json=False):
         """Perform the call and return the sum of all unique values"""
         result = get_json_from_remote_server(self.call)
         if not result:
             return 0
-        return result if returnJSON else int(reduce_json(result))
+        return result if return_json else int(reduce_json(result))
 
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
@@ -30,7 +32,7 @@ class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
         referrers = list(result)
         for referrer in referrers:
             referrer['sum_visit_length'] = stringify_seconds(referrer['sum_visit_length'])
-        return sorted(referrers, key=lambda r: r['nb_visits'], reverse=True)[0:10]
+        return sorted(referrers, key=attrgetter('nb_visits'), reverse=True)[0:10]
 
 
 class PiwikQueryReportEventMetricUniqueVisits(PiwikQueryReportEventMetricBase):
@@ -54,15 +56,13 @@ class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
         return stringify_seconds(seconds)
 
     def _get_average_duration(self, result):
-        data = result.values()
-        if len(data) == 0:
-            return 0
-
         seconds = 0
+        data = result.values()
+        if not data:
+            return seconds
         for day in data:
             if isinstance(day, dict):
                 seconds += day.get('avg_time_on_site', 0)
-
         return seconds / len(data)
 
 
@@ -73,8 +73,8 @@ class PiwikQueryReportEventMetricPeakDateAndVisitors(PiwikQueryReportEventMetric
     def get_result(self):
         """Perform the call and return the peak date and how many users"""
         result = get_json_from_remote_server(self.call)
-        if len(result) > 0:
-            date, value = max(result.iteritems(), key=lambda e: e[1])
+        if result:
+            date, value = max(result.iteritems(), key=itemgetter(1))
             return {'date': date, 'users': value}
         else:
             return {'date': "No Data", 'users': 0}
