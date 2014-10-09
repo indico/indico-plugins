@@ -1,5 +1,6 @@
-from logging import Logger
 from urllib2 import urlopen, urlparse, URLError
+
+from flask_pluginengine import current_plugin
 
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
@@ -7,7 +8,7 @@ from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 class PiwikRequest(object):
     """Wrapper for Piwik API requests"""
 
-    def __init__(self, server_url, query_script, site_id, api_token=None, logger=None):
+    def __init__(self, server_url, query_script, site_id, api_token=None):
         if not server_url:
             raise ValueError("server_url can't be empty")
         if not query_script:
@@ -18,7 +19,6 @@ class PiwikRequest(object):
         self.query_script = query_script
         self.site_id = site_id
         self.api_token = api_token
-        self.logger = logger
 
     @property
     def api_url(self):
@@ -33,9 +33,6 @@ class PiwikRequest(object):
         """
         query = self.get_query_url(**query_params)
         ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query, default_response)
-
-    def get_logger(self):
-        return self.logger if self.logger else Logger()
 
     def get_query(self, query_params={}):
         """Return a query string"""
@@ -57,12 +54,10 @@ class PiwikRequest(object):
         try:
             response = urlopen(url=query, timeout=timeout)
         except URLError:
-            logger = self.get_logger()
-            logger.exception('Unable to retrieve data')
+            current_plugin.get_logger().exception('Unable to retrieve data')
             return default_response
         except Exception:
-            logger = self.get_logger()
-            logger.exception('The Piwik server did not respond')
+            current_plugin.get_logger().exception('The Piwik server did not respond')
             return default_response
         value = response.read()
         response.close()

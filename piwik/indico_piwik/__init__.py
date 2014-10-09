@@ -40,7 +40,7 @@ class PiwikPlugin(IndicoPlugin):
     }
 
     @staticmethod
-    def get_logger(self):
+    def get_logger():
         return Logger.get('plugin.piwik')
 
     def init(self):
