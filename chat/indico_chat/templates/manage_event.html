@@ -1,71 +1,74 @@
 <h2 class="page-title">{% trans %}Chat Rooms{% endtrans %}</h2>
 
-<div class="plugin-chat chat-mgmt" id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}">
-    <div class="groupTitle">{% trans %}Current chat rooms{% endtrans %}</div>
+{% if event_chatrooms %}
+    <div class="plugin-chat chat-mgmt" id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}" style="margin-bottom: 2em;">
+        <div class="groupTitle">{% trans %}Current chat rooms{% endtrans %}</div>
 
-    {% for event_chatroom in event_chatrooms %}
-        {% set chatroom = event_chatroom.chatroom %}
-        {% set server = chatroom.server %}
-        <div class="chatroom">
-            <span><strong>{{ chatroom.name }}</strong></span>
-            -
-            <a class="chat-toggle-details" href="#">{% trans %}Show Details{% endtrans %}</a>
-            {% if logs_enabled and not chatroom.custom_server %}
+        {% for event_chatroom in event_chatrooms %}
+            {% set chatroom = event_chatroom.chatroom %}
+            {% set server = chatroom.server %}
+            <div class="chatroom">
+                <span><strong>{{ chatroom.name }}</strong></span>
                 -
-                <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}">{% trans %}Logs{% endtrans %}</a>
-            {% endif %}
-            -
-            <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}">{% trans %}Edit{% endtrans %}</a>
-            {% if not chatroom.custom_server %}
+                <a class="chat-toggle-details" href="#">{% trans %}Show Details{% endtrans %}</a>
+                {% if logs_enabled and not chatroom.custom_server %}
+                    -
+                    <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}">{% trans %}Logs{% endtrans %}</a>
+                {% endif %}
                 -
-                <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>
-            {% endif %}
-            -
-            <a class="js-chat-remove-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}">
-                {%- trans %}Remove{% endtrans -%}
-            </a>
-            {% if chat_links %}
+                <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}">{% trans %}Edit{% endtrans %}</a>
+                {% if not chatroom.custom_server %}
+                    -
+                    <a class="js-chat-refresh-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}">{% trans %}Refresh{% endtrans %}</a>
+                {% endif %}
                 -
-                <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a></strong>
-            {% endif %}
-            <dl class="chat-details" style="display: none;">
-                <dt>{% trans %}Name{% endtrans %}:</dt>
-                <dd>{{ chatroom.name }}</dd>
-                {% if chatroom.jid_node != chatroom.name.lower() %}
-                    <dt>JID:</dt>
-                    <dd>{{ chatroom.jid_node }}</dd>
+                <a class="js-chat-remove-room" href="#" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}">
+                    {%- trans %}Remove{% endtrans -%}
+                </a>
+                {% if chat_links %}
+                    -
+                    <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a></strong>
                 {% endif %}
-                <dt>{% trans %}Server{% endtrans %}:</dt>
-                <dd><span class="{% if chatroom.custom_server %}chat-custom-server{% endif %}">{{ server }}</span></dd>
-                {% if chatroom.description %}
-                    <dt>{% trans %}Description{% endtrans %}:</dt>
-                    <dd>{{ chatroom.description }}</dd>
-                {% endif %}
-                    <dt>{% trans %}Hidden{% endtrans %}:</dt>
-                    <dd>{% if event_chatroom.hidden %}Yes{% else %}No{% endif %}</dd>
-                {% if chatroom.password %}
-                    <dt>{% trans %}Password{% endtrans %}:</dt>
-                    <dd>{{ chatroom.password }}</dd>
-                    <dt>{% trans %}Password visible{% endtrans %}:</dt>
-                    <dd>{% if event_chatroom.show_password %}Yes{% else %}No{% endif %}</dd>
-                {% endif %}
-                <dt>Created by:</dt>
-                <dd>{{ chatroom.created_by_user.getStraightFullName() }}</dd>
-                <dt>Created on:</dt>
-                <dd>{{ chatroom.created_dt | format_datetime('long') }}</dd>
-                <dt>Modified on:</dt>
-                <dd>
-                    {% if chatroom.modified_dt %}
-                        {{ chatroom.modified_dt | format_datetime('long') }}
-                    {% else %}
-                        <em>Never</em>
+                <dl class="chat-details" style="display: none;">
+                    <dt>{% trans %}Name{% endtrans %}:</dt>
+                    <dd>{{ chatroom.name }}</dd>
+                    {% if chatroom.jid_node != chatroom.name.lower() %}
+                        <dt>JID:</dt>
+                        <dd>{{ chatroom.jid_node }}</dd>
                     {% endif %}
-                </dd>
-            </dl>
-        </div>
-    {% endfor %}
-</div>
-<div style="margin-top: 2em;">
+                    <dt>{% trans %}Server{% endtrans %}:</dt>
+                    <dd><span class="{% if chatroom.custom_server %}chat-custom-server{% endif %}">{{ server }}</span></dd>
+                    {% if chatroom.description %}
+                        <dt>{% trans %}Description{% endtrans %}:</dt>
+                        <dd>{{ chatroom.description }}</dd>
+                    {% endif %}
+                        <dt>{% trans %}Hidden{% endtrans %}:</dt>
+                        <dd>{% if event_chatroom.hidden %}Yes{% else %}No{% endif %}</dd>
+                    {% if chatroom.password %}
+                        <dt>{% trans %}Password{% endtrans %}:</dt>
+                        <dd>{{ chatroom.password }}</dd>
+                        <dt>{% trans %}Password visible{% endtrans %}:</dt>
+                        <dd>{% if event_chatroom.show_password %}Yes{% else %}No{% endif %}</dd>
+                    {% endif %}
+                    <dt>Created by:</dt>
+                    <dd>{{ chatroom.created_by_user.getStraightFullName() }}</dd>
+                    <dt>Created on:</dt>
+                    <dd>{{ chatroom.created_dt | format_datetime('long') }}</dd>
+                    <dt>Modified on:</dt>
+                    <dd>
+                        {% if chatroom.modified_dt %}
+                            {{ chatroom.modified_dt | format_datetime('long') }}
+                        {% else %}
+                            <em>Never</em>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div>
     <div class="groupTitle">{% trans %}Add chat room{% endtrans %}</div>
     {% if available_chatrooms %}
         <form action="{{ url_for_plugin('.manage_rooms_attach', event) }}" method="post">
