@@ -7,22 +7,28 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
 
-from queries.metrics import (PiwikQueryReportEventMetricDownloads, PiwikQueryReportEventMetricPeakDateAndVisitors,
-                             PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
-                             PiwikQueryReportEventMetricVisits, PiwikQueryReportEventMetricVisitDuration)
+from .queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
+from .queries.metrics import (PiwikQueryReportEventMetricDownloads, PiwikQueryReportEventMetricPeakDateAndVisitors,
+                              PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
+                              PiwikQueryReportEventMetricVisits, PiwikQueryReportEventMetricVisitDuration)
 
 
 class ReportBase(Serializer):
     """Wrapper for Piwik report collection"""
 
-    __public__ = ['metrics']
+    __public__ = []
     default_report_interval = 14
 
     def __init__(self, event_id, contrib_id=None, start_date=None, end_date=None, **report_params):
+        self.graphs = {}
         self.metrics = {}
         self.event_id = event_id
         self.contrib_id = contrib_id
         self._init_date_range(start_date, end_date)
+        self.params = {'start_date': self.start_date,
+                       'end_date': self.end_date,
+                       'event_id': self.event_id,
+                       'contrib_id': self.contrib_id}
         self._build_report(**report_params)
         self.timestamp = utc2server(nowutc(), naive=False)
 
@@ -42,17 +48,28 @@ class ReportBase(Serializer):
             self.start_date = self.end_date - timedelta(days=ReportBase.default_report_interval)
 
 
+class ReportCountries(ReportBase):
+    __public__ = ['graphs']
+
+    def _build_report(self):
+        self.graphs['countries'] = PiwikQueryReportEventGraphCountries(**self.params).get_result()
+
+
+class ReportDevices(ReportBase):
+    __public__ = ['graphs']
+
+    def _build_report(self):
+        self.graphs['devices'] = PiwikQueryReportEventGraphDevices(**self.params).get_result()
+
+
 class ReportDownloads(ReportBase):
+    __public__ = ['metrics']
+
     def _build_report(self, download_url):
-        params = {'start_date': self.start_date,
-                  'end_date': self.end_date,
-                  'event_id': self.event_id,
-                  'contrib_id': self.contrib_id}
-        self.metrics['downloads'] = PiwikQueryReportEventMetricDownloads(**params).get_result(download_url)
+        self.metrics['downloads'] = PiwikQueryReportEventMetricDownloads(**self.params).get_result(download_url)
 
 
 class ReportGeneral(ReportBase):
-
     __public__ = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
 
     @property
@@ -61,16 +78,11 @@ class ReportGeneral(ReportBase):
 
     def _build_report(self):
         """Build the report by performing queries to Piwik"""
-        params = {'start_date': self.start_date,
-                  'end_date': self.end_date,
-                  'event_id': self.event_id,
-                  'contrib_id': self.contrib_id}
-
-        queries = {'visits': PiwikQueryReportEventMetricVisits(**params),
-                   'uniqueVisits': PiwikQueryReportEventMetricUniqueVisits(**params),
-                   'visitLength': PiwikQueryReportEventMetricVisitDuration(**params),
-                   'referrers': PiwikQueryReportEventMetricReferrers(**params),
-                   'peakDate': PiwikQueryReportEventMetricPeakDateAndVisitors(**params)}
+        queries = {'visits': PiwikQueryReportEventMetricVisits(**self.params),
+                   'uniqueVisits': PiwikQueryReportEventMetricUniqueVisits(**self.params),
+                   'visitLength': PiwikQueryReportEventMetricVisitDuration(**self.params),
+                   'referrers': PiwikQueryReportEventMetricReferrers(**self.params),
+                   'peakDate': PiwikQueryReportEventMetricPeakDateAndVisitors(**self.params)}
 
         for query_name, query in queries.iteritems():
             self.metrics[query_name] = query.get_result()
@@ -92,13 +104,11 @@ class ReportGeneral(ReportBase):
 
 
 class ReportVisits(ReportBase):
+    __public__ = ['metrics']
+
     def _build_report(self):
-        params = {'start_date': self.start_date,
-                  'end_date': self.end_date,
-                  'event_id': self.event_id,
-                  'contrib_id': self.contrib_id}
-        self.metrics['unique'] = PiwikQueryReportEventMetricUniqueVisits(**params).get_result()
-        self.metrics['total'] = PiwikQueryReportEventMetricVisits(**params).get_result()
+        self.metrics['unique'] = PiwikQueryReportEventMetricUniqueVisits(**self.params).get_result()
+        self.metrics['total'] = PiwikQueryReportEventMetricVisits(**self.params).get_result()
         self._reduce_metrics()
 
     def _reduce_metrics(self):
