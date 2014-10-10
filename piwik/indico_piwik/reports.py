@@ -1,5 +1,4 @@
 from datetime import timedelta
-from functools import wraps
 
 from indico.util.date_time import format_time
 from indico.util.serializer import Serializer
@@ -22,7 +21,6 @@ class Report(Serializer):
         self.metrics = {}
         self.contributions = {}
 
-        self.event = ConferenceHolder().getById(event_id)
         self.event_id = event_id
         self.contrib_id = contrib_id
         self._init_date_range(start_date, end_date)
@@ -41,6 +39,10 @@ class Report(Serializer):
         self._fetch_report()
         self._fetch_contribution_info()
         self.timestamp = utc2server(nowutc(), naive=False)
+
+    @property
+    def event(self):
+        return ConferenceHolder().getById(self.event_id)
 
     def _fetch_contribution_info(self):
         """Build the list of information entries for contributions of the event"""
@@ -70,65 +72,18 @@ class Report(Serializer):
             self.start_date = self.end_date - timedelta(days=Report.default_report_interval)
 
 
-class CachedReport(object):
-    """
-    This class acts as a wrapper for functions which return a report object,
-    by decorating the get<report> methods with the memonize function in the
-    BaseStatisticsReport object, the result is wrapped here and its age
-    is compared with the TTL if in the cache, either returning said item or
-    allowing the method to generate a new one.
-    """
-
-    def __init__(self, function):
-        self._function = function
-        self._cache = GenericCache('Piwik.ReportCache')
-
-    def getReport(self, *args, **kwargs):
-        """
-        Ascertain if live updating first, if so disregard and continue.
-        """
-        from . import PiwikPlugin
-
-        if not PiwikPlugin.settings.get('cache_enabled'):
-            return self._function(*args, **kwargs)
-
-        keyParams = list(args)
-        keyParams.extend([self._function.__module__, self._function.__name__])
-        key = self._generateKey(keyParams)
-
-        resource = self._cache.get(key, None)
-
-        if not resource:
-            result = self._function(*args, **kwargs)
-            ttl = PiwikPlugin.settings.get('cache_ttl')
-            self._cache.set(key, result, ttl)
-            return result
-        else:
-            return resource
-
-    def _generateKey(self, params):
-        """
-        Generates a unique key for caching against the params given.
-        """
-        return reduce(lambda x, y: str(x) + '-' + str(y), params)
-
-
-def memoize_report(function):
-    """
-    Decorator method for the get<reports> methods, see CachedReport for
-    details on how this works with GenericCache.
-    """
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        return CachedReport(function).getReport(*args, **kwargs)
-
-    return wrapper
-
-
-@memoize_report
 def obtain_report(event_id, contrib_id=None, start_date=None, end_date=None):
-    """Query the Piwik server and return the serialized event report"""
-    if event_id is None:
-        raise Exception("The event ID can't be None")
-    return Report(event_id, contrib_id, start_date, end_date).to_serializable()
+    """Return the serialized event report only querying the server when not in cache"""
+    from . import PiwikPlugin
+
+    if not PiwikPlugin.settings.get('cache_enabled'):
+        return Report(event_id, contrib_id, start_date, end_date).to_serializable()
+
+    cache = GenericCache('Piwik.ReportCache')
+    key = '{}-{}-{}-{}'.format(event_id, contrib_id, unicode(start_date), unicode(end_date))
+
+    report = cache.get(key)
+    if not report:
+        report = Report(event_id, contrib_id, start_date, end_date)
+        cache.set(key, report, PiwikPlugin.settings.get('cache_ttl'))
+    return report.to_serializable()
