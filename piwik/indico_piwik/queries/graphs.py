@@ -29,10 +29,11 @@ class PiwikQueryEventGraphBase(PiwikQueryReportEventBase):
         return img_prefix + img_code
 
 
-class PiwikQueryEventGraphVisits(PiwikQueryEventGraphBase):
+class PiwikQueryEventGraphCountries(PiwikQueryEventGraphBase):
     def call(self, **query_params):
-        return super(PiwikQueryEventGraphVisits, self).call(apiModule='VisitsSummary', apiAction='get', width=720,
-                                                            height=260, graphType='evolution', **query_params)
+        return super(PiwikQueryEventGraphCountries, self).call(apiModule='UserCountry', apiAction='getCountry',
+                                                               period='range', width=490, height=260,
+                                                               graphType='horizontalBar', **query_params)
 
 
 class PiwikQueryEventGraphDevices(PiwikQueryEventGraphBase):
@@ -40,10 +41,3 @@ class PiwikQueryEventGraphDevices(PiwikQueryEventGraphBase):
         return super(PiwikQueryEventGraphDevices, self).call(apiModule='UserSettings', apiAction='getOS',
                                                              period='range', width=320, height=260,
                                                              graphType='horizontalBar', **query_params)
-
-
-class PiwikQueryEventGraphCountries(PiwikQueryEventGraphBase):
-    def call(self, **query_params):
-        return super(PiwikQueryEventGraphCountries, self).call(apiModule='UserCountry', apiAction='getCountry',
-                                                               period='range', width=490, height=260,
-                                                               graphType='horizontalBar', **query_params)
