@@ -32,6 +32,28 @@ class ReportBase(Serializer):
         self._build_report(**report_params)
         self.timestamp = utc2server(nowutc(), naive=False)
 
+    @property
+    def event(self):
+        return ConferenceHolder().getById(self.event_id)
+
+    @classmethod
+    def get(cls, *args, **kwargs):
+        """Create and return a serializable Report object, retrieved from cache if possible"""
+
+        from . import PiwikPlugin
+
+        if not PiwikPlugin.settings.get('cache_enabled'):
+            return cls(*args, **kwargs).to_serializable()
+
+        cache = GenericCache('Piwik.Report')
+        key = u'{}-{}-{}'.format(cls.__name__, args, kwargs)
+
+        report = cache.get(key)
+        if not report:
+            report = cls(*args, **kwargs)
+            cache.set(key, report, PiwikPlugin.settings.get('cache_ttl'))
+        return report.to_serializable()
+
     def _build_report(self):
         """To be overriden"""
         pass
@@ -71,10 +93,6 @@ class ReportDownloads(ReportBase):
 
 class ReportGeneral(ReportBase):
     __public__ = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
-
-    @property
-    def event(self):
-        return ConferenceHolder().getById(self.event_id)
 
     def _build_report(self):
         """Build the report by performing queries to Piwik"""
@@ -119,20 +137,3 @@ class ReportVisits(ReportBase):
                 reduced_metrics[date][metric_type] = int(hits)
 
         self.metrics = reduced_metrics
-
-
-def obtain_report(event_id, contrib_id=None, start_date=None, end_date=None):
-    """Return the serialized event report only querying the server when not in cache"""
-    from . import PiwikPlugin
-
-    if not PiwikPlugin.settings.get('cache_enabled'):
-        return ReportGeneral(event_id, contrib_id, start_date, end_date).to_serializable()
-
-    cache = GenericCache('Piwik.ReportCache')
-    key = '{}-{}-{}-{}'.format(event_id, contrib_id, unicode(start_date), unicode(end_date))
-
-    report = cache.get(key)
-    if not report:
-        report = ReportGeneral(event_id, contrib_id, start_date, end_date)
-        cache.set(key, report, PiwikPlugin.settings.get('cache_ttl'))
-    return report.to_serializable()
