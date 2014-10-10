@@ -10,7 +10,8 @@ from indico.util.i18n import _
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
-from .controllers import RHStatistics
+from .controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisits,
+                          RHApiEventGraphCountries, RHApiEventGraphDevices)
 from .forms import SettingsForm
 from .queries.tracking import PiwikQueryTrackDownload
 
@@ -101,4 +102,9 @@ class PiwikPlugin(IndicoPlugin):
 
 
 blueprint = IndicoPluginBlueprint('piwik', __name__)
-blueprint.add_url_rule('/event/<confId>/manage/statistics_new', 'view', RHStatistics)
+blueprint.add_url_rule('/event/<confId>/manage/statistics', 'view', RHStatistics)
+blueprint.add_url_rule('/event/<confId>/manage/statistics/material', 'material', RHApiMaterial)
+blueprint.add_url_rule('/event/<confId>/manage/statistics/data/downloads', 'data-downloads', RHApiDownloads)
+blueprint.add_url_rule('/event/<confId>/manage/statistics/data/visits', 'data-visits', RHApiEventVisits)
+blueprint.add_url_rule('/event/<confId>/manage/statistics/graph/countries', 'graph-countries', RHApiEventGraphCountries)
+blueprint.add_url_rule('/event/<confId>/manage/statistics/graph/devices', 'graph-devices', RHApiEventGraphDevices)
