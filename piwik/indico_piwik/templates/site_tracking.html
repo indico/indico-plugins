@@ -1,20 +1,42 @@
 <!-- Piwik -->
 <script type="text/javascript">
-    var _paq = _paq || [];
+
     (function() {
-        var u = (("https:" == document.location.protocol) ? "https://" : "http://");
-        u += '{{ server_url }}';
-        _paq.push(['setSiteId', {{ site_id }}]);
-        _paq.push(['setTrackerUrl', u + 'piwik.php']);
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
+        var url = '//{{ server_url }}';
         var g = document.createElement('script');
         var s = document.getElementsByTagName('script')[0];
         g.type = 'text/javascript';
         g.defer = true;
         g.async = true;
-        g.src = u + 'piwik.js';
+        g.src = url + 'piwik.js';
         s.parentNode.insertBefore(g, s);
+
+        window.piwikAsyncInit = function() {
+            try {
+                track_site();
+                {% if event_id %}
+                    track_event();
+                {% endif %}
+            } catch(err) {}
+        }
+
+        track_site = function() {
+            var general_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_general }});
+            general_tracker.enableLinkTracking();
+            general_tracker.trackPageView();
+        }
+
+        {% if event_id %}
+            track_event = function() {
+                var event_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_events }});
+                event_tracker.enableLinkTracking();
+                event_tracker.trackPageView();
+                event_tracker.setCustomVariable(1, 'Conference', {{ event_id }}, 'page');
+                {% if contrib_id %}
+                    event_tracker.setCustomVariable(2, 'Contribution', {{ contrib_id }}, 'page');
+                {% endif %}
+            }
+        {% endif %}
     })();
 </script>
 <!-- End Piwik Code -->

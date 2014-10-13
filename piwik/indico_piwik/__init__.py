@@ -48,31 +48,18 @@ class PiwikPlugin(IndicoPlugin):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
         self.connect(signals.material_downloaded, self.track_download)
-        self.template_hook('page-header', self.inject_page_header)
-        self.template_hook('page-footer', self.inject_page_footer)
+        self.template_hook('page-header', self.inject_tracking)
 
-    def inject_page_header(self, template, **kwargs):
+    def inject_tracking(self, template, **kwargs):
         server_url = self._get_tracking_url()
         site_id_general = self.settings.get('site_id_general')
         if not self.settings.get('enabled') or not server_url or not site_id_general:
             return ''
+        event_tracking_params = self._get_event_tracking_params()
         return render_plugin_template('site_tracking.html',
-                                      site_id=site_id_general,
-                                      server_url=server_url)
-
-    def inject_page_footer(self):
-        site_id_events = PiwikPlugin.settings.get('site_id_events')
-        if not self.settings.get('enabled_for_events') or not site_id_events:
-            return ''
-        params = {'url': self._get_tracking_url(),
-                  'site_id': site_id_events}
-        if request.blueprint == 'event':
-            params['event_id'] = request.view_args['confId']
-            contrib_id = request.view_args.get('contribId')
-            if contrib_id:
-                contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
-                params['contrib_id'] = contribution.getUniqueId()
-        return render_plugin_template('events_tracking.html', **params)
+                                      site_id_general=site_id_general,
+                                      server_url=server_url,
+                                      **event_tracking_params)
 
     def add_sidemenu_item(self, event):
         menu_item = SideMenuItem(_("Piwik Statistics"), url_for_plugin('piwik.view', event))
@@ -93,6 +80,19 @@ class PiwikPlugin(IndicoPlugin):
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = 'Download - {}'.format(resource_title)
         tracker.call(resource_url, resource_title)
+
+    def _get_event_tracking_params(self):
+        site_id_events = PiwikPlugin.settings.get('site_id_events')
+        if not self.settings.get('enabled_for_events') or not site_id_events:
+            return {}
+        params = {'site_id_events': site_id_events}
+        if request.blueprint == 'event':
+            params['event_id'] = request.view_args['confId']
+            contrib_id = request.view_args.get('contribId')
+            if contrib_id:
+                contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
+                params['contrib_id'] = contribution.getUniqueId()
+        return params
 
     def _get_tracking_url(self):
         url = self.settings.get('server_url')
