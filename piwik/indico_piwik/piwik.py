@@ -38,7 +38,7 @@ class PiwikRequest(object):
         """Return a query string"""
         query = ''
         if self.api_token is not None:
-            query_params['token_auth'] = self._api_token
+            query_params['token_auth'] = self.api_token
         for key, value in query_params.iteritems():
             if isinstance(value, list):
                 value = ','.join(value)
