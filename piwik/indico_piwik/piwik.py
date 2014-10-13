@@ -31,12 +31,13 @@ class PiwikRequest(object):
         :param default_response: Return value in case the query fails
         :param query_params: Dictionary with the parameters of the query
         """
-        query = self.get_query_url(**query_params)
-        ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query, default_response)
+        query_url = self.get_query_url(**query_params)
+        ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query_url, default_response)
 
     def get_query(self, query_params={}):
         """Return a query string"""
         query = ''
+        query_params['idSite'] = self.site_id
         if self.api_token is not None:
             query_params['token_auth'] = self.api_token
         for key, value in query_params.iteritems():
@@ -49,15 +50,15 @@ class PiwikRequest(object):
         """Return the url for a Piwik API query"""
         return '{}?{}'.format(self.api_url, self.get_query(query_params))
 
-    def _perform_call(self, query, default_response=None, timeout=10):
+    def _perform_call(self, query_url, default_response=None, timeout=10):
         """Returns the raw results from the API"""
         try:
-            response = urlopen(url=query, timeout=timeout)
+            response = urlopen(url=query_url, timeout=timeout)
         except URLError:
-            current_plugin.get_logger().exception('Unable to retrieve data')
+            current_plugin.get_logger().exception("Unable to retrieve data")
             return default_response
         except Exception:
-            current_plugin.get_logger().exception('The Piwik server did not respond')
+            current_plugin.get_logger().exception("Unable to connect")
             return default_response
         value = response.read()
         response.close()
