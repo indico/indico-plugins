@@ -56,7 +56,7 @@ class PiwikPlugin(IndicoPlugin):
         if not self.settings.get('enabled') or not server_url or not site_id_general:
             return ''
         event_tracking_params = self._get_event_tracking_params()
-        return render_plugin_template('site_tracking.html',
+        return render_plugin_template('tracking.html',
                                       site_id_general=site_id_general,
                                       server_url=server_url,
                                       **event_tracking_params)
