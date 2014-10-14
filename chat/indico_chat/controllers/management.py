@@ -25,6 +25,7 @@ from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.forms.base import FormDefaults
 
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
@@ -104,7 +105,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
     """Creates a new chatroom for an event"""
 
     def _process(self):
-        form = AddChatroomForm(obj=FormDefaults(name=unicode(self.event.title, 'utf-8')),
+        form = AddChatroomForm(obj=FormDefaults(name=to_unicode(self.event.title)),
                                date=self.event.getAdjustedStartDate())
         if form.validate_on_submit():
             chatroom = Chatroom(created_by_user=session.user)
@@ -144,7 +145,7 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
         RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
-        reason = '{} has requested to delete this room.'.format(unicode(session.user.getStraightFullName(), 'utf-8'))
+        reason = '{} has requested to delete this room.'.format(to_unicode(session.user.getStraightFullName()))
         chatroom_deleted = self.event_chatroom.delete(reason)
         notify_deleted(self.chatroom, self.event, session.user, chatroom_deleted)
         if chatroom_deleted:
