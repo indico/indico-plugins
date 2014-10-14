@@ -29,7 +29,7 @@ class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def call(self, download_url):
-        return super(PiwikQueryReportEventMetricReferrers, self).call(method='Actions.getDownload',
+        return super(PiwikQueryReportEventMetricDownloads, self).call(method='Actions.getDownload',
                                                                       downloadUrl=quote(download_url))
 
     def get_result(self, download_url):
@@ -42,28 +42,28 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
 
         # Piwik returns hits as a list of hits per date
         for date, hits in results.iteritems():
-            day_hits = {'total_hits': 0, 'unique_hits': 0}
+            day_hits = {'total': 0, 'unique': 0}
             if hits:
                 for metrics in hits:
-                    day_hits['total_hits'] += metrics['nb_hits']
-                    day_hits['unique_hits'] += metrics['nb_uniq_visitors']
+                    day_hits['total'] += metrics['nb_hits']
+                    day_hits['unique'] += metrics['nb_uniq_visitors']
             hits_calendar[date] = day_hits
 
         return hits_calendar
 
     def _get_cumulative_results(self, results):
         """
-        Returns a dictionary of {'total_hits': x, 'unique_hits': y} for the
+        Returns a dictionary of {'total': x, 'unique': y} for the
         date range.
         """
-        total_hits = {'total_hits': 0, 'unique_hits': 0}
+        hits = {'total': 0, 'unique': 0}
 
         day_hits = list(hits[0] for hits in results.values() if hits)
         for metrics in day_hits:
-            total_hits['total_hits'] += metrics['nb_hits']
-            total_hits['unique_hits'] += metrics['nb_uniq_visitors']
+            hits['total'] += metrics['nb_hits']
+            hits['unique'] += metrics['nb_uniq_visitors']
 
-        return total_hits
+        return hits
 
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):

@@ -38,9 +38,9 @@ class RHApiEventBase(RHApiBase):
         self._report_params['contrib_id'] = params.get('contrib_id')
 
 
-class RHApiDownloads(RHApiBase):
+class RHApiDownloads(RHApiEventBase):
     def _checkParams(self, params):
-        RHApiBase._checkParams(self, params)
+        RHApiEventBase._checkParams(self, params)
         self._report_params['download_url'] = params['download_url']
 
     def _process(self):

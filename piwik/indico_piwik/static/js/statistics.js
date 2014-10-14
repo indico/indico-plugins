@@ -182,26 +182,23 @@ $(function() {
         replot = typeof replot !== 'undefined' ? replot : false;
         var DOMTarget = 'materialDownloadChart';
         var graphParams = getIndicoBaseParams();
-        graphParams['materialURL'] = uri;
+        graphParams.download_url = uri;
 
-        indicoRequest('piwik.getMaterialStatistics', graphParams,
-            function(result, error) {
-                if (!error) {
-                    if (result !== null) {
-                        var materialHits = [getArrayValues(result['individual'],
-                                            'total_hits'),
-                                            getArrayValues(result['individual'],
-                                            'unique_hits')];
-
-                        drawGraph(materialHits, DOMTarget, replot);
-                        // Write to the title the total material downloads
-                        $('#materialTotalDownloads').html(result['cumulative']['total_hits']);
-                    }
-                } else {
-                    $('#dialogNoGraphData').dialog('open');
+        $.ajax({
+            url: build_url(PiwikPlugin.urls.data_downloads, {'confId': $('#confId').val(), 'download_url': uri}),
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
                 }
+                var materialHits = [getArrayValues(data.metrics.downloads.individual, 'total'),
+                                    getArrayValues(data.metrics.downloads.individual, 'unique')];
+                drawGraph(materialHits, DOMTarget, replot);
+                // Write to the title the total material downloads
+                $('#materialTotalDownloads').html(data.metrics.downloads.cumulative.total);
             }
-        );
+        });
     };
 
     /* jqTree Specifics */
