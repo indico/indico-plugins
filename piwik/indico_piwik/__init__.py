@@ -101,10 +101,10 @@ class PiwikPlugin(IndicoPlugin):
         return url.netloc + url.path
 
 
-blueprint = IndicoPluginBlueprint('piwik', __name__)
-blueprint.add_url_rule('/event/<confId>/manage/statistics', 'view', RHStatistics)
-blueprint.add_url_rule('/event/<confId>/manage/statistics/material', 'material', RHApiMaterial)
-blueprint.add_url_rule('/event/<confId>/manage/statistics/data/downloads', 'data-downloads', RHApiDownloads)
-blueprint.add_url_rule('/event/<confId>/manage/statistics/data/visits', 'data-visits', RHApiEventVisits)
-blueprint.add_url_rule('/event/<confId>/manage/statistics/graph/countries', 'graph-countries', RHApiEventGraphCountries)
-blueprint.add_url_rule('/event/<confId>/manage/statistics/graph/devices', 'graph-devices', RHApiEventGraphDevices)
+blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<confId>/manage/statistics')
+blueprint.add_url_rule('/', 'view', RHStatistics)
+blueprint.add_url_rule('/material', 'material', RHApiMaterial)
+blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads)
+blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisits)
+blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries)
+blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices)
