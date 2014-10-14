@@ -276,28 +276,30 @@ $(function() {
         }
     });
 
-    /* Static graph data being retrieved by the API. */
-    var staticGraphs = [{
-        'apiMethod': 'piwik.getGeographyGraph',
-        'el': 'graphGeography'
-    }, {
-        'apiMethod': 'piwik.getDevicesGraph',
-        'el': 'graphDevices'
-    }];
-
     /* Iterates through the objects relating to static graphs and calls them
      * to populate page. @todo: Move this to Backbone.js
      **/
     var loadStaticGraphs = function() {
-        $.each(staticGraphs, function(index, graph) {
-            indicoRequest(graph.apiMethod, getIndicoBaseParams(),
-                function(result, error) {
-                    if (!error) {
-                        $('#' + graph.el).attr('src', result);
-                    } else {
-                        $('#' + graph.el).html($T('No Graph Data Received'));
+        var graph_requests = [{'endpoint': 'graph_countries', 'report': 'countries'},
+                              {'endpoint': 'graph_devices', 'report': 'devices'}];
+        $.each(graph_requests, function(index, request) {
+            $.ajax({
+                url: build_url(PiwikPlugin.urls[request.endpoint], {confId: $('#confId').val()}),
+                type: 'POST',
+                dataType: 'json',
+                success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
                     }
-                });
+                    var graph_holder =  $('#' + request.endpoint);
+                    if (data.graphs[request.report] !== null) {
+                        graph_holder.attr('src', data.graphs[request.report]);
+                    } else {
+                        var error = $('<div>').text($T("No graph data Received"));
+                        graph_holder.replaceWith(error);
+                    }
+                }
+            });
         });
     };
 

@@ -7,6 +7,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from indico.util.i18n import _
+from indico.web.flask.util import url_rule_to_js
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -68,6 +69,10 @@ class PiwikPlugin(IndicoPlugin):
     def get_blueprints(self):
         return blueprint
 
+    def get_vars_js(self):
+        return {'urls': {'graph_countries': url_rule_to_js('plugin_piwik.graph_countries'),
+                         'graph_devices': url_rule_to_js('plugin_piwik.graph_devices')}}
+
     def register_assets(self):
         self.register_js_bundle('statistics_js', 'js/statistics.js')
         self.register_css_bundle('statistics_css', 'css/statistics.css')
@@ -106,5 +111,5 @@ blueprint.add_url_rule('/', 'view', RHStatistics)
 blueprint.add_url_rule('/material', 'material', RHApiMaterial)
 blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads)
 blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisits)
-blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries)
-blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices)
+blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries, methods=('GET', 'POST'))
+blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices, methods=('GET', 'POST'))

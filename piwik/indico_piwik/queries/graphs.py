@@ -1,5 +1,7 @@
 from base64 import b64encode
 
+from flask_pluginengine import current_plugin
+
 from . import PiwikQueryReportEventBase
 
 
@@ -21,12 +23,13 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
         :return: Encoded PNG graph data string to be inserted in a `src`
                  atribute of a HTML img tag.
         """
-        img_prefix = 'data:image/png;base64,'
-        png = self.call(default_response='none')
-        if png == 'none':
-            return png
-        img_code = b64encode(png)
-        return img_prefix + img_code
+        png = self.call()
+        if png is None:
+            return
+        if png.startswith('GD extension must be loaded'):
+            current_plugin.get_logger().warning('Piwik server answered on ImageGraph.get: {}'.format(png))
+            return
+        return 'data:image/png;base64,{}'.format(b64encode(png))
 
 
 class PiwikQueryReportEventGraphCountries(PiwikQueryReportEventGraphBase):
