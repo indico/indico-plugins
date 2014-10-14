@@ -37,9 +37,11 @@ class PiwikQueryReportEventBase(PiwikQueryReportBase):
         self.start_date = start_date
         self.end_date = end_date
 
-    def call(self, **query_params):
+    def call(self, segmentation_enabled=True, **query_params):
+        if segmentation_enabled:
+            query_params['segmentation'] = self.get_segmentation()
         return super(PiwikQueryReportEventBase, self).call(module='API', date=[self.start_date, self.end_date],
-                                                           segmentation=self.get_segmentation(), **query_params)
+                                                           **query_params)
 
     def get_segmentation(self):
         segmentation = {'customVariablePageName1': ('==', 'Conference'),
