@@ -123,7 +123,7 @@ class ChatPlugin(IndicoPlugin):
         return render_plugin_template('event_header.html', event=event, event_chatrooms=chatrooms,
                                       how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))
 
-    def extend_indico_help(self, sender):
+    def extend_indico_help(self, sender, **kwargs):
         return {
             _('Chat Guides'): {
                 _('Chat User Guide'): ('ihelp/html/Chat/ChatUserGuide.html',
