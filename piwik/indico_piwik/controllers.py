@@ -6,7 +6,7 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from .views import WPStatistics
-from .reports import ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportVisits
+from .reports import ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportVisitsPerDay
 
 
 class RHStatistics(RHConferenceModifBase):
@@ -47,9 +47,9 @@ class RHApiDownloads(RHApiBase):
         return jsonify(ReportDownloads.get(**self._report_params))
 
 
-class RHApiEventVisits(RHApiEventBase):
+class RHApiEventVisitsPerDay(RHApiEventBase):
     def _process(self):
-        return jsonify(ReportVisits.get(**self._report_params))
+        return jsonify(ReportVisitsPerDay.get(**self._report_params))
 
 
 class RHApiEventGraphCountries(RHApiEventBase):

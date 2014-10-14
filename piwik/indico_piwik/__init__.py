@@ -11,7 +11,7 @@ from indico.web.flask.util import url_rule_to_js
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
-from .controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisits,
+from .controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
                           RHApiEventGraphCountries, RHApiEventGraphDevices)
 from .forms import SettingsForm
 from .queries.tracking import PiwikQueryTrackDownload
@@ -113,6 +113,6 @@ blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<confId>
 blueprint.add_url_rule('/', 'view', RHStatistics)
 blueprint.add_url_rule('/material', 'material', RHApiMaterial, methods=('GET', 'POST'))
 blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads, methods=('GET', 'POST'))
-blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisits, methods=('GET', 'POST'))
+blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisitsPerDay, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices, methods=('GET', 'POST'))

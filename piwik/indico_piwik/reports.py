@@ -121,12 +121,12 @@ class ReportGeneral(ReportBase):
             self.contributions[contrib_id] = info
 
 
-class ReportVisits(ReportBase):
+class ReportVisitsPerDay(ReportBase):
     __public__ = ['metrics']
 
     def _build_report(self):
-        self.metrics['unique'] = PiwikQueryReportEventMetricUniqueVisits(**self.params).get_result()
-        self.metrics['total'] = PiwikQueryReportEventMetricVisits(**self.params).get_result()
+        self.metrics['unique'] = PiwikQueryReportEventMetricUniqueVisits(**self.params).get_result(reduced=False)
+        self.metrics['total'] = PiwikQueryReportEventMetricVisits(**self.params).get_result(reduced=False)
         self._reduce_metrics()
 
     def _reduce_metrics(self):

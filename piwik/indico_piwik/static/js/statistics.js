@@ -160,16 +160,18 @@ $(function() {
         var DOMTarget = 'visitorChart';
         $('#' + DOMTarget).html(progressIndicator(true, true).dom);
 
-        indicoRequest('piwik.getEventVisits', getIndicoBaseParams(),
-            function(result, error) {
-                if (!error) {
-                    var source = [getArrayValues(result, 'total_hits'),
-                                  getArrayValues(result, 'unique_hits')]
-
-                    drawGraph(source, DOMTarget, false);
-                } else {
-                    $('#' + DOMTarget).html($T('No data found.'));
+        $.ajax({
+            url: build_url(PiwikPlugin.urls.data_visits, {confId: $('#confId').val()}),
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
                 }
+                var source = [getArrayValues(data.metrics, 'total'),
+                              getArrayValues(data.metrics, 'unique')];
+                drawGraph(source, DOMTarget, false);
+            }
         });
     };
 
@@ -295,7 +297,7 @@ $(function() {
                     if (data.graphs[request.report] !== null) {
                         graph_holder.attr('src', data.graphs[request.report]);
                     } else {
-                        var error = $('<div>').text($T("No graph data Received"));
+                        var error = $('<div>').text($T("No graph data received"));
                         graph_holder.replaceWith(error);
                     }
                 }

@@ -13,12 +13,18 @@ class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):
     def call(self, method, **query_params):
         return super(PiwikQueryReportEventMetricBase, self).call(method=method, format='JSON', **query_params)
 
-    def get_result(self, return_json=False):
+    def get_result(self):
         """Perform the call and return the sum of all unique values"""
-        result = get_json_from_remote_server(self.call)
-        if not result:
-            return 0
-        return result if return_json else int(reduce_json(result))
+        pass
+
+
+class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
+    def get_result(self, reduced=True):
+        query_params = {} if reduced else {'segmentation_enabled': False}
+        result = get_json_from_remote_server(self.call, **query_params)
+        if reduced:
+            return int(reduce_json(result)) if result else 0
+        return result if result else {}
 
 
 class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
@@ -34,7 +40,7 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def _get_per_day_results(self, results):
         hits_calendar = {}
 
-        # Piwik returns hits as a list of hits per date.
+        # Piwik returns hits as a list of hits per date
         for date, hits in results.iteritems():
             day_hits = {'total_hits': 0, 'unique_hits': 0}
             if hits:
@@ -74,14 +80,15 @@ class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
         return sorted(referrers, key=itemgetter('nb_visits'), reverse=True)[0:10]
 
 
-class PiwikQueryReportEventMetricUniqueVisits(PiwikQueryReportEventMetricBase):
-    def call(self):
-        return super(PiwikQueryReportEventMetricUniqueVisits, self).call(method='VisitsSummary.getUniqueVisitors')
+class PiwikQueryReportEventMetricUniqueVisits(PiwikQueryReportEventMetricVisitsBase):
+    def call(self, **query_params):
+        return super(PiwikQueryReportEventMetricUniqueVisits, self).call(method='VisitsSummary.getUniqueVisitors',
+                                                                         **query_params)
 
 
-class PiwikQueryReportEventMetricVisits(PiwikQueryReportEventMetricBase):
-    def call(self):
-        return super(PiwikQueryReportEventMetricVisits, self).call(method='VisitsSummary.getVisits')
+class PiwikQueryReportEventMetricVisits(PiwikQueryReportEventMetricVisitsBase):
+    def call(self, **query_params):
+        return super(PiwikQueryReportEventMetricVisits, self).call(method='VisitsSummary.getVisits', **query_params)
 
 
 class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
