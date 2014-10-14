@@ -97,10 +97,10 @@ class ReportGeneral(ReportBase):
     def _build_report(self):
         """Build the report by performing queries to Piwik"""
         queries = {'visits': PiwikQueryReportEventMetricVisits(**self.params),
-                   'uniqueVisits': PiwikQueryReportEventMetricUniqueVisits(**self.params),
-                   'visitLength': PiwikQueryReportEventMetricVisitDuration(**self.params),
+                   'unique_visits': PiwikQueryReportEventMetricUniqueVisits(**self.params),
+                   'visit_duration': PiwikQueryReportEventMetricVisitDuration(**self.params),
                    'referrers': PiwikQueryReportEventMetricReferrers(**self.params),
-                   'peakDate': PiwikQueryReportEventMetricPeakDateAndVisitors(**self.params)}
+                   'peak': PiwikQueryReportEventMetricPeakDateAndVisitors(**self.params)}
 
         for query_name, query in queries.iteritems():
             self.metrics[query_name] = query.get_result()

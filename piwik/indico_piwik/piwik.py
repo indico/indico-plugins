@@ -27,13 +27,13 @@ class PiwikRequest(object):
         return '{}://{}{}{}'.format(scheme, url.netloc, url.path, self.query_script)
 
     def call(self, default_response=None, **query_params):
-        """Perform a query to the Piwik server.
+        """Perform a query to the Piwik server and return the response.
 
         :param default_response: Return value in case the query fails
         :param query_params: Dictionary with the parameters of the query
         """
         query_url = self.get_query_url(**query_params)
-        ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query_url, default_response)
+        return ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query_url, default_response)
 
     def get_query(self, query_params={}):
         """Return a query string"""

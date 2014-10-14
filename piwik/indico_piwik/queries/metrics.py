@@ -1,6 +1,6 @@
 from __future__ import division
 
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 from urllib2 import quote
 
 from . import PiwikQueryReportEventBase
@@ -71,7 +71,7 @@ class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
         referrers = list(result)
         for referrer in referrers:
             referrer['sum_visit_length'] = stringify_seconds(referrer['sum_visit_length'])
-        return sorted(referrers, key=attrgetter('nb_visits'), reverse=True)[0:10]
+        return sorted(referrers, key=itemgetter('nb_visits'), reverse=True)[0:10]
 
 
 class PiwikQueryReportEventMetricUniqueVisits(PiwikQueryReportEventMetricBase):

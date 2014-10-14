@@ -27,23 +27,23 @@
                         <input type="text"
                                class="statsDates"
                                id="statsFilterStartDate"
-                               data-default="{{ report.startDate }}"
-                               value="{{ report.startDate }}">
+                               data-default="{{ report.start_date }}"
+                               value="{{ report.start_date }}">
                         {% trans %}to{% endtrans %}
                         <input type="text" class="statsDates"
                                id="statsFilterEndDate"
-                               data-default="{{ report.endDate }}"
-                               value="{{ report.endDate }}">
+                               data-default="{{ report.end_date }}"
+                               value="{{ report.end_date }}">
                         <input type="hidden" id="confId" value="{{ report.event_id }}">
                         <input type="hidden" id="contribId" value="{{ report.contrib_id }}">
                     </div>
                     <div class="statsFilterOption">
-                    {% if report.contributions_info %}
+                    {% if report.contributions %}
                         {% trans %}Choose Event / Contribution{% endtrans %}
                         <select id="updateContribution">
                             <option value="None">{% trans %}Event{% endtrans %}:</option>
-                            {% for id, title in report.contributions_info.itervalues() %}
-                                <option value="{{ id }}" {{ 'selected' if selected == id }}>
+                            {% for id, title in report.contributions.iteritems() %}
+                                <option value="{{ id }}" {{ 'selected' if report.contrib_id == id }}>
                                     {% trans %}Contribution{% endtrans %}: {{ title }}
                                 </option>
                             {% endfor %}
@@ -92,15 +92,15 @@
                     </tr>
                     <tr>
                         <td>{% trans %}Unique Visitors{% endtrans %}</td>
-                        <td>{{ report.metrics.uniqueVisits }}</td>
+                        <td>{{ report.metrics.unique_visits }}</td>
                     </tr>
                     <tr>
                         <td>{% trans %}Returning Visitors{% endtrans %}</td>
-                        <td>{{ report.metrics.visits - report.metrics.uniqueVisits }}</td>
+                        <td>{{ report.metrics.visits - report.metrics.unique_visits }}</td>
                     </tr>
                     <tr>
                         <td>{% trans %}Avg. Duration{% endtrans %}</td>
-                        <td>{{ report.metrics.visitLength }}</td>
+                        <td>{{ report.metrics.visit_duration }}</td>
                     </tr>
                 </table>
                 <div class="statsTableDivider">
@@ -109,11 +109,11 @@
                 <table>
                     <tr>
                         <td>{% trans %}Peak Date{% endtrans %}:</td>
-                        <td>{{ report.metrics.peakDate.date }}</td>
+                        <td>{{ report.metrics.peak.date }}</td>
                     </tr>
                     <tr>
                         <td>{% trans %}Peak Users{% endtrans %}:</td>
-                        <td>{{ report.metrics.peakDate.users }}</td>
+                        <td>{{ report.metrics.peak.users }}</td>
                     </tr>
                 </table>
             </div>
@@ -237,5 +237,5 @@
     var str_hide_query = '{{ str_hide_query }}';
 
     // Data for jqPlot
-    var reportDates = {'start': "{{ report.startDate }}", 'end': "{{ report.endDate }}"};
+    var reportDates = {'start': "{{ report.start_date}}", 'end': "{{ report.end_date }}"};
 </script>
