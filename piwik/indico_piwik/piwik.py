@@ -23,7 +23,8 @@ class PiwikRequest(object):
     @property
     def api_url(self):
         url = urlparse.urlparse(self.server_url)
-        return url.netloc + url.path + self.query_script
+        scheme = url.scheme if url.scheme else 'https'
+        return '{}://{}{}{}'.format(scheme, url.netloc, url.path, self.query_script)
 
     def call(self, default_response=None, **query_params):
         """Perform a query to the Piwik server.
