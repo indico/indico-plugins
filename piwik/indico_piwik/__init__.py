@@ -70,7 +70,10 @@ class PiwikPlugin(IndicoPlugin):
         return blueprint
 
     def get_vars_js(self):
-        return {'urls': {'graph_countries': url_rule_to_js('plugin_piwik.graph_countries'),
+        return {'urls': {'material': url_rule_to_js('plugin_piwik.material'),
+                         'data_downloads': url_rule_to_js('plugin_piwik.data_downloads'),
+                         'data_visits': url_rule_to_js('plugin_piwik.data_visits'),
+                         'graph_countries': url_rule_to_js('plugin_piwik.graph_countries'),
                          'graph_devices': url_rule_to_js('plugin_piwik.graph_devices')}}
 
     def register_assets(self):
@@ -108,8 +111,8 @@ class PiwikPlugin(IndicoPlugin):
 
 blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<confId>/manage/statistics')
 blueprint.add_url_rule('/', 'view', RHStatistics)
-blueprint.add_url_rule('/material', 'material', RHApiMaterial)
-blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads)
-blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisits)
+blueprint.add_url_rule('/material', 'material', RHApiMaterial, methods=('GET', 'POST'))
+blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads, methods=('GET', 'POST'))
+blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisits, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices, methods=('GET', 'POST'))
