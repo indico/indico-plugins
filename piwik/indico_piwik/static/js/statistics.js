@@ -1,7 +1,6 @@
 $(function() {
     $('#statsModify').click(function() {
-        var text = ($(this).html() == str_modif_query)
-                 ? str_hide_query : str_modif_query;
+        var text = ($.trim($(this).html()) == str_modif_query) ? str_hide_query : str_modif_query;
         $(this).html(text);
         $('#statsFilter').slideToggle('fast');
     });
