@@ -5,9 +5,8 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
 from indico.util.i18n import _
-from indico.web.flask.util import url_rule_to_js
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -63,18 +62,18 @@ class PiwikPlugin(IndicoPlugin):
                                       **event_tracking_params)
 
     def add_sidemenu_item(self, event):
-        menu_item = SideMenuItem(_("Piwik Statistics"), url_for_plugin('piwik.view', event))
+        menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event))
         return 'statistics', menu_item
 
     def get_blueprints(self):
         return blueprint
 
     def get_vars_js(self):
-        return {'urls': {'material': url_rule_to_js('plugin_piwik.material'),
-                         'data_downloads': url_rule_to_js('plugin_piwik.data_downloads'),
-                         'data_visits': url_rule_to_js('plugin_piwik.data_visits'),
-                         'graph_countries': url_rule_to_js('plugin_piwik.graph_countries'),
-                         'graph_devices': url_rule_to_js('plugin_piwik.graph_devices')}}
+        return {'urls': {'material': plugin_url_rule_to_js('material'),
+                         'data_downloads': plugin_url_rule_to_js('data_downloads'),
+                         'data_visits': plugin_url_rule_to_js('data_visits'),
+                         'graph_countries': plugin_url_rule_to_js('graph_countries'),
+                         'graph_devices': plugin_url_rule_to_js('graph_devices')}}
 
     def register_assets(self):
         self.register_js_bundle('statistics_js', 'js/statistics.js')
