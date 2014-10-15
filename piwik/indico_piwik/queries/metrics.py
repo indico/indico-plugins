@@ -40,7 +40,6 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def _get_per_day_results(self, results):
         hits_calendar = {}
 
-        # Piwik returns hits as a list of hits per date
         for date, hits in results.iteritems():
             day_hits = {'total': 0, 'unique': 0}
             if hits:
