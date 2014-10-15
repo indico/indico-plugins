@@ -66,9 +66,9 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
 
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
-    def call(self):
+    def call(self, **query_params):
         return super(PiwikQueryReportEventMetricReferrers, self).call(method='Referrers.getReferrerType',
-                                                                      period='range')
+                                                                      period='range', **query_params)
 
     def get_result(self):
         """Perform the call and return a list of referrers"""
@@ -91,8 +91,8 @@ class PiwikQueryReportEventMetricVisits(PiwikQueryReportEventMetricVisitsBase):
 
 
 class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
-    def call(self):
-        return super(PiwikQueryReportEventMetricVisitDuration, self).call(method='VisitsSummary.get')
+    def call(self, **query_params):
+        return super(PiwikQueryReportEventMetricVisitDuration, self).call(method='VisitsSummary.get', **query_params)
 
     def get_result(self):
         """Perform the call and return a string with the time in hh:mm:ss"""
@@ -112,8 +112,9 @@ class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
 
 
 class PiwikQueryReportEventMetricPeakDateAndVisitors(PiwikQueryReportEventMetricBase):
-    def call(self):
-        return super(PiwikQueryReportEventMetricPeakDateAndVisitors, self).call(method='VisitsSummary.getVisits')
+    def call(self, **query_params):
+        return super(PiwikQueryReportEventMetricPeakDateAndVisitors, self).call(method='VisitsSummary.getVisits',
+                                                                                **query_params)
 
     def get_result(self):
         """Perform the call and return the peak date and how many users"""
