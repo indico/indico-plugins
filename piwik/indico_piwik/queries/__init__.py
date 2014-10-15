@@ -39,21 +39,20 @@ class PiwikQueryReportEventBase(PiwikQueryReportBase):
 
     def call(self, segmentation_enabled=True, **query_params):
         if segmentation_enabled:
-            query_params['segmentation'] = self.get_segmentation()
+            query_params['segment'] = self.get_segmentation()
         return super(PiwikQueryReportEventBase, self).call(module='API', date=[self.start_date, self.end_date],
                                                            **query_params)
 
     def get_segmentation(self):
         segmentation = {'customVariablePageName1': ('==', 'Conference'),
                         'customVariablePageValue1': ('==', self.event_id)}
+
         if self.contrib_id:
             segmentation['customVariablePageName2'] = ('==', 'Contribution')
             segmentation['customVariablePageValue2'] = ('==', self.contrib_id)
 
         segments = set()
         for name, (equality, value) in segmentation.iteritems():
-            if isinstance(value, list):
-                value = ','.join(value)
             segment = '{}{}{}'.format(name, equality, value)
             segments.add(segment)
 

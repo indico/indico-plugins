@@ -20,20 +20,20 @@ class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):
 
 class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
     def get_result(self, reduced=True):
-        query_params = {} if reduced else {'segmentation_enabled': False}
-        result = get_json_from_remote_server(self.call, **query_params)
+        result = get_json_from_remote_server(self.call)
         if reduced:
             return int(reduce_json(result)) if result else 0
         return result if result else {}
 
 
 class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
-    def call(self, download_url):
+    def call(self, download_url, **query_params):
         return super(PiwikQueryReportEventMetricDownloads, self).call(method='Actions.getDownload',
-                                                                      downloadUrl=quote(download_url))
+                                                                      downloadUrl=quote(download_url),
+                                                                      **query_params)
 
     def get_result(self, download_url):
-        result = get_json_from_remote_server(self.call, download_url=download_url)
+        result = get_json_from_remote_server(self.call, download_url=download_url, segmentation_enabled=False)
         return {'cumulative': self._get_cumulative_results(result),
                 'individual': self._get_per_day_results(result)}
 
