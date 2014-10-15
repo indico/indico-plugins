@@ -155,17 +155,18 @@ $(function() {
     var load_material_tree = function() {
         $(treeDOMTarget).html(progressIndicator(true, true).dom);
 
-        indicoRequest('piwik.getMaterialTreeData',
-        {
-            confId: $('#confId').val()
-        },
-        function(result, error) {
-            if (!error) {
-                if (result !== null) {
-                    draw_jqTree(result);
+        $.ajax({
+            url: build_url(PiwikPlugin.urls.material, {confId: $('#confId').val()}),
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
+                }
+                if (data.material.tree !== null) {
+                    draw_jqTree(data.material.tree);
                 } else {
-                    /* There is no material present */
-                    $(treeDOMTarget).html($T('No Material Found.'));
+                    $(treeDOMTarget).html($T('No material found'));
                 }
             }
         });
