@@ -2,18 +2,6 @@ $(function() {
     var treeDOMTarget = '#materialTree';
 
     /**
-     * Build URI for page update
-     */
-    var build_updated_uri = function() {
-        var params = get_api_params();
-        var contrib_id = $('#updateContribution').val();
-        if (contrib_id != 'None') {
-            params.contrib_id = contrib_id;
-        }
-        return $.param(params);
-    };
-
-    /**
      * Clears the DOM element for the graph and then initiates a jqPlot render
      * in the target area.
      *
@@ -95,7 +83,8 @@ $(function() {
      * Get base values for API requests
      */
     var get_api_params = function() {
-        var params = {'start_date' : $('#statsFilterStartDate').val(),
+        var params = {'confId': $('#confId').val(),
+                      'start_date' : $('#statsFilterStartDate').val(),
                       'end_date' : $('#statsFilterEndDate').val()};
 
         var contrib_id = $('#contribId').val();
@@ -104,6 +93,19 @@ $(function() {
         }
 
         return params;
+    };
+
+    /**
+     * Build URI for page update
+     */
+    var get_updated_uri = function() {
+        var params = {'start_date' : $('#statsFilterStartDate').val(),
+                      'end_date' : $('#statsFilterEndDate').val()};
+        var contrib_id = $('#updateContribution').val();
+        if (contrib_id != 'None') {
+            params.contrib_id = contrib_id;
+        }
+        return $.param(params);
     };
 
     /**
@@ -130,11 +132,11 @@ $(function() {
     var load_material_graph = function(uri, replot) {
         replot = typeof replot !== 'undefined' ? replot : false;
         var DOMTarget = 'materialDownloadChart';
-        var graphParams = get_api_params();
-        graphParams.download_url = uri;
+        var graph_params = get_api_params();
+        graph_params.download_url = uri;
 
         $.ajax({
-            url: build_url(PiwikPlugin.urls.data_downloads, {'confId': $('#confId').val(), 'download_url': uri}),
+            url: build_url(PiwikPlugin.urls.data_downloads, graph_params),
             type: 'POST',
             dataType: 'json',
             success: function(data) {
@@ -156,7 +158,7 @@ $(function() {
         $(treeDOMTarget).html(progressIndicator(true, true).dom);
 
         $.ajax({
-            url: build_url(PiwikPlugin.urls.material, {confId: $('#confId').val()}),
+            url: build_url(PiwikPlugin.urls.material, get_api_params()),
             type: 'POST',
             dataType: 'json',
             success: function(data) {
@@ -180,7 +182,7 @@ $(function() {
         $('#' + DOMTarget).html(progressIndicator(true, true).dom);
 
         $.ajax({
-            url: build_url(PiwikPlugin.urls.data_visits, {confId: $('#confId').val()}),
+            url: build_url(PiwikPlugin.urls.data_visits, get_api_params()),
             type: 'POST',
             dataType: 'json',
             success: function(data) {
@@ -202,7 +204,7 @@ $(function() {
                               {'endpoint': 'graph_devices', 'report': 'devices'}];
         $.each(graph_requests, function(index, request) {
             $.ajax({
-                url: build_url(PiwikPlugin.urls[request.endpoint], {confId: $('#confId').val()}),
+                url: build_url(PiwikPlugin.urls[request.endpoint], get_api_params()),
                 type: 'POST',
                 dataType: 'json',
                 success: function(data) {
@@ -234,7 +236,7 @@ $(function() {
         });
 
         $('#updateQuery').click(function() {
-            var url = '?{0}'.format(build_updated_uri());
+            var url = '?{0}'.format(get_updated_uri());
             window.location.href = url;
         });
 

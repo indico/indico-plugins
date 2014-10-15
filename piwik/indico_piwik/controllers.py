@@ -16,7 +16,7 @@ class RHStatistics(RHConferenceModifBase):
         self._params['str_modif_query'] = _('Modify Query')
         self._params['str_hide_query'] = _('Hide Modify Query')
         self._params['str_no_graph'] = _('No graph data was returned by the server, please alter the date range.')
-        self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contribId'),
+        self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
                                                    start_date=params.get('start_date'), end_date=params.get('end_date'))
 
     def _process(self):
