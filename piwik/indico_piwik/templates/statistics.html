@@ -65,7 +65,14 @@
         <div class="statsWidget full edge">
             <div class="statsWidgetTitle">
             {% trans %}Visitor Hit Rates{% endtrans %}
-                <span id="visitsInfoHelp" class="fakeLink">
+                <span id="visitsInfoHelp" class="fakeLink" title="
+                    {%- trans -%}
+                        Please note, statistics have only been collected since the plugin's
+                        introduction. This means that there is no data present for the earlier
+                        period of some events, this does not necessarily mean that there was no
+                        activity in the event at that time.
+                    {%- endtrans -%}
+                ">
                     {% trans %}Info{% endtrans %}
                 </span>
             </div>
@@ -206,15 +213,6 @@
     <div id="statsGenerated">
         {% trans dt=report.timestamp | format_datetime('long') -%}
             This report was generated at: {{ dt }}
-        {%- endtrans %}
-    </div>
-
-    <div id="statsInfoHidden">
-        {% trans -%}
-            Please note, statistics have only been collected since the plugin's
-            introduction. This means that there is no data present for the earlier
-            period of some events, this does not necessarily mean that there was no
-            activity in the event at that time.
         {%- endtrans %}
     </div>
 </div>

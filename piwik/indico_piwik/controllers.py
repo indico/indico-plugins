@@ -18,7 +18,7 @@ class RHStatistics(RHConferenceModifBase):
         self._params['str_hide_query'] = _('Hide Modify Query')
         self._params['str_no_graph'] = _('No graph data was returned by the server, please alter the date range.')
         self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contribId'),
-                                                   start_date=params.get('startDate'), end_date=params.get('endDate'))
+                                                   start_date=params.get('start_date'), end_date=params.get('end_date'))
 
     def _process(self):
         return WPStatistics.render_template('statistics.html', self._conf, **self._params)
@@ -27,8 +27,8 @@ class RHStatistics(RHConferenceModifBase):
 class RHApiBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        self._report_params = {'start_date': params.get('startDate'),
-                               'end_date': params.get('endDate')}
+        self._report_params = {'start_date': params.get('start_date'),
+                               'end_date': params.get('end_date')}
 
 
 class RHApiEventBase(RHApiBase):

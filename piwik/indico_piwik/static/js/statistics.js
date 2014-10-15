@@ -1,73 +1,16 @@
 $(function() {
-    $('#statsModify').click(function() {
-        var text = ($.trim($(this).html()) == str_modif_query) ? str_hide_query : str_modif_query;
-        $(this).html(text);
-        $('#statsFilter').slideToggle('fast');
-    });
+    var treeDOMTarget = '#materialTree';
 
-    $('.statsDates').datepicker({
-        dateFormat : 'yy-mm-dd',
-        defaultDate : $(this).attr('data-default')
-    });
-
-    var buildURI = function() {
-        var params = {'confId' : $('#confId').val(),
-                      'startDate' : $('#statsFilterStartDate').val(),
-                      'endDate' : $('#statsFilterEndDate').val(),
-                      'tab' : 'Piwik'
-        };
-
-        var updateContrib = $('#updateContribution').val();
-
-        if (updateContrib != 'None') {
-            params['contribId'] = updateContrib;
+    /**
+     * Build URI for page update
+     */
+    var build_updated_uri = function() {
+        var params = get_api_params();
+        var contrib_id = $('#updateContribution').val();
+        if (contrib_id != 'None') {
+            params.contrib_id = contrib_id;
         }
-
         return $.param(params);
-    };
-
-    /**
-     * Reconstruct the query string based on local values and force relocation.
-     */
-    $('#updateQuery').click(function() {
-        var url = 'statistics?';
-        url += buildURI();
-        window.location.href = url;
-    });
-
-    /**
-     * Provides the 'info' tooltip handling for Visitor Hit Rates
-     */
-    $('#visitsInfoHelp').qtip({
-        content: $('#statsInfoHidden').html(),
-        position: {
-            my: 'top middle',
-            at: 'bottom middle'
-        },
-        style: {
-            classes: 'qtip-rounded qtip-shadow qtip-light'
-        }
-    });
-
-    /* jqPlot Specifics */
-
-    /**
-     * This method extracts the data from the JSON returned via the API into
-     * the array format which jqPlot requires. Specifying 'withDate' as true
-     * makes each element of the array a key-pair value of date-hits for the
-     * renderer jqPlot provides.
-     */
-    var getArrayValues = function(data, key, withDate) {
-        output = [];
-        withDate = typeof withDate !== 'undefined' ? withDate : true;
-
-        for (var date in data) {
-            hits = data[date];
-            value = (withDate) ? [date, hits[key]] : hits[key];
-            output.push(value);
-        }
-
-        return output;
     };
 
     /**
@@ -76,9 +19,7 @@ $(function() {
      *
      * @param source - JSON of dates: {total / unique} hits
      */
-    var drawGraph = function(source, DOMTarget, replot) {
-
-        // Clear the DOM target
+    var draw_jqplot_graph = function(source, DOMTarget, replot) {
         $('#' + DOMTarget).html('');
 
         var plotOptions = {
@@ -123,39 +64,117 @@ $(function() {
             }]
         };
 
-        // Create the plot here
         if (replot) {
             $.jqplot(DOMTarget, source, plotOptions).replot();
         } else {
             $.jqplot(DOMTarget, source, plotOptions);
         }
-
     };
 
     /**
-     * Base values for API requests, to be extended as needed.
+     * Draw a customized jqTree
      */
-    var getIndicoBaseParams = function() {
-        var indicoBaseParams = {
-            startDate: $('#statsFilterStartDate').val(),
-            endDate: $('#statsFilterEndDate').val(),
-            confId: $('#confId').val()
-        };
+    var draw_jqTree = function(treeData) {
+        $(treeDOMTarget).tree({
+            data: treeData,
+            autoOpen: 0,
+            saveState: true,
+            onCanSelectNode: function(node) {
+                // Leaf node (material) can be selected
+                return (node.children.length === 0);
+            },
+            onCreateLi: function(node, $li) {
+                if (node.id !== undefined) {
+                    $li.find('.title').addClass('selectableNode');
+                }
+            }
+        });
+    };
 
-        var contribId = $('#contribId').val();
+    /**
+     * Get base values for API requests
+     */
+    var get_api_params = function() {
+        var params = {'start_date' : $('#statsFilterStartDate').val(),
+                      'end_date' : $('#statsFilterEndDate').val()};
 
-        // We only want to append if it's not the internal 'None' flag.
-        if (contribId != 'None') {
-            indicoBaseParams['contribId'] = contribId;
+        var contrib_id = $('#contribId').val();
+        if (contrib_id != 'None') {
+            params.contrib_id = contrib_id;
         }
 
-        return indicoBaseParams;
+        return params;
     };
 
     /**
-     * Loads hit rate data via AJAX to propagate the main Visitors Graph.
+     * Extract data from a JSON object returned via the API into
+     * the jqPlot array format. If 'with_date' is true
+     * each element will be a key-pair value of date-hits.
      */
-    var loadVisitorsGraph = function(data) {
+    var get_jqplot_array_values = function(data, key, with_date) {
+        output = [];
+        with_date = typeof with_date !== 'undefined' ? with_date : true;
+
+        for (var date in data) {
+            hits = data[date];
+            value = (with_date) ? [date, hits[key]] : hits[key];
+            output.push(value);
+        }
+
+        return output;
+    };
+
+    /**
+     * Load material downloads data via AJAX and draw its graph
+     */
+    var load_material_graph = function(uri, replot) {
+        replot = typeof replot !== 'undefined' ? replot : false;
+        var DOMTarget = 'materialDownloadChart';
+        var graphParams = get_api_params();
+        graphParams.download_url = uri;
+
+        $.ajax({
+            url: build_url(PiwikPlugin.urls.data_downloads, {'confId': $('#confId').val(), 'download_url': uri}),
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
+                }
+                var materialHits = [get_jqplot_array_values(data.metrics.downloads.individual, 'total'),
+                                    get_jqplot_array_values(data.metrics.downloads.individual, 'unique')];
+                draw_jqplot_graph(materialHits, DOMTarget, replot);
+                $('#materialTotalDownloads').html(data.metrics.downloads.cumulative.total);
+            }
+        });
+    };
+
+    /**
+     * Load the material files data and draw its jqTree
+     */
+    var load_material_tree = function() {
+        $(treeDOMTarget).html(progressIndicator(true, true).dom);
+
+        indicoRequest('piwik.getMaterialTreeData',
+        {
+            confId: $('#confId').val()
+        },
+        function(result, error) {
+            if (!error) {
+                if (result !== null) {
+                    draw_jqTree(result);
+                } else {
+                    /* There is no material present */
+                    $(treeDOMTarget).html($T('No Material Found.'));
+                }
+            }
+        });
+    };
+
+    /**
+     * Loads visits data and draw its graph
+     */
+    var load_visits_graph = function(data) {
         var DOMTarget = 'visitorChart';
         $('#' + DOMTarget).html(progressIndicator(true, true).dom);
 
@@ -167,117 +186,17 @@ $(function() {
                 if (handleAjaxError(data)) {
                     return;
                 }
-                var source = [getArrayValues(data.metrics, 'total'),
-                              getArrayValues(data.metrics, 'unique')];
-                drawGraph(source, DOMTarget, false);
+                var source = [get_jqplot_array_values(data.metrics, 'total'),
+                              get_jqplot_array_values(data.metrics, 'unique')];
+                draw_jqplot_graph(source, DOMTarget, false);
             }
         });
     };
 
     /**
-     * Loads material data via AJAX to propagate Material Graph(s)
+     * Load static graphs via ajax
      */
-    var loadMaterialGraph = function(uri, replot) {
-        replot = typeof replot !== 'undefined' ? replot : false;
-        var DOMTarget = 'materialDownloadChart';
-        var graphParams = getIndicoBaseParams();
-        graphParams.download_url = uri;
-
-        $.ajax({
-            url: build_url(PiwikPlugin.urls.data_downloads, {'confId': $('#confId').val(), 'download_url': uri}),
-            type: 'POST',
-            dataType: 'json',
-            success: function(data) {
-                if (handleAjaxError(data)) {
-                    return;
-                }
-                var materialHits = [getArrayValues(data.metrics.downloads.individual, 'total'),
-                                    getArrayValues(data.metrics.downloads.individual, 'unique')];
-                drawGraph(materialHits, DOMTarget, replot);
-                // Write to the title the total material downloads
-                $('#materialTotalDownloads').html(data.metrics.downloads.cumulative.total);
-            }
-        });
-    };
-
-    /* jqTree Specifics */
-    var treeDOMTarget = '#materialTree';
-
-    /**
-     * Handles all the specific jqTree customization required.
-     */
-    var drawTree = function(treeData) {
-        $(treeDOMTarget).tree(
-        {
-            data: treeData,
-            autoOpen: 0,
-            saveState: true,
-            onCanSelectNode: function(node) {
-                /* If this node has no children, it is material - ergo, make it
-                 * selectable so that the event binding can work. */
-                return (node.children.length == 0)
-            },
-            onCreateLi: function(node, $li) {
-                if (node.id !== undefined) {
-                    $li.find('.title').addClass('selectableNode');
-                }
-            }
-        });
-    }
-
-    /**
-     * Loads the data required for jqTree via AJAX and then delegates this
-     * data to drawTree for DOM insertion.
-     */
-    var loadTree = function() {
-        var materialTreeData = null;
-
-        /* Placeholder loading spinner for larger events. */
-        $(treeDOMTarget).html(progressIndicator(true, true).dom);
-
-        indicoRequest('piwik.getMaterialTreeData',
-        {
-            confId: $('#confId').val()
-        },
-        function(result, error) {
-            if (!error) {
-                if (result !== null) {
-                    drawTree(result);
-                } else {
-                    /* There is no material present */
-                    $(treeDOMTarget).html($T('No Material Found.'));
-                }
-            }
-        });
-    };
-
-    /**
-     * Event handler for clicking 'selectable' elements from the jqTree.
-     */
-    $(treeDOMTarget).bind('tree.click', function(event) {
-        $('#materialTitle').html(event.node.name);
-        $('#materialDownloadChart').html(progressIndicator(true, true).dom);
-        loadMaterialGraph(event.node.id, true);
-    });
-
-    /**
-     * jQuery UI Dialog if no data is received via AJAX (timeout)
-     */
-    $('#dialogNoGraphData').dialog({
-        modal: true,
-        resizable: false,
-        autoOpen: false,
-        buttons: {
-            Ok: function() {
-                $(this).dialog('close');
-            }
-        }
-    });
-
-    /* Iterates through the objects relating to static graphs and calls them
-     * to populate page. @todo: Move this to Backbone.js
-     **/
-    var loadStaticGraphs = function() {
+    var load_graphs = function() {
         var graph_requests = [{'endpoint': 'graph_countries', 'report': 'countries'},
                               {'endpoint': 'graph_devices', 'report': 'devices'}];
         $.each(graph_requests, function(index, request) {
@@ -301,14 +220,46 @@ $(function() {
         });
     };
 
-    /**
-     * Initializer to begin the dynamic loading of widgets etc on pageload.
-     */
-    var statsInit = function() {
-        loadStaticGraphs();
-        loadVisitorsGraph();
-        loadTree();
+    var init = function() {
+        $('#statsModify').click(function() {
+            var text = ($.trim($(this).html()) == str_modif_query) ? str_hide_query : str_modif_query;
+            $(this).html(text);
+            $('#statsFilter').slideToggle('fast');
+        });
+
+        $('.statsDates').datepicker({
+            dateFormat : 'yy-mm-dd',
+            defaultDate : $(this).attr('data-default')
+        });
+
+        $('#updateQuery').click(function() {
+            var url = '?{0}'.format(build_updated_uri());
+            window.location.href = url;
+        });
+
+        // Event handler for clicking 'selectable' elements from the jqTree.
+        $(treeDOMTarget).bind('tree.click', function(event) {
+            $('#materialTitle').html(event.node.name);
+            $('#materialDownloadChart').html(progressIndicator(true, true).dom);
+            load_material_graph(event.node.id, true);
+        });
+
+        // jQuery UI Dialog if no data is received via AJAX (timeout)
+        $('#dialogNoGraphData').dialog({
+            modal: true,
+            resizable: false,
+            autoOpen: false,
+            buttons: {
+                Ok: function() {
+                    $(this).dialog('close');
+                }
+            }
+        });
+
+        load_graphs();
+        load_visits_graph();
+        load_material_tree();
     };
 
-    statsInit();
+    init();
 });
