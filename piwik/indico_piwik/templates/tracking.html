@@ -30,11 +30,11 @@
             track_event = function() {
                 var event_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_events }});
                 event_tracker.enableLinkTracking();
-                event_tracker.trackPageView();
-                event_tracker.setCustomVariable(1, 'Conference', {{ event_id }}, 'page');
+                event_tracker.setCustomVariable(1, 'Conference', '{{ event_id }}', 'page');
                 {% if contrib_id %}
-                    event_tracker.setCustomVariable(2, 'Contribution', {{ contrib_id }}, 'page');
+                    event_tracker.setCustomVariable(2, 'Contribution', '{{ contrib_id }}', 'page');
                 {% endif %}
+                event_tracker.trackPageView();
             }
         {% endif %}
     })();
