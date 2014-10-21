@@ -20,7 +20,7 @@ from setuptools import setup, find_packages
 setup(
     name='indico_chat',
     version='0.1',
-    url='https://github.com/indico/indico-chat',
+    url='https://github.com/indico/indico-plugin-chat',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
     author_email='indico-team@cern.ch',
