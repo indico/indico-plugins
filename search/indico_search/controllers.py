@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import request
 from flask_pluginengine import current_plugin
 
 from MaKaC.conference import ConferenceHolder, Conference, CategoryManager

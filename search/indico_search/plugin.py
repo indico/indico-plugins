@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import plugins_loaded
+
 from indico.core.plugins import IndicoPlugin
 
 from indico_search.blueprint import blueprint
@@ -29,6 +31,14 @@ class SearchPlugin(IndicoPlugin):
 
     hidden = True
     _engine_plugin = None  # the search engine plugin
+
+    def init(self):
+        super(SearchPlugin, self).init()
+        self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
+
+    def _plugins_loaded(self, sender, **kwargs):
+        if not self.engine_plugin:
+            raise RuntimeError('Search plugin active but no search engine plugin loaded')
 
     @property
     def engine_plugin(self):
