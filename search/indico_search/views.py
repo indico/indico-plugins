@@ -16,13 +16,16 @@
 
 from __future__ import unicode_literals
 
-from indico.core.plugins import IndicoPluginBlueprint
+from indico.core.plugins import WPJinjaMixinPlugin
+from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 
-from indico_search.controllers import RHSearch
+
+class WPSearchCategory(WPJinjaMixinPlugin, WPCategoryDisplayBase):
+    def _getBody(self, params):
+        return self._getPageContent(params)
 
 
-blueprint = IndicoPluginBlueprint('search', 'indico_search')
-
-blueprint.add_url_rule('/search', 'search', RHSearch, methods=('GET', 'POST'))
-blueprint.add_url_rule('/category/<categId>/search', 'search', RHSearch, methods=('GET', 'POST'))
-blueprint.add_url_rule('/event/<confId>/search', 'search', RHSearch, methods=('GET', 'POST'))
+class WPSearchEvent(WPJinjaMixinPlugin, WPConferenceDisplayBase):
+    def _getBody(self, params):
+        return self._getPageContent(params)

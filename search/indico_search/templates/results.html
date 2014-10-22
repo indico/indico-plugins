@@ -1,0 +1,72 @@
+<div class="container">
+    {% if only_public %}
+        <div class="searchPublicWarning" style="float: right;">
+            {% trans %}Warning: since you are not logged in, only results from public events will appear.{% endtrans %}
+        </div>
+    {% endif %}
+
+    <h1 class="Search">
+        {% trans %}Search{% endtrans %}
+        {% if obj_type == 'event' %}
+            {% trans %}Event{% endtrans %}
+        {% elif obj_type == 'category' %}
+            {% trans %}Category{% endtrans %}
+        {% endif %}
+    </h1>
+
+    <div class="topBar">
+        <div class="content">
+            <div class="SearchDiv">
+                <div style="float: right; margin-top:10px;">
+                    <span style="color:#777">Search powered by</span>
+                    {% block banner %}{% endblock %}
+                </div>
+
+                <form method="post" action="" style="width: 400px;">
+                    <div>
+                        {{ form.phrase(style='width: 300px; height: 20px; font-size: 17px; vertical-align: middle;') }}
+                        <input type="submit" value="{% trans %}Search{% endtrans %}" style="vertical-align: middle;">
+                        {% block tooltip %}{% endblock %}
+                    </div>
+
+                    <div style="padding-top: 4px;">
+                        <a id="advancedOptionsText" href="#">{% trans %}Show advanced options{% endtrans %}</a>
+                    </div>
+
+                    <div id="advancedOptions" style="display: none;">
+                        <table style="text-align: right;" id="advancedOptionsTable">
+                            <tr>
+                                <td>{{ form.field.label() }}</td>
+                                <td>{{ form.field() }}</td>
+                            </tr>
+                            {% block criteria_fields %}{% endblock %}
+                            <tr>
+                                <td>{{ form.start_date.label() }}</td>
+                                <td>{{ form.start_date(style='width: 180px;') }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ form.end_date.label() }}</td>
+                                <td>{{ form.end_date(style='width: 180px;') }}</td>
+                            </tr>
+                            {% block sort_fields %}{% endblock %}
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% block results %}{% endblock %}
+    </div>
+</div>
+
+<script>
+    $('#advancedOptionsText').on('click', function(e) {
+        e.preventDefault();
+        var container = $('#advancedOptions').toggle();
+        var text = container.is(':hidden') ? $T('Show advanced options') : $T('Hide advanced options');
+        $('#advancedOptionsText').text(text);
+    });
+
+    $('#start_date, #end_date').datepicker();
+</script>
+
+{% block scripts %}{% endblock %}

@@ -28,17 +28,17 @@ class SearchPlugin(IndicoPlugin):
     """
 
     hidden = True
-    _engine = None  # the search engine plugin
+    _engine_plugin = None  # the search engine plugin
 
     @property
-    def engine(self):
-        return self._engine
+    def engine_plugin(self):
+        return self._engine_plugin
 
-    @engine.setter
-    def engine(self, value):
-        if self._engine is not None:
-            raise RuntimeError('Another search engine is active: {}'.format(self._engine.name))
-        self._engine = value
+    @engine_plugin.setter
+    def engine_plugin(self, value):
+        if self._engine_plugin is not None:
+            raise RuntimeError('Another search engine plugin is active: {}'.format(self._engine_plugin.name))
+        self._engine_plugin = value
 
     def get_blueprints(self):
         return blueprint
