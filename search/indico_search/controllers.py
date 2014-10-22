@@ -27,7 +27,7 @@ from indico_search.views import WPSearchCategory, WPSearchEvent
 class RHSearch(RHCustomizable):
     def _checkParams(self):
         if 'confId' in request.view_args:
-            self.obj = ConferenceHolder().getById(request.view_args['confId'])
+            self.obj = self._conf = ConferenceHolder().getById(request.view_args['confId'])
             self.obj_type = 'event'
         elif 'categId' in request.view_args:
             self.obj = CategoryManager().getById(request.view_args['categId'])

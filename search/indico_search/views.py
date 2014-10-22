@@ -27,5 +27,6 @@ class WPSearchCategory(WPJinjaMixinPlugin, WPCategoryDisplayBase):
 
 
 class WPSearchEvent(WPJinjaMixinPlugin, WPConferenceDisplayBase):
+    # XXX shouldn't this inhert from WPConferenceDefaultDisplayBase?!
     def _getBody(self, params):
         return self._getPageContent(params)
