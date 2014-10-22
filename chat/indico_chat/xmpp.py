@@ -21,14 +21,13 @@ import re
 
 import requests
 from flask import current_app
+from flask_pluginengine import current_plugin
 from requests.exceptions import RequestException
 from sleekxmpp import ClientXMPP
 from sleekxmpp.exceptions import IqError
 
-from indico.core.logger import Logger
 from indico.util.string import unicode_to_ascii
 from indico_chat.util import check_config
-
 
 INVALID_JID_CHARS = re.compile(r'[^-!#()*+,.=^_a-z0-9]')
 WHITESPACE = re.compile(r'\s+')
@@ -45,7 +44,7 @@ def create_room(room):
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
         muc.configureRoom(room.jid, _set_form_values(xmpp, room))
 
-    Logger.get('plugin.chat').info('Creating room {}'.format(room.jid))
+    current_plugin.logger.info('Creating room {}'.format(room.jid))
     _execute_xmpp(_create_room)
 
 
@@ -60,7 +59,7 @@ def update_room(room):
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
         muc.configureRoom(room.jid, _set_form_values(xmpp, room, muc.getRoomConfig(room.jid)))
 
-    Logger.get('plugin.chat').info('Updating room {}'.format(room.jid))
+    current_plugin.logger.info('Updating room {}'.format(room.jid))
     _execute_xmpp(_update_room)
 
 
@@ -74,7 +73,7 @@ def delete_room(room, reason=''):
         muc = xmpp.plugin['xep_0045']
         muc.destroy(room.jid, reason=reason)
 
-    Logger.get('plugin.chat').info('Deleting room {}'.format(room.jid))
+    current_plugin.logger.info('Deleting room {}'.format(room.jid))
     _execute_xmpp(_delete_room)
     delete_logs(room)
 
@@ -190,9 +189,9 @@ def _execute_xmpp(connected_callback):
         except Exception as e:
             result[1] = e
             if isinstance(e, IqError):
-                Logger.get('plugin.chat').exception('XMPP callback failed: {}'.format(e.condition))
+                current_plugin.logger.exception('XMPP callback failed: {}'.format(e.condition))
             else:
-                Logger.get('plugin.chat').exception('XMPP callback failed')
+                current_plugin.logger.exception('XMPP callback failed')
         finally:
             xmpp.disconnect(wait=0)
 
@@ -205,7 +204,7 @@ def _execute_xmpp(connected_callback):
     try:
         xmpp.connect()
     except Exception:
-        Logger.get('plugin.chat').exception('XMPP connection failed')
+        current_plugin.logger.exception('XMPP connection failed')
         xmpp.disconnect()
         raise
 
@@ -243,10 +242,10 @@ def retrieve_logs(room, start_date=None, end_date=None):
     try:
         response = requests.get(base_url, params=params)
     except RequestException:
-        Logger.get('plugin.chat').exception('Could not retrieve logs for {}'.format(room.jid))
+        current_plugin.logger.exception('Could not retrieve logs for {}'.format(room.jid))
         return None
     if response.headers.get('content-type') == 'application/json':
-        Logger.get('plugin.chat').warning('Could not retrieve logs for {}: {}'.format(room.jid,
+        current_plugin.logger.warning('Could not retrieve logs for {}: {}'.format(room.jid,
                                                                                       response.json().get('error')))
         return None
     return response.text
@@ -263,7 +262,7 @@ def delete_logs(room):
     try:
         response = requests.get(posixpath.join(base_url, 'delete'), params={'cr': room.jid}).json()
     except (RequestException, ValueError):
-        Logger.get('plugin.chat').exception('Could not delete logs for {}'.format(room.jid))
+        current_plugin.logger.exception('Could not delete logs for {}'.format(room.jid))
         return
     if not response.get('success'):
-        Logger.get('plugin.chat').warning('Could not delete logs for {}: {}'.format(room.jid), response.get('error'))
+        current_plugin.logger.warning('Could not delete logs for {}: {}'.format(room.jid), response.get('error'))
