@@ -56,10 +56,10 @@ class PiwikRequest(object):
         try:
             response = urlopen(url=query_url, timeout=timeout)
         except URLError:
-            current_plugin.get_logger().exception("Unable to retrieve data")
+            current_plugin.logger.exception("Unable to retrieve data")
             return default_response
         except Exception:
-            current_plugin.get_logger().exception("Unable to connect")
+            current_plugin.logger.exception("Unable to connect")
             return default_response
         value = response.read()
         response.close()

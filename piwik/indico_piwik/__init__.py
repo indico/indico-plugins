@@ -4,7 +4,6 @@ from flask import request
 from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
-from indico.core.logger import Logger
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
 from indico.util.i18n import _
 from MaKaC.conference import ConferenceHolder, LocalFile
@@ -39,10 +38,6 @@ class PiwikPlugin(IndicoPlugin):
         'site_id_general': 1,
         'site_id_events': 2
     }
-
-    @staticmethod
-    def get_logger():
-        return Logger.get('plugin.piwik')
 
     def init(self):
         super(PiwikPlugin, self).init()
