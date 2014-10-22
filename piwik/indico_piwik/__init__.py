@@ -69,11 +69,11 @@ class PiwikPlugin(IndicoPlugin):
         return blueprint
 
     def get_vars_js(self):
-        return {'urls': {'material': plugin_url_rule_to_js('material'),
-                         'data_downloads': plugin_url_rule_to_js('data_downloads'),
-                         'data_visits': plugin_url_rule_to_js('data_visits'),
-                         'graph_countries': plugin_url_rule_to_js('graph_countries'),
-                         'graph_devices': plugin_url_rule_to_js('graph_devices')}}
+        return {'urls': {'material': plugin_url_rule_to_js('piwik.material'),
+                         'data_downloads': plugin_url_rule_to_js('piwik.data_downloads'),
+                         'data_visits': plugin_url_rule_to_js('piwik.data_visits'),
+                         'graph_countries': plugin_url_rule_to_js('piwik.graph_countries'),
+                         'graph_devices': plugin_url_rule_to_js('piwik.graph_devices')}}
 
     def register_assets(self):
         self.register_js_bundle('statistics_js', 'js/statistics.js')
