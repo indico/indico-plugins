@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
-from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 
 class WPSearchCategory(WPJinjaMixinPlugin, WPCategoryDisplayBase):
@@ -26,7 +26,6 @@ class WPSearchCategory(WPJinjaMixinPlugin, WPCategoryDisplayBase):
         return self._getPageContent(params)
 
 
-class WPSearchEvent(WPJinjaMixinPlugin, WPConferenceDisplayBase):
-    # XXX shouldn't this inhert from WPConferenceDefaultDisplayBase?!
+class WPSearchConference(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         return self._getPageContent(params)

@@ -35,6 +35,6 @@ FIELD_CHOICES = [('', _('Anywhere')),
 
 class SearchForm(IndicoForm):
     phrase = StringField(_('Phrase'), filters=[strip_whitespace])
-    field = SelectField(_('Search in'), choices=FIELD_CHOICES)
+    field = SelectField(_('Search in'), choices=FIELD_CHOICES, default='')
     start_date = DateField('Start Date', [Optional()], parse_kwargs={'dayfirst': True})
     end_date = DateField('End Date', [Optional()], parse_kwargs={'dayfirst': True})

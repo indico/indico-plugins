@@ -21,6 +21,7 @@ from flask_pluginengine import plugins_loaded
 from indico.core.plugins import IndicoPlugin
 
 from indico_search.blueprint import blueprint
+from indico_search.util import render_engine_or_search_template
 
 
 class SearchPlugin(IndicoPlugin):
@@ -35,6 +36,7 @@ class SearchPlugin(IndicoPlugin):
     def init(self):
         super(SearchPlugin, self).init()
         self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
+        self.template_hook('conference-header', self._add_conference_search_box)
 
     def _plugins_loaded(self, sender, **kwargs):
         if not self.engine_plugin:
@@ -52,3 +54,8 @@ class SearchPlugin(IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
+
+    def _add_conference_search_box(self, event, **kwargs):
+        if event.getDisplayMgr().getSearchEnabled():
+            form = self.engine_plugin.search_form(prefix='search-')
+            return render_engine_or_search_template('searchbox_conference.html', event=event, form=form)

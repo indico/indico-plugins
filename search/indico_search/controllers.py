@@ -21,7 +21,7 @@ from flask_pluginengine import current_plugin
 
 from MaKaC.conference import ConferenceHolder, Conference, CategoryManager
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
-from indico_search.views import WPSearchCategory, WPSearchEvent
+from indico_search.views import WPSearchCategory, WPSearchConference
 
 
 class RHSearch(RHCustomizable):
@@ -43,8 +43,8 @@ class RHSearch(RHCustomizable):
 
     def _process(self):
         with current_plugin.engine_plugin.plugin_context():
-            form = current_plugin.search_form()
-            view_class = WPSearchEvent if isinstance(self.obj, Conference) else WPSearchCategory
+            form = current_plugin.search_form(prefix='search-')
+            view_class = WPSearchConference if isinstance(self.obj, Conference) else WPSearchCategory
             result = None
             if form.validate_on_submit():
                 result = current_plugin.perform_search(form.data, self.obj, self.page)
