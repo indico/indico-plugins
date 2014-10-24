@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import request
 from flask_pluginengine import plugins_loaded
 
 from indico.core.plugins import IndicoPlugin
@@ -37,6 +38,13 @@ class SearchPlugin(IndicoPlugin):
         super(SearchPlugin, self).init()
         self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
         self.template_hook('conference-header', self._add_conference_search_box)
+        self.template_hook('page-header', self._add_category_search_box)
+        self.inject_js('search_js')
+        self.inject_css('search_css')
+
+    def register_assets(self):
+        self.register_js_bundle('search_js', 'js/search.js')
+        self.register_css_bundle('search_css', 'css/search.scss')
 
     def _plugins_loaded(self, sender, **kwargs):
         if not self.engine_plugin:
@@ -59,3 +67,8 @@ class SearchPlugin(IndicoPlugin):
         if event.getDisplayMgr().getSearchEnabled():
             form = self.engine_plugin.search_form(prefix='search-')
             return render_engine_or_search_template('searchbox_conference.html', event=event, form=form)
+
+    def _add_category_search_box(self, category, **kwargs):
+        if category is not None and request.blueprint != 'plugin_search':
+            form = self.engine_plugin.search_form(prefix='search-')
+            return render_engine_or_search_template('searchbox_category.html', category=category, form=form)

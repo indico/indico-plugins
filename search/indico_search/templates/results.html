@@ -1,11 +1,11 @@
 <div class="container">
     {% if only_public %}
-        <div class="searchPublicWarning" style="float: right;">
+        <div class="search-public-warning" style="float: right;">
             {% trans %}Warning: since you are not logged in, only results from public events will appear.{% endtrans %}
         </div>
     {% endif %}
 
-    <h1 class="Search">
+    <h1 class="search-title">
         {% trans %}Search{% endtrans %}
         {% if obj_type == 'event' %}
             {% trans %}Event{% endtrans %}
@@ -16,7 +16,7 @@
 
     <div class="topBar">
         <div class="content">
-            <div class="SearchDiv">
+            <div>
                 <div style="float: right; margin-top:10px;">
                     <span style="color:#777">Search powered by</span>
                     {% block banner %}{% endblock %}
@@ -30,11 +30,11 @@
                     </div>
 
                     <div style="padding-top: 4px;">
-                        <a id="advancedOptionsText" href="#">{% trans %}Show advanced options{% endtrans %}</a>
+                        <a id="toggle-advanced-options" href="#">{% trans %}Show advanced options{% endtrans %}</a>
                     </div>
 
-                    <div id="advancedOptions" style="display: none;">
-                        <table style="text-align: right;" id="advancedOptionsTable">
+                    <div id="advanced-options" style="display: none;">
+                        <table style="text-align: right;">
                             <tr>
                                 <td>{{ form.field.label() }}</td>
                                 <td>{{ form.field() }}</td>
@@ -59,14 +59,14 @@
 </div>
 
 <script>
-    $('#advancedOptionsText').on('click', function(e) {
+    $('#toggle-advanced-options').on('click', function(e) {
         e.preventDefault();
-        var container = $('#advancedOptions').toggle();
+        var container = $('#advanced-options').toggle();
         var text = container.is(':hidden') ? $T('Show advanced options') : $T('Hide advanced options');
-        $('#advancedOptionsText').text(text);
+        $('#toggle-advanced-options').text(text);
     });
 
-    $('#start_date, #end_date').datepicker();
+    $('#search-start_date, #search-end_date').datepicker();
 </script>
 
 {% block scripts %}{% endblock %}

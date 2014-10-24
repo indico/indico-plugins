@@ -1,0 +1,41 @@
+<form method="post" action="{{ url_for_plugin('search.search') }}" id="category-search-form" style="margin: 0;">
+    <div class="search-box" id="category-search-box">
+        <div class="search-controls">
+            <div class="search-button icon-search"></div>
+            <div id="category-search-expand" class="arrowExpandIcon"></div>
+            {{ form.phrase(style='background-color: transparent;') }}
+        </div>
+
+        <div class="extra-options">
+            <div class="label">
+                {% trans %}Advanced options{% endtrans %}
+                {% block search_syntax_tooltip %}{% endblock %}
+            </div>
+            <table>
+                <tr>
+                    <td style="text-align: right; white-space: nowrap;">{{ form.field.label() }}</td>
+                    <td>{{ form.field(class_='search-field') }}</td>
+                </tr>
+                {% block extra_fields %}{% endblock %}
+                <tr>
+                    <td style="text-align: right; white-space: nowrap;">{{ form.start_date.label() }}</td>
+                    <td style="white-space: nowrap;">{{ form.start_date() }}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; white-space: nowrap;">{{ form.end_date.label() }}</td>
+                    <td style="white-space: nowrap;">{{ form.end_date() }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>
+
+<script>
+    categorySearchBox({
+        categoryNamesUrl: {{ url_for_plugin('search.category_names') | tojson }},
+        searchUrl: {{ url_for_plugin('search.search') | tojson }},
+        searchCategoryUrl: {{ url_for_plugin('search.search', category) | tojson }},
+        categoryName: {{ category.name | tojson }},
+        isRoot: {{ category.isRoot() | tojson }}
+    });
+</script>

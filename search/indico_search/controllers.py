@@ -16,11 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import request, jsonify
 from flask_pluginengine import current_plugin
 
+from indico.util.string import to_unicode
+from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, Conference, CategoryManager
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
+from MaKaC.webinterface.rh.base import RH
+from MaKaC.webinterface.urlHandlers import UHCategoryDisplay
+
 from indico_search.views import WPSearchCategory, WPSearchConference
 
 
@@ -50,3 +55,21 @@ class RHSearch(RHCustomizable):
                 result = current_plugin.perform_search(form.data, self.obj, self.page)
             return view_class.render_template('results.html', self.obj, only_public=current_plugin.only_public,
                                               form=form, obj_type=self.obj_type, result=result)
+
+
+class RHSearchCategoryTitles(RH):
+    def _process(self):
+        matches = IndexesHolder().getIndex('categoryName').search(request.args['term'])
+        results = []
+        for category_id in matches[:7]:
+            try:
+                categ = CategoryManager().getById(category_id)
+            except KeyError:
+                continue
+            results.append({
+                'title': to_unicode(categ.getTitle()),
+                'path': map(to_unicode, categ.getCategoryPathTitles()[1:-1]),
+                'url': unicode(UHCategoryDisplay.getURL(categ))
+            })
+
+        return jsonify(success=True, results=results, count=len(matches))

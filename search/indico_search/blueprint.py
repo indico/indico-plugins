@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_search.controllers import RHSearch
+from indico_search.controllers import RHSearch, RHSearchCategoryTitles
 
 
 blueprint = IndicoPluginBlueprint('search', 'indico_search')
@@ -26,3 +26,5 @@ blueprint = IndicoPluginBlueprint('search', 'indico_search')
 blueprint.add_url_rule('/search', 'search', RHSearch, methods=('GET', 'POST'))
 blueprint.add_url_rule('/category/<categId>/search', 'search', RHSearch, methods=('GET', 'POST'))
 blueprint.add_url_rule('/event/<confId>/search', 'search', RHSearch, methods=('GET', 'POST'))
+
+blueprint.add_url_rule('/category/search-titles', 'category_names', RHSearchCategoryTitles)
