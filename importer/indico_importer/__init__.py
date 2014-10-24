@@ -1,3 +1,4 @@
+from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
 
@@ -13,9 +14,13 @@ class ImporterPlugin(IndicoPlugin):
         super(ImporterPlugin, self).init()
         self.inject_js('importer_js', WPConfModifScheduleGraphic)
         self.inject_css('importer_css', WPConfModifScheduleGraphic)
+        self.connect(signals.timetable_buttons, self.get_timetable_buttons)
 
     def get_blueprints(self):
         return IndicoPluginBlueprint('importer', __name__)
+
+    def get_timetable_buttons(self, *args, **kwargs):
+        yield ('Importer', 'createImporterDialog')
 
     def register_assets(self):
         self.register_js_bundle('importer_js', 'js/importer.js')
