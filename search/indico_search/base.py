@@ -71,6 +71,8 @@ class SearchEngine(object):
     def process(self):
         """Executes the search
 
-        :return: an object that's passed directly to the result template
+        :return: an object that's passed directly to the result template.
+                 if a flask response is returned, it is sent to the client
+                 instead (useful to redirect to an external page)
         """
         raise NotImplementedError

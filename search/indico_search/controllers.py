@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request, jsonify
 from flask_pluginengine import current_plugin
+from werkzeug.wrappers import Response
 
 from indico.util.string import to_unicode
 from MaKaC.common.indexes import IndexesHolder
@@ -30,6 +31,7 @@ from indico_search.views import WPSearchCategory, WPSearchConference
 
 
 class RHSearch(RHCustomizable):
+    """Performs a search using the search engine plugin"""
     def _checkParams(self):
         if 'confId' in request.view_args:
             self.obj = self._conf = ConferenceHolder().getById(request.view_args['confId'])
@@ -49,15 +51,18 @@ class RHSearch(RHCustomizable):
     def _process(self):
         with current_plugin.engine_plugin.plugin_context():
             form = current_plugin.search_form(prefix='search-')
-            view_class = WPSearchConference if isinstance(self.obj, Conference) else WPSearchCategory
             result = None
             if form.validate_on_submit():
                 result = current_plugin.perform_search(form.data, self.obj, self.page)
+            if isinstance(result, Response):  # probably a redirect
+                return result
+            view_class = WPSearchConference if isinstance(self.obj, Conference) else WPSearchCategory
             return view_class.render_template('results.html', self.obj, only_public=current_plugin.only_public,
                                               form=form, obj_type=self.obj_type, result=result)
 
 
 class RHSearchCategoryTitles(RH):
+    """Searches for categories with matching titles"""
     def _process(self):
         matches = IndexesHolder().getIndex('categoryName').search(request.args['term'])
         results = []
