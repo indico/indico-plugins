@@ -16,13 +16,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Function used by the importer plugin to create importer dialog.
- * @param timetable Timetable object used to specify import destination
- */
-function createImporterDialog(timetable) {
-    new ImportDialog(timetable);
-}
 
 /** Namespace for importer utility functions and variables */
 ImporterUtils = {
@@ -1360,3 +1353,11 @@ type("TableTreeList", [], {
         this.hidden = hidden;
     }
 );
+
+
+$(function() {
+    $('#timetableDiv').on('click', '.js-createImporterDialog', function(event) {
+        var timetable = $(this).data('timetable');
+        new ImportDialog(timetable);
+    });
+});
