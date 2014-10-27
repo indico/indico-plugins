@@ -30,6 +30,8 @@ class ImporterPlugin(IndicoPlugin):
     the timetable.
     """
 
+    hidden = True
+
     def init(self):
         super(ImporterPlugin, self).init()
         self.inject_js('importer_js', WPConfModifScheduleGraphic)
