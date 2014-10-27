@@ -14,17 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from wtforms import StringField
 
-from indico.core.plugins import IndicoPlugin
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
 
-from .forms import SettingsForm
 
-
-class ImporterInvenioPlugin(IndicoPlugin):
-    """Importer for Invenio plugin
-
-    Extends Indico Importer plugin with capabilites to import from Invenio.
-    """
-
-    settings_form = SettingsForm
+class SettingsForm(IndicoForm):
+    server_url = StringField(_("Invenio server URL"))
