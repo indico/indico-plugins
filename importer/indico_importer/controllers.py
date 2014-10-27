@@ -15,7 +15,7 @@ class RHDataImport(RHProtected):
     def process(self, params):
         importer = current_plugin.importers.get(params['importer_name'])
         if not importer:
-            return 'No such importer available'
+            return jsonify(dict(success=False))
         query = params.get('query')
         size = params.get('size', 10)
         return importer.import_data(query, size)

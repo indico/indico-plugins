@@ -1,5 +1,5 @@
 from indico.core import signals
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
 
 from .controllers import RHDataImport, RHGetImporters
@@ -25,11 +25,15 @@ class ImporterPlugin(IndicoPlugin):
     def get_timetable_buttons(self, *args, **kwargs):
         yield ('Importer', 'createImporterDialog')
 
+    def get_vars_js(self):
+        return {'urls': {'import_data': plugin_url_rule_to_js('importer.import_data'),
+                         'importers': plugin_url_rule_to_js('importer.importers')}}
+
     def register_assets(self):
         self.register_js_bundle('importer_js', 'js/importer.js')
         self.register_css_bundle('importer_css', 'css/importer.css')
 
 
 blueprint = IndicoPluginBlueprint('importer', __name__)
-blueprint.add_url_rule('/import/<importer_name>', 'import', RHDataImport, methods=('GET', 'POST'))
+blueprint.add_url_rule('/import/<importer_name>', 'import_data', RHDataImport, methods=('GET', 'POST'))
 blueprint.add_url_rule('/importers', 'importers', RHGetImporters, methods=('GET', 'POST'))

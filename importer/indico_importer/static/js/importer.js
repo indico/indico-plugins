@@ -205,11 +205,17 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             /** Loads a list of importers from the server */
             function(hook) {
                 var self = this;
-                indicoRequest('importer.getImporters', {}, function(result, error) {
-                    if (!error) {
-                        self.importers = result;
+                $.ajax({
+                    url: build_url(ImporterPlugin.urls.importers, {}),
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (handleAjaxError(data)) {
+                            return;
+                        }
+                        self.importers = data;
+                        hook.set(true);
                     }
-                    hook.set(true);
                 });
             }
         ],
@@ -636,21 +642,27 @@ type("ImporterListWidget", ["SelectableListWidget"], {
         _searchBase: function(query, importer, size, successFunc, callbacks) {
             var self = this;
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            indicoRequest("importer.import",
-                    {'importer': importer,
-                     'query': query,
-                     // One more entry is fetched to be able to check if it's possible to fetch
-                     // more entries in case of further requests.
-                     'size': size + 1},
-                     function(result, error) {
-                         if (!error && result && successFunc) {
-                             successFunc(result);
-                         }
-                         each(callbacks, function(callback) {
-                             callback();
-                         });
-                         killProgress();
-                     });
+            $.ajax({
+                // One more entry is fetched to be able to check if it's possible to fetch
+                // more entries in case of further requests.
+                url: build_url(ImporterPlugin.urls.import_data, {'importer_name': importer,
+                                                                 'query': query,
+                                                                 'size': size + 1}),
+                type: 'POST',
+                dataType: 'json',
+                success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    if (data.success) {
+                        successFunc(data.result);
+                    }
+                    each(callbacks, function(callback) {
+                        callback();
+                    });
+                    killProgress();
+                }
+            });
             //Saves last request data
             this.lastSearchImporter = importer;
             this.lastSearchQuery = query;
