@@ -16,15 +16,17 @@
 
 from __future__ import unicode_literals
 
-from indico.core.plugins import IndicoPlugin
+from indico_importer import ImporterEnginePluginBase
 
 from .forms import SettingsForm
+from .importer import InvenioImporter
 
 
-class ImporterInvenioPlugin(IndicoPlugin):
+class ImporterInvenioPlugin(ImporterEnginePluginBase):
     """Importer for Invenio plugin
 
-    Extends Indico Importer plugin with capabilites to import from Invenio.
+    Adds Invenio importer to Indico timetable import sources.
     """
 
+    engine_class = InvenioImporter
     settings_form = SettingsForm
