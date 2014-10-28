@@ -37,6 +37,9 @@ class ImporterEnginePluginBase(IndicoPlugin):
 class ImporterEngineBase(object):
     """Base class for data importers"""
 
+    _id = ''
+    name = ''
+
     def import_data(self, query, size):
         """Fetch and converts data from external source.
 

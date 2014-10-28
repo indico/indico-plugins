@@ -31,7 +31,7 @@ class RHDataImport(RHProtected):
     size - number of returned queries
     """
     def process(self, params):
-        importer = current_plugin.importers.get(params['importer_name'])
+        importer = current_plugin.importer_engines.get(params['importer_name'])
         if not importer:
             return jsonify(dict(success=False))
         query = params.get('query')
@@ -41,5 +41,5 @@ class RHDataImport(RHProtected):
 
 class RHGetImporters(RHProtected):
     def process(self, params):
-        importers = {importer.id: importer.name for importer in current_plugin.importer_engines}
+        importers = {k: v.name for k, v in current_plugin.importer_engines.iteritems()}
         return jsonify(importers)
