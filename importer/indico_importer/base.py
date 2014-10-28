@@ -12,10 +12,29 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Indico;if not, see <http://www.gnu.org/licenses/>.
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+from flask_pluginengine import depends
+
+from indico.core.plugins import IndicoPlugin
+from indico_importer.plugin import ImporterPlugin
 
 
-class DataImporterBase(object):
+@depends('importer')
+class ImporterEnginePluginBase(IndicoPlugin):
+    """Base class for importer engine plugins"""
+
+    engine_class = None
+
+    def init(self):
+        super(ImporterEnginePluginBase, self).init()
+        self.engine = self.engine_class()
+        ImporterPlugin.instance.register_importer_engine(self.engine)
+
+
+class ImporterEngineBase(object):
     """Base class for data importers"""
 
     def import_data(self, query, size):
