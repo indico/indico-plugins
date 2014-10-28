@@ -18,12 +18,9 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js
-from indico.util.signals import values_from_signal
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
 
-from . import signals as plugin_signals
 from .controllers import RHDataImport, RHGetImporters
-from .importer import DataImporterBase
 
 
 class ImporterPlugin(IndicoPlugin):
@@ -40,7 +37,7 @@ class ImporterPlugin(IndicoPlugin):
         self.inject_js('importer_js', WPConfModifScheduleGraphic)
         self.inject_css('importer_css', WPConfModifScheduleGraphic)
         self.connect(signals.timetable_buttons, self.get_timetable_buttons)
-        self.register_importers()
+        self.importer_engines = {}
 
     def get_blueprints(self):
         return blueprint
@@ -56,12 +53,8 @@ class ImporterPlugin(IndicoPlugin):
         self.register_js_bundle('importer_js', 'js/importer.js')
         self.register_css_bundle('importer_css', 'css/importer.css')
 
-    def register_importers(self):
-        self.importers = []
-        importers = values_from_signal(plugin_signals.register_importers.send(self))
-        for importer in importers:
-            if isinstance(importer, DataImporterBase):
-                self.importers.append(importer)
+    def register_importer_engine(self, importer_engine):
+        self.importer_engines[importer_engine.name] = importer_engine
 
 
 blueprint = IndicoPluginBlueprint('importer', __name__)

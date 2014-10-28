@@ -41,7 +41,5 @@ class RHDataImport(RHProtected):
 
 class RHGetImporters(RHProtected):
     def process(self, params):
-        importers = {}
-        for importer in current_plugin.importers.itervalues():
-            importers[importer.id] = importer.name
+        importers = {importer.id: importer.name for importer in current_plugin.importer_engines}
         return jsonify(importers)
