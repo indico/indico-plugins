@@ -29,5 +29,5 @@ setup(
     install_requires=[
         'indico>=1.9.1'
     ],
-    entry_points={'indico.plugins': {'importer = indico_importer:ImporterPlugin'}}
+    entry_points={'indico.plugins': {'importer = indico_importer.plugin:ImporterPlugin'}}
 )
