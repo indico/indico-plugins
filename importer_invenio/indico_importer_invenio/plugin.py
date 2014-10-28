@@ -16,19 +16,15 @@
 
 from __future__ import unicode_literals
 
-from setuptools import setup, find_packages
+from indico.core.plugins import IndicoPlugin
+
+from .forms import SettingsForm
 
 
-setup(
-    name='indico_importer_invenio',
-    version='0.1',
-    packages=find_packages(),
-    zip_safe=False,
-    include_package_data=True,
-    platforms='any',
-    install_requires=[
-        'indico>=1.9.1',
-        'indico_importer'
-    ],
-    entry_points={'indico.plugins': {'importer_invenio = indico_importer_invenio.plugin:ImporterInvenioPlugin'}}
-)
+class ImporterInvenioPlugin(IndicoPlugin):
+    """Importer for Invenio plugin
+
+    Extends Indico Importer plugin with capabilites to import from Invenio.
+    """
+
+    settings_form = SettingsForm
