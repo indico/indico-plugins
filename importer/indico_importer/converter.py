@@ -44,7 +44,7 @@ class RecordConverter(object):
     conversion = []
 
     @staticmethod
-    def defaultConversionMethod(attr):
+    def default_conversion_method(attr):
         """
         Method that will be used to convert an entry in dictionary unless other method is specified.
         """
@@ -61,7 +61,7 @@ class RecordConverter(object):
             return [cls._convert(record)]
 
     @classmethod
-    def _convertInternal(cls, record):
+    def _convert_internal(cls, record):
         """
         Converts a single dictionary into converted dictionary or list of dictionaries into converted
         list of dictionaries. Used while passing dictionaries to another converter.
@@ -77,34 +77,34 @@ class RecordConverter(object):
         Core method of the converter. Converts a single dictionary into another dictionary.
         """
         if record:
-            convertedDict = {}
+            converted_dict = {}
             for field in cls.conversion:
                 key = field[0]
                 if len(field) >= 2 and field[1]:
-                    convertedKey = field[1]
+                    converted_key = field[1]
                 else:
-                    convertedKey = key
+                    converted_key = key
                 if len(field) >= 3 and field[2]:
-                    conversionMethod = field[2]
+                    conversion_method = field[2]
                 else:
-                    conversionMethod = cls.defaultConversionMethod
+                    conversion_method = cls.default_conversion_method
                 if len(field) >= 4:
                     converter = field[3]
                 else:
                     converter = None
                 try:
-                    value = conversionMethod(record[key])
+                    value = conversion_method(record[key])
                 except KeyError:
                     continue
                 if converter:
-                    value = converter._convertInternal(value)
-                if convertedKey == "*append*":
+                    value = converter._convert_internal(value)
+                if converted_key == "*append*":
                     if isinstance(value, list):
                         for v in value:
-                            convertedDict.update(v)
+                            converted_dict.update(v)
                     else:
-                        convertedDict.update(value)
+                        converted_dict.update(value)
                 else:
-                    convertedDict[convertedKey] = value
-            return convertedDict
+                    converted_dict[converted_key] = value
+            return converted_dict
         return {}
