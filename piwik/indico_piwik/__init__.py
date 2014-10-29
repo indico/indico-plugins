@@ -32,10 +32,9 @@ from .queries.tracking import PiwikQueryTrackDownload
 
 
 class PiwikPlugin(IndicoPlugin):
-    """Piwik statistics plugin
+    """Piwik statistics
 
-    Piwik statistics plugin provides statistics of conferences, meetings
-    and contributions.
+    Retrieves piwik statistics for conferences, meetings and contributions.
     """
 
     settings_form = SettingsForm
