@@ -24,7 +24,7 @@ from MaKaC.webinterface.rh.base import RHProtected
 
 class RHGetImporters(RHProtected):
     def _process(self):
-        importers = {k: v.name for k, v in current_plugin.importer_engines.iteritems()}
+        importers = {k: importer.name for k, (importer, _) in current_plugin.importer_engines.iteritems()}
         return jsonify(importers)
 
 
@@ -32,5 +32,6 @@ class RHImportData(RHProtected):
     def _process(self):
         size = request.form.get('size', 10)
         query = request.form.get('query')
-        importer = current_plugin.importer_engines.get(request.view_args['importer_name'])
-        return importer.import_data(query, size)
+        importer, plugin = current_plugin.importer_engines.get(request.view_args['importer_name'])
+        with plugin.plugin_context():
+            return importer.import_data(query, size)

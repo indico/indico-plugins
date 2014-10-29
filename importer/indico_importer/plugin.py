@@ -53,8 +53,8 @@ class ImporterPlugin(IndicoPlugin):
         self.register_js_bundle('importer_js', 'js/importer.js')
         self.register_css_bundle('importer_css', 'css/importer.css')
 
-    def register_importer_engine(self, importer_engine):
-        self.importer_engines[importer_engine._id] = importer_engine
+    def register_importer_engine(self, importer_engine, plugin):
+        self.importer_engines[importer_engine._id] = (importer_engine, plugin)
 
 
 blueprint = IndicoPluginBlueprint('importer', __name__)

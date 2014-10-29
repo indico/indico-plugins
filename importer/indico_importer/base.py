@@ -31,7 +31,7 @@ class ImporterEnginePluginBase(IndicoPlugin):
     def init(self):
         super(ImporterEnginePluginBase, self).init()
         self.engine = self.engine_class()
-        ImporterPlugin.instance.register_importer_engine(self.engine)
+        ImporterPlugin.instance.register_importer_engine(self.engine, self)
 
 
 class ImporterEngineBase(object):
