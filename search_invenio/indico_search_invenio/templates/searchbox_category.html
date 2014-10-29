@@ -1,0 +1,8 @@
+{% extends 'search:searchbox_category.html' %}
+
+{% block extra_fields %}
+    <tr>
+        <td style="text-align: right; white-space: nowrap;">{{ form.collection.label() }}</td>
+        <td style="white-space: nowrap;">{{ form.collection() }}</td>
+    </tr>
+{% endblock %}

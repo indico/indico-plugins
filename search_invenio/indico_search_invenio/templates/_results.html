@@ -1,0 +1,39 @@
+{# This macro is used by results.html and also in the InvenioRemoteSearch class! #}
+{% macro render_result(result, is_event) %}
+    <li>
+        {% if result.title %}
+            <a class="title" href="{{ result.url }}">{{ result.title }}</a>
+        {% endif %}
+        {% if result.start_date %}
+            <small class="date">{{ result.start_date.strftime('%Y-%m-%d %H:%M:%S (%Z)') }}</small>
+        {% endif %}
+        {% if not is_event %}
+            <small class="parent-event">{{ result.event.title }}</small>
+        {% endif %}
+        {% if result.authors %}
+            <ul class="authors">
+                {% for author in result.authors %}
+                    <li>
+                        {{ author.name }}
+                        <small>({{ author.role }}{% if author.affiliation %}, {{ author.affiliation }}{% endif %})</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if result.description %}
+            {% set truncated = result.description | truncate(100) %}
+            <div class="description">
+                {{ truncated }}
+                {% if truncated != result.description %}
+                    <a class="link show-full-desc js-show-full-desc" href="#">more</a>
+                    <div style="display: none;">{{ result.description }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <ul class="nobulletsListInline material">
+            {% for link, title in result.materials %}
+                <li><a class="link" href="{{ link }}">{{ title }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endmacro %}
