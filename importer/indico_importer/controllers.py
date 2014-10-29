@@ -16,30 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify
+from flask import jsonify, request
 from flask_pluginengine import current_plugin
 
 from MaKaC.webinterface.rh.base import RHProtected
 
 
-class RHDataImport(RHProtected):
-    """
-    Fetches data from the specified importer plugin.
-    Arguments:
-    importer - name of an importer plugin being used
-    query - string used in importer's search phrase
-    size - number of returned queries
-    """
-    def process(self, params):
-        importer = current_plugin.importer_engines.get(params['importer_name'])
-        if not importer:
-            return jsonify(dict(success=False))
-        query = params.get('query')
-        size = params.get('size', 10)
-        return importer.import_data(query, size)
-
-
 class RHGetImporters(RHProtected):
-    def process(self, params):
+    def _process(self):
         importers = {k: v.name for k, v in current_plugin.importer_engines.iteritems()}
         return jsonify(importers)
+
+
+class RHImportData(RHProtected):
+    def _process(self):
+        size = request.form.get('size', 10)
+        query = request.form.get('query')
+        importer = current_plugin.importer_engines.get(request.view_args['importer_name'])
+        return importer.import_data(query, size)

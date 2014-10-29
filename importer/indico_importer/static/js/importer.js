@@ -218,7 +218,7 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 var self = this;
                 $.ajax({
                     url: build_url(ImporterPlugin.urls.importers, {}),
-                    type: 'POST',
+                    type: 'GET',
                     dataType: 'json',
                     success: function(data) {
                         if (handleAjaxError(data)) {
@@ -652,7 +652,6 @@ type("ImporterListWidget", ["SelectableListWidget"], {
          */
         _searchBase: function(query, importer, size, successFunc, callbacks) {
             var self = this;
-            var killProgress = IndicoUI.Dialogs.Util.progress();
             $.ajax({
                 // One more entry is fetched to be able to check if it's possible to fetch
                 // more entries in case of further requests.
@@ -661,17 +660,15 @@ type("ImporterListWidget", ["SelectableListWidget"], {
                                                                  'size': size + 1}),
                 type: 'POST',
                 dataType: 'json',
+                complete: IndicoUI.Dialogs.Util.progress(),
                 success: function(data) {
                     if (handleAjaxError(data)) {
                         return;
                     }
-                    if (data.success) {
-                        successFunc(data.result);
-                    }
-                    each(callbacks, function(callback) {
+                    successFunc(data.result);
+                    _.each(callbacks, function(callback) {
                         callback();
                     });
-                    killProgress();
                 }
             });
             //Saves last request data

@@ -20,7 +20,7 @@ from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
 
-from .controllers import RHDataImport, RHGetImporters
+from .controllers import RHGetImporters, RHImportData
 
 
 class ImporterPlugin(IndicoPlugin):
@@ -58,5 +58,5 @@ class ImporterPlugin(IndicoPlugin):
 
 
 blueprint = IndicoPluginBlueprint('importer', __name__)
-blueprint.add_url_rule('/import/<importer_name>', 'import_data', RHDataImport, methods=('GET', 'POST'))
-blueprint.add_url_rule('/importers', 'importers', RHGetImporters, methods=('GET', 'POST'))
+blueprint.add_url_rule('/importers/<importer_name>/search', 'import_data', RHImportData, methods=('POST',))
+blueprint.add_url_rule('/importers/', 'importers', RHGetImporters)
