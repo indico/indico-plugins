@@ -280,9 +280,8 @@ class InvenioSearchEngine(SearchEngine):
         return '{}.{}'.format(prefix, suffix)
 
     def _make_obj_query(self):
-        query = []
         if isinstance(self.obj, Category) and not self.obj.isRoot():
-            query.append('650_7:"{}*"'.format(':'.join(map(to_unicode, self.obj.getCategoryPath()))))
+            return '650_7:"{}*"'.format(':'.join(map(to_unicode, self.obj.getCategoryPath())))
         elif isinstance(self.obj, Conference):
             # XXX: The old plugin prefixed this with 'AND ' but according to the invenio docs, AND is implied
-            query.append('970__a:"INDICO.{}.*"'.format(self.obj.id))
+            return '970__a:"INDICO.{}.*"'.format(self.obj.id)
