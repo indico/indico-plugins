@@ -12,9 +12,14 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Indico;if not, see <http://www.gnu.org/licenses/>.
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from flask_pluginengine import current_plugin
 
 from indico_importer import ImporterEngineBase
+
+from .connector import InvenioConnector
+from .converters import InvenioRecordConverter
 
 
 class InvenioImporter(ImporterEngineBase):
@@ -22,3 +27,8 @@ class InvenioImporter(ImporterEngineBase):
 
     _id = 'invenio'
     name = 'CDS Invenio'
+
+    def import_data(self, query, size):
+        url = current_plugin.settings.get('server_url')
+        registers = InvenioConnector(url).search(p=query, rg=size)
+        return InvenioRecordConverter.convert(registers)
