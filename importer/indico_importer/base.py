@@ -23,15 +23,16 @@ from indico_importer.plugin import ImporterPlugin
 
 
 @depends('importer')
-class ImporterEnginePluginBase(IndicoPlugin):
+class ImporterSourcePluginBase(IndicoPlugin):
     """Base class for importer engine plugins"""
 
-    engine_class = None
+    importer_engine_classes = set()
 
     def init(self):
-        super(ImporterEnginePluginBase, self).init()
-        self.engine = self.engine_class()
-        ImporterPlugin.instance.register_importer_engine(self.engine, self)
+        super(ImporterSourcePluginBase, self).init()
+        for engine_class in self.importer_engine_classes:
+            importer_engine = engine_class()
+            ImporterPlugin.instance.register_importer_engine(importer_engine, self)
 
 
 class ImporterEngineBase(object):

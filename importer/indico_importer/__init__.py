@@ -14,6 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ('ImporterEnginePluginBase', 'ImporterEngineBase')
+__all__ = ('ImporterSourcePluginBase', 'ImporterEngineBase')
 
-from .base import ImporterEnginePluginBase, ImporterEngineBase
+from .base import ImporterSourcePluginBase, ImporterEngineBase
