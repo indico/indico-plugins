@@ -1,0 +1,2 @@
+graft indico_piwik/static
+graft indico_piwik/templates
