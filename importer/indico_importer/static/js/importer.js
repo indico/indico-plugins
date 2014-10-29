@@ -665,7 +665,7 @@ type("ImporterListWidget", ["SelectableListWidget"], {
                     if (handleAjaxError(data)) {
                         return;
                     }
-                    successFunc(data.result);
+                    successFunc(data.records);
                     _.each(callbacks, function(callback) {
                         callback();
                     });

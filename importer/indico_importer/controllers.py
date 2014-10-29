@@ -30,8 +30,9 @@ class RHGetImporters(RHProtected):
 
 class RHImportData(RHProtected):
     def _process(self):
-        size = request.form.get('size', 10)
-        query = request.form.get('query')
+        size = request.args.get('size', 10)
+        query = request.args.get('query')
         importer, plugin = current_plugin.importer_engines.get(request.view_args['importer_name'])
         with plugin.plugin_context():
-            return importer.import_data(query, size)
+            data = {'records': importer.import_data(query, size)}
+        return jsonify(data)
