@@ -1,1 +1,3 @@
 graft indico_search_invenio/static
+graft indico_search_invenio/templates
+include indico_search_invenio/marc2short.xsl
