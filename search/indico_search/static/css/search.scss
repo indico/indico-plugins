@@ -14,17 +14,59 @@
     }
 }
 
-.search-public-warning {
-    color: #FF4444;
-    padding: 10px;
-}
+.search-container {
+    .search-public-warning {
+        float: right;
+        padding: 10px;
+        color: #FF4444;
+    }
 
-.search-title {
-    font-size: 2em;
-    color: #B14300;
-    font-weight: normal;
-    margin: 0;
-    padding: 0;
+    .search-banner {
+        float: right;
+        margin-top: 10px;
+
+        & > span {
+            color: #777;
+        }
+
+        img {
+            vertical-align: middle;
+            border: 0;
+        }
+    }
+
+    .content {
+        form {
+            width: 400px;
+
+            #search-phrase {
+                width: 300px;
+                height: 20px;
+                font-size: 17px;
+                vertical-align: middle;
+            }
+
+            input[type=submit] {
+                vertical-align: middle;
+            }
+
+            .toggle-advanced-options-container {
+                padding-top: 4px;
+            }
+
+            .advanced-options > table {
+                text-align: right;
+            }
+        }
+    }
+
+    h1 {
+        font-size: 2em;
+        color: #B14300;
+        font-weight: normal;
+        margin: 0;
+        padding: 0;
+    }
 }
 
 #category-search-form {

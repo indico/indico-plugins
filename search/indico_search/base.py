@@ -41,32 +41,26 @@ class SearchPluginBase(IndicoPlugin):
         """If the search engine only returns public events"""
         return session.user is None
 
-    def perform_search(self, values, obj=None, page=1):
+    def perform_search(self, values, obj=None):
         """Performs the search.
 
         For documentation on the parameters and return value, see
         the documentation of the :class:`SearchEngine` class.
         """
-        return self.engine_class(values, obj, page).process()
+        return self.engine_class(values, obj).process()
 
 
 class SearchEngine(object):
     """Base class for a search engine"""
 
-    def __init__(self, values, obj, page):
+    def __init__(self, values, obj):
         """
         :param values: the values sent by the user
         :param obj: object to search in (a `Category` or `Conference`)
-        :param page: the result page to show (if supported)
         """
         self.values = values
         self.obj = obj
-        self.page = page
         self.user = session.user
-
-    def build_url(self, **query_params):
-        """Creates the URL for the search request"""
-        raise NotImplementedError
 
     def process(self):
         """Executes the search

@@ -43,18 +43,13 @@ class RHSearch(RHCustomizable):
             self.obj = CategoryManager().getRoot()
             self.obj_type = None
 
-        try:
-            self.page = int(request.values['page'])
-        except (ValueError, KeyError):
-            self.page = 1
-
     def _process(self):
         with current_plugin.engine_plugin.plugin_context():
             form = current_plugin.search_form(prefix='search-')
             result = None
             if form.validate_on_submit():
-                result = current_plugin.perform_search(form.data, self.obj, self.page)
-            if isinstance(result, Response):  # probably a redirect
+                result = current_plugin.perform_search(form.data, self.obj)
+            if isinstance(result, Response):  # probably a redirect or a json response
                 return result
             view_class = WPSearchConference if isinstance(self.obj, Conference) else WPSearchCategory
             return view_class.render_template('results.html', self.obj, only_public=current_plugin.only_public,

@@ -1,11 +1,11 @@
-<div class="container">
+<div class="container search-container">
     {% if only_public %}
-        <div class="search-public-warning" style="float: right;">
+        <div class="search-public-warning">
             {% trans %}Warning: since you are not logged in, only results from public events will appear.{% endtrans %}
         </div>
     {% endif %}
 
-    <h1 class="search-title">
+    <h1>
         {% trans %}Search{% endtrans %}
         {% if obj_type == 'event' %}
             {% trans %}Event{% endtrans %}
@@ -17,24 +17,24 @@
     <div class="topBar">
         <div class="content">
             <div>
-                <div style="float: right; margin-top:10px;">
-                    <span style="color:#777">Search powered by</span>
+                <div class="search-banner">
+                    <span>Search powered by</span>
                     {% block banner %}{% endblock %}
                 </div>
 
-                <form method="post" action="" style="width: 400px;">
+                <form method="post" action="">
                     <div>
-                        {{ form.phrase(style='width: 300px; height: 20px; font-size: 17px; vertical-align: middle;') }}
-                        <input type="submit" value="{% trans %}Search{% endtrans %}" style="vertical-align: middle;">
+                        {{ form.phrase() }}
+                        <input type="submit" value="{% trans %}Search{% endtrans %}">
                         {% block tooltip %}{% endblock %}
                     </div>
 
-                    <div style="padding-top: 4px;">
+                    <div class="toggle-advanced-options-container">
                         <a id="toggle-advanced-options" href="#">{% trans %}Show advanced options{% endtrans %}</a>
                     </div>
 
-                    <div id="advanced-options" style="display: none;">
-                        <table style="text-align: right;">
+                    <div id="advanced-options" class="advanced-options" style="display: none;">
+                        <table>
                             <tr>
                                 <td>{{ form.field.label() }}</td>
                                 <td>{{ form.field() }}</td>
@@ -54,7 +54,17 @@
                 </form>
             </div>
         </div>
-        {% block results %}{% endblock %}
+        {% set errors = form.error_list %}
+        {% if errors %}
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if form.validate_on_submit() %}
+            {% block results %}{% endblock %}
+        {% endif %}
     </div>
 </div>
 

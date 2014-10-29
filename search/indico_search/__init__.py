@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ('SearchPluginBase', 'SearchEngine')
+__all__ = ('SearchPluginBase', 'SearchEngine', 'SearchForm')
 
 from .base import SearchPluginBase, SearchEngine
+from .forms import SearchForm
