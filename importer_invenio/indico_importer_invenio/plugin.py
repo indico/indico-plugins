@@ -23,7 +23,7 @@ from .importer import InvenioImporter
 
 
 class ImporterInvenioPlugin(ImporterSourcePluginBase):
-    """Importer for Invenio plugin
+    """Importer for Invenio
 
     Adds Invenio importer to Indico timetable import sources.
     """
