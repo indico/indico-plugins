@@ -26,7 +26,7 @@ from indico_importer.plugin import ImporterPlugin
 class ImporterSourcePluginBase(IndicoPlugin):
     """Base class for importer engine plugins"""
 
-    importer_engine_classes = set()
+    importer_engine_classes = None
 
     def init(self):
         super(ImporterSourcePluginBase, self).init()
@@ -71,4 +71,4 @@ class ImporterEngineBase(object):
                "place": eventPlace},
                ...]
         """
-        raise NotImplementedError("Base class method needs to be implemented")
+        raise NotImplementedError
