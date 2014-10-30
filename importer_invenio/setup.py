@@ -22,6 +22,10 @@ from setuptools import setup, find_packages
 setup(
     name='indico_importer_invenio',
     version='0.1',
+    url='https://github.com/indico/indico-plugin-importer-imvenio',
+    license='https://www.gnu.org/licenses/gpl-3.0.txt',
+    author='Indico Team',
+    author_email='indico-team@cern.ch',
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
@@ -29,6 +33,12 @@ setup(
     install_requires=[
         'indico>=1.9.1',
         'indico_importer'
+    ],
+    classifiers=[
+        'Environment :: Plugins',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Programming Language :: Python :: 2.7'
     ],
     entry_points={'indico.plugins': {'importer_invenio = indico_importer_invenio.plugin:ImporterInvenioPlugin'}}
 )
