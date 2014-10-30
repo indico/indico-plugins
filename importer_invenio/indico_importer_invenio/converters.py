@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico_importer.converter import RecordConverter
-from indico_importer.utils import parse_datetime
+from indico_importer.util import convert_dt_tuple
 from MaKaC.webinterface.common.tools import strip_ml_tags
 
 
@@ -46,8 +46,8 @@ class InvenioPlaceTimeConverter111(InvenioRecordConverterBase):
     Extracts event's place and start/end time. Used for entry 111 in MARC 21.
     """
 
-    conversion = [('9', 'startDateTime', parse_datetime),
-                  ('z', 'endDateTime', parse_datetime),
+    conversion = [('9', 'startDateTime', convert_dt_tuple),
+                  ('z', 'endDateTime', convert_dt_tuple),
                   ('c', 'place')]
 
 
@@ -56,8 +56,8 @@ class InvenioPlaceTimeConverter518(InvenioRecordConverterBase):
     Extracts event's place and start/end time. Used for entry 518 in MARC 21.
     """
 
-    conversion = [('d', 'startDateTime', parse_datetime),
-                  ('h', 'endDateTime', parse_datetime),
+    conversion = [('d', 'startDateTime', convert_dt_tuple),
+                  ('h', 'endDateTime', convert_dt_tuple),
                   ('r', 'place')]
 
 
