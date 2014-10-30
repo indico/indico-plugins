@@ -25,7 +25,7 @@ from .controllers import RHGetImporters, RHImportData
 
 
 class ImporterPlugin(IndicoPlugin):
-    """Importer plugin
+    """Importer
 
     Extends Indico for other plugins to import data from external sources to
     the timetable.
