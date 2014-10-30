@@ -28,8 +28,6 @@ class RecordConverter(object):
     It's a list tuples in which a single element represents a translation that will be made. Every
     element of the list is a tuple that consists of from 1 to 4 entries.
 
-    *** IMPORTANT syntax for a tuple containing a single element is (element, ) NOT (element) !. ***
-
     The first one is the key name in the source dictionary, the value that applies to this key will
     be the subject of the translation. The second is the key in the destination dictionary at which
     translated value will be put. If not specified its value will be equal the value of the first
