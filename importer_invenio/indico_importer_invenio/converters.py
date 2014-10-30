@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico_importer.converter import RecordConverter
+from indico_importer.converter import APPEND, RecordConverter
 from indico_importer.util import convert_dt_tuple
 from MaKaC.webinterface.common.tools import strip_ml_tags
 
@@ -78,9 +78,9 @@ class InvenioRecordConverter(InvenioRecordConverterBase):
     conversion = [('088', 'reportNumbers', lambda x: [number for number in x[0]['a'][0].split(' ') if number != '(Confidential)']),
                   ('100', 'primaryAuthor', lambda x: x[0] if 'Primary Author' in x[0].get('e', []) else {}, InvenioAuthorConverter),
                   ('100', 'speaker', lambda x: x[0] if 'Speaker' in x[0].get('e', []) else {}, InvenioAuthorConverter),
-                  ('111', '*append*', None, InvenioPlaceTimeConverter111),
+                  ('111', APPEND, None, InvenioPlaceTimeConverter111),
                   ('245', 'title', lambda x: x[0]['a'][0]),
-                  ('518', '*append*', None, InvenioPlaceTimeConverter518),
+                  ('518', APPEND, None, InvenioPlaceTimeConverter518),
                   ('520', 'summary', lambda x: strip_ml_tags(x[0]['a'][0])),
                   ('700', 'secondaryAuthor', None, InvenioAuthorConverter),
                   ('61124', 'meetingName', lambda x: str(x[0]['a'][0])),
