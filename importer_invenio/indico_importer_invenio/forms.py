@@ -14,11 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from wtforms import StringField
+from wtforms.fields.html5 import URLField
+from wtforms.validators import URL
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 
 
 class SettingsForm(IndicoForm):
-    server_url = StringField(_("Invenio server URL"))
+    server_url = URLField(_("Invenio server URL"), validators=[URL()])
