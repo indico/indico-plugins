@@ -22,12 +22,22 @@ from setuptools import setup, find_packages
 setup(
     name='indico_importer',
     version='0.1',
+    url='https://github.com/indico/indico-plugin-importer',
+    license='https://www.gnu.org/licenses/gpl-3.0.txt',
+    author='Indico Team',
+    author_email='indico-team@cern.ch',
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     install_requires=[
         'indico>=1.9.1'
+    ],
+    classifiers=[
+        'Environment :: Plugins',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Programming Language :: Python :: 2.7'
     ],
     entry_points={'indico.plugins': {'importer = indico_importer.plugin:ImporterPlugin'}}
 )
