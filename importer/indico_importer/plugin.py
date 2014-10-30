@@ -44,7 +44,7 @@ class ImporterPlugin(IndicoPlugin):
         return blueprint
 
     def get_timetable_buttons(self, *args, **kwargs):
-        yield (_('Importer'), 'createImporterDialog')
+        yield (_('Importer'), 'create-importer-dialog')
 
     def get_vars_js(self):
         return {'urls': {'import_data': plugin_url_rule_to_js('importer.import_data'),

@@ -1353,7 +1353,7 @@ type("TableTreeList", [], {
 
 
 $(function() {
-    $('#timetableDiv').on('click', '.js-createImporterDialog', function(event) {
+    $('#timetableDiv').on('click', '.js-create-importer-dialog', function(event) {
         var timetable = $(this).data('timetable');
         new ImportDialog(timetable);
     });
