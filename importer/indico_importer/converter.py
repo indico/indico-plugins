@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+APPEND = object()
+
 
 class RecordConverter(object):
     """
@@ -74,35 +76,36 @@ class RecordConverter(object):
         """
         Core method of the converter. Converts a single dictionary into another dictionary.
         """
-        if record:
-            converted_dict = {}
-            for field in cls.conversion:
-                key = field[0]
-                if len(field) >= 2 and field[1]:
-                    converted_key = field[1]
+        if not record:
+            return {}
+
+        converted_dict = {}
+        for field in cls.conversion:
+            key = field[0]
+            if len(field) >= 2 and field[1]:
+                converted_key = field[1]
+            else:
+                converted_key = key
+            if len(field) >= 3 and field[2]:
+                conversion_method = field[2]
+            else:
+                conversion_method = cls.default_conversion_method
+            if len(field) >= 4:
+                converter = field[3]
+            else:
+                converter = None
+            try:
+                value = conversion_method(record[key])
+            except KeyError:
+                continue
+            if converter:
+                value = converter._convert_internal(value)
+            if converted_key is APPEND:
+                if isinstance(value, list):
+                    for v in value:
+                        converted_dict.update(v)
                 else:
-                    converted_key = key
-                if len(field) >= 3 and field[2]:
-                    conversion_method = field[2]
-                else:
-                    conversion_method = cls.default_conversion_method
-                if len(field) >= 4:
-                    converter = field[3]
-                else:
-                    converter = None
-                try:
-                    value = conversion_method(record[key])
-                except KeyError:
-                    continue
-                if converter:
-                    value = converter._convert_internal(value)
-                if converted_key == "*append*":
-                    if isinstance(value, list):
-                        for v in value:
-                            converted_dict.update(v)
-                    else:
-                        converted_dict.update(value)
-                else:
-                    converted_dict[converted_key] = value
-            return converted_dict
-        return {}
+                    converted_dict.update(value)
+            else:
+                converted_dict[converted_key] = value
+        return converted_dict
