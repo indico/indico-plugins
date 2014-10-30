@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
+from indico.util.i18n import _
 
 from .controllers import RHGetImporters, RHImportData
 
@@ -43,7 +44,7 @@ class ImporterPlugin(IndicoPlugin):
         return blueprint
 
     def get_timetable_buttons(self, *args, **kwargs):
-        yield ('Importer', 'createImporterDialog')
+        yield (_('Importer'), 'createImporterDialog')
 
     def get_vars_js(self):
         return {'urls': {'import_data': plugin_url_rule_to_js('importer.import_data'),
