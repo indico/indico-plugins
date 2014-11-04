@@ -75,3 +75,37 @@ def initial_export(agent_id, force=False):
     print 'TODO: run initial export'
     agent.initial_data_exported = True
     db.session.commit()
+
+
+@cli_manager.command
+def create_agent(agent_type, name=None):
+    """Creates a new agent"""
+    update_session_options(db)
+    try:
+        agent_class = current_plugin.agent_classes[agent_type]
+    except KeyError:
+        print 'No such agent type'
+        return
+    # TODO: Prompt for agent type specific settings
+    agent = LiveSyncAgent(backend_name=agent_type, name=name or agent_class.title)
+    db.session.add(agent)
+    db.session.commit()
+    print agent
+
+
+# TODO: delete_agent, update_agent, create_task
+
+
+@cli_manager.command
+def run(agent_id=None):
+    if agent_id is None:
+        agents = LiveSyncAgent.find_all()
+    else:
+        agent = LiveSyncAgent.find_first(id=int(agent_id))
+        if agent is None:
+            print 'No such agent'
+            return
+        agents = [agent]
+
+    for agent in agents:
+        pass  # TODO

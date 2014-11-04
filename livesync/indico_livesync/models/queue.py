@@ -16,18 +16,27 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
-
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent
 
 
+class ChangeType(int, IndicoEnum):
+    created = 1
+    deleted = 2
+    moved = 3
+    data_changed = 4
+    title_changed = 5
+    protection_changed = 6
+
+
 class LiveSyncQueueEntry(db.Model):
     __tablename__ = 'queues'
-    __table_args__ = {'schema': 'plugin_livesync'}
+    __table_args__ = (db.CheckConstraint('change IN ({})'.format(', '.join(map(str, ChangeType)))),
+                      {'schema': 'plugin_livesync'})
 
     #: Entry ID
     id = db.Column(
@@ -39,6 +48,7 @@ class LiveSyncQueueEntry(db.Model):
     agent_id = db.Column(
         db.Integer,
         db.ForeignKey('plugin_livesync.agents.id'),
+        nullable=False,
         index=True
     )
 
@@ -49,18 +59,34 @@ class LiveSyncQueueEntry(db.Model):
         default=now_utc
     )
 
-    # XXX: maybe use an Enum for this?
-    # XXX: or should it be an array? old code seems to have records with multiple changes
-    #: the change type
+    #: the change type, a :class:`ChangeType`
     change = db.Column(
-        db.String,
+        db.SmallInteger,
         nullable=False
     )
 
-    #: Data related to the change
-    data = db.Column(
-        JSON,
-        nullable=False,
+    #: The ID of the changed category
+    category_id = db.Column(
+        db.String,
+        nullable=True
+    )
+
+    #: The event ID of the changed event/contribution/subcontribution
+    event_id = db.Column(
+        db.String,
+        nullable=True
+    )
+
+    #: The contribution ID of the changed contribution/subcontribution
+    contrib_id = db.Column(
+        db.String,
+        nullable=True
+    )
+
+    #: The subcontribution ID of the changed subcontribution
+    subcontrib_id = db.Column(
+        db.String,
+        nullable=True
     )
 
     #: The associated :class:LiveSyncAgent
@@ -71,15 +97,22 @@ class LiveSyncQueueEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<LiveSyncQueueEntry({}, {}, {}, {})>'.format(self.agent, self.id, self.change, self.data)
+        return '<LiveSyncQueueEntry({}, {}, {}, {})>'.format(self.agent, self.id, ChangeType(self.change).name,
+                                                             self.data)
 
     @classmethod
-    def create(cls, change, data):
+    def create(cls, changes, obj_ref):
         """Creates a new change in all queues
 
-        :param change: the change type
-        :param data: the associated data (a json-serializable object)
+        :param changes: the change types, an iterable containing
+                        :class:`ChangeType`
+        :param obj_ref: the object reference (returned by `obj_ref`)
+                        of the changed object
         """
+        obj_ref = dict(obj_ref)
+        obj_ref.pop('type')
         for agent in LiveSyncAgent.find():
-            db.session.add(cls(agent=agent, change=change, data=data))
+            for change in changes:
+                entry = cls(agent=agent, change=change, **obj_ref)
+                db.session.add(entry)
         db.session.flush()

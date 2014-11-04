@@ -32,9 +32,13 @@ def upgrade():
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('agent_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('timestamp', UTCDateTime(), nullable=False),
-                    sa.Column('change', sa.String(), nullable=False),
-                    sa.Column('data', postgresql.JSON(), nullable=False),
+                    sa.Column('change', sa.SmallInteger(), nullable=False),
+                    sa.Column('category_id', sa.String()),
+                    sa.Column('event_id', sa.String()),
+                    sa.Column('contrib_id', sa.String()),
+                    sa.Column('subcontrib_id', sa.String()),
                     sa.ForeignKeyConstraint(['agent_id'], ['plugin_livesync.agents.id']),
+                    sa.CheckConstraint('change IN (1, 2, 3, 4, 5, 6)'),
                     sa.PrimaryKeyConstraint('id'),
                     schema='plugin_livesync')
 
