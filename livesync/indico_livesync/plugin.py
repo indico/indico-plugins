@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.core.plugins import IndicoPlugin, wrap_cli_manager
 
 from indico_livesync.cli import cli_manager
-from indico_livesync.handler import LiveSyncSignalHandler
+from indico_livesync.handler import connect_signals
 
 
 class LiveSyncPlugin(IndicoPlugin):
@@ -33,7 +33,7 @@ class LiveSyncPlugin(IndicoPlugin):
     def init(self):
         super(LiveSyncPlugin, self).init()
         self.agent_classes = {}
-        self.signal_handler = LiveSyncSignalHandler(self)
+        connect_signals(self)
 
     def add_cli_command(self, manager):
         manager.add_command('livesync', wrap_cli_manager(cli_manager, self))
