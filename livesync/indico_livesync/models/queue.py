@@ -139,3 +139,29 @@ class LiveSyncQueueEntry(db.Model):
                 entry = cls(agent=agent, change=change, **obj_ref)
                 db.session.add(entry)
         db.session.flush()
+
+    def iter_subentries(self):
+        """Iterates through all children"""
+        if self.type not in {'category', 'event', 'contribution'}:
+            return
+        data = {'change': self.change,
+                'category_id': self.category_id, 'event_id': self.event_id,
+                'contrib_id': self.contrib_id, 'subcontrib_id': self.subcontrib_id}
+        if self.type == 'category':
+            for event in self.object.iterAllConferences():
+                new_data = dict(data)
+                new_data['type'] = 'event'
+                new_data['event_id'] = event.getId()
+                yield LiveSyncQueueEntry(**new_data)
+        elif self.type == 'event':
+            for contrib in self.object.iterContributions():
+                new_data = dict(data)
+                new_data['type'] = 'contribution'
+                new_data['contrib_id'] = contrib.getId()
+                yield LiveSyncQueueEntry(**new_data)
+        elif self.type == 'contribution':
+            for subcontrib in self.object.iterSubContributions():
+                new_data = dict(data)
+                new_data['type'] = 'subcontribution'
+                new_data['subcontrib_id'] = subcontrib.getId()
+                yield LiveSyncQueueEntry(**new_data)
