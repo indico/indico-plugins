@@ -117,8 +117,12 @@ class LiveSyncQueueEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<LiveSyncQueueEntry({}, {}, {}, {})>'.format(self.agent, self.id, ChangeType(self.change).name,
-                                                             self.data)
+        ref_repr = '{}.{}.{}.{}'.format(self.category_id if self.category_id else 'x',
+                                        self.event_id if self.event_id else 'x',
+                                        self.contrib_id if self.contrib_id else 'x',
+                                        self.subcontrib_id if self.subcontrib_id else 'x')
+        return '<LiveSyncQueueEntry({}, {}, {}, {}, {})>'.format(self.agent, self.id, self.type,
+                                                                 ChangeType(self.change).name, ref_repr)
 
     @classmethod
     def create(cls, changes, obj_ref):
