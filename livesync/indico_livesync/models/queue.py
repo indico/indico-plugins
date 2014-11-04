@@ -16,12 +16,15 @@
 
 from __future__ import unicode_literals
 
+from werkzeug.datastructures import ImmutableDict
+
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent
+from indico_livesync.util import obj_deref
 
 
 class ChangeType(int, IndicoEnum):
@@ -100,6 +103,17 @@ class LiveSyncQueueEntry(db.Model):
         'LiveSyncAgent',
         backref=db.backref('queue', cascade='all, delete-orphan', lazy='dynamic')
     )
+
+    @property
+    def object(self):
+        """Returns the changed object"""
+        return obj_deref(self.object_ref)
+
+    @property
+    def object_ref(self):
+        """Returns the reference of the changed object"""
+        return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
+                             contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
 
     @return_ascii
     def __repr__(self):
