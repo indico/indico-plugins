@@ -65,6 +65,12 @@ class LiveSyncQueueEntry(db.Model):
         nullable=False
     )
 
+    #: The type of the changed object
+    type = db.Column(
+        db.String,
+        nullable=False
+    )
+
     #: The ID of the changed category
     category_id = db.Column(
         db.String,
@@ -110,7 +116,6 @@ class LiveSyncQueueEntry(db.Model):
                         of the changed object
         """
         obj_ref = dict(obj_ref)
-        obj_ref.pop('type')
         for agent in LiveSyncAgent.find():
             for change in changes:
                 entry = cls(agent=agent, change=change, **obj_ref)

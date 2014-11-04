@@ -33,6 +33,7 @@ def upgrade():
                     sa.Column('agent_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('timestamp', UTCDateTime(), nullable=False),
                     sa.Column('change', sa.SmallInteger(), nullable=False),
+                    sa.Column('type', sa.String(), nullable=False),
                     sa.Column('category_id', sa.String()),
                     sa.Column('event_id', sa.String()),
                     sa.Column('contrib_id', sa.String()),
