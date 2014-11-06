@@ -71,7 +71,7 @@ def connect_signals(plugin):
 
 def _moved(obj, old_parent, new_parent, **kwargs):
     print '_moved', obj, old_parent, new_parent
-    _register_change(obj, 'moved')
+    _register_change(obj, ChangeType.moved)
     category_protection = old_parent.isProtected()
     new_category_protection = new_parent.isProtected()
 
