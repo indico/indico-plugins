@@ -141,7 +141,11 @@ class LiveSyncQueueEntry(db.Model):
         db.session.flush()
 
     def iter_subentries(self):
-        """Iterates through all children"""
+        """Iterates through all children
+
+        The only field of the yielded items that should be used are
+        `type`, `object` and `object_ref`.
+        """
         if self.type not in {'category', 'event', 'contribution'}:
             return
         data = {'change': self.change,

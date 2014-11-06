@@ -14,32 +14,56 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from collections import defaultdict
+
+from indico.util.struct.enum import IndicoEnum
+
 from indico_livesync.models.queue import ChangeType
 
 
+class SimpleChange(int, IndicoEnum):
+    deleted = 1
+    created = 2
+    updated = 4
+
+
 def process_records(records):
-    changes = {}
+    """Converts queue entries into object changes.
+
+    :param records: an iterable containing `LiveSyncQueueEntry` objects
+    :return: a dict mapping object references to `SimpleChange` bitsets
+    """
+    changes = defaultdict(int)
 
     for record in records:
-        if record.type != ChangeType.deleted and record.object is None:
+        if record.change != ChangeType.deleted and record.object is None:
+            # Skip entries which are not deletions but have no corresponding objects.
+            # Probably they are updates for objects that got deleted afterwards.
             continue
-        if record.type == ChangeType.created:
-            changes[record.obj] = ChangeType.type
-        elif record.type == ChangeType.deleted:
-            changes[record.obj] = ChangeType.type
-        elif record.type in {ChangeType.moved, ChangeType.protection_changed}:
-            changes.update(_cascade_change(record))
-        elif record.type == ChangeType.title_changed:
-            pass
-        elif record.type == ChangeType.data_changed and not record.category_id:
-            changes[record.obj] = ChangeType.type
+        if record.change == ChangeType.created:
+            if record.type != 'category':
+                changes[record.object_ref] |= SimpleChange.created
+        elif record.change == ChangeType.deleted:
+            if record.type != 'category':
+                changes[record.object_ref] = SimpleChange.deleted
+        elif record.change in {ChangeType.moved, ChangeType.protection_changed}:
+            for ref in _cascade(record):
+                changes[ref] |= SimpleChange.updated
+            changes.update()
+        elif record.change == ChangeType.title_changed:
+            pass  # XXX: included in data_changed
+        elif record.change == ChangeType.data_changed:
+            if record.type != 'category':
+                changes[record.object_ref] |= SimpleChange.updated
 
-    for obj, state in records.iteritems():
-        pass
-
-
-def _cascade_change(record):
-    changes = {record.obj: record.type}
-    for subrecord in record.subrecords():
-        changes.update(_cascade_change(subrecord))
     return changes
+
+
+def _cascade(record):
+    yield record.object_ref
+    for subrecord in record.iter_subentries():
+        if subrecord.object:
+            for item in _cascade(subrecord):
+                yield item
