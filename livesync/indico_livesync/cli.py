@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
+import transaction
 from flask_pluginengine import current_plugin
 from flask_script import Manager
 from terminaltables import AsciiTable
 
-from indico.core.db import db
+from indico.core.db import db, DBMgr
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.util.console import cformat
 
@@ -98,14 +99,21 @@ def create_agent(agent_type, name=None):
 
 @cli_manager.command
 def run(agent_id=None):
+    """Runs the livesync agent"""
+    update_session_options(db)
     if agent_id is None:
-        agents = LiveSyncAgent.find_all()
+        agent_list = LiveSyncAgent.find_all()
     else:
         agent = LiveSyncAgent.find_first(id=int(agent_id))
         if agent is None:
             print 'No such agent'
             return
-        agents = [agent]
+        agent_list = [agent]
 
-    for agent in agents:
-        pass  # TODO
+    for agent in agent_list:
+        print cformat('Running agent: %{white!}{}%{reset}').format(agent.name)
+        with DBMgr.getInstance().global_connection():
+            try:
+                agent.backend(agent).run()
+            finally:
+                transaction.abort()

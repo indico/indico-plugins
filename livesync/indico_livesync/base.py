@@ -21,6 +21,7 @@ from flask_pluginengine import depends, trim_docstring
 from indico.core.plugins import IndicoPlugin
 from indico.util.decorators import classproperty
 
+from indico_livesync.models.queue import LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
 
@@ -59,3 +60,16 @@ class LiveSyncAgentBase(object):
             return parts[1].strip()
         except IndexError:
             return 'no description available'
+
+    def __init__(self, agent):
+        """
+        :param agent: a `LiveSyncAgent` instance
+        """
+        self.agent = agent
+
+    def fetch_records(self, count=None):
+        return self.agent.queue.filter_by(processed=False).order_by(LiveSyncQueueEntry.timestamp).limit(count).all()
+
+    def run(self):
+        """Runs the livsync export"""
+        raise NotImplementedError

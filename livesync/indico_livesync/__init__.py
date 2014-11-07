@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
-__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase')
+__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'SimpleChange', 'process_records')
 
 from .base import LiveSyncPluginBase, LiveSyncAgentBase
+from .simplify import SimpleChange, process_records

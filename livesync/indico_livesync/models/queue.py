@@ -62,6 +62,13 @@ class LiveSyncQueueEntry(db.Model):
         default=now_utc
     )
 
+    #: if this record has already been processed
+    processed = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
     #: the change type, a :class:`ChangeType`
     change = db.Column(
         db.SmallInteger,
