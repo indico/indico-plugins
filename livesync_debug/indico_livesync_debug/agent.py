@@ -14,7 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico_livesync import LiveSyncAgentBase
+from __future__ import unicode_literals
+
+from indico.core.db import db
+from indico.util.console import cformat
+
+from indico_livesync import LiveSyncAgentBase, SimpleChange, process_records
+from indico_livesync.util import obj_deref
+
+
+def _change_str(change):
+    return ','.join(flag.name for flag in SimpleChange if change & flag)
 
 
 class LiveSyncDebugAgent(LiveSyncAgentBase):
@@ -22,3 +32,19 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
 
     This agent simply dumps all changes to stdout.
     """
+
+    def run(self):
+        records = self.fetch_records()
+        print cformat('%{white!}Raw changes:%{reset}')
+        for record in records:
+            print record
+
+        print
+        print cformat('%{white!}Simplified/cascaded changes:%{reset}')
+        for ref, change in process_records(records).iteritems():
+            obj = obj_deref(ref)
+            print cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj or ref)
+
+        for record in records:
+            record.processed = True
+        db.session.commit()
