@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.util.console import cformat
 
-from indico_livesync import LiveSyncAgentBase, SimpleChange, process_records
+from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records
 from indico_livesync.util import obj_deref
 
 
@@ -35,6 +35,10 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
 
     def run(self):
         records = self.fetch_records()
+        if not records:
+            print cformat('%{yellow!}No records%{reset}')
+            return
+
         print cformat('%{white!}Raw changes:%{reset}')
         for record in records:
             print record
@@ -44,6 +48,10 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
         for ref, change in process_records(records).iteritems():
             obj = obj_deref(ref)
             print cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj or ref)
+
+        print
+        print cformat('%{white!}Resulting MarcXML:%{reset}')
+        print MARCXMLGenerator.records_to_xml(records)
 
         for record in records:
             record.processed = True
