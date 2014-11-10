@@ -71,5 +71,14 @@ class LiveSyncAgentBase(object):
         return self.agent.queue.filter_by(processed=False).order_by(LiveSyncQueueEntry.timestamp).limit(count).all()
 
     def run(self):
-        """Runs the livsync export"""
+        """Runs the livesync export"""
+        raise NotImplementedError
+
+    def run_initial_export(self, events):
+        """Runs the initial export.
+
+        This process is expected to take a very long time.
+
+        :param events: iterable of all events in this indico instance
+        """
         raise NotImplementedError
