@@ -23,7 +23,7 @@ from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
 
 from indico_livesync import process_records, SimpleChange
-from indico_livesync.util import make_compound_id, obj_deref
+from indico_livesync.util import make_compound_id, obj_deref, obj_ref
 
 
 class MARCXMLGenerator:
@@ -33,11 +33,14 @@ class MARCXMLGenerator:
     def records_to_xml(cls, records):
         mg = MARCXMLGenerator()
         for ref, change in process_records(records).iteritems():
-            try:
-                mg.add_object(ref, bool(change & SimpleChange.deleted))
-            except Exception:
-                mg._remove_unfinished_record()
-                current_plugin.logger.exception('Could not process {}'.format(ref))
+            mg.safe_add_object(ref, bool(change & SimpleChange.deleted))
+        return mg.get_xml()
+
+    @classmethod
+    def objects_to_xml(cls, objs, change_type=SimpleChange.created):
+        mg = MARCXMLGenerator()
+        for obj in objs:
+            mg.safe_add_object(obj_ref(obj), bool(change_type & SimpleChange.deleted))
         return mg.get_xml()
 
     def __init__(self):
@@ -50,21 +53,26 @@ class MARCXMLGenerator:
         aw.setUser(AdminList().getInstance().getList()[0])
         self.output_generator = outputGenerator(aw, self.xml_generator)
 
+    def safe_add_object(self, ref, deleted=False):
+        try:
+            self.add_object(ref, deleted)
+        except Exception:
+            current_plugin.logger.exception('Could not process {}'.format(ref))
+
     def add_object(self, ref, deleted=False):
         if self.closed:
             raise RuntimeError('Cannot add object to closed xml generator')
         if deleted:
-            self.xml_generator.openTag('record')
-
-            self.xml_generator.openTag('datafield', [['tag', '970'], ['ind1', ' '], ['ind2', ' ']])
-            self.xml_generator.writeTag('subfield', 'INDICO.{}'.format(make_compound_id(ref)), [['code', 'a']])
-            self.xml_generator.closeTag('datafield')
-
-            self.xml_generator.openTag('datafield', [['tag', '980'], ['ind1', ' '], ['ind2', ' ']])
-            self.xml_generator.writeTag('subfield', 'DELETED', [['code', 'c']])
-            self.xml_generator.closeTag('datafield')
-
-            self.xml_generator.closeTag('record')
+            xg = XMLGen(init=False)
+            xg.openTag('record')
+            xg.openTag('datafield', [['tag', '970'], ['ind1', ' '], ['ind2', ' ']])
+            xg.writeTag('subfield', 'INDICO.{}'.format(make_compound_id(ref)), [['code', 'a']])
+            xg.closeTag('datafield')
+            xg.openTag('datafield', [['tag', '980'], ['ind1', ' '], ['ind2', ' ']])
+            xg.writeTag('subfield', 'DELETED', [['code', 'c']])
+            xg.closeTag('datafield')
+            xg.closeTag('record')
+            self.xml_generator += xg.xml
         elif ref['type'] in {'event', 'contribution', 'subcontribution'}:
             obj = obj_deref(ref)
             if obj is None:
@@ -72,11 +80,11 @@ class MARCXMLGenerator:
             elif not obj.getOwner():
                 raise ValueError('Cannot add object without owner: {}'.format(obj))
             if ref['type'] == 'event':
-                self._event_to_marcxml(obj)
+                self.xml_generator.xml += self._event_to_marcxml(obj)
             elif ref['type'] == 'contribution':
-                self._contrib_to_marcxml(obj)
+                self.xml_generator.xml += self._contrib_to_marcxml(obj)
             elif ref['type'] == 'subcontribution':
-                self._subcontrib_to_marcxml(obj)
+                self.xml_generator.xml += self._subcontrib_to_marcxml(obj)
         else:
             raise ValueError('unknown object ref: {}'.format(ref['type']))
         return self.xml_generator.getXml()
@@ -86,24 +94,23 @@ class MARCXMLGenerator:
             self.xml_generator.closeTag('collection')
         return self.xml_generator.getXml()
 
-    def _remove_unfinished_record(self):
-        # remove any line breaks, etc...
-        while not self.xml_generator.xml[-1].strip():
-            self.xml_generator.xml.pop()
-        # remove '<record>'
-        self.xml_generator.xml.pop()
-
     def _event_to_marcxml(self, obj):
-        self.xml_generator.openTag('record')
-        self.output_generator.confToXMLMarc21(obj, out=self.xml_generator, overrideCache=True)
-        self.xml_generator.closeTag('record')
+        xg = XMLGen(init=False)
+        xg.openTag('record')
+        self.output_generator.confToXMLMarc21(obj, out=xg, overrideCache=True)
+        xg.closeTag('record')
+        return xg.xml
 
     def _contrib_to_marcxml(self, obj):
-        self.xml_generator.openTag('record')
-        self.output_generator.contribToXMLMarc21(obj, out=self.xml_generator, overrideCache=True)
-        self.xml_generator.closeTag('record')
+        xg = XMLGen(init=False)
+        xg.openTag('record')
+        self.output_generator.contribToXMLMarc21(obj, out=xg, overrideCache=True)
+        xg.closeTag('record')
+        return xg.xml
 
     def _subcontrib_to_marcxml(self, obj):
-        self.xml_generator.openTag('record')
-        self.output_generator.subContribToXMLMarc21(obj, out=self.xml_generator, overrideCache=True)
-        self.xml_generator.closeTag('record')
+        xg = XMLGen(init=False)
+        xg.openTag('record')
+        self.output_generator.subContribToXMLMarc21(obj, out=xg, overrideCache=True)
+        xg.closeTag('record')
+        return xg.xml
