@@ -55,3 +55,17 @@ def obj_deref(ref):
         return contrib.getSubContributionById(ref['subcontrib_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
+
+
+def make_compound_id(ref):
+    """Returns the compound ID for the referenced object"""
+    if ref['type'] == 'category':
+        raise ValueError('Compound IDs are not supported for categories')
+    elif ref['type'] == 'event':
+        return ref['event_id']
+    elif ref['type'] == 'contribution':
+        return '{}.{}'.format(ref['event_id'], ref['contrib_id'])
+    elif ref['type'] == 'subcontribution':
+        return '{}.{}.{}'.format(ref['event_id'], ref['contrib_id'], ref['subcontrib_id'])
+    else:
+        raise ValueError('Unexpected object type: {}'.format(ref['type']))
