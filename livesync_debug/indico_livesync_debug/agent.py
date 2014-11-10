@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.util.console import cformat
+from indico.util.struct.iterables import grouper
 
 from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records
 from indico_livesync.util import obj_deref
@@ -56,3 +57,10 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
         for record in records:
             record.processed = True
         db.session.commit()
+
+    def run_initial_export(self, events):
+        for i, batch in enumerate(grouper(events, 10), 1):
+            print
+            print cformat('%{white!}Batch {}:%{reset}').format(i)
+            print MARCXMLGenerator.objects_to_xml(event for event in batch if event is not None)
+            print
