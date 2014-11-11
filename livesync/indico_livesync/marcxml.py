@@ -72,7 +72,7 @@ class MARCXMLGenerator:
             xg.writeTag('subfield', 'DELETED', [['code', 'c']])
             xg.closeTag('datafield')
             xg.closeTag('record')
-            self.xml_generator += xg.xml
+            self.xml_generator.xml += xg.xml
         elif ref['type'] in {'event', 'contribution', 'subcontribution'}:
             obj = obj_deref(ref)
             if obj is None:
