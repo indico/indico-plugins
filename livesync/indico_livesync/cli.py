@@ -83,7 +83,7 @@ def initial_export(agent_id, force=False):
                 transaction.abort()
 
     with DBMgr.getInstance().global_connection():
-        agent.backend(agent).run_initial_export(_iter_events())
+        agent.create_backend().run_initial_export(_iter_events())
 
     agent.initial_data_exported = True
     db.session.commit()
@@ -128,6 +128,6 @@ def run(agent_id=None):
         print cformat('Running agent: %{white!}{}%{reset}').format(agent.name)
         with DBMgr.getInstance().global_connection():
             try:
-                agent.backend(agent).run()
+                agent.create_backend().run()
             finally:
                 transaction.abort()
