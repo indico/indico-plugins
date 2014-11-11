@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.conference import Conference, Contribution, SubContribution, Category, CategoryManager, ConferenceHolder
 from werkzeug.datastructures import ImmutableDict
+
+from MaKaC.conference import Conference, Contribution, SubContribution, Category, CategoryManager, ConferenceHolder
 
 
 def obj_ref(obj, parent=None):

@@ -20,6 +20,7 @@ from flask_pluginengine import depends, trim_docstring
 
 from indico.core.plugins import IndicoPlugin
 from indico.util.decorators import classproperty
+from MaKaC.conference import CategoryManager
 
 from indico_livesync.models.queue import LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
@@ -66,9 +67,39 @@ class LiveSyncAgentBase(object):
         :param agent: a `LiveSyncAgent` instance
         """
         self.agent = agent
+        self.excluded_categories = self._get_excluded_categories()
+
+    def _get_excluded_categories(self):
+        todo = {x['id'] for x in LiveSyncPlugin.settings.get('excluded_categories')}
+        excluded = set()
+        while todo:
+            category_id = todo.pop()
+            try:
+                category = CategoryManager().getById(category_id)
+            except KeyError:
+                continue
+            excluded.add(category.getId())
+            todo.update(category.subcategories)
+        return excluded
+
+    def _is_entry_excluded(self, entry):
+        if entry.type == 'category':
+            return entry.category_id in self.excluded_categories
+        else:
+            obj = entry.object
+            if not obj:
+                return False
+            category = obj.getConference().getOwner() if obj.getConference() else None
+            if category:
+                return category.getId() in self.excluded_categories
+        return False
 
     def fetch_records(self, count=None):
-        return self.agent.queue.filter_by(processed=False).order_by(LiveSyncQueueEntry.timestamp).limit(count).all()
+        query = (self.agent.queue
+                 .filter_by(processed=False)
+                 .order_by(LiveSyncQueueEntry.timestamp)
+                 .limit(count))
+        return [entry for entry in query if not self._is_entry_excluded(entry)]
 
     def run(self):
         """Runs the livesync export"""

@@ -17,18 +17,29 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPlugin, wrap_cli_manager
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import MultipleItemsField
 
 from indico_livesync.cli import cli_manager
 from indico_livesync.handler import connect_signals
 
 
+class SettingsForm(IndicoForm):
+    excluded_categories = MultipleItemsField(_('Excluded categories'), fields=(('id', _('Category ID')),),
+                                             description=_("Changes to objects inside these categories or any of their "
+                                                           "subcategories are excluded."))
+
+
 class LiveSyncPlugin(IndicoPlugin):
     """LiveSync
 
-    Provides a base for livesync plugins.
+    Provides the basic LiveSync functionality.
+    Only useful if a livesync agent plugin is installed, too.
     """
 
-    hidden = True
+    settings_form = SettingsForm
+    default_settings = {'excluded_categories': []}
 
     def init(self):
         super(LiveSyncPlugin, self).init()
