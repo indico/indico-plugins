@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db import db
-from indico.util.console import cformat
+from indico.util.console import cformat, strip_ansi
 from indico.util.struct.iterables import grouper
 
 from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records
+from indico_livesync.uploader import Uploader
 from indico_livesync.util import obj_deref
 
 
@@ -34,33 +34,54 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
     This agent simply dumps all changes to stdout.
     """
 
-    def run(self):
+    def _print(self, msg=''):
+        if not self.task:
+            print msg
+        elif msg:
+            if not isinstance(msg, basestring):
+                msg = repr(msg)
+            self.task.logger.info(strip_ansi(msg))
+
+    def run(self, task=None):
         records = self.fetch_records()
         if not records:
-            print cformat('%{yellow!}No records%{reset}')
+            self._print(cformat('%{yellow!}No records%{reset}'))
             return
 
-        print cformat('%{white!}Raw changes:%{reset}')
+        self._print(cformat('%{white!}Raw changes:%{reset}'))
         for record in records:
-            print record
+            self._print(record)
 
-        print
-        print cformat('%{white!}Simplified/cascaded changes:%{reset}')
+        self._print()
+        self._print(cformat('%{white!}Simplified/cascaded changes:%{reset}'))
         for ref, change in process_records(records).iteritems():
             obj = obj_deref(ref)
-            print cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj or ref)
+            self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj or ref))
 
-        print
-        print cformat('%{white!}Resulting MarcXML:%{reset}')
-        print MARCXMLGenerator.records_to_xml(records)
-
-        for record in records:
-            record.processed = True
-        db.session.commit()
+        self._print()
+        self._print(cformat('%{white!}Resulting MarcXML:%{reset}'))
+        uploader = DebugUploader(self)
+        uploader.run(records)
 
     def run_initial_export(self, events):
-        for i, batch in enumerate(grouper(events, 10), 1):
+        uploader = DebugUploader(self)
+        uploader.run_initial(events)
+        for i, batch in enumerate(grouper(events, 10, skip_missing=True), 1):
             print
             print cformat('%{white!}Batch {}:%{reset}').format(i)
             print MARCXMLGenerator.objects_to_xml(event for event in batch if event is not None)
             print
+
+
+class DebugUploader(Uploader):
+    BATCH_SIZE = 5
+
+    def __init__(self, *args, **kwargs):
+        super(DebugUploader, self).__init__(*args, **kwargs)
+        self.n = 0
+
+    def upload_records(self, records, from_queue):
+        self.n += 1
+        self.agent._print(cformat('%{white!}Batch {}:%{reset}').format(self.n))
+        xml = MARCXMLGenerator.records_to_xml(records) if from_queue else MARCXMLGenerator.objects_to_xml(records)
+        self.agent._print(xml if xml else '(no changes)')
