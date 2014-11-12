@@ -31,8 +31,11 @@ class MARCXMLGenerator:
 
     @classmethod
     def records_to_xml(cls, records):
+        processed = process_records(records)
+        if not processed:
+            return None
         mg = MARCXMLGenerator()
-        for ref, change in process_records(records).iteritems():
+        for ref, change in processed.iteritems():
             mg.safe_add_object(ref, bool(change & SimpleChange.deleted))
         return mg.get_xml()
 

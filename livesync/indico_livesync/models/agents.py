@@ -64,9 +64,9 @@ class LiveSyncAgent(db.Model):
         from indico_livesync.plugin import LiveSyncPlugin
         return LiveSyncPlugin.instance.agent_classes.get(self.backend_name)
 
-    def create_backend(self):
+    def create_backend(self, task=None):
         """Creates a new backend instance"""
-        return self.backend(self)
+        return self.backend(self, task)
 
     @return_ascii
     def __repr__(self):

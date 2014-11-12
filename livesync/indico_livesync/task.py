@@ -46,4 +46,4 @@ class LiveSyncTask(PeriodicUniqueTask):
                     continue
                 with DBMgr.getInstance().global_connection():
                     self.logger.info('Running agent {}'.format(agent.name))
-                    agent.create_backend().run(task=self)
+                    agent.create_backend(self).run()

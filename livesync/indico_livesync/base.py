@@ -62,11 +62,13 @@ class LiveSyncAgentBase(object):
         except IndexError:
             return 'no description available'
 
-    def __init__(self, agent):
+    def __init__(self, agent, task=None):
         """
         :param agent: a `LiveSyncAgent` instance
+        :param task: a `LiveSyncTask` instance if running as a task
         """
         self.agent = agent
+        self.task = task
         self.excluded_categories = self._get_excluded_categories()
 
     def _get_excluded_categories(self):
