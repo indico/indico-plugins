@@ -41,6 +41,9 @@ class LiveSyncTask(PeriodicUniqueTask):
         plugin = LiveSyncPlugin.instance  # RuntimeError if not active
         with plugin.plugin_context():
             for agent in LiveSyncAgent.find_all():
+                if agent.backend is None:
+                    self.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
+                    continue
                 if not agent.initial_data_exported:
                     self.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
                     continue

@@ -54,7 +54,11 @@ def agents():
     for agent in agent_list:
         initial = (cformat('%{green!}done%{reset}') if agent.initial_data_exported else
                    cformat('%{yellow!}pending%{reset}'))
-        table_data.append([unicode(agent.id), agent.name, agent.backend.title, initial, unicode(agent.queue.count())])
+        if agent.backend is None:
+            backend_title = cformat('%{red!}invalid backend ({})%{reset}').format(agent.backend_name)
+        else:
+            backend_title = agent.backend.title
+        table_data.append([unicode(agent.id), agent.name, backend_title, initial, unicode(agent.queue.count())])
     table = AsciiTable(table_data)
     table.justify_columns[4] = 'right'
     print table.table
@@ -73,6 +77,9 @@ def initial_export(agent_id, force=False):
     agent = LiveSyncAgent.find_first(id=int(agent_id))
     if agent is None:
         print 'No such agent'
+        return
+    if agent.backend is None:
+        print cformat('Cannot run agent %{red!}{}%{reset} (backend not found)').format(agent.name)
         return
     print cformat('Selected agent: %{white!}{}%{reset} ({})').format(agent.name, agent.backend.title)
     if agent.initial_data_exported and not force:
@@ -127,6 +134,9 @@ def run(agent_id=None):
         agent_list = [agent]
 
     for agent in agent_list:
+        if agent.backend is None:
+            print cformat('Skipping agent: %{red!}{}%{reset} (backend not found)').format(agent.name)
+            continue
         if not agent.initial_data_exported:
             print cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name)
             continue
