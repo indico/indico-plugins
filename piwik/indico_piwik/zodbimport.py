@@ -46,5 +46,8 @@ class PiwikImporter(Importer):
                         'jsHookEnabled': 'enabled_for_events',
                         'downloadTrackingEnabled': 'enabled_for_downloads'}
         for old, new in settings_map.iteritems():
-            PiwikPlugin.settings.set(new, opts[old].getValue())
+            value = opts[old].getValue()
+            if isinstance(value, basestring):
+                value = convert_to_unicode(value).strip()
+            PiwikPlugin.settings.set(new, value)
         db.session.commit()
