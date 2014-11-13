@@ -40,5 +40,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'livesync = indico_livesync.plugin:LiveSyncPlugin'}}
+    entry_points={'indico.plugins': {'livesync = indico_livesync.plugin:LiveSyncPlugin'},
+                  'indico.zodb_importers': {'livesync = indico_livesync.zodbimport:LiveSyncImporter'}}
 )
