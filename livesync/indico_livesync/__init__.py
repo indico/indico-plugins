@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
-__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'SimpleChange', 'process_records', 'MARCXMLGenerator')
+__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'SimpleChange', 'process_records', 'MARCXMLGenerator',
+           'Uploader', 'MARCXMLUploader')
 
 from .base import LiveSyncPluginBase, LiveSyncAgentBase
 from .simplify import SimpleChange, process_records
 from .marcxml import MARCXMLGenerator
+from .uploader import Uploader, MARCXMLUploader

@@ -21,9 +21,15 @@ import transaction
 from indico.core.db import db
 from indico.util.struct.iterables import grouper
 
+from indico_livesync import MARCXMLGenerator
+
 
 class Uploader(object):
+    """Handles batch data upload to a remote service."""
+
+    #: Number of queue entries to process at a time
     BATCH_SIZE = 100
+    #: Number of events to process at a time during initial export
     INITIAL_BATCH_SIZE = 100
 
     def __init__(self, agent):
@@ -71,3 +77,14 @@ class Uploader(object):
             record.processed = True
         db.session.commit()
         transaction.abort()  # clear ZEO cache
+
+
+class MARCXMLUploader(Uploader):
+    def upload_records(self, records, from_queue):
+        xml = MARCXMLGenerator.records_to_xml(records) if from_queue else MARCXMLGenerator.objects_to_xml(records)
+        if xml is not None:
+            self.upload_xml(xml)
+
+    def upload_xml(self, xml):
+        """Receives MARCXML strings to be uploaded"""
+        raise NotImplementedError
