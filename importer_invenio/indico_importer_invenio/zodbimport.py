@@ -16,12 +16,22 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.html5 import URLField
-from wtforms.validators import URL
+from indico.core.db import db
+from indico.util.console import cformat
+from indico_zodbimport import Importer, convert_to_unicode
 
-from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
+from indico_importer_invenio.plugin import ImporterInvenioPlugin
 
 
-class SettingsForm(IndicoForm):
-    server_url = URLField(_("Invenio server URL"), validators=[URL()])
+class InvenioImporter(Importer):
+    plugins = {'importer', 'importer_invenio'}
+
+    def migrate(self):
+        self.migrate_settings()
+
+    def migrate_settings(self):
+        print cformat('%{white!}migrating settings')
+        ImporterInvenioPlugin.settings.delete_all()
+        opts = self.zodb_root['plugins']['importer']._PluginType__plugins['invenio']._PluginBase__options
+        ImporterInvenioPlugin.settings.set('server_url', convert_to_unicode(opts['location'].getValue()).strip())
+        db.session.commit()
