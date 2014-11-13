@@ -46,6 +46,8 @@ class LiveSyncAgentBase(object):
 
     #: the plugin containing the agent
     plugin = None  # set automatically when the agent is registered
+    #: the Uploader to use. only needed if run and run_initial_export are not overridden
+    uploader = None
 
     @classproperty
     @classmethod
@@ -105,7 +107,12 @@ class LiveSyncAgentBase(object):
 
     def run(self):
         """Runs the livesync export"""
-        raise NotImplementedError
+        if self.uploader is None:
+            raise NotImplementedError
+
+        records = self.fetch_records()
+        uploader = self.uploader(self)
+        uploader.run(records)
 
     def run_initial_export(self, events):
         """Runs the initial export.
@@ -114,4 +121,8 @@ class LiveSyncAgentBase(object):
 
         :param events: iterable of all events in this indico instance
         """
-        raise NotImplementedError
+        if self.uploader is None:
+            raise NotImplementedError
+
+        uploader = self.uploader(self)
+        uploader.run_initial(events)
