@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from setuptools import setup, find_packages
 
 
@@ -37,5 +39,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'piwik = indico_piwik:PiwikPlugin'}}
+    entry_points={'indico.plugins': {'piwik = indico_piwik:PiwikPlugin'},
+                  'indico.zodb_importers': {'piwik = indico_piwik.zodbimport:PiwikImporter'}}
 )
