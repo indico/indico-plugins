@@ -41,7 +41,7 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
                 msg = repr(msg)
             self.task.logger.info(strip_ansi(msg))
 
-    def run(self, task=None):
+    def run(self):
         records = self.fetch_records()
         if not records:
             self._print(cformat('%{yellow!}No records%{reset}'))
