@@ -19,8 +19,7 @@ from __future__ import unicode_literals
 from indico.util.console import cformat, strip_ansi
 from indico.util.struct.iterables import grouper
 
-from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records
-from indico_livesync.uploader import Uploader
+from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
 from indico_livesync.util import obj_deref
 
 
