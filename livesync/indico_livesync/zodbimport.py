@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-
 from indico.core.db import db
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
@@ -38,7 +37,6 @@ class LiveSyncImporter(Importer):
     def migrate(self):
         # noinspection PyAttributeOutsideInit
         self.livesync_root = self.zodb_root['plugins']['livesync']._storage
-        print dict(self.livesync_root)
         with LiveSyncPlugin.instance.plugin_context():
             self.migrate_settings()
             self.migrate_agents()
