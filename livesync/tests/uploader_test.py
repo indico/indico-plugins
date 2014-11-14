@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from mock import MagicMock
 import pytest
+from mock import MagicMock
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.uploader import Uploader, MARCXMLUploader

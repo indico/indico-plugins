@@ -27,7 +27,7 @@ from indico_livesync.plugin import LiveSyncPlugin
 
 
 @depends('livesync')
-class LiveSyncPluginBase(IndicoPlugin):
+class LiveSyncPluginBase(IndicoPlugin):  # pragma: no cover
     """Base class for livesync plugins"""
 
     #: dict containing the agent(s) provided by the plugin; the keys are unique identifiers
@@ -107,7 +107,7 @@ class LiveSyncAgentBase(object):
 
     def run(self):
         """Runs the livesync export"""
-        if self.uploader is None:
+        if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         records = self.fetch_records()
@@ -121,7 +121,7 @@ class LiveSyncAgentBase(object):
 
         :param events: iterable of all events in this indico instance
         """
-        if self.uploader is None:
+        if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         uploader = self.uploader(self)
