@@ -1,7 +1,7 @@
 [run]
 branch = true
 include = indico_*
-
+omit = */zodbimport.py
 
 [report]
 exclude_lines =
