@@ -65,7 +65,7 @@ class Uploader(object):
         :param from_queue: if `records` contains queue entries.
                            expect events if it is False.
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def processed_records(self, records):
         """Executed after successfully uploading a batch of records from the queue.
@@ -87,4 +87,4 @@ class MARCXMLUploader(Uploader):
 
     def upload_xml(self, xml):
         """Receives MARCXML strings to be uploaded"""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
