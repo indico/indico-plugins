@@ -25,6 +25,7 @@ def upgrade():
                     sa.Column('backend_name', sa.String(), nullable=False),
                     sa.Column('name', sa.String(), nullable=False),
                     sa.Column('initial_data_exported', sa.Boolean(), nullable=False),
+                    sa.Column('last_run', UTCDateTime(), nullable=False),
                     sa.Column('settings', postgresql.JSON(), nullable=False),
                     sa.PrimaryKeyConstraint('id'),
                     schema='plugin_livesync')

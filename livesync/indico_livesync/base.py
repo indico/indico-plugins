@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask_pluginengine import depends, trim_docstring
 
 from indico.core.plugins import IndicoPlugin
+from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from MaKaC.conference import CategoryManager
 
@@ -108,6 +109,13 @@ class LiveSyncAgentBase(object):
                  .limit(count))
         return [entry for entry in query if not self._is_entry_excluded(entry)]
 
+    def update_last_run(self):
+        """Updates the last run timestamp.
+
+        Don't forget to call this if you implement your own `run` method!
+        """
+        self.agent.last_run = now_utc()
+
     def run(self):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
@@ -116,6 +124,7 @@ class LiveSyncAgentBase(object):
         records = self.fetch_records()
         uploader = self.uploader(self)
         uploader.run(records)
+        self.update_last_run()
 
     def run_initial_export(self, events):
         """Runs the initial export.

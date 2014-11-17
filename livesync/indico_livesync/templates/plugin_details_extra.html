@@ -7,6 +7,7 @@
                 <th class="small-column">{% trans %}ID{% endtrans %}</th>
                 <th>{% trans %}Name{% endtrans %}</th>
                 <th>{% trans %}Backend{% endtrans %}</th>
+                <th>{% trans %}Last Run{% endtrans %}</th>
                 <th class="small-column">{% trans %}Initial Export{% endtrans %}</th>
                 <th class="small-column">{% trans %}Queue{% endtrans %}</th>
                 <th class="action-column">{% trans %}Actions{% endtrans %}</th>
@@ -25,13 +26,20 @@
                         {% endif %}
                     </td>
                     <td>
+                        {%- if agent.last_run -%}
+                            {{ agent.last_run | format_datetime('short') }}
+                        {%- else -%}
+                            {% trans %}Never{% endtrans %}
+                        {%- endif -%}
+                    </td>
+                    <td>
                         {% if agent.initial_data_exported %}
                             {% trans %}Done{% endtrans %}
                         {% else %}
                             <strong>{% trans %}Pending{% endtrans %}</strong>
                         {% endif %}
                     </td>
-                    <td class="text-right">{{ agent.queue.count() }}</td>
+                    <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
                     <td>
                         <a href="#" class="action-icon icon-remove js-delete-agent"
                            data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"></a>

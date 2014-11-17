@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 
@@ -50,3 +50,4 @@ class LiveSyncTask(PeriodicUniqueTask):
                 with DBMgr.getInstance().global_connection():
                     self.logger.info('Running agent {}'.format(agent.name))
                     agent.create_backend(self).run()
+                    db.session.commit()

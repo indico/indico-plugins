@@ -125,6 +125,7 @@ def run(agent_id=None):
         with DBMgr.getInstance().global_connection():
             try:
                 agent.create_backend().run()
+                db.session.commit()
             finally:
                 transaction.abort()
 

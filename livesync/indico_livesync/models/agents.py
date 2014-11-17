@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
 
-from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
 
@@ -49,6 +50,13 @@ class LiveSyncAgent(db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+
+    #: Timestamp of the last run
+    last_run = db.Column(
+        UTCDateTime,
+        nullable=False,
+        default=now_utc
     )
 
     #: Backend-specific settings
