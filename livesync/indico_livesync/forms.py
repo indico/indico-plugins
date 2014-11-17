@@ -16,11 +16,14 @@
 
 from __future__ import unicode_literals
 
-__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'AgentForm', 'SimpleChange', 'process_records',
-           'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
+from wtforms.fields.core import StringField
+from wtforms.validators import DataRequired
 
-from .base import LiveSyncPluginBase, LiveSyncAgentBase
-from .forms import AgentForm
-from .simplify import SimpleChange, process_records
-from .marcxml import MARCXMLGenerator
-from .uploader import Uploader, MARCXMLUploader
+from indico.util.i18n import _
+from indico.util.string import strip_whitespace
+from indico.web.forms.base import IndicoForm
+
+
+class AgentForm(IndicoForm):
+    name = StringField(_('Name'), [DataRequired()], filters=[strip_whitespace],
+                       description=_("The name of the agent. Only used in the administration interface."))

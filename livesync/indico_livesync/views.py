@@ -16,11 +16,9 @@
 
 from __future__ import unicode_literals
 
-__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'AgentForm', 'SimpleChange', 'process_records',
-           'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
+from indico.core.plugins import WPJinjaMixinPlugin
+from indico.core.plugins.views import WPPlugins
 
-from .base import LiveSyncPluginBase, LiveSyncAgentBase
-from .forms import AgentForm
-from .simplify import SimpleChange, process_records
-from .marcxml import MARCXMLGenerator
-from .uploader import Uploader, MARCXMLUploader
+
+class WPLiveSync(WPJinjaMixinPlugin, WPPlugins):
+    pass

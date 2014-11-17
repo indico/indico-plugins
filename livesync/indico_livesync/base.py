@@ -22,6 +22,7 @@ from indico.core.plugins import IndicoPlugin
 from indico.util.decorators import classproperty
 from MaKaC.conference import CategoryManager
 
+from indico_livesync.forms import AgentForm
 from indico_livesync.models.queue import LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
@@ -48,6 +49,8 @@ class LiveSyncAgentBase(object):
     plugin = None  # set automatically when the agent is registered
     #: the Uploader to use. only needed if run and run_initial_export are not overridden
     uploader = None
+    #: the form used when creating/editing the agent
+    form = AgentForm
 
     @classproperty
     @classmethod

@@ -16,12 +16,17 @@
 
 from __future__ import unicode_literals
 
+from flask import request
+
 from indico.core.plugins import IndicoPlugin, wrap_cli_manager
+from indico.core.plugins.views import WPPlugins
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 
+from indico_livesync.blueprint import blueprint
 from indico_livesync.cli import cli_manager
+from indico_livesync.controllers import extend_plugin_details
 from indico_livesync.handler import connect_signals
 
 
@@ -45,6 +50,15 @@ class LiveSyncPlugin(IndicoPlugin):
         super(LiveSyncPlugin, self).init()
         self.agent_classes = {}
         connect_signals(self)
+        self.template_hook('plugin-details', self._extend_plugin_details)
+        self.inject_js('livesync_admin_js', WPPlugins, subclasses=False,
+                       condition=lambda: request.view_args.get('plugin') == self.name)
+
+    def get_blueprints(self):
+        return blueprint
+
+    def register_assets(self):
+        self.register_js_bundle('livesync_admin_js', 'js/livesync_admin.js')
 
     def add_cli_command(self, manager):
         manager.add_command('livesync', wrap_cli_manager(cli_manager, self))
@@ -53,3 +67,7 @@ class LiveSyncPlugin(IndicoPlugin):
         if name in self.agent_classes:
             raise RuntimeError('Duplicate livesync agent: {}'.format(name))
         self.agent_classes[name] = agent_class
+
+    def _extend_plugin_details(self, plugin, **kwargs):
+        if plugin == self:
+            return extend_plugin_details()

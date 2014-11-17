@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-__all__ = ('LiveSyncPluginBase', 'LiveSyncAgentBase', 'AgentForm', 'SimpleChange', 'process_records',
-           'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
+from indico.core.plugins import IndicoPluginBlueprint
 
-from .base import LiveSyncPluginBase, LiveSyncAgentBase
-from .forms import AgentForm
-from .simplify import SimpleChange, process_records
-from .marcxml import MARCXMLGenerator
-from .uploader import Uploader, MARCXMLUploader
+from indico_livesync.controllers import RHAddAgent, RHEditAgent, RHDeleteAgent
+
+blueprint = IndicoPluginBlueprint('livesync', 'indico_livesync', url_prefix='/admin/plugins/livesync')
+
+blueprint.add_url_rule('/agents/create/<backend>', 'add_agent', RHAddAgent, methods=('GET', 'POST'))
+blueprint.add_url_rule('/agents/<int:agent_id>/', 'edit_agent', RHEditAgent, methods=('GET', 'POST'))
+blueprint.add_url_rule('/agents/<int:agent_id>/delete', 'delete_agent', RHDeleteAgent, methods=('POST',))

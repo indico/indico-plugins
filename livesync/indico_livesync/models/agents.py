@@ -59,6 +59,10 @@ class LiveSyncAgent(db.Model):
     )
 
     @property
+    def locator(self):
+        return {'agent_id': self.id}
+
+    @property
     def backend(self):
         """Returns the backend class"""
         from indico_livesync.plugin import LiveSyncPlugin
