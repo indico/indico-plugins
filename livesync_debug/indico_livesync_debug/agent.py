@@ -61,6 +61,7 @@ class LiveSyncDebugAgent(LiveSyncAgentBase):
         self._print(cformat('%{white!}Resulting MarcXML:%{reset}'))
         uploader = DebugUploader(self)
         uploader.run(records)
+        self.update_last_run()
 
     def run_initial_export(self, events):
         uploader = DebugUploader(self)
