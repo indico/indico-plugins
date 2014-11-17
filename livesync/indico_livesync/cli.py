@@ -102,25 +102,6 @@ def initial_export(agent_id, force=False):
 
 
 @cli_manager.command
-def create_agent(agent_type, name=None):
-    """Creates a new agent"""
-    update_session_options(db)
-    try:
-        agent_class = current_plugin.agent_classes[agent_type]
-    except KeyError:
-        print 'No such agent type'
-        return
-    # TODO: Prompt for agent type specific settings
-    agent = LiveSyncAgent(backend_name=agent_type, name=name or agent_class.title)
-    db.session.add(agent)
-    db.session.commit()
-    print agent
-
-
-# TODO: delete_agent, update_agent
-
-
-@cli_manager.command
 def run(agent_id=None):
     """Runs the livesync agent"""
     update_session_options(db)
