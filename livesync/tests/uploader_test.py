@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import pytest
 from mock import MagicMock
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
@@ -26,6 +25,7 @@ class RecordingUploader(Uploader):
     def __init__(self, *args, **kwargs):
         super(RecordingUploader, self).__init__(*args, **kwargs)
         self._uploaded = []
+        self.logger = MagicMock()
 
     def upload_records(self, records, from_queue):
         self._uploaded.append((records, from_queue))
@@ -98,9 +98,9 @@ def test_run_failing(mocker):
     uploader = FailingUploader(create_mock_agent())
     uploader.BATCH_SIZE = 3
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(10))
-    with pytest.raises(Exception):
-        uploader.run(records)
-    # No uploads should bappen after a failed batch
+    uploader.run(records)
+    assert uploader.logger.exception.called
+    # No uploads should happen after a failed batch
     assert uploader._uploaded == [(records[:3], True), (records[3:6], True)]
     # Only successful records should be marked as processed
     assert all(record.processed for record in records[:3])

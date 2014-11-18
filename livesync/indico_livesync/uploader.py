@@ -42,9 +42,14 @@ class Uploader(object):
 
         :param records: an iterable containing queue entries
         """
+        self_name = type(self).__name__
         for i, batch in enumerate(grouper(records, self.BATCH_SIZE, skip_missing=True), 1):
-            self.logger.debug('{} processing batch {}'.format(type(self).__name__, i))
-            self.upload_records(batch, from_queue=True)
+            self.logger.debug('{} processing batch {}'.format(self_name, i))
+            try:
+                self.upload_records(batch, from_queue=True)
+            except Exception:
+                self.logger.exception('{} could not upload batch'.format(self_name))
+                return
             self.processed_records(batch)
             if self.task:
                 self.task.extend_runtime()
