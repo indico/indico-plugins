@@ -23,6 +23,7 @@ from indico.util.i18n import _
 from indico.util.string import strip_whitespace
 
 from indico_livesync import LiveSyncAgentBase, MARCXMLUploader, AgentForm
+from indico_livesync_invenio.connector import InvenioConnector
 
 
 class InvenioAgentForm(AgentForm):
@@ -30,9 +31,21 @@ class InvenioAgentForm(AgentForm):
                           description=_("The URL of the Invenio instance"))
 
 
+class InvenioUploaderError(Exception):
+    pass
+
+
 class InvenioUploader(MARCXMLUploader):
+
+    def __init__(self, *args, **kwargs):
+        super(InvenioUploader, self).__init__(*args, **kwargs)
+        url = self.agent.agent.settings.get('server_url')
+        self.connector = InvenioConnector(url)
+
     def upload_xml(self, xml):
-        pass
+        result = self.connector.upload_marcxml(xml, '-ir').read()
+        if not isinstance(result, long) and not result.startswith('[INFO]'):
+            raise InvenioUploaderError(result.strip())
 
 
 class InvenioLiveSyncAgent(LiveSyncAgentBase):
