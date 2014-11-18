@@ -16,8 +16,11 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from werkzeug.datastructures import ImmutableDict
 
+from indico.util.date_time import now_utc
 from MaKaC.conference import Conference, Contribution, SubContribution, Category, CategoryManager, ConferenceHolder
 
 
@@ -70,3 +73,16 @@ def make_compound_id(ref):
         return '{}.{}.{}'.format(ref['event_id'], ref['contrib_id'], ref['subcontrib_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
+
+
+def clean_old_entries():
+    """Deletes obsolete entries from the queues"""
+    from indico_livesync.plugin import LiveSyncPlugin
+    from indico_livesync.models.queue import LiveSyncQueueEntry
+
+    queue_entry_ttl = LiveSyncPlugin.settings.get('queue_entry_ttl')
+    if not queue_entry_ttl:
+        return
+    expire_threshold = now_utc() - timedelta(days=queue_entry_ttl)
+    LiveSyncQueueEntry.find(LiveSyncQueueEntry.processed,
+                            LiveSyncQueueEntry.timestamp < expire_threshold).delete(synchronize_session='fetch')

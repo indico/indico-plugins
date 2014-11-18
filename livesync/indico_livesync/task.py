@@ -21,6 +21,7 @@ from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 
 from indico_livesync.models.agents import LiveSyncAgent
+from indico_livesync.util import clean_old_entries
 
 
 class LiveSyncTask(PeriodicUniqueTask):
@@ -40,6 +41,8 @@ class LiveSyncTask(PeriodicUniqueTask):
 
         plugin = LiveSyncPlugin.instance  # RuntimeError if not active
         with plugin.plugin_context():
+            clean_old_entries()
+
             for agent in LiveSyncAgent.find_all():
                 if agent.backend is None:
                     self.logger.warning('Skipping agent {}; backend not found'.format(agent.name))

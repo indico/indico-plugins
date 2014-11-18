@@ -18,6 +18,9 @@ from __future__ import unicode_literals
 
 from flask import request
 
+from wtforms.validators import NumberRange
+from wtforms.fields.html5 import IntegerField
+
 from indico.core.plugins import IndicoPlugin, wrap_cli_manager
 from indico.core.plugins.views import WPPlugins
 from indico.util.i18n import _
@@ -31,6 +34,12 @@ from indico_livesync.handler import connect_signals
 
 
 class SettingsForm(IndicoForm):
+    queue_entry_ttl = IntegerField(_('Queue entry TTL'), [NumberRange(min=0)],
+                                   description=_("How many days should processed entries be kept in the queue. "
+                                                 "The time counts from the creation of the queue entries, so if the "
+                                                 "LiveSync task is not running for some time, queue entries may be "
+                                                 "deleted during the next run after processing them. Setting it to 0 "
+                                                 "disables automatic deletion."))
     excluded_categories = MultipleItemsField(_('Excluded categories'), fields=(('id', _('Category ID')),),
                                              description=_("Changes to objects inside these categories or any of their "
                                                            "subcategories are excluded."))
@@ -44,7 +53,8 @@ class LiveSyncPlugin(IndicoPlugin):
     """
 
     settings_form = SettingsForm
-    default_settings = {'excluded_categories': []}
+    default_settings = {'excluded_categories': [],
+                        'queue_entry_ttl': 0}
 
     def init(self):
         super(LiveSyncPlugin, self).init()
