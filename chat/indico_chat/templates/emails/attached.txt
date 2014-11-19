@@ -1,0 +1,8 @@
+{% extends 'chat:emails/base.txt' %}
+
+{% block action %}attached{% endblock %}
+
+{% block details -%}
+You can find details on the following page:
+{{ url_for_plugin('.manage_rooms', event, _external=true) }}
+{%- endblock %}

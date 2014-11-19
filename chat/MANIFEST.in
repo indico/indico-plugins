@@ -1,0 +1,3 @@
+graft indico_chat/static
+graft indico_chat/migrations
+graft indico_chat/templates

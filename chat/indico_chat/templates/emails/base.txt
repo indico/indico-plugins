@@ -1,0 +1,15 @@
+{% macro get_subject() -%}
+    [Indico] [Chat] Chatroom {% block action %}{% endblock %}: '{{ chatroom.name }}' in '{{ event.getTitle() }}'
+{%- endmacro %}
+
+{% macro get_body() -%}
+A chatroom has been {{ self.action() }}{% if user %} by {{ user.getStraightFullName() }}{% endif %}:
+
+Chatroom: {{ chatroom.name }}
+Event:    {{ event.getTitle() }}
+
+{% block details %}{% endblock %}
+
+The event can be found here:
+{{ event.getURL() }}
+{%- endmacro %}

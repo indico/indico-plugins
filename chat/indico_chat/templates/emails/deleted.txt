@@ -1,0 +1,11 @@
+{% extends 'chat:emails/base.txt' %}
+
+{% block action %}removed{% endblock %}
+
+{% block details -%}
+    {%- if room_deleted -%}
+        The room has also been deleted from the Jabber server.
+    {%- else -%}
+        The room still exists on the Jabber server as it is used by other events.
+    {%- endif -%}
+{%- endblock %}
