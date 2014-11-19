@@ -1,40 +1,15 @@
 @import 'base/palette';
 
 .plugin-chat {
-    .chat-toggle-details {
-        color: #0B63A5;
-        text-decoration: none;
-    }
 
     .chatroom + .chatroom {
         margin-top: 5px;
-    }
-
-    dl.chat-details {
-        clear: left;
-        font-size: 90%;
-        margin: 5px 0 0 10px;
-
-        dt {
-            float: left;
-            color: $light-black;
-        }
-
-        dd {
-            margin-left: 100px;
-            display: block;
-        }
     }
 
     // Management
     &.chat-mgmt {
         .chat-custom-server {
             font-weight: bold;
-        }
-        dl.chat-details {
-            dd {
-                margin-left: 150px;
-            }
         }
         .chatroom + .chatroom {
             margin-top: 1em;
@@ -59,4 +34,9 @@
             border: none;
         }
     }
+}
+
+.chat-log-material-create {
+    padding-left: 2.4em;
+    margin: 0.5em 0;
 }

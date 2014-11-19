@@ -72,7 +72,7 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             flash(_('Chatroom updated'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
-                                               event_chatroom=self.event_chatroom)
+                                               event_chatroom=self.event_chatroom, event=self.event)
 
 
 class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
@@ -119,7 +119,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             notify_created(chatroom, self.event, session.user)
             flash(_('Chatroom created'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
-        return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form)
+        return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form, event=self.event)
 
 
 class RHChatManageEventAttach(RHChatManageEventBase):

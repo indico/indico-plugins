@@ -53,6 +53,17 @@
     };
 
     global.eventManageChat = function eventManageChat() {
+
+        $('.toggle-details').on('click', function(e) {
+            e.preventDefault();
+            var toggler = $(this);
+            toggler.closest('tr').next('tr').find('.details-container').slideToggle({
+                start: function() {
+                    toggler.toggleClass('icon-next icon-expand');
+                }
+            });
+        });
+
         $('.js-chat-remove-room').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);

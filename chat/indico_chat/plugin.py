@@ -82,7 +82,7 @@ class ChatPlugin(IndicoPlugin):
     settings_form_field_opts = {
         'server': {'placeholder': 'jabber.server.tld'},
         'muc_server': {'placeholder': 'conference.jabber.server.tld'},
-        'notify_emails': {'rows': 3, 'cols': 40, 'style': 'width: auto; height: auto;'},
+        'notify_emails': {'rows': 3, 'cols': 40, 'style': 'height: auto;'},
         'bot_jid': {'autocomplete': 'off'},
         'bot_password': {'autocomplete': 'off'}
     }

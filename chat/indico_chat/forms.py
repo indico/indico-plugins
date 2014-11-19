@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import current_plugin
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.validators import UsedIf
 from indico.util.i18n import _
 from indico.util.string import strip_whitespace
 
@@ -43,12 +45,18 @@ class EditChatroomForm(IndicoForm):
 
 
 class AddChatroomForm(EditChatroomForm):
-    custom_server = TextField(_('Server'), filters=[strip_whitespace, lambda x: x.lower() if x else x],
-                              description=_('External Jabber server. Should be left empty in most cases.'))
+
+    use_custom_server = BooleanField(_('Use custom server'))
+    custom_server = TextField(_('Custom server'), [UsedIf(lambda form, field: form.use_custom_server.data),
+                                                   DataRequired()],
+                              filters=[strip_whitespace, lambda x: x.lower() if x else x],
+                              description=_('External Jabber server.'))
 
     def __init__(self, *args, **kwargs):
         self._date = kwargs.pop('date')
         super(AddChatroomForm, self).__init__(*args, **kwargs)
+        self.use_custom_server.description = _('Check in case you want to use an external Jabber server and not the '
+                                               'default one ({0}).').format(current_plugin.settings.get('muc_server'))
 
     def validate_name(self, field):
         jid = generate_jid(field.data, self._date)

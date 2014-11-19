@@ -21,8 +21,8 @@
             <input class="i-button" type="submit" name="get_all_logs" value="{% trans %}Retrieve all logs{% endtrans %}">
         </form>
 
-        <div id="chat-log-material">
-            <p>
+        <div id="chat-log-material" class="info-message-box">
+            <div class="message-text">
                 {% trans -%}
                     You can add the currently displayed chat logs to the event material.
                 {%- endtrans %}
@@ -31,12 +31,14 @@
                     Have in mind that due to security policy logs will be private by default.
                     If you want to change the protection level you will have to do it manually.
                 {%- endtrans %}
-            </p>
-            <label for="chat-material-name">{% trans %}Material name{% endtrans %}</label>
-            <input type="text" id="chat-material-name" value="{{ chatroom.name }}">
-            <button type="button" class="i-button" id="chat-create-material" data-href="{{ url_for_plugin('.manage_rooms_attach_logs', event_chatroom) }}">
-                {%- trans %}Create material{% endtrans -%}
-            </button>
+            </div>
+            <div class="chat-log-material-create">
+                <label for="chat-material-name">{% trans %}Material name{% endtrans %}</label>
+                <input type="text" id="chat-material-name" value="{{ chatroom.name }}">
+                <button type="button" class="i-button" id="chat-create-material" data-href="{{ url_for_plugin('.manage_rooms_attach_logs', event_chatroom) }}">
+                    {%- trans %}Create material{% endtrans -%}
+                </button>
+            </div>
         </div>
     </div>
 
