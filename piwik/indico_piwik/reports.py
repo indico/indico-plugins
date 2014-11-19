@@ -54,7 +54,7 @@ class ReportBase(Serializer):
     def get(cls, *args, **kwargs):
         """Create and return a serializable Report object, retrieved from cache if possible"""
 
-        from . import PiwikPlugin
+        from indico_piwik.plugin import PiwikPlugin
 
         if not PiwikPlugin.settings.get('cache_enabled'):
             return cls(*args, **kwargs).to_serializable()

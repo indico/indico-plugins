@@ -20,7 +20,7 @@ from indico.core.db import db
 from indico.util.console import cformat
 from indico_zodbimport import Importer, convert_to_unicode
 
-from indico_piwik import PiwikPlugin
+from indico_piwik.plugin import PiwikPlugin
 
 
 class PiwikImporter(Importer):

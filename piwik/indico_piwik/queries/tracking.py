@@ -24,7 +24,7 @@ class PiwikQueryTrackBase(PiwikQueryBase):
     """Base class for action-tracking queries"""
 
     def __init__(self):
-        from indico_piwik import PiwikPlugin
+        from indico_piwik.plugin import PiwikPlugin
         super(PiwikQueryTrackBase, self).__init__(query_script=PiwikPlugin.track_script)
 
     def call(self, action_url, action_name, **query_params):
