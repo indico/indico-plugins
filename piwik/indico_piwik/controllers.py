@@ -20,8 +20,9 @@ from indico.core.config import Config
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-from .views import WPStatistics
-from .reports import ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial, ReportVisitsPerDay
+from indico_piwik.views import WPStatistics
+from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
+                                  ReportVisitsPerDay)
 
 
 class RHStatistics(RHConferenceModifBase):

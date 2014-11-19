@@ -23,10 +23,13 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
 
-from .queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
-from .queries.metrics import (PiwikQueryReportEventMetricDownloads, PiwikQueryReportEventMetricPeakDateAndVisitors,
-                              PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
-                              PiwikQueryReportEventMetricVisits, PiwikQueryReportEventMetricVisitDuration)
+from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
+from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
+                                          PiwikQueryReportEventMetricPeakDateAndVisitors,
+                                          PiwikQueryReportEventMetricReferrers,
+                                          PiwikQueryReportEventMetricUniqueVisits,
+                                          PiwikQueryReportEventMetricVisits,
+                                          PiwikQueryReportEventMetricVisitDuration)
 
 
 class ReportBase(Serializer):

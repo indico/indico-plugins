@@ -25,10 +25,10 @@ from indico.util.i18n import _
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
-from .controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
-                          RHApiEventGraphCountries, RHApiEventGraphDevices)
-from .forms import SettingsForm
-from .queries.tracking import PiwikQueryTrackDownload
+from indico_piwik.controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
+                                      RHApiEventGraphCountries, RHApiEventGraphDevices)
+from indico_piwik.forms import SettingsForm
+from indico_piwik.queries.tracking import PiwikQueryTrackDownload
 
 
 class PiwikPlugin(IndicoPlugin):
