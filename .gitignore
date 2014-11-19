@@ -1,0 +1,9 @@
+.coverage
+*.egg-info
+htmlcov/
+.idea/
+*.min.css
+*.min.js
+*.pyc
+.*.swp
+.webassets-cache/
