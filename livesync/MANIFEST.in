@@ -1,0 +1,3 @@
+graft indico_livesync/migrations
+graft indico_livesync/templates
+graft indico_livesync/static
