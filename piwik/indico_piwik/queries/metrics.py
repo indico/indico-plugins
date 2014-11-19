@@ -19,8 +19,8 @@ from __future__ import division
 from operator import itemgetter
 from urllib2 import quote
 
-from . import PiwikQueryReportEventBase
-from .utils import get_json_from_remote_server, reduce_json, stringify_seconds
+from indico_piwik.queries.base import PiwikQueryReportEventBase
+from indico_piwik.queries.utils import get_json_from_remote_server, reduce_json, stringify_seconds
 
 
 class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):

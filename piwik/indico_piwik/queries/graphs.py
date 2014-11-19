@@ -18,7 +18,7 @@ from base64 import b64encode
 
 from flask_pluginengine import current_plugin
 
-from . import PiwikQueryReportEventBase
+from indico_piwik.queries.base import PiwikQueryReportEventBase
 
 
 class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):

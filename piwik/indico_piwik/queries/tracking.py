@@ -17,7 +17,7 @@
 from datetime import datetime
 from urllib2 import quote
 
-from . import PiwikQueryBase
+from indico_piwik.queries.base import PiwikQueryBase
 
 
 class PiwikQueryTrackBase(PiwikQueryBase):
