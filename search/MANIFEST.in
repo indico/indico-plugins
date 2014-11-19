@@ -1,0 +1,2 @@
+graft indico_search/static
+graft indico_search/templates

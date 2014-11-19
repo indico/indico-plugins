@@ -1,0 +1,7 @@
+<div class="confSearchBox">
+    <form class="UIForm" method="post" action="{{ url_for_plugin('search.search', event) }}" style="margin: 0; padding: 0;">
+        <input class="searchButton" type="submit" value="{% trans %}Search{% endtrans %}">
+        {{ form.phrase(class_='searchField', id='conference-search-phrase') }}
+        {% block extra_fields %}{% endblock %}
+    </form>
+</div>
