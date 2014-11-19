@@ -1,7 +1,0 @@
-.idea/
-.*.swp
-*.pyc
-*.egg-info
-.webassets-cache/
-*.min.css
-*.min.js
