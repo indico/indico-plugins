@@ -1,0 +1,67 @@
+#result-tabs {
+    clear: both;
+
+    .no-results {
+        margin-top: 20px;
+        color: #f00;
+    }
+}
+
+.results-container {
+    .load-more-container {
+        overflow: auto;
+        text-align: center;
+
+        a {
+            font-weight: bold;
+        }
+    }
+
+    ul.result-list {
+        padding: 0;
+        list-style-type: none;
+
+        & > li {
+            border-bottom: 1px solid #ddd;
+            padding: 5px;
+
+            .title {
+                font-size: 14px;
+            }
+
+            .date {
+                display: block;
+            }
+
+            .parent-event {
+                display: block;
+                font-style: italic;
+            }
+
+            .link {
+                color: #76A2C4;
+            }
+
+            ul.authors {
+                margin-bottom: 5px;
+                margin-top: 5px;
+            }
+
+            ul.material {
+                margin-top: 5px;
+                margin-left: 20px;
+            }
+
+            .description {
+                margin: 5px 5px 5px 10px;
+                padding: 5px;
+                font-size: 13px;
+                color: #666;
+
+                a.show-full-desc {
+                    margin-bottom: 10px;
+                }
+            }
+        }
+    }
+}

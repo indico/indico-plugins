@@ -1,0 +1,76 @@
+{% extends 'search:results.html' %}
+{% from 'search_invenio:_results.html' import render_result %}
+
+{% block banner %}
+    <a href="http://invenio-software.org"><img src="{{ url_for_plugin('search_invenio.static', filename='images/logo.png') }}"
+                                               alt="Invenio"></a>
+{% endblock %}
+
+{% block criteria_fields %}
+    <tr>
+        <td>{{ form.collection.label() }}</td>
+        <td>{{ form.collection() }}</td>
+    </tr>
+{% endblock %}
+
+{% block sort_fields %}
+    <tr>
+        <td>{{ form.sort_order.label() }}</td>
+        <td>{{ form.sort_order() }}</td>
+    </tr>
+{% endblock %}
+
+{% block results %}
+    <div id="result-tabs">
+        {% if not result.events and not result.contributions %}
+            <div class="no-results">{% trans %}No results found{% endtrans %}</div>
+        {% else %}
+            {% if result.events %}
+                <div id="results-events" class="results-container js-results-container">
+                    <ul class="result-list">
+                        {% for event in result.events.results %}
+                            {{ render_result(event, is_event=true) }}
+                        {% endfor %}
+                    </ul>
+
+                    {% if result.events.has_more %}
+                        <div class="load-more-container">
+                            <a href="#" class="js-load-more" data-offset="{{ result.events.offset }}"
+                               data-collection="events">{% trans %}Load more results{% endtrans %}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if result.contributions %}
+                <div id="results-contribs" class="results-container js-results-container">
+                    <ul class="result-list">
+                        {% for contrib in result.contributions.results %}
+                            {{ render_result(contrib, is_event=false) }}
+                        {% endfor %}
+                    </ul>
+
+                    {% if result.contributions.has_more %}
+                        <div class="load-more-container">
+                            <a href="#" class="js-load-more" data-offset="{{ result.contributions.offset }}"
+                               data-collection="contributions">{% trans %}Load more results{% endtrans %}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% if result.events or result.contributions %}
+        <script>
+            invenioSearchResults({
+                queryData: {{ result.query | tojson }},
+                url: {{ request.url | tojson }},
+                hasEvents: {{ (result.events | count > 0) | tojson }},
+                hasContribs: {{ (result.contributions | count > 0) | tojson }}
+            });
+        </script>
+    {% endif %}
+{% endblock %}
