@@ -1,0 +1,42 @@
+<!-- Piwik -->
+<script type="text/javascript">
+
+    (function() {
+        var url = '//{{ server_url }}';
+        var g = document.createElement('script');
+        var s = document.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.defer = true;
+        g.async = true;
+        g.src = url + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+
+        window.piwikAsyncInit = function() {
+            try {
+                track_site();
+                {% if event_id %}
+                    track_event();
+                {% endif %}
+            } catch(err) {}
+        }
+
+        track_site = function() {
+            var general_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_general }});
+            general_tracker.enableLinkTracking();
+            general_tracker.trackPageView();
+        }
+
+        {% if event_id %}
+            track_event = function() {
+                var event_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_events }});
+                event_tracker.enableLinkTracking();
+                event_tracker.setCustomVariable(1, 'Conference', '{{ event_id }}', 'page');
+                {% if contrib_id %}
+                    event_tracker.setCustomVariable(2, 'Contribution', '{{ contrib_id }}', 'page');
+                {% endif %}
+                event_tracker.trackPageView();
+            }
+        {% endif %}
+    })();
+</script>
+<!-- End Piwik Code -->
