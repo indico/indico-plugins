@@ -20,3 +20,8 @@ script:
   - py.test
 notifications:
   email: false
+  irc:
+    channels:
+      - 'chat.freenode.net#indico'
+    use_notice: true
+    skip_join: true
