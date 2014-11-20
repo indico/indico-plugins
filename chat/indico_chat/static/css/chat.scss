@@ -6,6 +6,22 @@
         margin-top: 5px;
     }
 
+    dl.chat-details {
+        clear: left;
+        font-size: 90%;
+        margin: 5px 0 0 10px;
+
+        dt {
+            float: left;
+            color: $light-black;
+        }
+
+        dd {
+            margin-left: 100px;
+            display: block;
+        }
+    }
+
     // Management
     &.chat-mgmt {
         .chat-custom-server {
