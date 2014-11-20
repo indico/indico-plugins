@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico_livesync import LiveSyncPluginBase
 
-from indico_livesync_invenio.agent import InvenioLiveSyncBackend
+from indico_livesync_invenio.backend import InvenioLiveSyncBackend
 
 
 class InvenioLiveSyncPlugin(LiveSyncPluginBase):
