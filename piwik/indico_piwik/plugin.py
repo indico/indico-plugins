@@ -56,8 +56,8 @@ class PiwikPlugin(IndicoPlugin):
 
     def init(self):
         super(PiwikPlugin, self).init()
-        self.connect(signals.event_management_sidemenu, self.add_sidemenu_item)
-        self.connect(signals.material_downloaded, self.track_download)
+        self.connect(signals.event_management.sidemenu, self.add_sidemenu_item)
+        self.connect(signals.event.material_downloaded, self.track_download)
         self.template_hook('html-head', self.inject_tracking)
 
     def inject_tracking(self, template, **kwargs):

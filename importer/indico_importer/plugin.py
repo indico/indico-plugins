@@ -37,7 +37,7 @@ class ImporterPlugin(IndicoPlugin):
         super(ImporterPlugin, self).init()
         self.inject_js('importer_js', WPConfModifScheduleGraphic)
         self.inject_css('importer_css', WPConfModifScheduleGraphic)
-        self.connect(signals.timetable_buttons, self.get_timetable_buttons)
+        self.connect(signals.event.timetable_buttons, self.get_timetable_buttons)
         self.importer_engines = {}
 
     def get_blueprints(self):
