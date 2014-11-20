@@ -18,13 +18,13 @@ from __future__ import unicode_literals
 
 from indico_livesync import LiveSyncPluginBase
 
-from indico_livesync_invenio.agent import InvenioLiveSyncAgent
+from indico_livesync_invenio.agent import InvenioLiveSyncBackend
 
 
 class InvenioLiveSyncPlugin(LiveSyncPluginBase):
     """LiveSync Invenio
 
-    Provides an Invenio agent for LiveSync
+    Provides the Invenio backend for LiveSync
     """
 
-    agent_classes = {'invenio': InvenioLiveSyncAgent}
+    backend_classes = {'invenio': InvenioLiveSyncBackend}

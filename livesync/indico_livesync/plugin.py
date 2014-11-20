@@ -58,7 +58,7 @@ class LiveSyncPlugin(IndicoPlugin):
 
     def init(self):
         super(LiveSyncPlugin, self).init()
-        self.agent_classes = {}
+        self.backend_classes = {}
         connect_signals(self)
         self.template_hook('plugin-details', self._extend_plugin_details)
         self.inject_js('livesync_admin_js', WPPlugins, subclasses=False,
@@ -73,10 +73,10 @@ class LiveSyncPlugin(IndicoPlugin):
     def add_cli_command(self, manager):
         manager.add_command('livesync', wrap_cli_manager(cli_manager, self))
 
-    def register_agent_class(self, name, agent_class):
-        if name in self.agent_classes:
-            raise RuntimeError('Duplicate livesync agent: {}'.format(name))
-        self.agent_classes[name] = agent_class
+    def register_backend_class(self, name, backend_class):
+        if name in self.backend_classes:
+            raise RuntimeError('Duplicate livesync backend: {}'.format(name))
+        self.backend_classes[name] = backend_class
 
     def _extend_plugin_details(self, plugin, **kwargs):
         if plugin == self:

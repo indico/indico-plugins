@@ -32,19 +32,19 @@ from indico_livesync.plugin import LiveSyncPlugin
 class LiveSyncPluginBase(IndicoPlugin):  # pragma: no cover
     """Base class for livesync plugins"""
 
-    #: dict containing the agent(s) provided by the plugin; the keys are unique identifiers
-    agent_classes = None
+    #: dict containing the backend(s) provided by the plugin; the keys are unique identifiers
+    backend_classes = None
 
     def init(self):
         super(LiveSyncPluginBase, self).init()
-        for name, agent_class in self.agent_classes.iteritems():
-            assert agent_class.plugin is None
-            agent_class.plugin = type(self)
-            LiveSyncPlugin.instance.register_agent_class(name, agent_class)
+        for name, backend_class in self.backend_classes.iteritems():
+            assert backend_class.plugin is None
+            backend_class.plugin = type(self)
+            LiveSyncPlugin.instance.register_backend_class(name, backend_class)
 
 
-class LiveSyncAgentBase(object):
-    """Base class for livesync agents"""
+class LiveSyncBackendBase(object):
+    """Base class for livesync backends"""
 
     #: the plugin containing the agent
     plugin = None  # set automatically when the agent is registered

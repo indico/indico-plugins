@@ -31,7 +31,7 @@ from indico_livesync.views import WPLiveSync
 
 def extend_plugin_details():
     agents = LiveSyncAgent.find().order_by(LiveSyncAgent.name, LiveSyncAgent.id).all()
-    return render_plugin_template('plugin_details_extra.html', agents=agents, backends=current_plugin.agent_classes)
+    return render_plugin_template('plugin_details_extra.html', agents=agents, backends=current_plugin.backend_classes)
 
 
 class RHDeleteAgent(RHAdminBase):
@@ -51,7 +51,7 @@ class RHAddAgent(RHAdminBase):
 
     def _checkParams(self):
         self.backend_name = request.view_args['backend']
-        self.backend = current_plugin.agent_classes[self.backend_name]
+        self.backend = current_plugin.backend_classes[self.backend_name]
 
     def _process(self):
         form = self.backend.form(obj=FormDefaults(name=self.backend.title))

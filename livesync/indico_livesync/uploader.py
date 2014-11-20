@@ -32,10 +32,10 @@ class Uploader(object):
     #: Number of events to process at a time during initial export
     INITIAL_BATCH_SIZE = 100
 
-    def __init__(self, agent):
-        self.agent = agent
-        self.task = agent.task
-        self.logger = agent.task.logger if agent.task else agent.plugin.logger
+    def __init__(self, backend):
+        self.backend = backend
+        self.task = backend.task
+        self.logger = backend.task.logger if backend.task else backend.plugin.logger
 
     def run(self, records):
         """Runs the batch upload

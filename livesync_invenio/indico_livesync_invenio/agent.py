@@ -22,7 +22,7 @@ from wtforms.validators import DataRequired, URL
 from indico.util.i18n import _
 from indico.util.string import strip_whitespace
 
-from indico_livesync import LiveSyncAgentBase, MARCXMLUploader, AgentForm
+from indico_livesync import LiveSyncBackendBase, MARCXMLUploader, AgentForm
 from indico_livesync_invenio.connector import InvenioConnector
 
 
@@ -36,10 +36,9 @@ class InvenioUploaderError(Exception):
 
 
 class InvenioUploader(MARCXMLUploader):
-
     def __init__(self, *args, **kwargs):
         super(InvenioUploader, self).__init__(*args, **kwargs)
-        url = self.agent.agent.settings.get('server_url')
+        url = self.backend.agent.settings.get('server_url')
         self.connector = InvenioConnector(url)
 
     def upload_xml(self, xml):
@@ -48,10 +47,10 @@ class InvenioUploader(MARCXMLUploader):
             raise InvenioUploaderError(result.strip())
 
 
-class InvenioLiveSyncAgent(LiveSyncAgentBase):
-    """Invenio Agent
+class InvenioLiveSyncBackend(LiveSyncBackendBase):
+    """Invenio
 
-    This agent uploads data to Invenio.
+    This backend uploads data to Invenio.
     """
 
     uploader = InvenioUploader

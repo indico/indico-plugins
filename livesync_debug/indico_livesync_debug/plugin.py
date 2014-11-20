@@ -18,13 +18,13 @@ from __future__ import unicode_literals
 
 from indico_livesync import LiveSyncPluginBase
 
-from indico_livesync_debug.agent import LiveSyncDebugAgent
+from indico_livesync_debug.agent import LiveSyncDebugBackend
 
 
 class LiveSyncDebugPlugin(LiveSyncPluginBase):
     """LiveSync Debug
 
-    Provides a debug agent for LiveSync which just prints changes
+    Provides the debug backend for LiveSync which just prints/logs changes
     """
 
-    agent_classes = {'debug': LiveSyncDebugAgent}
+    backend_classes = {'debug': LiveSyncDebugBackend}

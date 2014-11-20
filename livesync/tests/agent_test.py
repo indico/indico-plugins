@@ -16,12 +16,12 @@
 
 from mock import MagicMock
 
-from indico_livesync.base import LiveSyncAgentBase
+from indico_livesync.base import LiveSyncBackendBase
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 
 
-class DummyAgent(LiveSyncAgentBase):
+class DummyBackend(LiveSyncBackendBase):
     """Dummy agent
 
     A dummy agent for testing
@@ -31,7 +31,7 @@ class DummyAgent(LiveSyncAgentBase):
         return set()
 
 
-class NonDescriptiveAgent(LiveSyncAgentBase):
+class NonDescriptiveAgent(LiveSyncBackendBase):
     """Nondescriptive agent"""
 
 
@@ -67,46 +67,46 @@ class MockCategoryManager(object):
 
 def test_title_description():
     """Test if title/description are extracted from docstring"""
-    assert DummyAgent.title == 'Dummy agent'
-    assert DummyAgent.description == 'A dummy agent for testing'
+    assert DummyBackend.title == 'Dummy agent'
+    assert DummyBackend.description == 'A dummy agent for testing'
     assert NonDescriptiveAgent.title == 'Nondescriptive agent'
     assert NonDescriptiveAgent.description == 'no description available'
 
 
 def test_run_initial():
     """Test if run_initial_export calls the uploader properly"""
-    agent = DummyAgent(MagicMock())
+    backend = DummyBackend(MagicMock())
     mock_uploader = MagicMock()
-    agent.uploader = lambda x: mock_uploader
+    backend.uploader = lambda x: mock_uploader
     events = object()
-    agent.run_initial_export(events)
+    backend.run_initial_export(events)
     mock_uploader.run_initial.assert_called_with(events)
 
 
 def test_run(mocker):
     """Test if run calls the fetcher/uploader properly"""
-    mocker.patch.object(DummyAgent, 'fetch_records')
-    agent = DummyAgent(MagicMock())
+    mocker.patch.object(DummyBackend, 'fetch_records')
+    backend = DummyBackend(MagicMock())
     mock_uploader = MagicMock()
-    agent.uploader = lambda x: mock_uploader
-    agent.run()
-    assert agent.fetch_records.called
+    backend.uploader = lambda x: mock_uploader
+    backend.run()
+    assert backend.fetch_records.called
     assert mock_uploader.run.called
 
 
 def test_fetch_records(db, mocker):
     """Test if the correct records are fetched"""
-    mocker.patch.object(DummyAgent, '_is_entry_excluded', return_value=False)
-    db_agent = LiveSyncAgent(backend_name='dummy', name='dummy')
-    agent = DummyAgent(db_agent)
-    db.session.add(db_agent)
+    mocker.patch.object(DummyBackend, '_is_entry_excluded', return_value=False)
+    agent = LiveSyncAgent(backend_name='dummy', name='dummy')
+    backend = DummyBackend(agent)
+    db.session.add(agent)
     queue = [LiveSyncQueueEntry(change=ChangeType.created, type='dummy', processed=True),
              LiveSyncQueueEntry(change=ChangeType.created, type='dummy')]
-    db_agent.queue = queue
+    agent.queue = queue
     db.session.flush()
-    assert agent.fetch_records() == [queue[1]]
-    assert agent._is_entry_excluded.call_count == 1
-    agent._is_entry_excluded.assert_called_with(queue[1])
+    assert backend.fetch_records() == [queue[1]]
+    assert backend._is_entry_excluded.call_count == 1
+    backend._is_entry_excluded.assert_called_with(queue[1])
 
 
 def test_excluded_categories(mocker, monkeypatch):
@@ -114,5 +114,5 @@ def test_excluded_categories(mocker, monkeypatch):
     monkeypatch.setattr('indico_livesync.base.CategoryManager', MockCategoryManager)
     plugin = mocker.patch('indico_livesync.base.LiveSyncPlugin')
     plugin.settings.get.return_value = [{'id': 'invalid'}, {'id': 'c'}, {'id': 'd'}]
-    agent = LiveSyncAgentBase(MagicMock())
-    assert agent.excluded_categories == {'c', 'd', 'e', 'f'}
+    backend = LiveSyncBackendBase(MagicMock())
+    assert backend.excluded_categories == {'c', 'd', 'e', 'f'}

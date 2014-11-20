@@ -6,7 +6,7 @@
         {%- if agent -%}
             {% trans %}Edit Agent{% endtrans %}
         {%- else -%}
-            {% trans %}Add{% endtrans %} {{ backend.title }}
+            {% trans backend=backend.title %}Add {{ backend }} Agent{% endtrans %}
         {%- endif -%}
     </h2>
 </div>

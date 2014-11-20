@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.util.console import cformat, strip_ansi
 from indico.util.struct.iterables import grouper
 
-from indico_livesync import LiveSyncAgentBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
+from indico_livesync import LiveSyncBackendBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
 from indico_livesync.util import obj_deref
 
 
@@ -27,10 +27,10 @@ def _change_str(change):
     return ','.join(flag.name for flag in SimpleChange if change & flag)
 
 
-class LiveSyncDebugAgent(LiveSyncAgentBase):
-    """Debug Agent
+class LiveSyncDebugBackend(LiveSyncBackendBase):
+    """Debug
 
-    This agent simply dumps all changes to stdout.
+    This backend simply dumps all changes to stdout or the logger.
     """
 
     def _print(self, msg=''):
@@ -82,6 +82,6 @@ class DebugUploader(Uploader):
 
     def upload_records(self, records, from_queue):
         self.n += 1
-        self.agent._print(cformat('%{white!}Batch {}:%{reset}').format(self.n))
+        self.backend._print(cformat('%{white!}Batch {}:%{reset}').format(self.n))
         xml = MARCXMLGenerator.records_to_xml(records) if from_queue else MARCXMLGenerator.objects_to_xml(records)
-        self.agent._print(xml if xml else '(no changes)')
+        self.backend._print(xml if xml else '(no changes)')

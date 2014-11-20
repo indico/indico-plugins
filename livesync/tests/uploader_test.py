@@ -44,7 +44,7 @@ class FailingUploader(RecordingUploader):
             raise Exception('All your data are belong to us!')
 
 
-def create_mock_agent(has_task=False):
+def create_mock_backend(has_task=False):
     agent = MagicMock()
     if not has_task:
         agent.task = None
@@ -55,7 +55,7 @@ def create_mock_agent(has_task=False):
 def test_run_initial(mocker):
     """Test the initial upload"""
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
-    uploader = RecordingUploader(create_mock_agent())
+    uploader = RecordingUploader(create_mock_backend())
     uploader.INITIAL_BATCH_SIZE = 3
     events = tuple(range(4))
     uploader.run_initial(events)
@@ -70,7 +70,7 @@ def test_run_initial(mocker):
 def test_run(mocker):
     """Test uploading queued data"""
     db = mocker.patch('indico_livesync.uploader.db')
-    uploader = RecordingUploader(create_mock_agent())
+    uploader = RecordingUploader(create_mock_backend())
     uploader.BATCH_SIZE = 3
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(4))
     uploader.run(records)
@@ -85,17 +85,17 @@ def test_run(mocker):
 def test_run_extend_task(mocker):
     """Test if the task is extended"""
     mocker.patch('indico_livesync.uploader.db')
-    uploader = RecordingUploader(create_mock_agent(has_task=True))
+    uploader = RecordingUploader(create_mock_backend(has_task=True))
     uploader.BATCH_SIZE = 3
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(4))
     uploader.run(records)
-    assert uploader.agent.task.extend_runtime.call_count == 2
+    assert uploader.backend.task.extend_runtime.call_count == 2
 
 
 def test_run_failing(mocker):
     """Test a failing queue run"""
     db = mocker.patch('indico_livesync.uploader.db')
-    uploader = FailingUploader(create_mock_agent())
+    uploader = FailingUploader(create_mock_backend())
     uploader.BATCH_SIZE = 3
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(10))
     uploader.run(records)
@@ -114,7 +114,7 @@ def test_marcxml_run(mocker):
     mocker.patch('indico_livesync.uploader.db')
     mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
     mxg = mocker.patch('indico_livesync.uploader.MARCXMLGenerator')
-    uploader = MARCXMLUploader(create_mock_agent())
+    uploader = MARCXMLUploader(create_mock_backend())
     uploader.run([LiveSyncQueueEntry(change=ChangeType.created)])
     assert mxg.records_to_xml.called
     assert not mxg.objects_to_xml.called
@@ -130,6 +130,6 @@ def test_marcxml_empty_result(mocker):
     """Test if the MARCXML uploader doesn't upload empty records"""
     mocker.patch('indico_livesync.uploader.MARCXMLGenerator.objects_to_xml', return_value=None)
     mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
-    uploader = MARCXMLUploader(create_mock_agent())
+    uploader = MARCXMLUploader(create_mock_backend())
     uploader.run_initial([1])
     assert not uploader.upload_xml.called

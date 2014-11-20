@@ -53,7 +53,7 @@
     </table>
 
     {% for name, backend in backends.items() | sort(attribute='1.title') %}
-        <a class="i-button icon-plus i-form-button" href="{{ url_for_plugin('livesync.add_agent', backend=name) }}">{% trans %}Add{% endtrans %} {{ backend.title }}</a>
+        <a class="i-button icon-plus i-form-button" href="{{ url_for_plugin('livesync.add_agent', backend=name) }}">{% trans backend=backend.title %}Add {{ backend }} agent{% endtrans %}</a>
     {% endfor %}
 
     {% set missing_initial_export = agents|rejectattr('initial_data_exported')|list %}

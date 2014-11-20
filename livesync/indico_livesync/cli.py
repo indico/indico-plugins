@@ -38,11 +38,11 @@ cli_manager = Manager(usage="Manages LiveSync")
 
 
 @cli_manager.command
-def available_agents():
-    """Lists the currently available agent types"""
+def available_backends():
+    """Lists the currently available backend types"""
     print 'The following LiveSync agents are available:'
-    for name, agent_class in current_plugin.agent_classes.iteritems():
-        print cformat('  - %{white!}{}%{reset}: {} ({})').format(name, agent_class.title, agent_class.description)
+    for name, backend in current_plugin.backend_classes.iteritems():
+        print cformat('  - %{white!}{}%{reset}: {} ({})').format(name, backend.title, backend.description)
 
 
 @cli_manager.command
