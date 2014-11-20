@@ -3,16 +3,16 @@
 
 <div class="plugin-chat chat-mgmt" id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}" style="margin-bottom: 2em;">
     <div class="groupTitle">{% trans %}Current chat rooms{% endtrans %}</div>
-    <table class="i-table-widget " style="max-width: 800px;">
-        <thead>
-             <tr>
-                <th class="small-column"></th>
-                <th>{% trans %}Name{% endtrans %}</th>
-                <th class="col-50">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if event_chatrooms %}
+    {% if event_chatrooms %}
+        <table class="i-table-widget fixed-width">
+            <thead>
+                 <tr>
+                    <th class="small-column"></th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th class="col-50">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for event_chatroom in event_chatrooms %}
                     {% set chatroom = event_chatroom.chatroom %}
                     {% set server = chatroom.server %}
@@ -79,34 +79,35 @@
                         </td>
                     </tr>
                 {% endfor %}
-            {% else %}
-                <tr>
-                    <td class="center" colspan="3">{% trans %}No chatrooms have been added yet.{% endtrans %}</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="info-message-box fixed-width">
+            <div class="message-text">{% trans %}No chatrooms have been added yet.{% endtrans %}</div>
+        </div>
+    {% endif %}
     <a class="i-button bottom i-form-button icon-plus" href="{{ url_for_plugin('.manage_rooms_create', event) }}">{% trans %}Create new room{% endtrans %}</a>
 </div>
-
 
 {% if available_chatrooms %}
     <div>
         <div class="groupTitle">{% trans %}Add existing chat room{% endtrans %}</div>
-        {{ form_header(action=url_for_plugin('.manage_rooms_attach', event), method='post') }}
-        <div class="form-group">
-            <div class="form-label form-block form-label-middle">{% trans %}Available chatrooms{% endtrans %}</div>
-            <div class="form-field form-block">
-                <select name="chatroom_id">
-                    {% for chatroom in available_chatrooms -%}
-                        <option value="{{ chatroom.id }}">{{ chatroom.name }}</option>
-                    {% endfor %}
-                </select>
+        <div class="fixed-width">
+            {{ form_header(action=url_for_plugin('.manage_rooms_attach', event), method='post') }}
+            <div class="form-group">
+                <div class="form-label form-block form-label-middle">{% trans %}Available chatrooms{% endtrans %}</div>
+                <div class="form-field form-block">
+                    <select name="chatroom_id">
+                        {% for chatroom in available_chatrooms -%}
+                            <option value="{{ chatroom.id }}">{{ chatroom.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
+            {% call form_footer() %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Attach existing room{% endtrans %}">
+            {% endcall %}
         </div>
-        {% call form_footer() %}
-            <input class="i-button big highlight" type="submit" value="{% trans %}Attach existing room{% endtrans %}">
-        {% endcall %}
     </div>
 {% endif %}
 
