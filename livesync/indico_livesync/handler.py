@@ -17,11 +17,13 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
-from flask import g
-from indico.core import signals
 
+from flask import g
+
+from indico.core import signals
 from MaKaC.accessControl import AccessController
 from MaKaC.conference import Conference, Contribution, SubContribution, Category, Session
+
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.util import obj_ref
 
@@ -70,7 +72,6 @@ def connect_signals(plugin):
 
 
 def _moved(obj, old_parent, new_parent, **kwargs):
-    print '_moved', obj, old_parent, new_parent
     _register_change(obj, ChangeType.moved)
     category_protection = old_parent.isProtected()
     new_category_protection = new_parent.isProtected()
@@ -80,13 +81,11 @@ def _moved(obj, old_parent, new_parent, **kwargs):
 
 
 def _created(obj, parent, **kwargs):
-    print '_created', obj, parent
     _register_change(parent, ChangeType.data_changed)
     _register_change(obj, ChangeType.created)
 
 
 def _deleted(obj, **kwargs):
-    print '_deleted', obj, kwargs
     parent = kwargs.pop('parent', None)
     _register_deletion(obj, parent)
 
@@ -94,17 +93,14 @@ def _deleted(obj, **kwargs):
 def _title_changed(obj, **kwargs):
     if kwargs.pop('attr', 'title') != 'title':
         return
-    print '_title_changed', obj, kwargs
     _register_change(obj, ChangeType.title_changed)
 
 
 def _data_changed(obj, **kwargs):
-    print '_data_changed', obj, kwargs
     _register_change(obj, ChangeType.data_changed)
 
 
 def _protection_changed(obj, old, new, **kwargs):
-    print '_protection_changed', obj, old, new
     if new == 0:  # inheriting
         new = 1 if obj.isProtected() else -1
     if old != new:
@@ -112,12 +108,10 @@ def _protection_changed(obj, old, new, **kwargs):
 
 
 def _acl_changed(obj, principal, **kwargs):
-    print '_acl_changed', obj, principal
     _handle_acl_change(obj)
 
 
 def _domain_changed(obj, **kwargs):
-    print '_domain_changed', obj
     _register_change(obj, ChangeType.protection_changed)
 
 
