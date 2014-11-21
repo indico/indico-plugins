@@ -1,56 +1,62 @@
 <h2>{% trans %}LiveSync Agents{% endtrans %}</h2>
 
-<div class="i-form" style="max-width: 800px;">
-    <table class="i-table-widget">
-        <thead>
-            <tr>
-                <th class="small-column">{% trans %}ID{% endtrans %}</th>
-                <th>{% trans %}Name{% endtrans %}</th>
-                <th>{% trans %}Backend{% endtrans %}</th>
-                <th>{% trans %}Last Run{% endtrans %}</th>
-                <th class="small-column">{% trans %}Initial Export{% endtrans %}</th>
-                <th class="small-column">{% trans %}Queue{% endtrans %}</th>
-                <th class="action-column">{% trans %}Actions{% endtrans %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for agent in agents %}
+<div class="i-form fixed-width">
+    {% if agents %}
+        <table class="i-table-widget">
+            <thead>
                 <tr>
-                    <td class="text-right">{{ agent.id }}</td>
-                    <td>{{ agent.name }}</td>
-                    <td>
-                        {% if agent.backend %}
-                            {{ agent.backend.title }}
-                        {% else %}
-                            <em class="text-error">{% trans name=agent.backend_name %}Not loaded: {{ name }}{% endtrans %}</em>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {%- if agent.last_run -%}
-                            {{ agent.last_run | format_datetime('short') }}
-                        {%- else -%}
-                            {% trans %}Never{% endtrans %}
-                        {%- endif -%}
-                    </td>
-                    <td>
-                        {% if agent.initial_data_exported %}
-                            {% trans %}Done{% endtrans %}
-                        {% else %}
-                            <strong>{% trans %}Pending{% endtrans %}</strong>
-                        {% endif %}
-                    </td>
-                    <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
-                    <td>
-                        <a href="#" class="action-icon icon-remove js-delete-agent"
-                           data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"></a>
-                        {%- if agent.backend -%}
-                            <a class="action-icon icon-edit" href="{{ url_for_plugin('livesync.edit_agent', agent) }}"></a>
-                        {%- endif -%}
-                    </td>
+                    <th class="small-column">{% trans %}ID{% endtrans %}</th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Backend{% endtrans %}</th>
+                    <th>{% trans %}Last Run{% endtrans %}</th>
+                    <th class="small-column">{% trans %}Initial Export{% endtrans %}</th>
+                    <th class="small-column">{% trans %}Queue{% endtrans %}</th>
+                    <th class="action-column">{% trans %}Actions{% endtrans %}</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for agent in agents %}
+                    <tr>
+                        <td class="text-right">{{ agent.id }}</td>
+                        <td>{{ agent.name }}</td>
+                        <td>
+                            {% if agent.backend %}
+                                {{ agent.backend.title }}
+                            {% else %}
+                                <em class="text-error">{% trans name=agent.backend_name %}Not loaded: {{ name }}{% endtrans %}</em>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {%- if agent.last_run -%}
+                                {{ agent.last_run | format_datetime('short') }}
+                            {%- else -%}
+                                {% trans %}Never{% endtrans %}
+                            {%- endif -%}
+                        </td>
+                        <td>
+                            {% if agent.initial_data_exported %}
+                                {% trans %}Done{% endtrans %}
+                            {% else %}
+                                <strong>{% trans %}Pending{% endtrans %}</strong>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
+                        <td>
+                            <a href="#" class="action-icon icon-remove js-delete-agent"
+                               data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"></a>
+                            {%- if agent.backend -%}
+                                <a class="action-icon icon-edit" href="{{ url_for_plugin('livesync.edit_agent', agent) }}"></a>
+                            {%- endif -%}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">{% trans %}No agents have been added yet.{% endtrans %}</div>
+        </div>
+    {% endif %}
 
     {% for name, backend in backends.items() | sort(attribute='1.title') %}
         <a class="i-button icon-plus i-form-button" href="{{ url_for_plugin('livesync.add_agent', backend=name) }}">{% trans backend=backend.title %}Add {{ backend }} agent{% endtrans %}</a>
