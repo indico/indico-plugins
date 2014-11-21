@@ -1,4 +1,4 @@
-{% from 'forms/form_widget.html' import form_header, form_fieldset, form_row, form_footer  %}
+{% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_rows %}
 
 <h2 class="page-title">{% trans %}Chat Rooms{% endtrans %}</h2>
 
@@ -16,15 +16,11 @@
     {{ form_header(id='chatroom-form') }}
 
     {% call form_fieldset(legend='Chatroom settings') %}
-        {% for field in form.visible_fields if field.short_name not in form.event_specific_fields %}
-            {{ form_row(field) }}
-        {% endfor %}
+        {{ form_rows(form, skip=form.event_specific_fields) }}
     {% endcall %}
 
     {% call form_fieldset(legend='Event settings', description='These settings affect only the current event even if the chatroom is used in multiple events.') %}
-        {% for field in form.visible_fields if field.short_name in form.event_specific_fields %}
-            {{ form_row(field) }}
-        {% endfor %}
+        {{ form_rows(form, fields=form.event_specific_fields) }}
     {% endcall %}
 
     {% call form_footer() %}
