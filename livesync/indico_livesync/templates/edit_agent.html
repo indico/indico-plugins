@@ -1,23 +1,27 @@
+{% extends 'admin/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
-<div class="plugin-header">
-    <h1>LiveSync</h1>
-    <h2>
-        {%- if agent -%}
-            {% trans %}Edit Agent{% endtrans %}
-        {%- else -%}
-            {% trans backend=backend.title %}Add {{ backend }} Agent{% endtrans %}
-        {%- endif -%}
-    </h2>
-</div>
+{% block title %}LiveSync{% endblock %}
 
-<p class="plugin-description">{{ backend.description }}</p>
+{% block subtitle %}
+    {%- if agent -%}
+        {% trans %}Edit Agent{% endtrans %}
+    {%- else -%}
+        {% trans backend=backend.title %}Add {{ backend }} Agent{% endtrans %}
+    {%- endif -%}
+{% endblock %}
 
-{{ form_header() }}
-{% for field in form.visible_fields %}
-    {{ form_row(field) }}
-{% endfor %}
-{% call form_footer() %}
-    <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
-    <a href="{{ url_for('plugins.details', plugin='livesync') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>
-{% endcall %}
+{% block description %}
+    {{ backend.description }}
+{% endblock %}
+
+{% block content %}
+    {{ form_header() }}
+    {% for field in form.visible_fields %}
+        {{ form_row(field) }}
+    {% endfor %}
+    {% call form_footer() %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+        <a href="{{ url_for('plugins.details', plugin='livesync') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}
