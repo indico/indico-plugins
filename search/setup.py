@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from setuptools import setup, find_packages
 
 
 setup(
     name='indico_search',
     version='0.1',
-    url='https://github.com/indico/indico-plugin-search',
+    url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
     author_email='indico-team@cern.ch',
