@@ -39,7 +39,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
 
 
 class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
-    """Manual Payment
+    """Payment: Bank Transfer
 
     Provides a payment method where bank details etc. are shown to the user
     who then pays manually using e.g. a wire transfer. Marking the registrant
@@ -47,3 +47,4 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
+    default_settings = {'method_name': 'Bank Transfer'}
