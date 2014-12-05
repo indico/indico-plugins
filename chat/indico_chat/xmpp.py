@@ -246,7 +246,7 @@ def retrieve_logs(room, start_date=None, end_date=None):
         return None
     if response.headers.get('content-type') == 'application/json':
         current_plugin.logger.warning('Could not retrieve logs for {}: {}'.format(room.jid,
-                                                                                      response.json().get('error')))
+                                                                                  response.json().get('error')))
         return None
     return response.text
 
