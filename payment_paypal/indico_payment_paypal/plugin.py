@@ -1,0 +1,45 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+from wtforms.fields.core import StringField
+from wtforms.fields.html5 import URLField
+from wtforms.validators import DataRequired
+
+from indico.core.plugins import IndicoPlugin
+from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
+from indico.util.i18n import _
+
+
+class PluginSettingsForm(PaymentPluginSettingsFormBase):
+    url = URLField(_('PayPal URL'), [DataRequired()], description=_('URL of PayPal'))
+    business = StringField(_('Business'), [DataRequired()],
+                           description=_('The PayPal ID or an email address associated with the PayPal account'))
+
+
+class EventSettingsForm(PaymentEventSettingsFormBase):
+    url = URLField(_('PayPal URL'), [DataRequired()], description=_('URL of PayPal'))
+    business = StringField(_('Business'), [DataRequired()],
+                           description=_('The PayPal ID or an email address associated with the PayPal account'))
+
+
+class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
+    """Payment: PayPal
+    """
+    settings_form = PluginSettingsForm
+    event_settings_form = EventSettingsForm
+    default_settings = {'method_name': 'PayPal'}

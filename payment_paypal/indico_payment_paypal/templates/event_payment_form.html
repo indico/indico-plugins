@@ -1,0 +1,27 @@
+Clicking on the <strong>Pay now</strong> button you will get redirected to the PayPal site in order to complete your transaction.
+
+<dl class="i-data-list">
+    <dt>First name</dt>
+    <dd>{{ registrant.getFirstName() }}</dd>
+    <dt>Last name</dt>
+    <dd>{{ registrant.getFamilyName() }}</dd>
+    <dt>Total amount</dt>
+    <dd>{{ amount }} {{ currency }}</dd>
+    <dt></dt>
+    <dd>
+        <form action="{{ event_settings.url }}" method="POST" id="paypal">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="{{ event_settings.business}}">
+            <input type="hidden" name="item_name" value="{{ registrant.getFamilyName() }}, {{ registrant.getFirstName() }}: registration for {{ event.getTitle() }}">
+            <input type="hidden" name="amount" value="{{ amount }}">
+            <input type="hidden" name="currency_code" value="{{ currency }}">
+            <input type="hidden" name="charset" value="utf-8">
+            <input type="hidden" name="return" value="{{ url_for('payment.event_payment_confirm', event, _external=True) }}">
+            <input type="hidden" name="cancel_return" value="{{ url_for('payment.event_payment_cancel', event, _external=True) }}">
+            <input type="hidden" name="notify_url" value="{{ url_for('payment.event_payment_notify', event, _external=True) }}">
+            <input type="image" name="submit" border="0" src="  https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_86x21.png" alt="PayPal - The safer, easier way to pay online">
+        </form>
+    </dd>
+</dl>
+
+
