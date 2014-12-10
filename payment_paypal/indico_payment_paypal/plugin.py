@@ -20,8 +20,9 @@ from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
+from indico_payment_paypal.controllers import RHPaymentEventNotify
 from indico.util.i18n import _
 
 
@@ -43,3 +44,12 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'PayPal'}
+
+    def get_blueprints(self):
+        return blueprint
+
+
+blueprint = IndicoPluginBlueprint('payment_paypal', __name__, url_prefix='/event/<confId>/registration/payment')
+
+#: Used by PayPal to send asynchronously a notification for the transaction (pending, successful, etc)
+blueprint.add_url_rule('/notify/paypal', 'notify', RHPaymentEventNotify, methods=('GET', 'POST'))

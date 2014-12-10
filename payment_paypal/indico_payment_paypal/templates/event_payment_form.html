@@ -18,7 +18,7 @@ Clicking on the <strong>Pay now</strong> button you will get redirected to the P
             <input type="hidden" name="charset" value="utf-8">
             <input type="hidden" name="return" value="{{ url_for('payment.event_payment_confirm', event, _external=True) }}">
             <input type="hidden" name="cancel_return" value="{{ url_for('payment.event_payment_cancel', event, _external=True) }}">
-            <input type="hidden" name="notify_url" value="{{ url_for('payment.event_payment_notify', event, _external=True) }}">
+            <input type="hidden" name="notify_url" value="{{ url_for_plugin('payment_paypal.notify', registrant, authkey=registrant.getRandomId(), _external=True) }}">
             <input type="image" name="submit" border="0" src="  https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_86x21.png" alt="PayPal - The safer, easier way to pay online">
         </form>
     </dd>
