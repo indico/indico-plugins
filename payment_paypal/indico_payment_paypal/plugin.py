@@ -43,7 +43,8 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
-    default_settings = {'method_name': 'PayPal'}
+    default_settings = {'method_name': 'PayPal',
+                        'url': 'https://www.paypal.com/cgi-bin/webscr'}
 
     def get_blueprints(self):
         return blueprint
