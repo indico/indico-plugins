@@ -27,15 +27,15 @@ from indico.util.i18n import _
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    url = URLField(_('PayPal URL'), [DataRequired()], description=_('URL of PayPal'))
-    business = StringField(_('Business'), [DataRequired()],
-                           description=_('The PayPal ID or an email address associated with the PayPal account'))
+    url = URLField(_('API URL'), [DataRequired()], description=_('URL of the PayPal HTTP API.'))
+    business = StringField(_('Business'),
+                           description=_('The default PayPal ID or email address associated with a PayPal account. '
+                                         'Event managers will be able to override this.'))
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    url = URLField(_('PayPal URL'), [DataRequired()], description=_('URL of PayPal'))
     business = StringField(_('Business'), [DataRequired()],
-                           description=_('The PayPal ID or an email address associated with the PayPal account'))
+                           description=_('The PayPal ID or email address associated with a PayPal account.'))
 
 
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
