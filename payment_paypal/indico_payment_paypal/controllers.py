@@ -25,8 +25,8 @@ from flask_pluginengine import current_plugin
 
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
-from indico.core.db import db
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
+from indico.modules.payment.util import register_transaction
 from indico.util import json
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
@@ -75,18 +75,13 @@ class RHPaymentEventNotify(RH):
             current_plugin.logger.warning("Payment status '{}' not recognized".format(payment_status))
             current_plugin.logger.warning("Data received: {}".format(request.form))
             return
-        new_transaction = PaymentTransaction.create_next(event_id=request.view_args['confId'],
-                                                         registrant_id=request.args['registrantId'],
-                                                         amount=request.form.get('mc_gross'),
-                                                         currency=request.form.get('mc_currency'),
-                                                         provider='paypal',
-                                                         action=PaypalTransactionActionMapping.mapping[payment_status],
-                                                         data=json.dumps(request.form))
-        if new_transaction:
-            db.session.add(new_transaction)
-            db.session.flush()
-            if new_transaction.has_conflict:
-                pass
+        register_transaction(event_id=request.view_args['confId'],
+                             registrant_id=request.args['registrantId'],
+                             amount=request.form.get('mc_gross'),
+                             currency=request.form.get('mc_currency'),
+                             action=PaypalTransactionActionMapping.mapping[payment_status],
+                             provider='paypal',
+                             data=json.dumps(request.form))
 
     def _verify_business(self):
         return current_plugin.event_settings.get(self.event, 'business') == request.form.get('business')
