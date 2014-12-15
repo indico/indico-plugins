@@ -20,16 +20,22 @@ from urllib2 import urlopen
 
 import werkzeug.datastructures
 from werkzeug.exceptions import BadRequest
-from flask import request, jsonify
+from flask import request
 from flask_pluginengine import current_plugin
 
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
 from indico.core.db import db
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.util import json
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
+
+
+class PaypalTransactionActionMapping(object):
+    mapping = {'Completed': TransactionAction.complete,
+               'Denied': TransactionAction.reject,
+               'Pending': TransactionAction.pending}
 
 
 class RHPaymentEventNotify(RH):
@@ -47,7 +53,6 @@ class RHPaymentEventNotify(RH):
             raise BadRequest
 
     def _process(self):
-        current_plugin.logger.warning("Verifying...")
         if not self._verify_business():
             return
         request.parameter_storage_class = werkzeug.datastructures.ImmutableOrderedMultiDict
@@ -57,45 +62,39 @@ class RHPaymentEventNotify(RH):
         if response.read() != 'VERIFIED':
             current_plugin.logger.warning("Paypal IPN string {arg} did not validate".format(arg=verify_string))
             return
-        current_plugin.logger.warning("Transaction was verified successfully")
-        # TODO: Check if the total amount has changed
         if self._is_transaction_duplicated():
-            current_plugin.logger.error("Transaction was skipped because it is duplicated. Data received: {}"
-                                        .format(request.form))
+            current_plugin.logger.info("Payment not recorded because transaction was duplicated. Data received: {}"
+                                       .format(request.form))
             return
-        # Now it's OK to store the transaction
-        new_transaction = PaymentTransaction(event_id=request.view_args['confId'],
-                                             registrant_id=request.args['registrantId'],
-                                             amount=request.form.get('mc_gross'),
-                                             currency=request.form.get('mc_currency'),
-                                             provider='paypal',
-                                             data=json.dumps(request.form))
-
-        # Still missing: Canceled_Reversal, Created, Expired, Pending, Processed, Voided
-        if request.form.get('payment_status') == 'Completed':
-            new_transaction.status = TransactionStatus.successful
-        elif request.form.get('payment_status') == 'Failed':
-            new_transaction.status = TransactionStatus.failed
-        elif request.form.get('payment_status') == 'Denied':
-            new_transaction.status = TransactionStatus.rejected  # The comment in transactions.py is confusing
-        elif request.form.get('payment_status') == 'Reversed' or request.form.get('payment_status') == 'Refunded':
-            new_transaction.status = TransactionStatus.cancelled
-        else:
-            current_plugin.logger.error("Payment status '{}' cannot be recognized"
-                                        .format(request.form.get('payment_status')))
-            current_plugin.logger.error("Failure in storing the transaction. Data received: {}".format(request.form))
+        payment_status = request.form.get('payment_status')
+        if payment_status == 'Failed':
+            current_plugin.logger.info("Payment failed".format(payment_status))
+            current_plugin.logger.info("Data received: {}".format(request.form))
             return
-        db.session.add(new_transaction)
-        db.session.flush()
-
-        return jsonify({'status': 'complete'})
+        if payment_status not in PaypalTransactionActionMapping.mapping.iterkeys():
+            current_plugin.logger.warning("Payment status '{}' not recognized".format(payment_status))
+            current_plugin.logger.warning("Data received: {}".format(request.form))
+            return
+        new_transaction = PaymentTransaction.create_next(event_id=request.view_args['confId'],
+                                                         registrant_id=request.args['registrantId'],
+                                                         amount=request.form.get('mc_gross'),
+                                                         currency=request.form.get('mc_currency'),
+                                                         provider='paypal',
+                                                         action=PaypalTransactionActionMapping.mapping[payment_status],
+                                                         data=json.dumps(request.form))
+        if new_transaction:
+            db.session.add(new_transaction)
+            db.session.flush()
+            if new_transaction.has_conflict:
+                pass
 
     def _verify_business(self):
         return current_plugin.event_settings.get(self.event, 'business') == request.form.get('business')
 
     def _is_transaction_duplicated(self):
         transaction = PaymentTransaction.find_latest_for_registrant(self.registrant)
-        if not transaction:
+        if not transaction or transaction.provider != 'paypal':
             return False
-        return (transaction.data.payment_status == request.form.get('payment_status') and
-                transaction.data.txn_id == request.form.get('txn_id'))
+        data = json.loads(transaction.data)
+        return (data['payment_status'] == request.form.get('payment_status') and
+                data['txn_id'] == request.form.get('txn_id'))
