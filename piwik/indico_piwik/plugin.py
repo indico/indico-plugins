@@ -16,12 +16,13 @@
 
 from urllib2 import urlparse
 
-from flask import request
+from flask import request, session
 from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
 from indico.util.i18n import _
+from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -72,8 +73,9 @@ class PiwikPlugin(IndicoPlugin):
                                       **event_tracking_params)
 
     def add_sidemenu_item(self, event, **kwargs):
-        menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event))
-        return 'statistics', menu_item
+        if event.canModify(AccessWrapper(session.user)):
+            menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event))
+            return 'statistics', menu_item
 
     def get_blueprints(self):
         return blueprint
