@@ -24,6 +24,7 @@ from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
 from indico_payment_paypal.controllers import RHPaymentEventNotify
 from indico.util.i18n import _
+from indico.util.string import remove_accents
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -48,6 +49,10 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
+
+    def adjust_payment_form_data(self, data):
+        data['item_name'] = '{}: registration for {}'.format(remove_accents(data['registrant'].getFullName()),
+                                                             remove_accents(data['event'].getTitle()))
 
 
 blueprint = IndicoPluginBlueprint('payment_paypal', __name__, url_prefix='/event/<confId>/registration/payment')
