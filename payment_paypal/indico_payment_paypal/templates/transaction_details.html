@@ -1,0 +1,9 @@
+{% extends 'payment/transaction_details.html' %}
+{% block details %}
+    <dt>{% trans %}Transaction ID{% endtrans %}</dt>
+    <dd>{{ transaction.data.txn_id }}</dd>
+    <dt>{% trans %}Invoice ID{% endtrans %}</dt>
+    <dd>{{ transaction.data.invoice }}</dd>
+    <dt>{% trans %}Payer e-mail{% endtrans %}</dt>
+    <dd>{{ transaction.data.payer_email }}</dd>
+{% endblock %}
