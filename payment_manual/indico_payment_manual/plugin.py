@@ -45,6 +45,7 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     who then pays manually using e.g. a wire transfer. Marking the registrant
     as paid is then done manually by a manager of the event.
     """
+    category = 'payment'
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'Bank Transfer'}

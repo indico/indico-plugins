@@ -42,6 +42,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """Payment: PayPal
     """
+    category = 'payment'
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'PayPal',

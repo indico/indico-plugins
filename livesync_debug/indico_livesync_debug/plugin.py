@@ -28,3 +28,4 @@ class LiveSyncDebugPlugin(LiveSyncPluginBase):
     """
 
     backend_classes = {'debug': LiveSyncDebugBackend}
+    category = 'synchronization'

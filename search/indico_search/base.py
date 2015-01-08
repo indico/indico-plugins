@@ -31,6 +31,7 @@ class SearchPluginBase(IndicoPlugin):
     engine_class = None
     #: the SearchForm subclass to use
     search_form = SearchForm
+    category = 'search'
 
     def init(self):
         super(SearchPluginBase, self).init()

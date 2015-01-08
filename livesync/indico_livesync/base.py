@@ -34,6 +34,7 @@ class LiveSyncPluginBase(IndicoPlugin):  # pragma: no cover
 
     #: dict containing the backend(s) provided by the plugin; the keys are unique identifiers
     backend_classes = None
+    category = 'synchronization'
 
     def init(self):
         super(LiveSyncPluginBase, self).init()

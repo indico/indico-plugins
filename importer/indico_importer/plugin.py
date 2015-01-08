@@ -32,6 +32,7 @@ class ImporterPlugin(IndicoPlugin):
     """
 
     hidden = True
+    category = 'import'
 
     def init(self):
         super(ImporterPlugin, self).init()
