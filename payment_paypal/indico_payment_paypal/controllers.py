@@ -27,6 +27,7 @@ from flask_pluginengine import current_plugin
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
+from indico.modules.payment.notifications import notify_amount_inconsistency
 from indico.modules.payment.util import register_transaction
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
@@ -50,7 +51,7 @@ class RHPaymentEventNotify(RH):
             raise BadRequest
 
     def _process(self):
-        if not self._verify_business():
+        if not self._verify_business() or not self._verify_amount():
             return
         verify_params = chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems())
         verify_string = urlencode(list(verify_params))
@@ -82,10 +83,19 @@ class RHPaymentEventNotify(RH):
 
     def _verify_business(self):
         expected = current_plugin.event_settings.get(self.event, 'business')
-        business = request.form.get('business')
+        business = request.form['business']
         if expected == business:
             return True
         current_plugin.logger.warning("Unexpected business: {} != {}".format(business, expected))
+        return False
+
+    def _verify_amount(self):
+        expected = self.registrant.getTotal()
+        amount = float(request.form['mc_gross'])
+        if expected == amount:
+            return True
+        current_plugin.logger.warning("Paid amount doesn't match event's fee: {} != {}".format(amount, expected))
+        notify_amount_inconsistency(self.event, self.registrant, amount)
         return False
 
     def _is_transaction_duplicated(self):
