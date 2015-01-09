@@ -17,12 +17,11 @@
 from __future__ import unicode_literals
 
 from itertools import chain
-from urllib import urlencode
-from urllib2 import urlopen
 
-from werkzeug.exceptions import BadRequest
+import requests
 from flask import request
 from flask_pluginengine import current_plugin
+from werkzeug.exceptions import BadRequest
 
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
@@ -53,12 +52,10 @@ class RHPaymentEventNotify(RH):
     def _process(self):
         if not self._verify_business() or not self._verify_amount():
             return
-        verify_params = chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems())
-        verify_string = urlencode(list(verify_params))
-        response = urlopen(current_plugin.settings.get('url'), data=verify_string)
-        result = response.read()
+        verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems()))
+        result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':
-            current_plugin.logger.warning("Paypal IPN string {} did not validate ({})".format(verify_string, result))
+            current_plugin.logger.warning("Paypal IPN string {} did not validate ({})".format(verify_params, result))
             return
         if self._is_transaction_duplicated():
             current_plugin.logger.info("Payment not recorded because transaction was duplicated\n"
