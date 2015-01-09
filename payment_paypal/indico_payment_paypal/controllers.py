@@ -50,7 +50,7 @@ class RHPaymentEventNotify(RH):
             raise BadRequest
 
     def _process(self):
-        if not self._verify_business() or not self._verify_amount():
+        if not self._verify_business():
             return
         verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
@@ -70,6 +70,7 @@ class RHPaymentEventNotify(RH):
             current_plugin.logger.warning("Payment status '{}' not recognized\n"
                                           "Data received: {}".format(payment_status, request.form))
             return
+        self._verify_amount()
         register_transaction(event_id=request.view_args['confId'],
                              registrant_id=request.args['registrantId'],
                              amount=request.form.get('mc_gross'),
