@@ -61,17 +61,17 @@ class RHPaymentEventNotify(RH):
             current_plugin.logger.warning("Paypal IPN string {} did not validate ({})".format(verify_string, result))
             return
         if self._is_transaction_duplicated():
-            current_plugin.logger.info("Payment not recorded because transaction was duplicated. Data received: {}"
-                                       .format(request.form))
+            current_plugin.logger.info("Payment not recorded because transaction was duplicated\n"
+                                       "Data received: {}".format(request.form))
             return
         payment_status = request.form.get('payment_status')
         if payment_status == 'Failed':
-            current_plugin.logger.info("Payment failed".format(payment_status))
-            current_plugin.logger.info("Data received: {}".format(request.form))
+            current_plugin.logger.info("Payment failed (status: {})\n"
+                                       "Data received: {}".format(payment_status, request.form))
             return
         if payment_status not in PaypalTransactionActionMapping.mapping:
-            current_plugin.logger.warning("Payment status '{}' not recognized".format(payment_status))
-            current_plugin.logger.warning("Data received: {}".format(request.form))
+            current_plugin.logger.warning("Payment status '{}' not recognized\n"
+                                          "Data received: {}".format(payment_status, request.form))
             return
         register_transaction(event_id=request.view_args['confId'],
                              registrant_id=request.args['registrantId'],
