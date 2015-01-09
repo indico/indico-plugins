@@ -40,7 +40,9 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
 
 
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
-    """Payment: PayPal
+    """PayPal
+
+    Provides a payment method using the PayPal IPN API.
     """
     category = 'payment'
     settings_form = PluginSettingsForm
