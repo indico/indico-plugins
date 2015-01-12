@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import depends
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico_importer.plugin import ImporterPlugin
 
 
@@ -27,6 +27,7 @@ class ImporterSourcePluginBase(IndicoPlugin):
     """Base class for importer engine plugins"""
 
     importer_engine_classes = None
+    category = PluginCategory.importers
 
     def init(self):
         super(ImporterSourcePluginBase, self).init()

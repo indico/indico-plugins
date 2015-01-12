@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import request
 from flask_pluginengine import plugins_loaded
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, PluginCategory
 
 from indico_search.blueprint import blueprint
 from indico_search.util import render_engine_or_search_template
@@ -31,7 +31,7 @@ class SearchPlugin(IndicoPlugin):
     Provides a base for search engine plugins.
     """
 
-    category = 'search'
+    category = PluginCategory.search
     hidden = True
     _engine_plugin = None  # the search engine plugin
 

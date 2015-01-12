@@ -17,7 +17,7 @@
 from flask import session
 from flask_pluginengine import depends
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, PluginCategory
 
 from indico_search.forms import SearchForm
 from indico_search.plugin import SearchPlugin
@@ -31,7 +31,7 @@ class SearchPluginBase(IndicoPlugin):
     engine_class = None
     #: the SearchForm subclass to use
     search_form = SearchForm
-    category = 'search'
+    category = PluginCategory.search
 
     def init(self):
         super(SearchPluginBase, self).init()

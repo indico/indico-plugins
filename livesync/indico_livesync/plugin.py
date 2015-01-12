@@ -21,7 +21,7 @@ from flask import request
 from wtforms.validators import NumberRange
 from wtforms.fields.html5 import IntegerField
 
-from indico.core.plugins import IndicoPlugin, wrap_cli_manager
+from indico.core.plugins import IndicoPlugin, PluginCategory, wrap_cli_manager
 from indico.core.plugins.views import WPPlugins
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -55,6 +55,7 @@ class LiveSyncPlugin(IndicoPlugin):
     settings_form = SettingsForm
     default_settings = {'excluded_categories': [],
                         'queue_entry_ttl': 0}
+    category = PluginCategory.synchronization
 
     def init(self):
         super(LiveSyncPlugin, self).init()

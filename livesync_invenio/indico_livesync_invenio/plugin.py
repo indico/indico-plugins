@@ -28,4 +28,3 @@ class InvenioLiveSyncPlugin(LiveSyncPluginBase):
     """
 
     backend_classes = {'invenio': InvenioLiveSyncBackend}
-    category = 'synchronization'

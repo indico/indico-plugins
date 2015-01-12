@@ -30,4 +30,3 @@ class ImporterInvenioPlugin(ImporterSourcePluginBase):
 
     importer_engine_classes = (InvenioImporter,)
     settings_form = SettingsForm
-    category = 'import'

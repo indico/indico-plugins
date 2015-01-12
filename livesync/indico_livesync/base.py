@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import depends, trim_docstring
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from MaKaC.conference import CategoryManager
@@ -34,7 +34,7 @@ class LiveSyncPluginBase(IndicoPlugin):  # pragma: no cover
 
     #: dict containing the backend(s) provided by the plugin; the keys are unique identifiers
     backend_classes = None
-    category = 'synchronization'
+    category = PluginCategory.synchronization
 
     def init(self):
         super(LiveSyncPluginBase, self).init()

@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, PluginCategory
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
 from indico.util.i18n import _
 
@@ -32,7 +32,7 @@ class ImporterPlugin(IndicoPlugin):
     """
 
     hidden = True
-    category = 'import'
+    category = PluginCategory.importers
 
     def init(self):
         super(ImporterPlugin, self).init()
