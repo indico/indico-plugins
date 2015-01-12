@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
 from indico.util.i18n import _
 from indico.web.forms.validators import UsedIf
@@ -48,3 +48,10 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'Bank Transfer'}
+
+    @property
+    def logo_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/logo.png')
+
+    def get_blueprints(self):
+        return IndicoPluginBlueprint('payment_manual', __name__)

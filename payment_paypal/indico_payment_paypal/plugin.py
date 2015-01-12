@@ -20,7 +20,7 @@ from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
 from indico_payment_paypal.controllers import RHPaymentEventNotify
 from indico.util.i18n import _
@@ -48,6 +48,10 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'PayPal',
                         'url': 'https://www.paypal.com/cgi-bin/webscr'}
+
+    @property
+    def logo_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
     def get_blueprints(self):
         return blueprint

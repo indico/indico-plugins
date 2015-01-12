@@ -1,1 +1,2 @@
+graft indico_payment_manual/static
 graft indico_payment_manual/templates
