@@ -25,7 +25,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.modules.payment.notifications import notify_amount_inconsistency
-from indico.modules.payment.util import register_transaction
+from indico.modules.payment.util import register_transaction, get_registrant_params
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
@@ -113,7 +113,7 @@ class RHPaypalSuccess(RHRegistrationFormRegistrantBase):
 
     def _process(self):
         flash(_('Your payment request has been processed.'), 'success')
-        return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
+        return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
 
 
 class RHPaypalCancel(RHRegistrationFormRegistrantBase):
@@ -121,4 +121,4 @@ class RHPaypalCancel(RHRegistrationFormRegistrantBase):
 
     def _process(self):
         flash(_('You cancelled the payment process.'), 'info')
-        return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
+        return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
