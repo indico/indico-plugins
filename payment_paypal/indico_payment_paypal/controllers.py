@@ -19,15 +19,19 @@ from __future__ import unicode_literals
 from itertools import chain
 
 import requests
-from flask import request
+from flask import request, flash, redirect
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
 
-from MaKaC.conference import ConferenceHolder
-from MaKaC.webinterface.rh.base import RH
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.modules.payment.notifications import notify_amount_inconsistency
 from indico.modules.payment.util import register_transaction
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from MaKaC.conference import ConferenceHolder
+from MaKaC.webinterface.rh.base import RH
+from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegistrantBase
+
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
 
@@ -38,7 +42,7 @@ class PaypalTransactionActionMapping(object):
                'Pending': TransactionAction.pending}
 
 
-class RHPaymentEventNotify(RH):
+class RHPaypalIPN(RH):
     """Process the notification sent by the PayPal"""
 
     def _checkParams(self):
@@ -102,3 +106,19 @@ class RHPaymentEventNotify(RH):
             return False
         return (transaction.data['payment_status'] == request.form.get('payment_status') and
                 transaction.data['txn_id'] == request.form.get('txn_id'))
+
+
+class RHPaypalSuccess(RHRegistrationFormRegistrantBase):
+    """Confirmation message after successful payment"""
+
+    def _process(self):
+        flash(_('Your payment request has been processed.'), 'success')
+        return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
+
+
+class RHPaypalCancel(RHRegistrationFormRegistrantBase):
+    """Cancellation message"""
+
+    def _process(self):
+        flash(_('You cancelled the payment process.'), 'info')
+        return redirect(url_for('event.confRegistrationFormDisplay', self._conf))

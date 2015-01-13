@@ -20,11 +20,12 @@ from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
-from indico_payment_paypal.controllers import RHPaymentEventNotify
 from indico.util.i18n import _
 from indico.util.string import remove_accents
+
+from indico_payment_paypal.blueprint import blueprint
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -57,11 +58,11 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return blueprint
 
     def adjust_payment_form_data(self, data):
-        data['item_name'] = '{}: registration for {}'.format(remove_accents(data['registrant'].getFullName()),
-                                                             remove_accents(data['event'].getTitle()))
-
-
-blueprint = IndicoPluginBlueprint('payment_paypal', __name__, url_prefix='/event/<confId>/registration/payment')
-
-#: Used by PayPal to send asynchronously a notification for the transaction (pending, successful, etc)
-blueprint.add_url_rule('/notify/paypal', 'notify', RHPaymentEventNotify, methods=('GET', 'POST'))
+        event = data['event']
+        registrant = data['registrant']
+        data['item_name'] = '{}: registration for {}'.format(remove_accents(registrant.getFullName()),
+                                                             remove_accents(event.getTitle()))
+        data['return_url'] = url_for_plugin('payment_paypal.success', event, _external=True)
+        data['cancel_url'] = url_for_plugin('payment_paypal.cancel', event, _external=True)
+        data['notify_url'] = url_for_plugin('payment_paypal.notify', registrant, authkey=registrant.getRandomId(),
+                                            _external=True)
