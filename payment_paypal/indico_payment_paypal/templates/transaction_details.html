@@ -13,9 +13,11 @@
 {% endblock %}
 
 {% block warning_box %}
-    {% call warning_message() %}
-        <p>{% trans %}The paid amount does not match the required amount. Please contact the registrant to solve the issue.{% endtrans %}</p>
-        <p>{% trans %}Paid: {% endtrans %}{{ format_currency(transaction.amount, transaction.currency, locale=session.lang) }}</p>
-        <p>{% trans %}Required: {% endtrans %}{{ format_currency(registrant.getTotal(), transaction.currency, locale=session.lang) }}</p>
-    {% endcall %}
+    {% if transaction.amount != registrant.getTotal() %}
+        {% call warning_message() %}
+            <p>{% trans %}The paid amount does not match the required amount. Please contact the registrant to solve the issue.{% endtrans %}</p>
+            <p>{% trans %}Paid: {% endtrans %}{{ format_currency(transaction.amount, transaction.currency, locale=session.lang) }}</p>
+            <p>{% trans %}Required: {% endtrans %}{{ format_currency(registrant.getTotal(), transaction.currency, locale=session.lang) }}</p>
+        {% endcall %}
+    {% endif %}
 {% endblock %}
