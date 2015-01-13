@@ -2,12 +2,14 @@
 {% from 'payment/macros.html' import warning_message %}
 
 {% block details %}
-    <dt>{% trans %}Transaction ID{% endtrans %}</dt>
-    <dd>{{ transaction.data.txn_id }}</dd>
-    <dt>{% trans %}Invoice ID{% endtrans %}</dt>
-    <dd>{{ transaction.data.invoice }}</dd>
-    <dt>{% trans %}Payer e-mail{% endtrans %}</dt>
-    <dd>{{ transaction.data.payer_email }}</dd>
+    {% if not transaction.data._migrated %}
+        <dt>{% trans %}Transaction ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.txn_id }}</dd>
+        <dt>{% trans %}Invoice ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.invoice }}</dd>
+        <dt>{% trans %}Payer e-mail{% endtrans %}</dt>
+        <dd>{{ transaction.data.payer_email }}</dd>
+    {% endif %}
 {% endblock %}
 
 {% block warning_box %}
