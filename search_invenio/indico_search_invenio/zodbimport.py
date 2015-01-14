@@ -33,10 +33,11 @@ class InvenioSearchImporter(Importer):
         print cformat('%{white!}migrating settings')
         InvenioSearchPlugin.settings.delete_all()
         opts = self.zodb_root['plugins']['search']._PluginType__plugins['invenio']._PluginBase__options
-        InvenioSearchPlugin.settings.set('search_url', convert_to_unicode(opts['serverUrl'].getValue()).strip())
+        InvenioSearchPlugin.settings.set('search_url',
+                                         convert_to_unicode(opts['serverUrl']._PluginOption__value).strip())
         type_map = {'public': 'api_public',
                     'private': 'api_private',
                     'redirect': 'redirect'}
-        display_mode = type_map[opts['type'].getValue()]
+        display_mode = type_map[opts['type']._PluginOption__value]
         InvenioSearchPlugin.settings.set('display_mode', display_mode)
         db.session.commit()

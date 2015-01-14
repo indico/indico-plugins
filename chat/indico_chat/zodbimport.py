@@ -49,7 +49,7 @@ class ChatImporter(Importer):
         ChatPlugin.settings.delete_all()
         type_opts = self.zodb_root['plugins']['InstantMessaging']._PluginBase__options
         opts = self.zodb_root['plugins']['InstantMessaging']._PluginType__plugins['XMPP']._PluginBase__options
-        host = convert_to_unicode(opts['chatServerHost'].getValue())
+        host = convert_to_unicode(opts['chatServerHost']._PluginOption__value)
         ChatPlugin.settings.set('admins', convert_principal_list(opts['admins']))
         ChatPlugin.settings.set('server', host)
         ChatPlugin.settings.set('muc_server', 'conference.{}'.format(host))
@@ -61,16 +61,16 @@ class ChatImporter(Importer):
             'ckEditor': 'how_to_connect'
         }
         for old, new in settings_map.iteritems():
-            value = opts[old].getValue()
+            value = opts[old]._PluginOption__value
             if isinstance(value, basestring):
                 value = convert_to_unicode(value).strip()
             elif new == 'notify_emails':
                 value = [email for email in value if is_valid_mail(email, multi=False)]
             ChatPlugin.settings.set(new, value)
-        if opts['activateLogs'].getValue():
+        if opts['activateLogs']._PluginOption__value:
             ChatPlugin.settings.set('log_url', 'https://{}/logs/'.format(host))
         chat_links = []
-        for item in type_opts['customLinks'].getValue():
+        for item in type_opts['customLinks']._PluginOption__value:
             link = item['structure'].replace('[chatroom]', '{room}').replace('[host]', '{server}')
             link = re.sub(r'(?<!conference\.)\{server}', host, link)
             link = link.replace('conference.{server}', '{server}')  # {server} is now the MUC server

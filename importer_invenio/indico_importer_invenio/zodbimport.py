@@ -33,5 +33,6 @@ class InvenioImporter(Importer):
         print cformat('%{white!}migrating settings')
         ImporterInvenioPlugin.settings.delete_all()
         opts = self.zodb_root['plugins']['importer']._PluginType__plugins['invenio']._PluginBase__options
-        ImporterInvenioPlugin.settings.set('server_url', convert_to_unicode(opts['location'].getValue()).strip())
+        ImporterInvenioPlugin.settings.set('server_url',
+                                           convert_to_unicode(opts['location']._PluginOption__value).strip())
         db.session.commit()

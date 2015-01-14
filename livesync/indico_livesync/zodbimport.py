@@ -46,7 +46,8 @@ class LiveSyncImporter(Importer):
         print cformat('%{white!}migrating settings')
         LiveSyncPlugin.settings.delete_all()
         opts = self.zodb_root['plugins']['livesync']._PluginBase__options
-        LiveSyncPlugin.settings.set('excluded_categories', [{'id': x} for x in opts['excludedCategories'].getValue()])
+        LiveSyncPlugin.settings.set('excluded_categories',
+                                    [{'id': x} for x in opts['excludedCategories']._PluginOption__value])
         db.session.commit()
 
     def migrate_agents(self):

@@ -36,7 +36,7 @@ class PiwikImporter(Importer):
         settings_map = {'cacheEnabled': 'cache_enabled',
                         'cacheTTL': 'cache_ttl'}
         for old, new in settings_map.iteritems():
-            PiwikPlugin.settings.set(new, type_opts[old].getValue())
+            PiwikPlugin.settings.set(new, type_opts[old]._PluginOption__value)
         opts = self.zodb_root['plugins']['statistics']._PluginType__plugins['piwik']._PluginBase__options
         settings_map = {'serverAPIUrl': 'server_api_url',
                         'serverUrl': 'server_url',
@@ -46,7 +46,7 @@ class PiwikImporter(Importer):
                         'jsHookEnabled': 'enabled_for_events',
                         'downloadTrackingEnabled': 'enabled_for_downloads'}
         for old, new in settings_map.iteritems():
-            value = opts[old].getValue()
+            value = opts[old]._PluginOption__value
             if isinstance(value, basestring):
                 value = convert_to_unicode(value).strip()
             PiwikPlugin.settings.set(new, value)
