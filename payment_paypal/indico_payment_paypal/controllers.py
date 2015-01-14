@@ -77,8 +77,8 @@ class RHPaypalIPN(RH):
         self._verify_amount()
         register_transaction(event_id=request.view_args['confId'],
                              registrant_id=request.args['registrantId'],
-                             amount=request.form.get('mc_gross'),
-                             currency=request.form.get('mc_currency'),
+                             amount=float(request.form['mc_gross']),
+                             currency=request.form['mc_currency'],
                              action=PaypalTransactionActionMapping.mapping[payment_status],
                              provider='paypal',
                              data=request.form)
