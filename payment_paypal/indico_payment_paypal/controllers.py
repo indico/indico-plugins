@@ -36,10 +36,9 @@ from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegi
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
 
 
-class PaypalTransactionActionMapping(object):
-    mapping = {'Completed': TransactionAction.complete,
-               'Denied': TransactionAction.reject,
-               'Pending': TransactionAction.pending}
+paypal_transaction_action_mapping = {'Completed': TransactionAction.complete,
+                                     'Denied': TransactionAction.reject,
+                                     'Pending': TransactionAction.pending}
 
 
 class RHPaypalIPN(RH):
@@ -70,7 +69,7 @@ class RHPaypalIPN(RH):
             current_plugin.logger.info("Payment failed (status: {})\n"
                                        "Data received: {}".format(payment_status, request.form))
             return
-        if payment_status not in PaypalTransactionActionMapping.mapping:
+        if payment_status not in paypal_transaction_action_mapping:
             current_plugin.logger.warning("Payment status '{}' not recognized\n"
                                           "Data received: {}".format(payment_status, request.form))
             return
@@ -79,7 +78,7 @@ class RHPaypalIPN(RH):
                              registrant_id=request.args['registrantId'],
                              amount=float(request.form['mc_gross']),
                              currency=request.form['mc_currency'],
-                             action=PaypalTransactionActionMapping.mapping[payment_status],
+                             action=paypal_transaction_action_mapping[payment_status],
                              provider='paypal',
                              data=request.form)
 
