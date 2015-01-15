@@ -69,6 +69,10 @@ class RHPaypalIPN(RH):
             current_plugin.logger.info("Payment failed (status: {})\n"
                                        "Data received: {}".format(payment_status, request.form))
             return
+        if payment_status == 'Refunded' or float(request.form.get('mc_gross')) <= 0:
+            current_plugin.logger.warning("Payment refunded (status: {})\n"
+                                          "Data received: {}".format(payment_status, request.form))
+            return
         if payment_status not in paypal_transaction_action_mapping:
             current_plugin.logger.warning("Payment status '{}' not recognized\n"
                                           "Data received: {}".format(payment_status, request.form))
