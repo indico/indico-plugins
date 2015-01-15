@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
@@ -27,17 +27,18 @@ from indico.util.i18n import _
 from indico.util.string import remove_accents
 
 from indico_payment_paypal.blueprint import blueprint
+from indico_payment_paypal.util import validate_business
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
     url = URLField(_('API URL'), [DataRequired()], description=_('URL of the PayPal HTTP API.'))
-    business = StringField(_('Business'),
+    business = StringField(_('Business'), [Optional(), validate_business],
                            description=_('The default PayPal ID or email address associated with a PayPal account. '
                                          'Event managers will be able to override this.'))
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    business = StringField(_('Business'), [DataRequired()],
+    business = StringField(_('Business'), [DataRequired(), validate_business],
                            description=_('The PayPal ID or email address associated with a PayPal account.'))
 
 
