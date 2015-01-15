@@ -39,5 +39,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'payment_paypal = indico_payment_paypal.plugin:PaypalPaymentPlugin'}}
+    entry_points={'indico.plugins': {'payment_paypal = indico_payment_paypal.plugin:PaypalPaymentPlugin'},
+                  'indico.zodb_importers': {'payment_paypal = indico_payment_paypal.zodbimport:PaypalPaymentImporter'}}
 )
