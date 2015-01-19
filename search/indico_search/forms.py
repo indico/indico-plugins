@@ -21,7 +21,6 @@ from wtforms.fields.core import StringField, SelectField
 from wtforms.validators import Optional
 
 from indico.util.i18n import _
-from indico.util.string import strip_whitespace
 from indico.web.forms.base import IndicoForm
 
 
@@ -34,7 +33,7 @@ FIELD_CHOICES = [('', _('Anywhere')),
 
 
 class SearchForm(IndicoForm):
-    phrase = StringField(_('Phrase'), filters=[strip_whitespace])
+    phrase = StringField(_('Phrase'))
     field = SelectField(_('Search in'), choices=FIELD_CHOICES, default='')
     start_date = DateField('Start Date', [Optional()], parse_kwargs={'dayfirst': True})
     end_date = DateField('End Date', [Optional()], parse_kwargs={'dayfirst': True})

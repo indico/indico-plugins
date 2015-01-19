@@ -20,10 +20,9 @@ from wtforms.fields.core import StringField
 from wtforms.validators import DataRequired
 
 from indico.util.i18n import _
-from indico.util.string import strip_whitespace
 from indico.web.forms.base import IndicoForm
 
 
 class AgentForm(IndicoForm):
-    name = StringField(_('Name'), [DataRequired()], filters=[strip_whitespace],
+    name = StringField(_('Name'), [DataRequired()],
                        description=_("The name of the agent. Only used in the administration interface."))

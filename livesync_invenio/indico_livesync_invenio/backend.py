@@ -20,14 +20,13 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, URL
 
 from indico.util.i18n import _
-from indico.util.string import strip_whitespace
 
 from indico_livesync import LiveSyncBackendBase, MARCXMLUploader, AgentForm
 from indico_livesync_invenio.connector import InvenioConnector
 
 
 class InvenioAgentForm(AgentForm):
-    server_url = URLField(_('URL'), [DataRequired(), URL(require_tld=False)], filters=[strip_whitespace],
+    server_url = URLField(_('URL'), [DataRequired(), URL(require_tld=False)],
                           description=_("The URL of the Invenio instance"))
 
 

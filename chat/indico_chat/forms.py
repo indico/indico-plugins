@@ -24,7 +24,6 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.validators import UsedIf
 from indico.util.i18n import _
-from indico.util.string import strip_whitespace
 
 from indico_chat.models.chatrooms import Chatroom
 from indico_chat.xmpp import generate_jid, room_exists
@@ -34,22 +33,19 @@ class EditChatroomForm(IndicoForm):
     event_specific_fields = {'hidden', 'show_password'}
 
     # Room-wide options
-    name = TextField(_('Name'), [DataRequired()], filters=[strip_whitespace], description=_('The name of the room'))
-    description = TextAreaField(_('Description'), filters=[strip_whitespace],
-                                description=_('The description of the room'))
-    password = TextField(_('Password'), filters=[strip_whitespace],
-                         description=_('An optional password required to join the room'))
+    name = TextField(_('Name'), [DataRequired()], description=_('The name of the room'))
+    description = TextAreaField(_('Description'), description=_('The description of the room'))
+    password = TextField(_('Password'), description=_('An optional password required to join the room'))
     # Event-specific options
     hidden = BooleanField(_('Hidden'), description=_('Hides the room on public event pages.'))
     show_password = BooleanField(_('Show password'), description=_('Shows the room password on public event pages.'))
 
 
 class AddChatroomForm(EditChatroomForm):
-
     use_custom_server = BooleanField(_('Use custom server'))
     custom_server = TextField(_('Custom server'), [UsedIf(lambda form, field: form.use_custom_server.data),
                                                    DataRequired()],
-                              filters=[strip_whitespace, lambda x: x.lower() if x else x],
+                              filters=[lambda x: x.lower() if x else x],
                               description=_('External Jabber server.'))
 
     def __init__(self, *args, **kwargs):
