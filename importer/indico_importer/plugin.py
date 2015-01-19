@@ -30,8 +30,6 @@ class ImporterPlugin(IndicoPlugin):
     Extends Indico for other plugins to import data from external sources to
     the timetable.
     """
-
-    hidden = True
     category = PluginCategory.importers
 
     def init(self):

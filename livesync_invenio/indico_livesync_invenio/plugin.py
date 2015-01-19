@@ -26,5 +26,4 @@ class InvenioLiveSyncPlugin(LiveSyncPluginBase):
 
     Provides the Invenio backend for LiveSync
     """
-
     backend_classes = {'invenio': InvenioLiveSyncBackend}

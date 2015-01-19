@@ -77,7 +77,7 @@ class ChatPlugin(IndicoPlugin):
 
     Provides an XMPP based chat for events.
     """
-
+    configurable = True
     settings_form = SettingsForm
     settings_form_field_opts = {
         'server': {'placeholder': 'jabber.server.tld'},

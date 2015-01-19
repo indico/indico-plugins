@@ -27,6 +27,6 @@ class ImporterInvenioPlugin(ImporterSourcePluginBase):
 
     Adds Invenio importer to Indico timetable import sources.
     """
-
-    importer_engine_classes = (InvenioImporter,)
+    configurable = True
     settings_form = SettingsForm
+    importer_engine_classes = (InvenioImporter,)

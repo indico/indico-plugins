@@ -30,9 +30,7 @@ class SearchPlugin(IndicoPlugin):
 
     Provides a base for search engine plugins.
     """
-
     category = PluginCategory.search
-    hidden = True
     _engine_plugin = None  # the search engine plugin
 
     def init(self):

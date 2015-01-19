@@ -47,6 +47,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     Provides a payment method using the PayPal IPN API.
     """
+    configurable = True
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'PayPal',

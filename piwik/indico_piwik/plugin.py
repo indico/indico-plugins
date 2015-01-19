@@ -37,6 +37,7 @@ class PiwikPlugin(IndicoPlugin):
 
     Retrieves piwik statistics for conferences, meetings and contributions.
     """
+    configurable = True
     settings_form = SettingsForm
     report_script = 'index.php'
     track_script = 'piwik.php'

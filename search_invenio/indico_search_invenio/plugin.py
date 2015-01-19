@@ -44,7 +44,7 @@ class InvenioSearchPlugin(SearchPluginBase):
 
     Uses Invenio as Indico's search engine
     """
-
+    configurable = True
     settings_form = SettingsForm
     default_settings = {
         'search_url': None,
