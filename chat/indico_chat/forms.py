@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 from wtforms.fields.core import BooleanField
-from wtforms.fields.simple import TextField, TextAreaField
+from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.web.forms.base import IndicoForm, generated_data
@@ -33,9 +33,9 @@ class EditChatroomForm(IndicoForm):
     event_specific_fields = {'hidden', 'show_password'}
 
     # Room-wide options
-    name = TextField(_('Name'), [DataRequired()], description=_('The name of the room'))
+    name = StringField(_('Name'), [DataRequired()], description=_('The name of the room'))
     description = TextAreaField(_('Description'), description=_('The description of the room'))
-    password = TextField(_('Password'), description=_('An optional password required to join the room'))
+    password = StringField(_('Password'), description=_('An optional password required to join the room'))
     # Event-specific options
     hidden = BooleanField(_('Hidden'), description=_('Hides the room on public event pages.'))
     show_password = BooleanField(_('Show password'), description=_('Shows the room password on public event pages.'))
@@ -43,10 +43,10 @@ class EditChatroomForm(IndicoForm):
 
 class AddChatroomForm(EditChatroomForm):
     use_custom_server = BooleanField(_('Use custom server'))
-    custom_server = TextField(_('Custom server'), [UsedIf(lambda form, field: form.use_custom_server.data),
-                                                   DataRequired()],
-                              filters=[lambda x: x.lower() if x else x],
-                              description=_('External Jabber server.'))
+    custom_server = StringField(_('Custom server'), [UsedIf(lambda form, field: form.use_custom_server.data),
+                                                     DataRequired()],
+                                filters=[lambda x: x.lower() if x else x],
+                                description=_('External Jabber server.'))
 
     def __init__(self, *args, **kwargs):
         self._date = kwargs.pop('date')

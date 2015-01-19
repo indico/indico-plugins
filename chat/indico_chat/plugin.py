@@ -21,7 +21,7 @@ from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
 from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import URLField
-from wtforms.fields.simple import TextField, TextAreaField
+from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
@@ -46,11 +46,12 @@ from indico_chat.views import WPChatEventPage, WPChatEventMgmt
 
 class SettingsForm(IndicoForm):
     admins = PrincipalField(_('Administrators'), description=_('Users who can manage chatrooms for all events'))
-    server = TextField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
-    muc_server = TextField(_('XMPP MUC server'), [DataRequired()], description=_("The hostname of the XMPP MUC server"))
-    bot_jid = TextField(_('Bot JID'), [DataRequired()],
-                        description=_("Jabber ID of the XMPP bot. Can be just a username (in that case the default "
-                                      "server is assumed) or a username@server."))
+    server = StringField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
+    muc_server = StringField(_('XMPP MUC server'), [DataRequired()],
+                             description=_("The hostname of the XMPP MUC server"))
+    bot_jid = StringField(_('Bot JID'), [DataRequired()],
+                          description=_("Jabber ID of the XMPP bot. Can be just a username (in that case the default "
+                                        "server is assumed) or a username@server."))
     bot_password = UnsafePasswordField(_('Bot Password'), [DataRequired()], description=_("Password for the bot"))
     notify_admins = BooleanField(_('Notify admins'),
                                  description=_("Should chat administrators receive email notifications?"))
