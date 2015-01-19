@@ -101,8 +101,9 @@ def initial_export(agent_id, force=False):
     db.session.commit()
 
 
-@cli_manager.command
-def run(agent_id=None):
+@cli_manager.option('agent_id')
+@cli_manager.option('--force', action='store_true')
+def run(agent_id, force=False):
     """Runs the livesync agent"""
     update_session_options(db)
     if agent_id is None:
@@ -118,7 +119,7 @@ def run(agent_id=None):
         if agent.backend is None:
             print cformat('Skipping agent: %{red!}{}%{reset} (backend not found)').format(agent.name)
             continue
-        if not agent.initial_data_exported:
+        if not agent.initial_data_exported and not force:
             print cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name)
             continue
         print cformat('Running agent: %{white!}{}%{reset}').format(agent.name)
