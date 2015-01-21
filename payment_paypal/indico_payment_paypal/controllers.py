@@ -78,8 +78,7 @@ class RHPaypalIPN(RH):
                                           "Data received: {}".format(payment_status, request.form))
             return
         self._verify_amount()
-        register_transaction(event_id=request.view_args['confId'],
-                             registrant_id=request.args['registrantId'],
+        register_transaction(registrant=self.registrant,
                              amount=float(request.form['mc_gross']),
                              currency=request.form['mc_currency'],
                              action=paypal_transaction_action_mapping[payment_status],
@@ -100,7 +99,7 @@ class RHPaypalIPN(RH):
         if expected == amount:
             return True
         current_plugin.logger.warning("Paid amount doesn't match event's fee: {} != {}".format(amount, expected))
-        notify_amount_inconsistency(self.event, self.registrant, amount)
+        notify_amount_inconsistency(self.registrant, amount)
         return False
 
     def _is_transaction_duplicated(self):
