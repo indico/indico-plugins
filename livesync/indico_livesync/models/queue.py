@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from werkzeug.datastructures import ImmutableDict
 
-from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -38,8 +38,7 @@ class ChangeType(int, IndicoEnum):
 
 class LiveSyncQueueEntry(db.Model):
     __tablename__ = 'queues'
-    __table_args__ = (db.CheckConstraint('change IN ({})'.format(', '.join(map(str, ChangeType)))),
-                      {'schema': 'plugin_livesync'})
+    __table_args__ = {'schema': 'plugin_livesync'}
 
     #: Entry ID
     id = db.Column(
@@ -71,7 +70,7 @@ class LiveSyncQueueEntry(db.Model):
 
     #: the change type, a :class:`ChangeType`
     change = db.Column(
-        db.SmallInteger,
+        PyIntEnum(ChangeType),
         nullable=False
     )
 

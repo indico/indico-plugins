@@ -10,7 +10,9 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+
+from indico_livesync.models.queue import ChangeType
 
 
 # revision identifiers, used by Alembic.
@@ -34,14 +36,13 @@ def upgrade():
                     sa.Column('agent_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('timestamp', UTCDateTime(), nullable=False),
                     sa.Column('processed', sa.Boolean(), nullable=False),
-                    sa.Column('change', sa.SmallInteger(), nullable=False),
+                    sa.Column('change', PyIntEnum(ChangeType), nullable=False),
                     sa.Column('type', sa.String(), nullable=False),
                     sa.Column('category_id', sa.String()),
                     sa.Column('event_id', sa.String()),
                     sa.Column('contrib_id', sa.String()),
                     sa.Column('subcontrib_id', sa.String()),
                     sa.ForeignKeyConstraint(['agent_id'], ['plugin_livesync.agents.id']),
-                    sa.CheckConstraint('change IN (1, 2, 3, 4, 5, 6)'),
                     sa.PrimaryKeyConstraint('id'),
                     schema='plugin_livesync')
 
