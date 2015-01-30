@@ -462,7 +462,7 @@ function categorySearchBox(options) {
             extra.slideDown('fast');
             if (!extraConfigured) {
                 extraConfigured = true;
-                extra.width(controls.width()).position({
+                extra.css('display', 'table').position({
                     of: controls,
                     my: 'right top',
                     at: 'right bottom'
