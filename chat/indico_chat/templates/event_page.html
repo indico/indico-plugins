@@ -44,7 +44,16 @@
                 {% endif %}
                 {% if chat_links %}
                     <td style="white-space: nowrap;">
-                        <strong><a class="dropDownMenu highlight js-chat-join" href="#" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a></strong>
+                        <div class="toolbar js-chat-links" style="margin: 0; min-height: 0;">
+                            <div class="group">
+                                <a class="i-button i-button-mini arrow event-service-right-button dropDownMenu highlight js-chat-join join-button" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                                <ul class="dropdown">
+                                    {% for chat_link in chat_links %}
+                                        <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
                     </td>
                 {% endif %}
             </tr>
@@ -52,5 +61,5 @@
     </tbody>
 </table>
 <script>
-    eventChatInfo();
+    $('.js-chat-links').dropdown();
 </script>

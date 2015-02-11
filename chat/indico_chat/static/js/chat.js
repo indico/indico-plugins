@@ -18,34 +18,6 @@
 (function(global) {
     'use strict';
 
-    global.eventChatInfo = function eventChatInfo() {
-        var menu = null;
-        var links = $('#chat-info-container').data('chatLinks');
-
-        $('.js-chat-join').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var menuItems = {};
-            $.each(links, function(i, link) {
-                var action = link.link;
-                action = action.replace(/\{server\}/g, $this.data('server'));
-                action = action.replace(/\{room\}/g, $this.data('room'));
-                menuItems[i] = {display: link.title, action: action};
-            });
-
-            if (menu && menu.isOpen()) {
-                menu.close();
-                if (menu._link == this) {
-                    return;
-                }
-            }
-            menu = new PopupMenu(menuItems, [$E(this)], 'categoryDisplayPopupList', true, false, null, null, true);
-            menu._link = this;
-            var pos = $this.offset();
-            menu.open(pos.left - 3, pos.top + $this.height());
-        });
-    };
-
     global.eventManageChat = function eventManageChat() {
 
         $('.toggle-details').on('click', function(e) {
