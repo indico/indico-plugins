@@ -1,7 +1,7 @@
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
 
-<div class="plugin-chat chat-mgmt" id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}" style="margin-bottom: 2em;">
+<div class="plugin-chat chat-mgmt" style="margin-bottom: 2em;">
     <div class="groupTitle">{% trans %}Current chat rooms{% endtrans %}</div>
     {% if event_chatrooms %}
         <table class="i-table-widget fixed-width">
@@ -32,7 +32,7 @@
                                     <a href="#" class="i-button icon-remove js-chat-remove-room" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}" title="{%- trans %}Remove{% endtrans -%}"></a>
                                 </div>
                                 <div class="group">
-                                    <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join{% endtrans %}</a>
+                                    <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown">{% trans %}Join{% endtrans %}</a>
                                     <ul class="dropdown">
                                         {% for chat_link in chat_links %}
                                             <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>

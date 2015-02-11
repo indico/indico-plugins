@@ -105,9 +105,8 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_management.clone, self.extend_event_management_clone)
         self.connect(signals.event_management.management_url, self.get_event_management_url)
         self.template_hook('event-header', self.inject_event_header)
-        for wp in (WPTPLConferenceDisplay, WPXSLConferenceDisplay, WPChatEventPage, WPChatEventMgmt):
-            self.inject_css('chat_css', wp)
-            self.inject_js('chat_js', wp)
+        self.inject_css('chat_css', WPChatEventMgmt)
+        self.inject_js('chat_js', WPChatEventMgmt)
 
     def get_blueprints(self):
         return blueprint

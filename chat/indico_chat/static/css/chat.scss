@@ -1,11 +1,6 @@
 @import 'base/palette';
 
 .plugin-chat {
-
-    .chatroom + .chatroom {
-        margin-top: 5px;
-    }
-
     // Management
     &.chat-mgmt {
         .chat-custom-server {

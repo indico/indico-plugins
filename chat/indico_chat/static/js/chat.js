@@ -19,7 +19,6 @@
     'use strict';
 
     global.eventManageChat = function eventManageChat() {
-
         $('.toggle-details').on('click', function(e) {
             e.preventDefault();
             var toggler = $(this);

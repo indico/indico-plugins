@@ -17,7 +17,7 @@
             {% endif %}
         </tr>
     </thead>
-    <tbody id="chat-info-container" data-chat-links="{{ chat_links | tojson | forceescape }}">
+    <tbody>
         {% for event_chatroom in event_chatrooms %}
             {% set chatroom = event_chatroom.chatroom %}
             {% set server = chatroom.server %}
@@ -46,7 +46,7 @@
                     <td style="white-space: nowrap;">
                         <div class="toolbar js-chat-links" style="margin: 0; min-height: 0;">
                             <div class="group">
-                                <a class="i-button i-button-mini arrow event-service-right-button dropDownMenu highlight js-chat-join join-button" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                                <a class="i-button i-button-mini arrow event-service-right-button dropDownMenu highlight join-button" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
                                 <ul class="dropdown">
                                     {% for chat_link in chat_links %}
                                         <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>

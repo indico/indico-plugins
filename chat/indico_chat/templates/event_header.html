@@ -1,11 +1,11 @@
-<tr class="plugin-chat" id="chat-info-container">
+<tr>
     <td class="leftCol">{% trans %}Chat rooms{% endtrans %}</td>
     <td>
         <div>
             {% for event_chatroom in event_chatrooms %}
                 {% set chatroom = event_chatroom.chatroom %}
                 {% set server = chatroom.server %}
-                <div class="chatroom event-service-row">
+                <div class="event-service-row">
                     <div class="event-service-row-collapsed clearfix">
                         <div class="event-service-info event-service-row-toggle left">
                             <i class="icon-bubble-quote"></i>
@@ -14,7 +14,7 @@
                         <div class="event-service-toolbar toolbar right">
                             {% if chat_links %}
                                 <div class="group">
-                                    <a class="i-button i-button-small arrow event-service-right-button dropDownMenu highlight js-chat-join join-button" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                                    <a class="i-button i-button-small arrow event-service-right-button dropDownMenu highlight join-button" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
                                     <ul class="dropdown">
                                         {% for chat_link in chat_links %}
                                             <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
