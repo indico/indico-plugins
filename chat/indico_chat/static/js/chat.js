@@ -22,11 +22,6 @@
         var menu = null;
         var links = $('#chat-info-container').data('chatLinks');
 
-        $('.chat-toggle-details').on('click', function(e) {
-            e.preventDefault();
-            $(this).siblings('.chat-details').slideToggle();
-        });
-
         $('.js-chat-join').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);

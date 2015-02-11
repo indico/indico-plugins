@@ -32,7 +32,7 @@
                                     <a href="#" class="i-button icon-remove js-chat-remove-room" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}" title="{%- trans %}Remove{% endtrans -%}"></a>
                                 </div>
                                 <div class="group">
-                                    <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join now!{% endtrans %}</a>
+                                    <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown" data-server="{{ server }}" data-room="{{ chatroom.jid_node }}">{% trans %}Join{% endtrans %}</a>
                                     <ul class="dropdown">
                                         {% for chat_link in chat_links %}
                                             <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
@@ -112,7 +112,6 @@
 {% endif %}
 
 <script>
-    eventChatInfo();
     eventManageChat();
     $('.toolbar').dropdown({selector: 'a[data-toggle=dropdown]'});
     $('.details-container').hide();
