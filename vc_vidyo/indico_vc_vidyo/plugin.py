@@ -15,17 +15,18 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+import re
 
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
 from wtforms.fields.simple import StringField
-from wtforms.validators import NumberRange
+from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.util.i18n import _
-from indico.web.forms.fields import EmailListField, UnsafePasswordField
+from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico_vc_vidyo.forms import VCRoomForm
 
@@ -36,20 +37,21 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         _('Notification emails'),
         description=_('Additional email addresses who will always receive notifications (one per line)')
     )
-    username = StringField(_('Username'), description=_('Indico username for Vidyo'))
-    password = UnsafePasswordField(_('Password'), description=_('Indico password for Vidyo'))
-    admin_api_wsdl = URLField(_('Admin API WSDL URL'))
-    user_api_wsdl = URLField(_('User API WSDL URL'))
+    username = StringField(_('Username'), [DataRequired()], description=_('Indico username for Vidyo'))
+    password = IndicoPasswordField(_('Password'), [DataRequired()], toggle=True,
+                                   description=_('Indico password for Vidyo'))
+    admin_api_wsdl = URLField(_('Admin API WSDL URL'), [DataRequired()])
+    user_api_wsdl = URLField(_('User API WSDL URL'), [DataRequired()])
     indico_room_prefix = IntegerField(_('Indico rooms prefix'), [NumberRange(min=0)],
                                       description=_('The prefix for Indico rooms'))
-    room_group_name = StringField(_("Public rooms' group name"),
+    room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
                                   description=_('Group name for public video conference rooms created by Indico'))
-    authenticators = StringField(_('Authenticators'),
+    authenticators = StringField(_('Authenticators'), [DataRequired()],
                                  description=_('Authenticators to convert Indico users to Vidyo accounts'))
-    num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1)],
+    num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
                                 description=_('Number of days after an Indico event when a video conference room is '
                                               'considered old'))
-    max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1)],
+    max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1), DataRequired()],
                                      description=_('Maximum number of rooms until a warning is sent to the managers'))
     vidyo_phone_link = URLField(_('VidyoVoice phone number'),
                                 description=_('Link to the list of VidyoVoice phone numbers'))
@@ -85,6 +87,13 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     }
     vc_room_form = VCRoomForm
+
+    def get_vc_room_form_defaults(self, event):
+        return {
+            # replace invalid chars with underscore
+            'name': re.sub(r'[^\w_-]', '_', event.getTitle()),
+            'auto_mute': True
+        }
 
     @property
     def logo_url(self):

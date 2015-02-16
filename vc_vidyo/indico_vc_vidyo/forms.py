@@ -20,16 +20,20 @@ import re
 
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Regexp
+from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
-from indico.web.forms.base import IndicoForm
+from indico.modules.vc.models import VCRoom
+from indico.modules.vc.plugins import VCRoomFormBase
 from indico.util.i18n import _
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
+PIN_RE = re.compile(r'^\d+$')
+
+ERROR_MSG_PIN = _("The PIN must be a number")
 
 
-class VCRoomForm(IndicoForm):
+class VCRoomForm(VCRoomFormBase):
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
                        description=_('The name of the room'))
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
@@ -37,7 +41,15 @@ class VCRoomForm(IndicoForm):
     auto_mute = BooleanField(_('Auto mute'),
                              description=_('The VidyoDesktop clients will join the meeting muted by default '
                                            '(audio and video)'))
-    moderator_pin = IndicoPasswordField(_('Moderator PIN'), toggle=True, description=_('Used to moderate the VC Room'))
-    room_pin = IndicoPasswordField(_('Room PIN'), toggle=True,
-                                   description=_('Used to protect the access to the VC Room '
-                                                 '(leave blank for open access)'))
+    moderator_pin = IndicoPasswordField(
+        _('Moderator PIN'),
+        [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
+        toggle=True, description=_('Used to moderate the VC Room'))
+    room_pin = IndicoPasswordField(
+        _('Room PIN'),
+        [Optional(), Length(min=3, max=10), Regexp(PIN_RE, message=ERROR_MSG_PIN)],
+        toggle=True, description=_('Used to protect the access to the VC Room (leave blank for open access)'))
+
+    def validate_name(self, field):
+        if field.data and VCRoom.find_first(name=field.data):
+            raise ValidationError(_("There is already a room with this name"))
