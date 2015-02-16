@@ -16,19 +16,28 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length, Regexp
 
 from indico.web.forms.base import IndicoForm
 from indico.util.i18n import _
-from indico.web.forms.fields import SingleUserField
+from indico.web.forms.fields import PrincipalField, IndicoPasswordField
+
+ROOM_NAME_RE = re.compile(r'[\w\-]+')
 
 
 class VCRoomForm(IndicoForm):
-    name = StringField(_('Name'), [DataRequired()], description=_('The name of the room'))
-    description = TextAreaField(_('Description'), description=_('The description of the room'))
-    moderator = SingleUserField(_('Moderator'), description=_('The moderator of the room'))
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
+                       description=_('The name of the room'))
+    description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
+    moderator = PrincipalField(_('Moderator'), multiple=False, description=_('The moderator of the room'))
     auto_mute = BooleanField(_('Auto mute'),
-                             description=_('The VidyoDesktop clients will join the meeting muted by default'
+                             description=_('The VidyoDesktop clients will join the meeting muted by default '
                                            '(audio and video)'))
+    moderator_pin = IndicoPasswordField(_('Moderator PIN'), toggle=True, description=_('Used to moderate the VC Room'))
+    room_pin = IndicoPasswordField(_('Room PIN'), toggle=True,
+                                   description=_('Used to protect the access to the VC Room '
+                                                 '(leave blank for open access)'))
