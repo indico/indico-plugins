@@ -92,7 +92,11 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return {
             # replace invalid chars with underscore
             'name': re.sub(r'[^\w_-]', '_', event.getTitle()),
-            'auto_mute': True
+            'auto_mute': True,
+            'show_pin': False,
+            'show_autojoin': True,
+            'show_phone_numbers': True,
+            'show': True
         }
 
     @property
