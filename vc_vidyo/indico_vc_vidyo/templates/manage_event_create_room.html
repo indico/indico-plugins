@@ -13,7 +13,7 @@
 {%- block content %}
     {{ form_header(id='vc-room-form') }}
 
-    {{ form_rows(form, skip=form.advanced_fields) }}
+    {{ form_rows(form, skip=form.skip_fields) }}
 
     {% call form_fieldset(legend='Advanced settings') %}
         {{ form_rows(form, fields=form.advanced_fields) }}

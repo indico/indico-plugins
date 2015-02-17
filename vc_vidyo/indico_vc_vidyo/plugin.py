@@ -23,8 +23,9 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
-from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
+from indico.modules.vc.views import WPVCManageEvent
+from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.util.i18n import _
 from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
@@ -88,20 +89,30 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     }
     vc_room_form = VCRoomForm
 
+    def init(self):
+        super(VidyoPlugin, self).init()
+        self.inject_css('vc_vidyo_css', WPVCManageEvent)
+
+    @property
+    def logo_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/logo.png')
+
+    def register_assets(self):
+        self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
+
+    def get_blueprints(self):
+        return IndicoPluginBlueprint('vc_vidyo', __name__)
+
     def get_vc_room_form_defaults(self, event):
         return {
             # replace invalid chars with underscore
             'name': re.sub(r'[^\w_-]', '_', event.getTitle()),
+            'linking': 'event',
+            'contribution': '',
+            'session': '',
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,
             'show_phone_numbers': True,
             'show': True
         }
-
-    @property
-    def logo_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/logo.png')
-
-    def get_blueprints(self):
-        return IndicoPluginBlueprint('vc_vidyo', __name__)

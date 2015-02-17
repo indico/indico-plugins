@@ -1,0 +1,16 @@
+{% from 'forms/form_widget.html' import form_field %}
+{% set form = field._form %}
+{% for subfield in field %}
+    <div class="i-radio i-linking">
+        {{ subfield() }}
+        {{ subfield.label }}
+        {% if subfield.data in form.conditional_fields %}
+            {{ form_field(form[subfield.data], "i-linking-dropdown") }}
+        {% elif subfield.data == 'event' %}
+            <span class='static-text'>{{ form.event.getTitle() }}</span>
+        {% endif %}
+    </div>
+{% endfor %}
+<script>
+    $('.i-linking > .i-linking-dropdown > select > option[value=""]').prop('disabled', true);
+</script>
