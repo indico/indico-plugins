@@ -23,6 +23,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
+from indico.util.user import retrieve_principals
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
@@ -70,7 +71,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     default_settings = {
         'managers': [],
-        'authorized_users': [],
+        'acl': [],
         'notify_managers': True,
         'support_email': Config.getInstance().getSupportEmail(),
         'notification_emails': [],
