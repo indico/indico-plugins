@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import re
 
 from wtforms.fields.core import BooleanField, SelectField
-from wtforms.fields.simple import StringField, TextAreaField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
 from indico.modules.vc.models import VCRoom
@@ -30,7 +30,6 @@ from indico.web.forms.fields import PrincipalField, IndicoPasswordField, IndicoR
 from indico.web.forms.widgets import SwitchWidget, JinjaWidget
 
 
-ROOM_NAME_RE = re.compile(r'[\w\-]+')
 PIN_RE = re.compile(r'^\d+$')
 
 ERROR_MSG_PIN = _("The PIN must be a number")
@@ -43,8 +42,6 @@ class VCRoomForm(VCRoomFormBase):
     conditional_fields = {'contribution', 'session'}
     skip_fields = advanced_fields | conditional_fields
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
-                       description=_('The name of the room'))
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
 
     linking = IndicoRadioField(_("Link to"), [DataRequired()],

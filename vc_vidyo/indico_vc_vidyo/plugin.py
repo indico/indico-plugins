@@ -17,17 +17,19 @@
 from __future__ import unicode_literals
 import re
 
+from flask import render_template
+
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
 from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
-from indico.util.user import retrieve_principals
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.util.i18n import _
+from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico_vc_vidyo.forms import VCRoomForm

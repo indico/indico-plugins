@@ -16,8 +16,19 @@
 
 from __future__ import unicode_literals
 
+from wtforms.fields.core import BooleanField
+
 from indico.core.plugins import IndicoPlugin
 from indico.modules.vc import VCPluginMixin
+from indico.modules.vc.plugins import VCRoomFormBase
+from indico.util.i18n import _
+from indico.web.forms.widgets import SwitchWidget
+
+
+class VCRoomForm(VCRoomFormBase):
+    show_phone_numbers = BooleanField(_('What is your favorite color?'),
+                                      widget=SwitchWidget(),
+                                      description=_("Yes. It doesn't make any sense."))
 
 
 class DummyPlugin(VCPluginMixin, IndicoPlugin):
@@ -26,6 +37,7 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
     Dummy Video conferencing plugin
     """
     configurable = True
+    vc_room_form = VCRoomForm
 
     @property
     def logo_url(self):

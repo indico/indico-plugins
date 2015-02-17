@@ -48,3 +48,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         }
     }
 }
+
+.i-button.js-create-room {
+    line-height: 2em;
+    img {
+        vertical-align: middle;
+        width: 2em;
+    }
+}
