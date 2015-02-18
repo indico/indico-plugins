@@ -28,7 +28,7 @@ from indico.util.user import retrieve_principal
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField, IndicoRadioField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import SwitchWidget, JinjaWidget
-
+from indico_vc_vidyo.util import iter_user_identities
 
 PIN_RE = re.compile(r'^\d+$')
 
@@ -103,13 +103,9 @@ class VCRoomForm(VCRoomFormBase):
         self.linking._form = self
 
     def validate_moderator(self, field):
-        from indico_vc_vidyo.plugin import VidyoPlugin
         avatar = retrieve_principal(field.data)
         if not avatar:
             raise ValidationError(_("Unable to find this user in Indico."))
-        authenticators = (a.strip() for a in VidyoPlugin.settings.get('authenticators').split(','))
-        logins = next((identity.getLogin()
-                       for auth in authenticators
-                       for identity in avatar.getIdentityByAuthenticatorId(auth)), None)
-        if not logins:
+
+        if not next(iter_user_identities(avatar), None):
             raise ValidationError(_("This user does not have a suitable account to use Vidyo."))

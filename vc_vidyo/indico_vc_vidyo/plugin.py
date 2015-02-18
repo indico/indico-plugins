@@ -18,19 +18,25 @@ from __future__ import unicode_literals
 import re
 
 
+from flask import session
+from suds import WebFault
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
 from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
+from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
-from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.util.i18n import _
+from indico.util.user import retrieve_principal
 from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
+
+from indico_vc_vidyo.api import AdminClient
 from indico_vc_vidyo.forms import VCRoomForm
+from indico_vc_vidyo.util import iter_user_identities
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -97,6 +103,56 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     @property
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
+
+    def create_room(self, vc_room, event):
+        client = AdminClient(self.settings)
+
+        room_moderator = retrieve_principal(vc_room.data['moderator'])
+
+        for login in iter_user_identities(room_moderator):
+
+            extension = "{}{}".format(self.settings.get('indico_room_prefix'), event.id)
+
+            room_obj = client.create_room_object(
+                name=vc_room.name,
+                RoomType='Public',
+                ownerName=login,
+                extension=extension,
+                groupName=self.settings.get('room_group_name'),
+                description=vc_room.data['description'])
+
+            room_obj.RoomMode.isLocked = False
+            room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
+            room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderator_pin'] != ""
+
+            if room_obj.RoomMode.hasPIN:
+                room_obj.RoomMode.roomPIN = vc_room.data['room_pin']
+            if room_obj.RoomMode.hasModeratorPIN:
+                room_obj.RoomMode.moderatorPIN = vc_room.data['moderator_pin']
+
+            try:
+                client.add_room(room_obj)
+                break
+            except WebFault as e:
+                # TODO: handler errors on room creation
+                # - extension already used (several bookings per event)
+                # - user account not valid
+                # - room with same name (?)
+                # - ... ?
+                self.logger.exception('Problem creating the room')
+                pass
+
+            # get room back, in order to fetch Vidyo-set parameters
+            created_room = client.find_room(extension)[0]
+
+            vc_room.data.update({
+                'vidyo_id': unicode(created_room.roomID),
+                'extension': unicode(created_room.extension),
+                'url': created_room.RoomMode.roomURL,
+                'owner_identity': created_room.ownerName
+            })
+
+            client.set_automute(created_room.roomID, vc_room.data['auto_mute'])
 
     def register_assets(self):
         self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')

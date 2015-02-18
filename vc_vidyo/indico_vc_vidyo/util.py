@@ -31,3 +31,13 @@ def get_auth_users():
 def is_auth_user(user):
     """Checks if a user is authorized"""
     return any(principal.containsUser(user) for principal in get_auth_users())
+
+
+def iter_user_identities(avatar):
+    """Iterates over all existing user identities that can be used with Vidyo"""
+    from indico_vc_vidyo.plugin import VidyoPlugin
+
+    authenticators = (a.strip() for a in VidyoPlugin.settings.get('authenticators').split(','))
+    return (identity.getLogin()
+            for auth in authenticators
+            for identity in avatar.getIdentityByAuthenticatorId(auth))
