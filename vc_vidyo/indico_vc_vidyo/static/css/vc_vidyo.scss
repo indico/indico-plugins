@@ -28,9 +28,9 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         padding: 0.7em 0;
     }
     > .i-linking-dropdown,
-    > span {
+    > span.static-text {
         display: inline-block !important;
-        width: 65%;
+        width: 65% !important;
     }
     > .i-linking-dropdown > select { width: 100%; }
 

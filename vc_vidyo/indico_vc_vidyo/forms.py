@@ -27,12 +27,26 @@ from indico.modules.vc.plugins import VCRoomFormBase
 from indico.util.i18n import _
 from indico.util.user import retrieve_principal
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField, IndicoRadioField
+from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import SwitchWidget, JinjaWidget
 
 
 PIN_RE = re.compile(r'^\d+$')
 
 ERROR_MSG_PIN = _("The PIN must be a number")
+
+
+class LinkingWidget(JinjaWidget):
+    """Renders a composite radio/select field"""
+
+    def __init__(self, **context):
+        super(LinkingWidget, self).__init__('linking_widget.html', plugin='vc_vidyo', **context)
+
+    def __call__(self, field, **kwargs):
+        form = field._form
+        has_error = {subfield.data: (subfield.data in form.conditional_fields and form[subfield.data].errors)
+                     for subfield in field}
+        return super(LinkingWidget, self).__call__(field, form=form, has_error=has_error, **kwargs)
 
 
 class VCRoomForm(VCRoomFormBase):
@@ -48,9 +62,10 @@ class VCRoomForm(VCRoomFormBase):
                                choices=[('event', _("Event")),
                                         ('contribution', _("Contribution")),
                                         ('session', _("Session"))],
-                               widget=JinjaWidget('linking_widget.html', plugin='vc_vidyo'))
-    contribution = SelectField(_("Contribution"), [DataRequired()])
-    session = SelectField(_("Session"), [DataRequired()])
+                               widget=LinkingWidget())
+    contribution = SelectField(_("Contribution"),
+                               [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
+    session = SelectField(_("Session"), [UsedIf(lambda form, field: form.linking.data == 'session'), DataRequired()])
     moderator = PrincipalField(_('Moderator'), [DataRequired()], multiple=False,
                                description=_('The moderator of the room'))
     moderator_pin = IndicoPasswordField(
