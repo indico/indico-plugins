@@ -22,7 +22,6 @@ from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
-from indico.modules.vc.models import VCRoom
 from indico.modules.vc.plugins import VCRoomFormBase
 from indico.util.i18n import _
 from indico.util.user import retrieve_principal
@@ -102,10 +101,6 @@ class VCRoomForm(VCRoomFormBase):
         self.session.choices = ([('', _("Please select a session"))] +
                                 [(session.id, session.title) for session in self.event.getSessionList()])
         self.linking._form = self
-
-    def validate_name(self, field):
-        if field.data and VCRoom.find_first(name=field.data):
-            raise ValidationError(_("There is already a room with this name"))
 
     def validate_moderator(self, field):
         from indico_vc_vidyo.plugin import VidyoPlugin
