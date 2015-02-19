@@ -60,8 +60,14 @@ class AdminClient(ClientBase):
 
         return self.soap.getRooms(filter_).room
 
-    def add_room(self, room):
-        self.soap.addRoom(room)
+    def get_room(self, vidyo_id):
+        return self.soap.getRoom(vidyo_id)
+
+    def add_room(self, room_obj):
+        self.soap.addRoom(room_obj)
+
+    def update_room(self, room_id, room_obj):
+        self.soap.updateRoom(room_id, room_obj)
 
     def set_automute(self, room_id, status):
         if status:

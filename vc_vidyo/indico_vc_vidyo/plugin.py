@@ -17,8 +17,7 @@
 from __future__ import unicode_literals
 import re
 
-
-from flask import session
+from sqlalchemy.orm.attributes import flag_modified
 from suds import WebFault
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
@@ -37,6 +36,7 @@ from indico.web.forms.widgets import CKEditorWidget
 from indico_vc_vidyo.api import AdminClient
 from indico_vc_vidyo.forms import VCRoomForm
 from indico_vc_vidyo.util import iter_user_identities
+from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -132,27 +132,56 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
             try:
                 client.add_room(room_obj)
-                break
-            except WebFault as e:
-                # TODO: handler errors on room creation
-                # - extension already used (several bookings per event)
-                # - user account not valid
-                # - room with same name (?)
-                # - ... ?
+            except WebFault as err:
                 self.logger.exception('Problem creating the room')
                 pass
+                # err_msg = err.fault.faultstring
+                # if err_msg.startswith
+                # if faultString.startswith('Room exist for name'):
+                #     if VidyoOperations.roomWithSameOwner(possibleLogins[loginToUse], roomNameForVidyo):
+                #         return VidyoError("duplicatedWithOwner", "create")
+                #     else:
+                #         return VidyoError("duplicated", "create")
+
+                # elif faultString.startswith('Member not found for ownerName'):
+                #     loginToUse = loginToUse + 1
+
+                # elif faultString.startswith('PIN should be a 3-10 digit number'):
+                #         return VidyoError("PINLength", "create")
+
+                # elif faultString.startswith('Room exist for extension'):
+
 
             # get room back, in order to fetch Vidyo-set parameters
             created_room = client.find_room(extension)[0]
 
             vc_room.data.update({
                 'vidyo_id': unicode(created_room.roomID),
-                'extension': unicode(created_room.extension),
                 'url': created_room.RoomMode.roomURL,
                 'owner_identity': created_room.ownerName
             })
+            vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(created_room.extension))
+            flag_modified(vc_room, 'data')
 
             client.set_automute(created_room.roomID, vc_room.data['auto_mute'])
+            break
+
+    def update_room(self, vc_room, event):
+        client = AdminClient(self.settings)
+        vidyo_id = vc_room.data['vidyo_id']
+        try:
+            room_obj = self.get_room(vc_room)
+        except WebFault as err:
+            self.logger.exception("Unable to retrieve room with id {room.data[vidyo_id]}".format(room=room_obj))
+            # TODO: handle errors
+            pass
+
+        room_obj.name = vc_room.name
+        return client.update_room(vidyo_id, room_obj)
+
+    def get_room(self, vc_room):
+        client = AdminClient(self.settings)
+        return client.get_room(vc_room.data['vidyo_id'])
 
     def register_assets(self):
         self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')

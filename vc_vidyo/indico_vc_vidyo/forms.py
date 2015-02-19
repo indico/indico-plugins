@@ -18,34 +18,19 @@ from __future__ import unicode_literals
 
 import re
 
-from wtforms.fields.core import BooleanField, SelectField
+from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
-from indico.modules.vc.plugins import VCRoomFormBase
+from indico.modules.vc.forms import VCRoomFormBase
 from indico.util.i18n import _
 from indico.util.user import retrieve_principal
-from indico.web.forms.fields import PrincipalField, IndicoPasswordField, IndicoRadioField
-from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import SwitchWidget, JinjaWidget
+from indico.web.forms.fields import PrincipalField, IndicoPasswordField
+from indico.web.forms.widgets import SwitchWidget
 from indico_vc_vidyo.util import iter_user_identities
 
 PIN_RE = re.compile(r'^\d+$')
-
 ERROR_MSG_PIN = _("The PIN must be a number")
-
-
-class LinkingWidget(JinjaWidget):
-    """Renders a composite radio/select field"""
-
-    def __init__(self, **context):
-        super(LinkingWidget, self).__init__('linking_widget.html', plugin='vc_vidyo', **context)
-
-    def __call__(self, field, **kwargs):
-        form = field._form
-        has_error = {subfield.data: (subfield.data in form.conditional_fields and form[subfield.data].errors)
-                     for subfield in field}
-        return super(LinkingWidget, self).__call__(field, form=form, has_error=has_error, **kwargs)
 
 
 class VCRoomForm(VCRoomFormBase):
@@ -56,15 +41,6 @@ class VCRoomForm(VCRoomFormBase):
     skip_fields = advanced_fields | conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
-
-    linking = IndicoRadioField(_("Link to"), [DataRequired()],
-                               choices=[('event', _("Event")),
-                                        ('contribution', _("Contribution")),
-                                        ('session', _("Session"))],
-                               widget=LinkingWidget())
-    contribution = SelectField(_("Contribution"),
-                               [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
-    session = SelectField(_("Session"), [UsedIf(lambda form, field: form.linking.data == 'session'), DataRequired()])
     moderator = PrincipalField(_('Moderator'), [DataRequired()], multiple=False,
                                description=_('The moderator of the room'))
     moderator_pin = IndicoPasswordField(
@@ -93,14 +69,6 @@ class VCRoomForm(VCRoomFormBase):
     show = BooleanField(_('Show room'),
                         widget=SwitchWidget(),
                         description=_('Display this room on the event page'))
-
-    def __init__(self, *args, **kwargs):
-        super(VCRoomForm, self).__init__(*args, **kwargs)
-        self.contribution.choices = ([('', _("Please select a contribution"))] +
-                                     [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
-        self.session.choices = ([('', _("Please select a session"))] +
-                                [(session.id, session.title) for session in self.event.getSessionList()])
-        self.linking._form = self
 
     def validate_moderator(self, field):
         avatar = retrieve_principal(field.data)
