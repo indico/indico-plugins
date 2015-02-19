@@ -40,5 +40,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'vc_vidyo = indico_vc_vidyo.plugin:VidyoPlugin'}}
+    entry_points={'indico.plugins': {'vc_vidyo = indico_vc_vidyo.plugin:VidyoPlugin'},
+                  'indico.zodb_importers': {'vc_vidyo = indico_vc_vidyo.zodbimport:VidyoImporter'}}
 )
