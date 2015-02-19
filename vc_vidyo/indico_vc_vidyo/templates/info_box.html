@@ -1,0 +1,34 @@
+<dl>
+    <dt>{% trans %}Description{% endtrans %}</dt>
+    <dd>{{ vc_room.data.description }}</dd>
+    {% if vc_room.data.extension %}
+        <dt>{% trans %}Extension{% endtrans %}</dt>
+        <dd>{{ vc_room.data.extension }}</dd>
+    {% endif %}
+    <dt>{% trans %}Moderator{% endtrans %}</dt>
+    <dd>{{ moderator.getFullName() }}</dd>
+    <dt>{% trans %}Linked to{% endtrans %}</dt>
+    <dd>
+        {% if link_type == 'event' %}
+            {% trans %}the whole event{% endtrans %}
+        {% elif link_type == 'contribution' %}
+            {% trans %}Contribution{% endtrans %}: {{ event.getContributionById(link_id).getTitle() }}
+        {% elif link_type == 'session' %}
+            {% trans %}Session{% endtrans %}: {{ event.getSessionById(link_id).getTitle() }}
+        {% endif %}
+    </dd>
+    {% if vc_room.data.show_pin %}
+        <dt>{% trans %}Room PIN{% endtrans %}</dt>
+        <dd>{{ vc_room.data.room_pin }}</dd>
+    {% endif %}
+</dl>
+{% if vc_room.data.show_autojoin or vc_room.data.show_phone_numbers %}
+    <div class="event-service-details-buttons">
+        {% if vc_room.data.show_autojoin %}
+            <span class="clip_button i-button i-button-mini" data-link="{{vc_room.data.url }}">Copy auto-join URL</span>
+        {% endif %}
+        {% if vc_room.data.show_phone_numbers %}
+            <span class="clip_button i-button i-button-mini" data-link="{{ phone_link }}">Copy phone numbers URL</span>
+        {% endif %}
+    </div>
+{% endif %}
