@@ -232,6 +232,17 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 client.set_automute(vidyo_id, vc_room.data['auto_mute'])
                 break
 
+    def delete_room(self, vc_room, event):
+        client = AdminClient(self.settings)
+
+        vidyo_id = vc_room.data['vidyo_id']
+        try:
+            client.delete_room(vidyo_id)
+        except WebFault as err:
+            err_msg = err.fault.faultstring
+            if not err_msg.startswith('Room not found for roomID'):
+                raise
+
     def get_room(self, vc_room):
         client = AdminClient(self.settings)
         return client.get_room(vc_room.data['vidyo_id'])

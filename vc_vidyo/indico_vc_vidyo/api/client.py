@@ -69,6 +69,9 @@ class AdminClient(ClientBase):
     def update_room(self, room_id, room_obj):
         self.soap.updateRoom(room_id, room_obj)
 
+    def delete_room(self, room_id):
+        self.soap.deleteRoom(room_id)
+
     def set_automute(self, room_id, status):
         if status:
             self.soap.setRoomProfile(room_id, AUTOMUTE_API_PROFILE)
