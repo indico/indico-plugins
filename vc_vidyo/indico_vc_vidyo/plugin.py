@@ -26,6 +26,7 @@ from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
+from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.i18n import _
@@ -35,7 +36,7 @@ from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo.api import AdminClient
 from indico_vc_vidyo.forms import VCRoomForm
-from indico_vc_vidyo.util import iter_user_identities
+from indico_vc_vidyo.util import iter_user_identities, iter_extensions
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
@@ -107,12 +108,17 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def create_room(self, vc_room, event):
         client = AdminClient(self.settings)
 
-        room_moderator = retrieve_principal(vc_room.data['moderator'])
+        moderator = retrieve_principal(vc_room.data['moderator'])
 
-        for login in iter_user_identities(room_moderator):
+        login_gen = iter_user_identities(moderator)
+        login = next(login_gen, None)
+        if login is None:
+            raise VCRoomError(_("No valid account found for this moderator"), 'moderator')
 
-            extension = "{}{}".format(self.settings.get('indico_room_prefix'), event.id)
+        extension_gen = iter_extensions(self.settings.get('indico_room_prefix'), event.id)
+        extension = next(extension_gen)
 
+        while True:
             room_obj = client.create_room_object(
                 name=vc_room.name,
                 RoomType='Public',
@@ -133,51 +139,98 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             try:
                 client.add_room(room_obj)
             except WebFault as err:
-                self.logger.exception('Problem creating the room')
-                pass
-                # err_msg = err.fault.faultstring
-                # if err_msg.startswith
-                # if faultString.startswith('Room exist for name'):
-                #     if VidyoOperations.roomWithSameOwner(possibleLogins[loginToUse], roomNameForVidyo):
-                #         return VidyoError("duplicatedWithOwner", "create")
-                #     else:
-                #         return VidyoError("duplicated", "create")
+                err_msg = err.fault.faultstring
+                if err_msg.startswith('Room exist for name'):
+                    raise VCRoomError(_("Room name already in use"), field='name')
 
-                # elif faultString.startswith('Member not found for ownerName'):
-                #     loginToUse = loginToUse + 1
+                elif err_msg.startswith('Member not found for ownerName'):
+                    login = next(login_gen, None)
+                    if login is None:
+                        raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
 
-                # elif faultString.startswith('PIN should be a 3-10 digit number'):
-                #         return VidyoError("PINLength", "create")
+                elif err_msg.startswith('Room exist for extension'):
+                    extension = next(extension_gen)
 
-                # elif faultString.startswith('Room exist for extension'):
+                else:
+                    raise
 
+            else:
+                # get room back, in order to fetch Vidyo-set parameters
+                created_room = client.find_room(extension)[0]
 
-            # get room back, in order to fetch Vidyo-set parameters
-            created_room = client.find_room(extension)[0]
+                vc_room.data.update({
+                    'vidyo_id': unicode(created_room.roomID),
+                    'url': created_room.RoomMode.roomURL,
+                    'owner_identity': created_room.ownerName
+                })
+                vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(created_room.extension))
 
-            vc_room.data.update({
-                'vidyo_id': unicode(created_room.roomID),
-                'url': created_room.RoomMode.roomURL,
-                'owner_identity': created_room.ownerName
-            })
-            vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(created_room.extension))
-            flag_modified(vc_room, 'data')
-
-            client.set_automute(created_room.roomID, vc_room.data['auto_mute'])
-            break
+                client.set_automute(created_room.roomID, vc_room.data['auto_mute'])
+                break
 
     def update_room(self, vc_room, event):
         client = AdminClient(self.settings)
-        vidyo_id = vc_room.data['vidyo_id']
+
         try:
             room_obj = self.get_room(vc_room)
         except WebFault as err:
-            self.logger.exception("Unable to retrieve room with id {room.data[vidyo_id]}".format(room=room_obj))
-            # TODO: handle errors
-            pass
+            raise VCRoomError(_("This room does not exist in Vidyo."))
+
+        moderator = retrieve_principal(vc_room.data['moderator'])
+
+        changed_moderator = room_obj.ownerName not in iter_user_identities(moderator)
+        if changed_moderator:
+            login_gen = iter_user_identities(moderator)
+            login = next(login_gen)
+            if login is None:
+                raise VCRoomError(_("No valid account found for this moderator"), 'moderator')
+            room_obj.ownerName = login
 
         room_obj.name = vc_room.name
-        return client.update_room(vidyo_id, room_obj)
+        room_obj.description = vc_room.data['description']
+
+        room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
+        room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderator_pin'] != ""
+
+        if room_obj.RoomMode.hasPIN:
+            room_obj.RoomMode.roomPIN = vc_room.data['room_pin']
+        if room_obj.RoomMode.hasModeratorPIN:
+            room_obj.RoomMode.moderatorPIN = vc_room.data['moderator_pin']
+
+        vidyo_id = vc_room.data['vidyo_id']
+        while True:
+            try:
+                client.update_room(vidyo_id, room_obj)
+            except WebFault as err:
+                err_msg = err.fault.faultstring
+                if err_msg.startswith('Room not exist for roomID'):
+                    raise VCRoomError(_("This room does not exist in Vidyo."))
+
+                elif err_msg.startswith('Room exist for name'):
+                    raise VCRoomError(_("Room name already in use"), field='name')
+
+                elif err_msg.startswith('Member not found for ownerName'):
+                    if changed_moderator:
+                        login = next(login_gen, None)
+                    if not changed_moderator or login is None:
+                        raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
+                    room_obj.ownerName = login
+
+                else:
+                    raise
+
+            else:
+                updated_room = self.get_room(vc_room)
+
+                vc_room.data.update({
+                    'url': updated_room.RoomMode.roomURL,
+                    'owner_identity': updated_room.ownerName
+                })
+                vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(updated_room.extension))
+                flag_modified(vc_room, 'data')
+
+                client.set_automute(vidyo_id, vc_room.data['auto_mute'])
+                break
 
     def get_room(self, vc_room):
         client = AdminClient(self.settings)
