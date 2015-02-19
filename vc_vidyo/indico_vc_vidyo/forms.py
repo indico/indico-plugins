@@ -37,8 +37,7 @@ class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Vidyo booking"""
 
     advanced_fields = {'show_pin', 'show_autojoin', 'show_phone_numbers', 'show'}
-    conditional_fields = {'contribution', 'session'}
-    skip_fields = advanced_fields | conditional_fields
+    skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
     moderator = PrincipalField(_('Moderator'), [DataRequired()], multiple=False,
