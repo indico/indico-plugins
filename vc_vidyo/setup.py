@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=1.9.1',
-        'sleekxmpp'
+        'suds-jurko'
     ],
     classifiers=[
         'Environment :: Plugins',
