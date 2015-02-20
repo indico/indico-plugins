@@ -31,8 +31,8 @@ def obj_ref(obj, parent=None):
     elif isinstance(obj, Conference):
         ref = {'type': 'event', 'event_id': obj.id}
     elif isinstance(obj, Contribution):
-        event = parent or obj.getConference().id
-        ref = {'type': 'contribution', 'event_id': event, 'contrib_id': obj.id}
+        event = parent or obj.getConference()
+        ref = {'type': 'contribution', 'event_id': event.id, 'contrib_id': obj.id}
     elif isinstance(obj, SubContribution):
         contrib = parent or obj.getContribution()
         ref = {'type': 'subcontribution',
