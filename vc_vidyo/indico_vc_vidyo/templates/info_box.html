@@ -12,9 +12,9 @@
         {% if event_vc_room.link_type.name == 'event' %}
             {% trans %}the whole event{% endtrans %}
         {% elif event_vc_room.link_type.name == 'contribution' %}
-            {% trans %}Contribution{% endtrans %}: {{ event.getContributionById(event_vc_room.link_id).getTitle() }}
+            {% trans %}Contribution{% endtrans %}: {{ event_vc_room.link_object.getTitle() }}
         {% elif event_vc_room.link_type.name == 'block' %}
-            {% trans %}Session{% endtrans %}: {{ event.getSessionById(event_vc_room.link_id).getTitle() }}
+            {% trans %}Session{% endtrans %}: {{ event_vc_room.link_object.getFullTitle() }}
         {% endif %}
     </dd>
     {% if vc_room.data.show_pin %}
@@ -25,17 +25,17 @@
         <dt class="large-row">Auto-join URL</dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
-                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}">
+                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" disabled/>
                 <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
             </div>
             <span class="vc-room-url-copied">Copied!</span>
         </dd>
     {% endif %}
-    {% if vc_room.data.show_phone_numbers %}
+    {% if vc_room.data.show_phone_numbers and phone_link %}
         <dt class="large-row">Phone numbers</dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
-                <input name="vc-room-phones-url" type="text" value="{{ phone_link }}">
+                <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" disabled/>
                 <button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ phone_link }}"></button>
             </div>
             <span class="vc-room-url-copied">Copied!</span>
