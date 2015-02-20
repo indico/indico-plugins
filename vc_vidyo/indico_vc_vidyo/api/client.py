@@ -16,6 +16,7 @@
 
 import re
 
+from suds import WebFault
 from suds.client import Client
 from suds.transport.https import HttpAuthenticated
 
@@ -23,6 +24,27 @@ from indico_vc_vidyo.api.cache import SudsCache
 
 DEFAULT_CLIENT_TIMEOUT = 30
 AUTOMUTE_API_PROFILE = "NoAudioAndVideo"
+
+
+class APIException(Exception):
+    pass
+
+
+class RoomNotFoundAPIException(APIException):
+    pass
+
+
+def raises_api_error(wrapped):
+    def _wrapper(*args, **kwargs):
+        try:
+            return wrapped(*args, **kwargs)
+        except WebFault as err:
+            err_msg = err.fault.faultstring
+            if err_msg.startswith('Room not found for roomID'):
+                raise RoomNotFoundAPIException()
+            else:
+                raise APIException(err_msg)
+    return _wrapper
 
 
 class ClientBase(object):
@@ -53,6 +75,7 @@ class AdminClient(ClientBase):
 
         return room
 
+    @raises_api_error
     def find_room(self, extension):
         filter_ = self.client.factory.create('Filter')
         filter_.query = extension
@@ -60,18 +83,23 @@ class AdminClient(ClientBase):
 
         return self.soap.getRooms(filter_).room
 
+    @raises_api_error
     def get_room(self, vidyo_id):
         return self.soap.getRoom(vidyo_id)
 
+    @raises_api_error
     def add_room(self, room_obj):
         self.soap.addRoom(room_obj)
 
+    @raises_api_error
     def update_room(self, room_id, room_obj):
         self.soap.updateRoom(room_id, room_obj)
 
+    @raises_api_error
     def delete_room(self, room_id):
         self.soap.deleteRoom(room_id)
 
+    @raises_api_error
     def get_automute(self, room_id):
         answer = self.soap.getRoomProfile(room_id)
         if answer:
@@ -79,6 +107,7 @@ class AdminClient(ClientBase):
         else:
             return False
 
+    @raises_api_error
     def set_automute(self, room_id, status):
         if status:
             self.soap.setRoomProfile(room_id, AUTOMUTE_API_PROFILE)

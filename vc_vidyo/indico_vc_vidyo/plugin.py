@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 import re
 
 from sqlalchemy.orm.attributes import flag_modified
-from suds import WebFault
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
 from wtforms.fields.simple import StringField
@@ -26,7 +25,7 @@ from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
-from indico.modules.vc.exceptions import VCRoomError
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.i18n import _
@@ -34,7 +33,7 @@ from indico.util.user import retrieve_principal
 from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
-from indico_vc_vidyo.api import AdminClient
+from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.forms import VCRoomForm
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
@@ -138,19 +137,17 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
             try:
                 client.add_room(room_obj)
-            except WebFault as err:
-                err_msg = err.fault.faultstring
+            except APIException as err:
+                err_msg = err.message
+
                 if err_msg.startswith('Room exist for name'):
                     raise VCRoomError(_("Room name already in use"), field='name')
-
                 elif err_msg.startswith('Member not found for ownerName'):
                     login = next(login_gen, None)
                     if login is None:
                         raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
-
                 elif err_msg.startswith('Room exist for extension'):
                     extension = next(extension_gen)
-
                 else:
                     raise
 
@@ -173,8 +170,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
         try:
             room_obj = self.get_room(vc_room)
-        except WebFault as err:
-            raise VCRoomError(_("This room does not exist in Vidyo."))
+        except RoomNotFoundAPIException:
+            raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
 
         moderator = retrieve_principal(vc_room.data['moderator'])
 
@@ -201,12 +198,11 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         while True:
             try:
                 client.update_room(vidyo_id, room_obj)
-            except WebFault as err:
-                err_msg = err.fault.faultstring
-                if err_msg.startswith('Room not exist for roomID'):
-                    raise VCRoomError(_("This room does not exist in Vidyo."))
-
-                elif err_msg.startswith('Room exist for name'):
+            except RoomNotFoundAPIException:
+                raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
+            except APIException as err:
+                err_msg = err.message
+                if err_msg.startswith('Room exist for name'):
                     raise VCRoomError(_("Room name already in use"), field='name')
 
                 elif err_msg.startswith('Member not found for ownerName'):
@@ -218,7 +214,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
                 else:
                     raise
-
             else:
                 updated_room_obj = self.get_room(vc_room)
 
@@ -232,10 +227,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         client = AdminClient(self.settings)
         try:
             room_obj = self.get_room(vc_room)
-        except WebFault as err:
-            err_msg = err.fault.faultstring
-            if not err_msg.startswith('Room not found for roomID'):
-                raise
+        except RoomNotFoundAPIException:
+            raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
 
         update_room_from_obj(self.settings, vc_room, room_obj)
         vc_room.data['auto_mute'] = client.get_automute(room_obj.roomID)
@@ -247,10 +240,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         vidyo_id = vc_room.data['vidyo_id']
         try:
             client.delete_room(vidyo_id)
-        except WebFault as err:
-            err_msg = err.fault.faultstring
-            if not err_msg.startswith('Room not found for roomID'):
-                raise
+        except RoomNotFoundAPIException:
+            pass
 
     def get_room(self, vc_room):
         client = AdminClient(self.settings)

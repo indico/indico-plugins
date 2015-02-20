@@ -82,7 +82,7 @@ class VidyoImporter(Importer):
             'show': not booking._hidden,
             'moderator': ('Avatar', booking._owner.id),
             'owner_identity': booking._ownerVidyoAccount,
-            'auto_mute': booking_params['autoMute']
+            'auto_mute': booking_params.get('autoMute', True)
         }
         db.session.add(vc_room)
         db.session.flush()
@@ -98,8 +98,9 @@ class VidyoImporter(Importer):
             event_vc_room = VCRoomEventAssociation(
                 event_id=booking._conf.id,
                 vc_room=vc_room,
-                link_type=VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]),
-                link_id=(extract_id(booking._linkVideoId) if booking._linkVideoType != 'event' else None)
+                link_type=(VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType])
+                           if booking._linkVideoType else VCRoomLinkType.event),
+                link_id=(extract_id(booking._linkVideoId) if booking._linkVideoType not in ('event', None) else None)
             )
             db.session.add(event_vc_room)
             print cformat('  + %{red!}{}%{reset} [%{yellow}{}%{reset}]').format(
