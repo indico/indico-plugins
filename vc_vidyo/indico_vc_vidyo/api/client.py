@@ -72,6 +72,13 @@ class AdminClient(ClientBase):
     def delete_room(self, room_id):
         self.soap.deleteRoom(room_id)
 
+    def get_automute(self, room_id):
+        answer = self.soap.getRoomProfile(room_id)
+        if answer:
+            return answer.roomProfileName == AUTOMUTE_API_PROFILE
+        else:
+            return False
+
     def set_automute(self, room_id, status):
         if status:
             self.soap.setRoomProfile(room_id, AUTOMUTE_API_PROFILE)

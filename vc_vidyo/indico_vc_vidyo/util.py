@@ -16,7 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.util.user import retrieve_principals
+from indico.util.user import retrieve_principals, principal_to_tuple
+from indico.core.config import Config
+
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 
 def get_auth_users():
@@ -43,10 +46,45 @@ def iter_user_identities(avatar):
             for identity in avatar.getIdentityByAuthenticatorId(auth))
 
 
+def get_avatar_from_identity(settings, identity):
+    """Get an actual avatar object from an auth identity"""
+    authenticators = list(auth.strip() for auth in settings.get('authenticators').split(','))
+    return next((avatar for auth_id, avatar in AuthenticatorMgr().getAvatarByLogin(identity, authenticators).iteritems()
+                if avatar is not None), None)
+
+
 def iter_extensions(prefix, event_id):
+    """Return extension (prefix + event_id) with an optional suffix which is
+       incremented step by step in case of collision
+    """
     extension = '{prefix}{event_id}'.format(prefix=prefix, event_id=event_id,)
     yield extension
     suffix = 1
     while True:
         yield '{extension}{suffix}'.format(extension=extension, suffix=suffix)
         suffix += 1
+
+
+def update_room_from_obj(settings, vc_room, room_obj):
+    """Updates a VCRoom DB object using a SOAP room object returned by the API"""
+    config = Config.getInstance()
+
+    vc_room.name = room_obj.name
+
+    if room_obj.ownerName != vc_room.data['owner_identity']:
+        print room_obj.ownerName
+        avatar = get_avatar_from_identity(settings, room_obj.ownerName)
+        # if the moderator does not exist any more (e.g. was changed on the server),
+        # use the janitor user as a placeholder
+        vc_room.data['moderator'] = (('Avatar', config.getJanitorUserId()) if avatar is None
+                                     else principal_to_tuple(avatar))
+
+    vc_room.data.update({
+        'description': room_obj.description,
+        'vidyo_id': unicode(room_obj.roomID),
+        'url': room_obj.RoomMode.roomURL,
+        'owner_identity': room_obj.ownerName,
+        'room_pin': room_obj.RoomMode.roomPIN if room_obj.RoomMode.hasPIN else "",
+        'moderator_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
+    })
+    vc_room.vidyo_extension.value = int(room_obj.extension)

@@ -36,7 +36,7 @@ from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo.api import AdminClient
 from indico_vc_vidyo.forms import VCRoomForm
-from indico_vc_vidyo.util import iter_user_identities, iter_extensions
+from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
@@ -181,9 +181,9 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         changed_moderator = room_obj.ownerName not in iter_user_identities(moderator)
         if changed_moderator:
             login_gen = iter_user_identities(moderator)
-            login = next(login_gen)
+            login = next(login_gen, None)
             if login is None:
-                raise VCRoomError(_("No valid account found for this moderator"), 'moderator')
+                raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
             room_obj.ownerName = login
 
         room_obj.name = vc_room.name
@@ -220,17 +220,26 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                     raise
 
             else:
-                updated_room = self.get_room(vc_room)
+                updated_room_obj = self.get_room(vc_room)
 
-                vc_room.data.update({
-                    'url': updated_room.RoomMode.roomURL,
-                    'owner_identity': updated_room.ownerName
-                })
-                vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(updated_room.extension))
+                update_room_from_obj(self.settings, vc_room, updated_room_obj)
                 flag_modified(vc_room, 'data')
 
                 client.set_automute(vidyo_id, vc_room.data['auto_mute'])
                 break
+
+    def refresh_room(self, vc_room, event):
+        client = AdminClient(self.settings)
+        try:
+            room_obj = self.get_room(vc_room)
+        except WebFault as err:
+            err_msg = err.fault.faultstring
+            if not err_msg.startswith('Room not found for roomID'):
+                raise
+
+        update_room_from_obj(self.settings, vc_room, room_obj)
+        vc_room.data['auto_mute'] = client.get_automute(room_obj.roomID)
+        flag_modified(vc_room, 'data')
 
     def delete_room(self, vc_room, event):
         client = AdminClient(self.settings)
