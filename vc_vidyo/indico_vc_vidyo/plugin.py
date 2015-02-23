@@ -110,9 +110,9 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
         vc_room.data.update({key: data.pop(key) for key in [
             'description',
-            'moderator',
+            'owner',
             'room_pin',
-            'moderator_pin',
+            'moderation_pin',
             'auto_mute'
         ]})
 
@@ -128,12 +128,12 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def create_room(self, vc_room, event):
         client = AdminClient(self.settings)
 
-        moderator = retrieve_principal(vc_room.data['moderator'])
+        owner = retrieve_principal(vc_room.data['owner'])
 
-        login_gen = iter_user_identities(moderator)
+        login_gen = iter_user_identities(owner)
         login = next(login_gen, None)
         if login is None:
-            raise VCRoomError(_("No valid account found for this moderator"), 'moderator')
+            raise VCRoomError(_("No valid Vidyo account found for this user"), 'owner')
 
         extension_gen = iter_extensions(self.settings.get('indico_room_prefix'), event.id)
         extension = next(extension_gen)
@@ -149,12 +149,12 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
             room_obj.RoomMode.isLocked = False
             room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
-            room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderator_pin'] != ""
+            room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderation_pin'] != ""
 
             if room_obj.RoomMode.hasPIN:
                 room_obj.RoomMode.roomPIN = vc_room.data['room_pin']
             if room_obj.RoomMode.hasModeratorPIN:
-                room_obj.RoomMode.moderatorPIN = vc_room.data['moderator_pin']
+                room_obj.RoomMode.moderatorPIN = vc_room.data['moderation_pin']
 
             try:
                 client.add_room(room_obj)
@@ -166,7 +166,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 elif err_msg.startswith('Member not found for ownerName'):
                     login = next(login_gen, None)
                     if login is None:
-                        raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
+                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
                 elif err_msg.startswith('Room exist for extension'):
                     extension = next(extension_gen)
                 else:
@@ -194,26 +194,26 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         except RoomNotFoundAPIException:
             raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
 
-        moderator = retrieve_principal(vc_room.data['moderator'])
+        owner = retrieve_principal(vc_room.data['owner'])
 
-        changed_moderator = room_obj.ownerName not in iter_user_identities(moderator)
-        if changed_moderator:
-            login_gen = iter_user_identities(moderator)
+        changed_owner = room_obj.ownerName not in iter_user_identities(owner)
+        if changed_owner:
+            login_gen = iter_user_identities(owner)
             login = next(login_gen, None)
             if login is None:
-                raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
+                raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
             room_obj.ownerName = login
 
         room_obj.name = vc_room.name
         room_obj.description = vc_room.data['description']
 
         room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
-        room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderator_pin'] != ""
+        room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderation_pin'] != ""
 
         if room_obj.RoomMode.hasPIN:
             room_obj.RoomMode.roomPIN = vc_room.data['room_pin']
         if room_obj.RoomMode.hasModeratorPIN:
-            room_obj.RoomMode.moderatorPIN = vc_room.data['moderator_pin']
+            room_obj.RoomMode.moderatorPIN = vc_room.data['moderation_pin']
 
         vidyo_id = vc_room.data['vidyo_id']
         while True:
@@ -227,10 +227,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                     raise VCRoomError(_("Room name already in use"), field='name')
 
                 elif err_msg.startswith('Member not found for ownerName'):
-                    if changed_moderator:
+                    if changed_owner:
                         login = next(login_gen, None)
-                    if not changed_moderator or login is None:
-                        raise VCRoomError(_("No valid account found for this moderator"), field='moderator')
+                    if not changed_owner or login is None:
+                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
                     room_obj.ownerName = login
 
                 else:

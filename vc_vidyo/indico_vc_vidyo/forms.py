@@ -40,11 +40,11 @@ class VCRoomForm(VCRoomFormBase):
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
-    moderator = PrincipalField(_('Moderator'), [DataRequired()], multiple=False,
-                               description=_('The moderator of the room'))
-    moderator_pin = IndicoPasswordField(_('Moderator PIN'),
-                                        [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
-                                        toggle=True, description=_('Used to moderate the VC Room'))
+    owner = PrincipalField(_('Owner'), [DataRequired()], multiple=False,
+                           description=_('The owner of the room'))
+    moderation_pin = IndicoPasswordField(_('Moderation PIN'),
+                                         [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
+                                         toggle=True, description=_('Used to moderate the VC Room'))
     room_pin = IndicoPasswordField(
         _('Room PIN'), [Optional(), Length(min=3, max=10), Regexp(PIN_RE, message=ERROR_MSG_PIN)],
         toggle=True, description=_('Used to protect the access to the VC Room (leave blank for open access)'))
@@ -64,7 +64,7 @@ class VCRoomForm(VCRoomFormBase):
                                       widget=SwitchWidget(),
                                       description=_("Show a link to the list of phone access numbers"))
 
-    def validate_moderator(self, field):
+    def validate_owner(self, field):
         avatar = retrieve_principal(field.data)
         if not avatar:
             raise ValidationError(_("Unable to find this user in Indico."))

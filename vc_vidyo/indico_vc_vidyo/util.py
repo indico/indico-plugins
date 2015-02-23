@@ -72,11 +72,10 @@ def update_room_from_obj(settings, vc_room, room_obj):
     vc_room.name = room_obj.name
 
     if room_obj.ownerName != vc_room.data['owner_identity']:
-        print room_obj.ownerName
         avatar = get_avatar_from_identity(settings, room_obj.ownerName)
-        # if the moderator does not exist any more (e.g. was changed on the server),
+        # if the owner does not exist any more (e.g. was changed on the server),
         # use the janitor user as a placeholder
-        vc_room.data['moderator'] = (('Avatar', config.getJanitorUserId()) if avatar is None
+        vc_room.data['owner'] = (('Avatar', config.getJanitorUserId()) if avatar is None
                                      else principal_to_tuple(avatar))
 
     vc_room.data.update({
@@ -85,6 +84,6 @@ def update_room_from_obj(settings, vc_room, room_obj):
         'url': room_obj.RoomMode.roomURL,
         'owner_identity': room_obj.ownerName,
         'room_pin': room_obj.RoomMode.roomPIN if room_obj.RoomMode.hasPIN else "",
-        'moderator_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
+        'moderation_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
     })
     vc_room.vidyo_extension.value = int(room_obj.extension)

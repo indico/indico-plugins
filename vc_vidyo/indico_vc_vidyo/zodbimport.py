@@ -74,13 +74,13 @@ class VidyoImporter(Importer):
             'description': booking_params['roomDescription'],
             'room_pin': booking._pin,
             'display_pin': booking_params['displayPin'],
-            'moderator_pin': booking._moderatorPin,
+            'moderation_pin': booking._moderatorPin,
             'show_phone_numbers': booking_params['displayPhoneNumbers'],
             'show_autojoin': booking_params['displayURL'],
             'vidyo_id': booking._roomId,
             'url': booking._url,
             'show': not booking._hidden,
-            'moderator': ('Avatar', booking._owner.id),
+            'owner': ('Avatar', booking._owner.id),
             'owner_identity': booking._ownerVidyoAccount,
             'auto_mute': booking_params.get('autoMute', True)
         }
