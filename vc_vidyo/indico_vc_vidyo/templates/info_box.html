@@ -32,7 +32,7 @@
         </dd>
     {% endif %}
     {% if vc_room.data.show_phone_numbers and phone_link %}
-        <dt class="large-row">Phone numbers</dt>
+        <dt class="large-row"><a href="{{ phone_link }}" target="_blank">Phone numbers</a></dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
                 <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" disabled/>
