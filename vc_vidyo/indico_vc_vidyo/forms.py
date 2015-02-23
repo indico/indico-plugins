@@ -36,26 +36,24 @@ ERROR_MSG_PIN = _("The PIN must be a number")
 class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Vidyo booking"""
 
-    advanced_fields = {'show_pin', 'show_autojoin', 'show_phone_numbers', 'show'}
+    advanced_fields = {'show_pin', 'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
     moderator = PrincipalField(_('Moderator'), [DataRequired()], multiple=False,
                                description=_('The moderator of the room'))
-    moderator_pin = IndicoPasswordField(
-        _('Moderator PIN'),
-        [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
-        toggle=True, description=_('Used to moderate the VC Room'))
+    moderator_pin = IndicoPasswordField(_('Moderator PIN'),
+                                        [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
+                                        toggle=True, description=_('Used to moderate the VC Room'))
     room_pin = IndicoPasswordField(
-        _('Room PIN'),
-        [Optional(), Length(min=3, max=10), Regexp(PIN_RE, message=ERROR_MSG_PIN)],
+        _('Room PIN'), [Optional(), Length(min=3, max=10), Regexp(PIN_RE, message=ERROR_MSG_PIN)],
         toggle=True, description=_('Used to protect the access to the VC Room (leave blank for open access)'))
     auto_mute = BooleanField(_('Auto mute'),
                              widget=SwitchWidget(_('On'), _('Off')),
                              description=_('The VidyoDesktop clients will join the VC room muted by default '
                                            '(audio and video)'))
 
-    # Advanced options
+    # Advanced options (per event)
     show_pin = BooleanField(_('Show PIN'),
                             widget=SwitchWidget(),
                             description=_("Show the VC Room PIN on the event page (insecure!)"))
@@ -65,9 +63,6 @@ class VCRoomForm(VCRoomFormBase):
     show_phone_numbers = BooleanField(_('Show Phone Access numbers'),
                                       widget=SwitchWidget(),
                                       description=_("Show a link to the list of phone access numbers"))
-    show = BooleanField(_('Show room'),
-                        widget=SwitchWidget(),
-                        description=_('Display this room on the event page'))
 
     def validate_moderator(self, field):
         avatar = retrieve_principal(field.data)

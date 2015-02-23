@@ -104,6 +104,27 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
+    def handle_form_data(self, event, vc_room, event_vc_room, data):
+
+        super(VidyoPlugin, self).handle_form_data(event, vc_room, event_vc_room, data)
+
+        vc_room.data.update({key: data.pop(key) for key in [
+            'description',
+            'moderator',
+            'room_pin',
+            'moderator_pin',
+            'auto_mute'
+        ]})
+
+        event_vc_room.data.update({key: data.pop(key) for key in [
+            'show_pin',
+            'show_autojoin',
+            'show_phone_numbers'
+        ]})
+
+        flag_modified(vc_room, 'data')
+        flag_modified(event_vc_room, 'data')
+
     def create_room(self, vc_room, event):
         client = AdminClient(self.settings)
 
@@ -254,15 +275,14 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return IndicoPluginBlueprint('vc_vidyo', __name__)
 
     def get_vc_room_form_defaults(self, event):
-        return {
+        defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
+        defaults.update({
             # replace invalid chars with underscore
             'name': re.sub(r'[^\w_-]', '_', event.getTitle()),
-            'linking': 'event',
-            'contribution': '',
-            'session': '',
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,
-            'show_phone_numbers': True,
-            'show': True
-        }
+            'show_phone_numbers': True
+        })
+
+        return defaults
