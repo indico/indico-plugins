@@ -50,8 +50,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                    description=_('Indico password for Vidyo'))
     admin_api_wsdl = URLField(_('Admin API WSDL URL'), [DataRequired()])
     user_api_wsdl = URLField(_('User API WSDL URL'), [DataRequired()])
-    indico_room_prefix = IntegerField(_('Indico rooms prefix'), [NumberRange(min=0)],
-                                      description=_('The prefix for Indico rooms'))
+    indico_room_prefix = IntegerField(_('Indico tenant prefix'), [NumberRange(min=0)],
+                                      description=_('The tenant prefix for Indico rooms created on this server'))
     room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
                                   description=_('Group name for public video conference rooms created by Indico'))
     authenticators = StringField(_('Authenticators'), [DataRequired()],
