@@ -3,9 +3,9 @@
 <dl>
     <dt>{% trans %}Description{% endtrans %}</dt>
     <dd>{{ vc_room.data.description }}</dd>
-    {% if vc_room.data.extension %}
+    {% if vc_room.vidyo_extension %}
         <dt>{% trans %}Extension{% endtrans %}</dt>
-        <dd>{{ vc_room.data.extension }}</dd>
+        <dd>{{ vc_room.vidyo_extension.value }}</dd>
     {% endif %}
     <dt>{% trans %}Moderator{% endtrans %}</dt>
     <dd>{{ owner.getFullName() }}</dd>
