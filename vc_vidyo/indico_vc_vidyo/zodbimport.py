@@ -28,6 +28,8 @@ from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 from indico_vc_vidyo.plugin import VidyoPlugin
 from indico_zodbimport import Importer
 
+from MaKaC.conference import ConferenceHolder
+
 
 LINKED_ID_RE = re.compile(r'.*[st](\w+)$')
 MAP_LINK_TYPES = {
@@ -92,11 +94,19 @@ class VidyoImporter(Importer):
         return vc_room
 
     def migrate_event_bookings(self, vc_room, bookings):
+        ch_idx = self.zodb_root['conferences']
         for booking in bookings:
             booking_params = booking._bookingParams
 
             link_type = (VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]) if booking._linkVideoType
                          else VCRoomLinkType.event)
+
+            if booking._conf.id not in ch_idx:
+                print cformat(
+                    "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to event '{}' but the latter seems to have been"
+                    " deleted. Removing link."
+                ).format(vc_room, booking._conf.id)
+                continue
 
             if link_type == VCRoomLinkType.event:
                 extracted_id = None
