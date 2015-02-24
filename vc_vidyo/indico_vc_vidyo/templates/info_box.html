@@ -27,20 +27,22 @@
         <dt class="large-row">Auto-join URL</dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
-                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" disabled/>
-                <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+                <div class="form-field-with-addon-wrapper">
+                    <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly="readonly"/><button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+                </div>
+                <span class="button-info-message">Copied!</span>
             </div>
-            <span class="vc-room-url-copied">Copied!</span>
         </dd>
     {% endif %}
     {% if event_vc_room.data.show_phone_numbers and phone_link %}
         <dt class="large-row"><a href="{{ phone_link }}" target="_blank">Phone numbers</a></dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
-                <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" disabled/>
-                <button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ phone_link }}"></button>
+                <div class="form-field-with-addon-wrapper">
+                    <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" readonly="readonly"/><button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ phone_link }}"></button>
+                </div>
+                <span class="button-info-message">Copied!</span>
             </div>
-            <span class="vc-room-url-copied">Copied!</span>
         </dd>
     {% endif %}
 </dl>
