@@ -1,3 +1,5 @@
+{% set owner = retrieve_principal(vc_room.data['owner']) %}
+{% set phone_link = settings.get('vidyo_phone_link') %}
 <dl>
     <dt>{% trans %}Description{% endtrans %}</dt>
     <dd>{{ vc_room.data.description }}</dd>
@@ -6,7 +8,7 @@
         <dd>{{ vc_room.data.extension }}</dd>
     {% endif %}
     <dt>{% trans %}Moderator{% endtrans %}</dt>
-    <dd>{{ moderator.getFullName() }}</dd>
+    <dd>{{ owner.getFullName() }}</dd>
     <dt>{% trans %}Linked to{% endtrans %}</dt>
     <dd>
         {% if event_vc_room.link_type.name == 'event' %}
