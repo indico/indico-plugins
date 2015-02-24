@@ -1,0 +1,57 @@
+{% set owner = retrieve_principal(vc_room.data['owner']) %}
+{% set phone_link = settings.get('vidyo_phone_link') %}
+<dl class="details-container">
+    <dt>{% trans %}Description{% endtrans %}</dt>
+    <dd>{{ vc_room.data.description }}</dd>
+    <dt>{% trans %}Extension{% endtrans %}</dt>
+    <dd>{{ vc_room.vidyo_extension.value }}</dd>
+    <dt>{% trans %}Moderator{% endtrans %}</dt>
+    <dd>{{ owner.getFullName() }}</dd>
+    <dt>Vidyo ID</dt>
+    <dd>{{ vc_room.data.vidyo_id }}</dd>
+    <dt>{% trans %}Linked to{% endtrans %}</dt>
+    <dd>
+        {% if event_vc_room.link_type.name == 'event' %}
+            {% trans %}the whole event{% endtrans %}
+        {% elif event_vc_room.link_type.name == 'contribution' %}
+            {% trans %}Contribution{% endtrans %}: {{ event_vc_room.link_object.getTitle() }}
+        {% elif event_vc_room.link_type.name == 'block' %}
+            {% trans %}Session{% endtrans %}: {{ event_vc_room.link_object.getFullTitle() }}
+        {% endif %}
+    </dd>
+    {% if vc_room.data.room_pin %}
+        <dt>{% trans %}Room PIN{% endtrans %}</dt>
+        <dd>
+            <div class="form-field-with-addon i-password toggle">
+                <div class="form-field-with-addon-wrapper">
+                    <input id="vc-room_pin" type="password" value="{{ vc_room.data.room_pin }}"><button id="vc-room_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor=""></button>
+                </div>
+            </div>
+        </dd>
+    {% endif %}
+    {% if vc_room.data.moderation_pin %}
+        <dt>{% trans %}Moderation PIN{% endtrans %}</dt>
+        <dd>
+            <div class="form-field-with-addon i-password toggle">
+                <div class="form-field-with-addon-wrapper">
+                    <input id="vc-moderation_pin" type="password" value="{{ vc_room.data.moderation_pin }}"><button id="vc-moderation_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor=""></button>
+                </div>
+            </div>
+        </dd>
+    {% endif %}
+    <dt>Auto-join URL</dt>
+    <dd>
+        <div class="form-field-with-addon">
+            <div class="form-field-with-addon-wrapper">
+                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly="readonly"/><button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+            </div>
+            <span class="button-info-message">Copied!</span>
+        </div>
+    </dd>
+    <dt>{% trans %}Created on{% endtrans %}</dt>
+    <dd>{{ vc_room.created_dt | format_datetime }}</dd>
+    {% if vc_room.modified_dt %}
+        <dt>{% trans %}Modified on{% endtrans %}</dt>
+        <dd>{{ vc_room.modified_dt | format_datetime }}</dd>
+    {% endif %}
+</dl>
