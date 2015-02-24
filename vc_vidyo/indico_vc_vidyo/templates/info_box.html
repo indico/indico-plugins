@@ -19,11 +19,11 @@
             {% trans %}Session{% endtrans %}: {{ event_vc_room.link_object.getFullTitle() }}
         {% endif %}
     </dd>
-    {% if vc_room.data.show_pin %}
+    {% if event_vc_room.data.show_pin %}
         <dt>{% trans %}Room PIN{% endtrans %}</dt>
         <dd>{{ vc_room.data.room_pin }}</dd>
     {% endif %}
-    {% if vc_room.data.show_autojoin %}
+    {% if event_vc_room.data.show_autojoin %}
         <dt class="large-row">Auto-join URL</dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
@@ -33,7 +33,7 @@
             <span class="vc-room-url-copied">Copied!</span>
         </dd>
     {% endif %}
-    {% if vc_room.data.show_phone_numbers and phone_link %}
+    {% if event_vc_room.data.show_phone_numbers and phone_link %}
         <dt class="large-row"><a href="{{ phone_link }}" target="_blank">Phone numbers</a></dt>
         <dd class="large-row">
             <div class="form-field-with-addon">
