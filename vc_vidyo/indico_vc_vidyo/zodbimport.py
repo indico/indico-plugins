@@ -28,8 +28,6 @@ from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 from indico_vc_vidyo.plugin import VidyoPlugin
 from indico_zodbimport import Importer
 
-from MaKaC.conference import ConferenceHolder
-
 
 LINKED_ID_RE = re.compile(r'.*[st](\w+)$')
 MAP_LINK_TYPES = {
@@ -55,12 +53,16 @@ class VidyoImporter(Importer):
     def migrate(self):
         self.migrate_settings()
 
-        self.booking_root = self.zodb_root['catalog']['BookingsByVidyoRoomIndex']._fwd_index
+        self.booking_root = self.zodb_root['catalog']['cs_bookingmanager_conference']._tree
+
         with VidyoPlugin.instance.plugin_context():
-            for booking_id, bookings in committing_iterator(self.booking_root.iteritems()):
-                all_bookings = list(bookings)
-                vc_room = self.migrate_vidyo_room(all_bookings[0])
-                self.migrate_event_bookings(vc_room, all_bookings)
+            for event_id, csbm in committing_iterator(self.booking_root.iteritems(), n=1000):
+                for bid, booking in csbm._bookings.iteritems():
+                    if booking._type == 'Vidyo':
+                        vc_room = VCRoom.find(VidyoExtension.value == booking._extension).join(VidyoExtension).first()
+                        if not vc_room:
+                            vc_room = self.migrate_vidyo_room(booking)
+                        self.migrate_event_booking(vc_room, booking)
 
     def migrate_settings(self):
         # TODO: migrate settings
@@ -83,6 +85,8 @@ class VidyoImporter(Importer):
             'owner_identity': booking._ownerVidyoAccount,
             'auto_mute': booking_params.get('autoMute', True)
         }
+        vc_room.modified_dt = booking._modificationDate
+        vc_room.created_dt = booking._creationDate
 
         db.session.add(vc_room)
         db.session.flush()
@@ -90,47 +94,47 @@ class VidyoImporter(Importer):
 
         db.session.add(vidyo_ext)
 
-        print cformat('- %{cyan}{}%{reset} [%{yellow!}{}%{reset}]').format(vc_room.name, booking._roomId)
+        print cformat('%{green}+++%{reset} %{cyan}{}%{reset} [%{yellow!}{}%{reset}]').format(
+            vc_room.name, booking._roomId)
         return vc_room
 
-    def migrate_event_bookings(self, vc_room, bookings):
+    def migrate_event_booking(self, vc_room, booking):
         ch_idx = self.zodb_root['conferences']
-        for booking in bookings:
-            booking_params = booking._bookingParams
+        booking_params = booking._bookingParams
 
-            link_type = (VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]) if booking._linkVideoType
-                         else VCRoomLinkType.event)
+        link_type = (VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]) if booking._linkVideoType
+                     else VCRoomLinkType.event)
 
-            if booking._conf.id not in ch_idx:
-                print cformat(
-                    "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to event '{}' but the latter seems to have been"
-                    " deleted. Removing link."
-                ).format(vc_room, booking._conf.id)
-                continue
+        if booking._conf.id not in ch_idx:
+            print cformat(
+                "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to event '{}' but the latter seems to have been"
+                " deleted. Removing link."
+            ).format(vc_room, booking._conf.id)
+            return
 
-            if link_type == VCRoomLinkType.event:
-                extracted_id = None
-            elif not booking._linkVideoId:
-                print cformat(
-                    "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to a {} but no id given%{reset}. Linking to event."
-                ).format(vc_room, link_type.name)
-                extracted_id = None
-                link_type = VCRoomLinkType.event
-            else:
-                extracted_id = extract_id(booking._linkVideoId)
+        if link_type == VCRoomLinkType.event:
+            extracted_id = None
+        elif not booking._linkVideoId:
+            print cformat(
+                "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to a {} but no id given%{reset}. Linking to event."
+            ).format(vc_room, link_type.name)
+            extracted_id = None
+            link_type = VCRoomLinkType.event
+        else:
+            extracted_id = extract_id(booking._linkVideoId)
 
-            event_vc_room = VCRoomEventAssociation(
-                event_id=booking._conf.id,
-                vc_room=vc_room,
-                link_type=link_type,
-                link_id=extracted_id
-            )
-            event_vc_room.data = {
-                'show_pin': booking_params['displayPin'],
-                'show_phone_numbers': booking_params['displayPhoneNumbers'],
-                'show_autojoin': booking_params['displayURL'],
-            }
+        event_vc_room = VCRoomEventAssociation(
+            event_id=booking._conf.id,
+            vc_room=vc_room,
+            link_type=link_type,
+            link_id=extracted_id
+        )
+        event_vc_room.data = {
+            'show_pin': booking_params['displayPin'],
+            'show_phone_numbers': booking_params.get('displayPhoneNumbers', True),
+            'show_autojoin': booking_params['displayURL'],
+        }
 
-            db.session.add(event_vc_room)
-            print cformat('  + %{red!}{}%{reset} [%{yellow}{}%{reset}]').format(
-                booking._conf.id, booking._linkVideoType)
+        db.session.add(event_vc_room)
+        print cformat('%{green}<->%{reset} %{cyan!}{}%{reset} %{red!}{}%{reset} [%{yellow}{}%{reset}]').format(
+            booking._conf.id, booking._roomId, booking._linkVideoType)
