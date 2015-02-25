@@ -34,7 +34,7 @@ from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
-from indico_vc_vidyo.forms import VCRoomForm
+from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
@@ -95,6 +95,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     }
     vc_room_form = VCRoomForm
+    vc_room_attach_form = VCRoomAttachForm
 
     def init(self):
         super(VidyoPlugin, self).init()
@@ -104,9 +105,19 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
-    def handle_form_data(self, event, vc_room, event_vc_room, data):
+    def handle_form_data_association(self, event, vc_room, event_vc_room, data):
+        super(VidyoPlugin, self).handle_form_data_association(event, vc_room, event_vc_room, data)
 
-        super(VidyoPlugin, self).handle_form_data(event, vc_room, event_vc_room, data)
+        event_vc_room.data.update({key: data.pop(key) for key in [
+            'show_pin',
+            'show_autojoin',
+            'show_phone_numbers'
+        ]})
+
+        flag_modified(event_vc_room, 'data')
+
+    def handle_form_data_vc_room(self, vc_room, data):
+        super(VidyoPlugin, self).handle_form_data_vc_room(vc_room, data)
 
         vc_room.data.update({key: data.pop(key) for key in [
             'description',
@@ -116,14 +127,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'auto_mute'
         ]})
 
-        event_vc_room.data.update({key: data.pop(key) for key in [
-            'show_pin',
-            'show_autojoin',
-            'show_phone_numbers'
-        ]})
-
         flag_modified(vc_room, 'data')
-        flag_modified(event_vc_room, 'data')
 
     def create_room(self, vc_room, event):
         client = AdminClient(self.settings)
@@ -285,6 +289,15 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'show_phone_numbers': True
         })
 
+        return defaults
+
+    def get_vc_room_attach_form_defaults(self, event):
+        defaults = super(VidyoPlugin, self).get_vc_room_attach_form_defaults(event)
+        defaults.update({
+            'show_pin': False,
+            'show_autojoin': True,
+            'show_phone_numbers': True
+        })
         return defaults
 
     def can_manage_room(self, user, room):

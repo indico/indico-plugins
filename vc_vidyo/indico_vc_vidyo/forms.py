@@ -22,7 +22,7 @@ from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
-from indico.modules.vc.forms import VCRoomFormBase
+from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
 from indico.util.i18n import _
 from indico.util.user import retrieve_principal
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField
@@ -33,7 +33,24 @@ PIN_RE = re.compile(r'^\d+$')
 ERROR_MSG_PIN = _("The PIN must be a number")
 
 
-class VCRoomForm(VCRoomFormBase):
+class VidyoAdvancedFormMixin(object):
+    # Advanced options (per event)
+    show_pin = BooleanField(_('Show PIN'),
+                            widget=SwitchWidget(),
+                            description=_("Show the VC Room PIN on the event page (insecure!)"))
+    show_autojoin = BooleanField(_('Show Auto-join URL'),
+                                 widget=SwitchWidget(),
+                                 description=_("Show the auto-join URL on the event page"))
+    show_phone_numbers = BooleanField(_('Show Phone Access numbers'),
+                                      widget=SwitchWidget(),
+                                      description=_("Show a link to the list of phone access numbers"))
+
+
+class VCRoomAttachForm(VCRoomAttachFormBase, VidyoAdvancedFormMixin):
+    pass
+
+
+class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
     """Contains all information concerning a Vidyo booking"""
 
     advanced_fields = {'show_pin', 'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
@@ -52,17 +69,6 @@ class VCRoomForm(VCRoomFormBase):
                              widget=SwitchWidget(_('On'), _('Off')),
                              description=_('The VidyoDesktop clients will join the VC room muted by default '
                                            '(audio and video)'))
-
-    # Advanced options (per event)
-    show_pin = BooleanField(_('Show PIN'),
-                            widget=SwitchWidget(),
-                            description=_("Show the VC Room PIN on the event page (insecure!)"))
-    show_autojoin = BooleanField(_('Show Auto-join URL'),
-                                 widget=SwitchWidget(),
-                                 description=_("Show the auto-join URL on the event page"))
-    show_phone_numbers = BooleanField(_('Show Phone Access numbers'),
-                                      widget=SwitchWidget(),
-                                      description=_("Show a link to the list of phone access numbers"))
 
     def validate_owner(self, field):
         avatar = retrieve_principal(field.data)
