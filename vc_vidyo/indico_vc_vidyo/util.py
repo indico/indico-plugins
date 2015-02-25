@@ -76,7 +76,7 @@ def update_room_from_obj(settings, vc_room, room_obj):
         # if the owner does not exist any more (e.g. was changed on the server),
         # use the janitor user as a placeholder
         vc_room.data['owner'] = (('Avatar', config.getJanitorUserId()) if avatar is None
-                                     else principal_to_tuple(avatar))
+                                 else principal_to_tuple(avatar))
 
     vc_room.data.update({
         'description': room_obj.description,

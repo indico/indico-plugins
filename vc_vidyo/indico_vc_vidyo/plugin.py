@@ -96,6 +96,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     }
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
+    friendly_name = 'Vidyo'
 
     def init(self):
         super(VidyoPlugin, self).init()
