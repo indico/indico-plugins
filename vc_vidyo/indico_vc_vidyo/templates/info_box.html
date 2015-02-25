@@ -9,16 +9,6 @@
     {% endif %}
     <dt>{% trans %}Moderator{% endtrans %}</dt>
     <dd>{{ owner.getFullName() }}</dd>
-    <dt>{% trans %}Linked to{% endtrans %}</dt>
-    <dd>
-        {% if event_vc_room.link_type.name == 'event' %}
-            {% trans %}the whole event{% endtrans %}
-        {% elif event_vc_room.link_type.name == 'contribution' %}
-            {% trans %}Contribution{% endtrans %}: {{ event_vc_room.link_object.getTitle() }}
-        {% elif event_vc_room.link_type.name == 'block' %}
-            {% trans %}Session{% endtrans %}: {{ event_vc_room.link_object.getFullTitle() }}
-        {% endif %}
-    </dd>
     {% if event_vc_room.data.show_pin %}
         <dt>{% trans %}Room PIN{% endtrans %}</dt>
         <dd>{{ vc_room.data.room_pin }}</dd>
