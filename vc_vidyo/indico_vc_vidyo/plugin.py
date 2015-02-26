@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-import re
 
 from flask import session
 from sqlalchemy.orm.attributes import flag_modified
@@ -285,7 +284,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
             # replace invalid chars with underscore
-            'name': re.sub(r'[^\w_-]', '_', event.getTitle()),
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,
