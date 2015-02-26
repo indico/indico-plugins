@@ -301,6 +301,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         })
         return defaults
 
-    def can_manage_room(self, user, room):
+    def can_manage_vc_room(self, user, room):
         return (user == retrieve_principal(room.data['owner']) or
-                super(VidyoPlugin, self).can_manage_room(user, room))
+                super(VidyoPlugin, self).can_manage_vc_room(user, room))
