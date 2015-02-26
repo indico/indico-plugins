@@ -20,7 +20,7 @@ def upgrade():
     op.execute(CreateSchema('plugin_vc_vidyo'))
     op.create_table('vidyo_extensions',
                     sa.Column('vc_room_id', sa.Integer(), nullable=False),
-                    sa.Column('value', sa.Integer(), nullable=True, index=True),
+                    sa.Column('value', sa.String(), nullable=True, index=True),
                     sa.ForeignKeyConstraint(['vc_room_id'], ['events.vc_rooms.id']),
                     sa.PrimaryKeyConstraint('vc_room_id'),
                     schema='plugin_vc_vidyo')

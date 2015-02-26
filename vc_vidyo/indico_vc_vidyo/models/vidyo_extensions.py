@@ -29,7 +29,7 @@ class VidyoExtension(db.Model):
         index=True
     )
     value = db.Column(
-        db.Integer,
+        db.String,
         index=True
     )
     vc_room = db.relationship(
