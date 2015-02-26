@@ -89,10 +89,11 @@ class VidyoImporter(Importer):
         vc_room.created_dt = booking._creationDate
 
         db.session.add(vc_room)
-        db.session.flush()
-        vidyo_ext = VidyoExtension(vc_room_id=vc_room.id, value=booking._extension)
+
+        vidyo_ext = VidyoExtension(vc_room=vc_room, value=booking._extension)
 
         db.session.add(vidyo_ext)
+        db.session.flush()
 
         print cformat('%{green}+++%{reset} %{cyan}{}%{reset} [%{yellow!}{}%{reset}]').format(
             vc_room.name, booking._roomId)
