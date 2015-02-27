@@ -42,10 +42,6 @@ from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     support_email = EmailField(_('Vidyo email support'))
-    notification_emails = EmailListField(
-        _('Notification emails'),
-        description=_('Additional email addresses who will always receive notifications (one per line)')
-    )
     username = StringField(_('Username'), [DataRequired()], description=_('Indico username for Vidyo'))
     password = IndicoPasswordField(_('Password'), [DataRequired()], toggle=True,
                                    description=_('Indico password for Vidyo'))
@@ -89,7 +85,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return {
             'managers': [],
             'acl': [],
-            'notify_managers': True,
             'support_email': Config.getInstance().getSupportEmail(),
             'notification_emails': [],
             'username': 'indico',

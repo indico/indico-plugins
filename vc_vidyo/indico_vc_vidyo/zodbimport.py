@@ -78,7 +78,6 @@ class VidyoImporter(Importer):
             'userAPIURL': 'user_api_wsdl',
             'prefix': 'indico_room_prefix',
             'indicoGroup': 'room_group_name',
-            'sendMailNotifications': 'notify_managers',
             'phoneNumbers': 'vidyo_phone_link',
             'maxDaysBeforeClean': 'num_days_old',
             'indicoUsername': 'username',
@@ -96,6 +95,8 @@ class VidyoImporter(Importer):
                 if match is None:
                     continue
                 value = match.group(0)
+            elif old == 'additionalEmails':
+                value = list(set(value) | {x.getEmail() for x in option_value(opts['admins'])})
             VidyoPlugin.settings.set(new, value)
         db.session.commit()
 
