@@ -29,7 +29,7 @@ from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, UnsafePasswordField
+from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import EventCloner
@@ -51,7 +51,8 @@ class SettingsForm(IndicoForm):
     bot_jid = StringField(_('Bot JID'), [DataRequired()],
                           description=_("Jabber ID of the XMPP bot. Can be just a username (in that case the default "
                                         "server is assumed) or a username@server."))
-    bot_password = UnsafePasswordField(_('Bot Password'), [DataRequired()], description=_("Password for the bot"))
+    bot_password = IndicoPasswordField(_('Bot Password'), [DataRequired()], toggle=True,
+                                       description=_("Password for the bot"))
     notify_admins = BooleanField(_('Notify admins'),
                                  description=_("Should chat administrators receive email notifications?"))
     notify_emails = EmailListField(_('Notification emails'),
