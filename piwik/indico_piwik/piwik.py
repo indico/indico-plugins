@@ -18,9 +18,6 @@ from urllib2 import urlopen, urlparse, URLError
 
 from flask_pluginengine import current_plugin
 
-from MaKaC.common.externalOperationsManager import ExternalOperationsManager
-
-
 class PiwikRequest(object):
     """Wrapper for Piwik API requests"""
 
@@ -49,7 +46,7 @@ class PiwikRequest(object):
         :param query_params: Dictionary with the parameters of the query
         """
         query_url = self.get_query_url(**query_params)
-        return ExternalOperationsManager.execute(self, 'performCall', self._perform_call, query_url, default_response)
+        return self._perform_call(query_url, default_response)
 
     def get_query(self, query_params={}):
         """Return a query string"""
