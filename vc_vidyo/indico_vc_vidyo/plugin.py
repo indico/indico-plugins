@@ -92,7 +92,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         'max_rooms_warning': 5000,
         'vidyo_phone_link': None,
         'creation_email_footer': None
-
     }
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm

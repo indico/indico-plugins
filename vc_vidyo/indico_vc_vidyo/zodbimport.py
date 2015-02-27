@@ -22,11 +22,11 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
-
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
+from indico_zodbimport import Importer, option_value, convert_principal_list, convert_to_unicode
+
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 from indico_vc_vidyo.plugin import VidyoPlugin
-from indico_zodbimport import Importer
 
 
 LINKED_ID_RE = re.compile(r'.*[st](\w+)$')
@@ -51,10 +51,11 @@ class VidyoImporter(Importer):
         return VCRoom.find(type='vidyo').count() or VidyoExtension.find().count()
 
     def migrate(self):
-        self.migrate_settings()
-
         self.booking_root = self.zodb_root['catalog']['cs_bookingmanager_conference']._tree
+        self.migrate_settings()
+        self.migrate_event_bookings()
 
+    def migrate_event_bookings(self):
         with VidyoPlugin.instance.plugin_context():
             for event_id, csbm in committing_iterator(self.booking_root.iteritems(), n=1000):
                 for bid, booking in csbm._bookings.iteritems():
@@ -65,8 +66,38 @@ class VidyoImporter(Importer):
                         self.migrate_event_booking(vc_room, booking)
 
     def migrate_settings(self):
-        # TODO: migrate settings
-        pass
+        print cformat('%{white!}migrating settings')
+        VidyoPlugin.settings.delete_all()
+        opts = self.zodb_root['plugins']['Collaboration']._PluginType__plugins['Vidyo']._PluginBase__options
+        VidyoPlugin.settings.set('managers', convert_principal_list(opts['admins']))
+        VidyoPlugin.settings.set('acl', convert_principal_list(opts['AuthorisedUsersGroups']))
+        VidyoPlugin.settings.set('authenticators', ', '.join(map(convert_to_unicode,
+                                                                 option_value(opts['authenticatorList']))))
+        settings_map = {
+            'adminAPIURL': 'admin_api_wsdl',
+            'userAPIURL': 'user_api_wsdl',
+            'prefix': 'indico_room_prefix',
+            'indicoGroup': 'room_group_name',
+            'sendMailNotifications': 'notify_managers',
+            'phoneNumbers': 'vidyo_phone_link',
+            'maxDaysBeforeClean': 'num_days_old',
+            'indicoUsername': 'username',
+            'indicoPassword': 'password',
+            'contactSupport': 'support_email',
+            'cleanWarningAmount': 'max_rooms_warning',
+            'additionalEmails': 'notification_emails'
+        }
+        for old, new in settings_map.iteritems():
+            value = option_value(opts[old])
+            if old == 'prefix':
+                value = int(value)
+            elif old == 'phoneNumbers':
+                match = next((re.search(r'https?://[^"]+', convert_to_unicode(v)) for v in value), None)
+                if match is None:
+                    continue
+                value = match.group(0)
+            VidyoPlugin.settings.set(new, value)
+        db.session.commit()
 
     def migrate_vidyo_room(self, booking):
         booking_params = booking._bookingParams
