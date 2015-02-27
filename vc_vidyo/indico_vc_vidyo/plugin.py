@@ -75,24 +75,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     configurable = True
     strict_settings = True
     settings_form = PluginSettingsForm
-    default_settings = {
-        'managers': [],
-        'acl': [],
-        'notify_managers': True,
-        'support_email': Config.getInstance().getSupportEmail(),
-        'notification_emails': [],
-        'username': 'indico',
-        'password': None,
-        'admin_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalAdminService?wsdl',
-        'user_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalUserService?wsdl',
-        'indico_room_prefix': 10,
-        'room_group_name': 'Indico',
-        'authenticators': ', '.join(auth[0] for auth in Config.getInstance().getAuthenticatorList()),
-        'num_days_old': 180,
-        'max_rooms_warning': 5000,
-        'vidyo_phone_link': None,
-        'creation_email_footer': None
-    }
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Vidyo'
@@ -100,6 +82,27 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.inject_css('vc_vidyo_css', WPVCManageEvent)
+
+    @property
+    def default_settings(self):
+        return {
+            'managers': [],
+            'acl': [],
+            'notify_managers': True,
+            'support_email': Config.getInstance().getSupportEmail(),
+            'notification_emails': [],
+            'username': 'indico',
+            'password': None,
+            'admin_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalAdminService?wsdl',
+            'user_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalUserService?wsdl',
+            'indico_room_prefix': 10,
+            'room_group_name': 'Indico',
+            'authenticators': ', '.join(auth[0] for auth in Config.getInstance().getAuthenticatorList()),
+            'num_days_old': 180,
+            'max_rooms_warning': 5000,
+            'vidyo_phone_link': None,
+            'creation_email_footer': None
+        }
 
     @property
     def logo_url(self):
