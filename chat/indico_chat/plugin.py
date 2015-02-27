@@ -34,14 +34,13 @@ from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
-from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPXSLConferenceDisplay
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.notifications import notify_deleted
 from indico_chat.util import is_chat_admin
-from indico_chat.views import WPChatEventPage, WPChatEventMgmt
+from indico_chat.views import WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
