@@ -1,18 +1,18 @@
+{% extends 'admin/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_rows %}
-
-<h2 class="page-title">{% trans %}Chat Rooms{% endtrans %}</h2>
-
 {% set chatroom = event_chatroom.chatroom if event_chatroom %}
 
-<div>
-    <div class="groupTitle">
-        {%- if chatroom -%}
-            {% trans %}Edit chatroom{% endtrans %}
-        {%- else -%}
-            {% trans %}Create chatroom{% endtrans %}
-        {%- endif -%}
-    </div>
+{% block title %}{% trans %}Chat Rooms{% endtrans %}{% endblock %}
 
+{% block subtitle %}
+    {%- if chatroom -%}
+        {% trans %}Edit chatroom{% endtrans %}
+    {%- else -%}
+        {% trans %}Create chatroom{% endtrans %}
+    {%- endif -%}
+{% endblock %}
+
+{% block content %}
     {{ form_header(id='chatroom-form') }}
 
     {% call form_fieldset(legend='Chatroom settings') %}
@@ -47,4 +47,4 @@
             $('#custom_server').prop('disabled', !$('#use_custom_server').prop('checked'));
         });
     </script>
-</div>
+{% endblock %}
