@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 import re
 
+from flask import session
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
@@ -29,7 +30,7 @@ from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.i18n import _
-from indico.util.user import retrieve_principal
+from indico.util.user import retrieve_principal, principal_to_tuple
 from indico.web.forms.fields import EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -289,7 +290,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,
-            'show_phone_numbers': True
+            'show_phone_numbers': True,
+            'owner': principal_to_tuple(session.user)
         })
 
         return defaults
