@@ -20,7 +20,7 @@ from wtforms.fields.core import BooleanField
 
 from indico.core.plugins import IndicoPlugin
 from indico.modules.vc import VCPluginMixin
-from indico.modules.vc.plugins import VCRoomFormBase
+from indico.modules.vc.forms import VCRoomFormBase
 from indico.util.i18n import _
 from indico.web.forms.widgets import SwitchWidget
 
