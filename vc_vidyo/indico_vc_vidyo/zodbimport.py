@@ -135,7 +135,8 @@ class VidyoImporter(Importer):
         ch_idx = self.zodb_root['conferences']
         booking_params = booking._bookingParams
 
-        link_type = (VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]) if booking._linkVideoType
+        old_link_type = getattr(booking, '_linkVideoType', None)
+        link_type = (VCRoomLinkType.get(MAP_LINK_TYPES[booking._linkVideoType]) if old_link_type
                      else VCRoomLinkType.event)
 
         if booking._conf.id not in ch_idx:
@@ -170,4 +171,4 @@ class VidyoImporter(Importer):
 
         db.session.add(event_vc_room)
         print cformat('%{green}<->%{reset} %{cyan!}{}%{reset} %{red!}{}%{reset} [%{yellow}{}%{reset}]').format(
-            booking._conf.id, booking._roomId, booking._linkVideoType)
+            booking._conf.id, booking._roomId, old_link_type)
