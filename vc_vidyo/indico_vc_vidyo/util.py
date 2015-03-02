@@ -57,7 +57,7 @@ def iter_extensions(prefix, event_id):
     """Return extension (prefix + event_id) with an optional suffix which is
        incremented step by step in case of collision
     """
-    extension = '{prefix}{event_id}'.format(prefix=prefix, event_id=event_id,)
+    extension = '{prefix}{event_id}'.format(prefix=prefix, event_id=event_id)
     yield extension
     suffix = 1
     while True:
