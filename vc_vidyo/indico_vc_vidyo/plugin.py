@@ -104,6 +104,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
+    @property
+    def icon_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/vidyo_logo_notext.png')
+
     def handle_form_data_association(self, event, vc_room, event_vc_room, data):
         super(VidyoPlugin, self).handle_form_data_association(event, vc_room, event_vc_room, data)
 

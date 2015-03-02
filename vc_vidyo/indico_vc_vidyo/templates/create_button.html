@@ -1,6 +1,6 @@
 <a data-vc-system="{{plugin.service_name}}"
    class="i-button i-form-button js-create-room"
    href="{{ url_for_plugin('.manage_vc_rooms_create', event, service=plugin.service_name) }}">
-   <img src="{{ url_for_plugin('vc_vidyo.static', filename='images/vidyo_logo_notext.png') }}" />
+   <img src="{{ plugin.icon_url }}" />
    {%trans%}Create new Vidyo room{%endtrans%}
 </a>
