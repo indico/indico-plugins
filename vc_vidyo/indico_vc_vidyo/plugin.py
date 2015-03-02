@@ -107,8 +107,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def icon_url(self):
         return url_for_plugin(self.name + '.static', filename='images/vidyo_logo_notext.png')
 
-    def handle_form_data_association(self, event, vc_room, event_vc_room, data):
-        super(VidyoPlugin, self).handle_form_data_association(event, vc_room, event_vc_room, data)
+    def update_data_association(self, event, vc_room, event_vc_room, data):
+        super(VidyoPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
 
         event_vc_room.data.update({key: data.pop(key) for key in [
             'show_pin',
@@ -118,16 +118,12 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
         flag_modified(event_vc_room, 'data')
 
-    def handle_form_data_vc_room(self, vc_room, data):
-        super(VidyoPlugin, self).handle_form_data_vc_room(vc_room, data)
+    def update_data_vc_room(self, vc_room, data):
+        super(VidyoPlugin, self).update_data_vc_room(vc_room, data)
 
-        vc_room.data.update({key: data.pop(key) for key in [
-            'description',
-            'owner',
-            'room_pin',
-            'moderation_pin',
-            'auto_mute'
-        ]})
+        for key in ['description', 'owner', 'room_pin', 'moderation_pin', 'auto_mute']:
+            if key in data:
+                vc_room.data[key] = data.pop(key)
 
         flag_modified(vc_room, 'data')
 
