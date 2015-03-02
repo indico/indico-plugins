@@ -6,7 +6,12 @@
     <dt>{% trans %}Extension{% endtrans %}</dt>
     <dd>{{ vc_room.vidyo_extension.value }}</dd>
     <dt>{% trans %}Moderator{% endtrans %}</dt>
-    <dd>{{ owner.getFullName() }}</dd>
+    <dd>{% if owner %}
+            {{ owner.getFullName() }}
+        {% else %}
+            {{ vc_room.data['owner_account'] }} <em>(deleted)</em>
+        {% endif %}
+    </dd>
     <dt>Vidyo ID</dt>
     <dd>{{ vc_room.data.vidyo_id }}</dd>
     <dt>{% trans %}Linked to{% endtrans %}</dt>
