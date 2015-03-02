@@ -1,11 +1,11 @@
 $(function() {
-    $('.event-service-row').dropdown({
+    $('.vc-toolbar').dropdown({
         positioning: {
             level1: {my: 'right top', at: 'right bottom', offset: '0px 0px'}
         }
     });
 
-    $('.event-service-row .action-make-moderator').click(function() {
+    $('.vc-toolbar .action-make-moderator').click(function() {
         var $this = $(this);
 
         $.ajax({

@@ -1,4 +1,4 @@
-<div class="event-service-toolbar toolbar right">
+<div class="event-service-toolbar vc-toolbar toolbar right">
     <div class="group">
         <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
         {% if event.canUserModify(session.user) and session.user.id != vc_room.data['owner'][1] %}
