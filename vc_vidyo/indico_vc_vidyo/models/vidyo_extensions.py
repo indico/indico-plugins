@@ -33,7 +33,7 @@ class VidyoExtension(db.Model):
         index=True
     )
     extension = db.Column(
-        db.Integer,
+        db.BigInteger,
         index=True
     )
     owned_by_id = db.Column(
