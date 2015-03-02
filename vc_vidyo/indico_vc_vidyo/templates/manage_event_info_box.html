@@ -1,4 +1,4 @@
-{% set owner = retrieve_principal(vc_room.data['owner']) %}
+{% set owner = retrieve_principal(vc_room.data.owner) %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
 <dl class="details-container">
     <dt>{% trans %}Description{% endtrans %}</dt>
@@ -9,7 +9,7 @@
     <dd>{% if owner %}
             {{ owner.getFullName() }}
         {% else %}
-            {{ vc_room.data['owner_account'] }} <em>(deleted)</em>
+            {{ vc_room.data.owner_account }} <em>(deleted)</em>
         {% endif %}
     </dd>
     <dt>Vidyo ID</dt>
@@ -29,7 +29,7 @@
         <dd>
             <div class="form-field-with-addon i-password toggle">
                 <div class="form-field-with-addon-wrapper">
-                    <input id="vc-room_pin" type="password" value="{{ vc_room.data.room_pin }}"><button id="vc-room_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor=""></button>
+                    <input id="vc-room_pin" type="password" value="{{ vc_room.data.room_pin }}"><button id="vc-room_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor></button>
                 </div>
             </div>
         </dd>
@@ -39,7 +39,7 @@
         <dd>
             <div class="form-field-with-addon i-password toggle">
                 <div class="form-field-with-addon-wrapper">
-                    <input id="vc-moderation_pin" type="password" value="{{ vc_room.data.moderation_pin }}"><button id="vc-moderation_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor=""></button>
+                    <input id="vc-moderation_pin" type="password" value="{{ vc_room.data.moderation_pin }}"><button id="vc-moderation_pin-button" type="button" class="i-button icon-eye-blocked" title="Click to show/hide the password" data-tooltip-anchor></button>
                 </div>
             </div>
         </dd>
@@ -48,7 +48,7 @@
     <dd>
         <div class="form-field-with-addon">
             <div class="form-field-with-addon-wrapper">
-                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly="readonly"/><button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+                <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly><button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
             </div>
             <span class="button-info-message">Copied!</span>
         </div>

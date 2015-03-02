@@ -1,4 +1,4 @@
-{% set owner = retrieve_principal(vc_room.data['owner']) %}
+{% set owner = retrieve_principal(vc_room.data.owner) %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
 <dl>
     {% if for_tooltip %}
@@ -22,7 +22,11 @@
         <dd class="large-row">
             <div class="form-field-with-addon">
                 <div class="form-field-with-addon-wrapper">
-                    <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly>{% if not for_tooltip %}<button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>{% endif %}
+                    <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly>
+                    {%- if not for_tooltip -%}
+                        <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button"
+                                title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+                    {%- endif -%}
                 </div>
                 <span class="button-info-message">Copied!</span>
             </div>
@@ -33,7 +37,11 @@
         <dd class="large-row">
             <div class="form-field-with-addon">
                 <div class="form-field-with-addon-wrapper">
-                    <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" readonly>{% if not for_tooltip %}<button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button" title="Click to copy the URL" data-link="{{ phone_link }}"></button>{% endif %}
+                    <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" readonly>
+                    {%- if not for_tooltip -%}
+                        <button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button"
+                                title="Click to copy the URL" data-link="{{ phone_link }}"></button>
+                    {%- endif -%}
                 </div>
                 <span class="button-info-message">Copied!</span>
             </div>

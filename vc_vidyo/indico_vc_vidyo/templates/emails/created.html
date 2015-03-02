@@ -1,13 +1,13 @@
 {% extends 'vc/emails/created.html' %}
 
 {% block plugin_specific_info %}
-    <li><strong>Auto-join URL</strong>: <a href="{{ vc_room.data['url'] }}">{{ vc_room.data['url'] }}</a></li>
-    <li><strong>Owner:</strong> {{ vc_room.data['owner_identity'] }}</li>
+    <li><strong>Auto-join URL</strong>: <a href="{{ vc_room.data.url }}">{{ vc_room.data.url }}</a></li>
+    <li><strong>Owner:</strong> {{ vc_room.data.owner_identity }}</li>
 {% endblock %}
 
 {% block custom_footer %}
     {% if plugin.settings.get('creation_email_footer') %}
-        <hr/>
+        <hr>
         {{ plugin.settings.get('creation_email_footer') |safe }}
     {% endif %}
 {% endblock %}
