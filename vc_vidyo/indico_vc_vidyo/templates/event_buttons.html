@@ -1,6 +1,18 @@
 <div class="event-service-toolbar toolbar right">
     <div class="group">
         <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
+        {% if event.canUserModify(session.user) and session.user.id != vc_room.data['owner'][1] %}
+            <a class="i-button i-button-small highlight arrow" data-toggle="dropdown"></a>
+            <ul class="dropdown" data-level="level1">
+                <li>
+                    <a href="#"
+                       title="{% trans name=vc_room.data.owner_identity %}You will be the moderator of this Vidyo room, replacing {{name}}.{% endtrans %}"
+                       class="action-make-moderator" data-href="{{ url_for('vc.vc_room_modify', event_vc_room) }}">
+                        {% trans %}Make me moderator{% endtrans %}
+                    </a>
+                </li>
+            </ul>
+        {% endif %}
     </div>
     {{ template_hook('vidyo-event-buttons', event_vc_room=event_vc_room) }}
 </div>

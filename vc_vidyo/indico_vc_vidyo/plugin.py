@@ -30,13 +30,15 @@ from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.i18n import _
 from indico.util.user import retrieve_principal, principal_to_tuple
-from indico.web.forms.fields import EmailListField, IndicoPasswordField
+from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
+
+from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -78,6 +80,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.inject_css('vc_vidyo_css', WPVCManageEvent)
+        self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
 
     @property
     def default_settings(self):
@@ -273,6 +276,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def register_assets(self):
         self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
+        self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
     def get_blueprints(self):
         return IndicoPluginBlueprint('vc_vidyo', __name__)
