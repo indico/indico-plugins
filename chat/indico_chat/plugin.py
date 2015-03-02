@@ -28,6 +28,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.util.i18n import _
+from indico.util.user import principals_merge_users
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
@@ -104,6 +105,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_management.sidemenu, self.extend_event_management_menu)
         self.connect(signals.event_management.clone, self.extend_event_management_clone)
         self.connect(signals.event_management.management_url, self.get_event_management_url)
+        self.connect(signals.merge_users, self._merge_users)
         self.template_hook('event-header', self.inject_event_header)
         self.inject_css('chat_css', WPChatEventMgmt)
         self.inject_js('chat_js', WPChatEventMgmt)
@@ -155,6 +157,11 @@ class ChatPlugin(IndicoPlugin):
         for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
             chatroom_deleted = event_chatroom.delete()
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
+
+    def _merge_users(self, user, merged, **kwargs):
+        new_id = int(user.id)
+        old_id = int(merged.id)
+        self.settings.set('admins', principals_merge_users(self.settings.get('admins'), new_id, old_id))
 
 
 class ChatroomCloner(EventCloner):
