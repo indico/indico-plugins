@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core.db.sqlalchemy import db
+from indico.util.string import return_ascii
+from MaKaC.user import AvatarHolder
 
 
 class VidyoExtension(db.Model):
@@ -28,12 +32,29 @@ class VidyoExtension(db.Model):
         primary_key=True,
         index=True
     )
-    value = db.Column(
-        db.String,
+    extension = db.Column(
+        db.Integer,
         index=True
+    )
+    owned_by_id = db.Column(
+        db.Integer,
+        index=True,
     )
     vc_room = db.relationship(
         'VCRoom',
         backref=db.backref('vidyo_extension', cascade='all, delete-orphan', uselist=False, lazy=False),
         lazy=False
     )
+
+    @property
+    def owned_by_user(self):
+        """The Avatar who owns the vidyo room."""
+        return AvatarHolder().getById(str(self.owned_by_id))
+
+    @owned_by_user.setter
+    def owned_by_user(self, user):
+        self.owned_by_id = int(user.getId())
+
+    @return_ascii
+    def __repr__(self):
+        return '<VidyoExtension({}, {}, {})>'.format(self.vc_room, self.extension, self.owned_by_id)

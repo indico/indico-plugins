@@ -187,7 +187,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                     'url': created_room.RoomMode.roomURL,
                     'owner_identity': created_room.ownerName
                 })
-                vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, value=int(created_room.extension))
+                vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, extension=int(created_room.extension),
+                                                         owned_by_user=owner)
 
                 client.set_automute(created_room.roomID, vc_room.data['auto_mute'])
                 break
@@ -283,7 +284,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def get_vc_room_form_defaults(self, event):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
-            # replace invalid chars with underscore
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,
@@ -305,3 +305,9 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def can_manage_vc_room(self, user, room):
         return (user == retrieve_principal(room.data['owner']) or
                 super(VidyoPlugin, self).can_manage_vc_room(user, room))
+
+    def _merge_users(self, user, merged, **kwargs):
+        super(VidyoPlugin, self)._merge_users(user, merged, **kwargs)
+        new_id = int(user.id)
+        old_id = int(merged.id)
+        VidyoExtension.find(owned_by_id=old_id).update({'owned_by_id': new_id})

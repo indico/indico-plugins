@@ -86,4 +86,5 @@ def update_room_from_obj(settings, vc_room, room_obj):
         'room_pin': room_obj.RoomMode.roomPIN if room_obj.RoomMode.hasPIN else "",
         'moderation_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
     })
-    vc_room.vidyo_extension.value = int(room_obj.extension)
+    vc_room.vidyo_extension.extension = int(room_obj.extension)
+    vc_room.vidyo_extension.owned_by_id = vc_room.data['owner'][1]

@@ -9,7 +9,7 @@
     <dd>{{ vc_room.data.description }}</dd>
     {% if vc_room.vidyo_extension %}
         <dt>{% trans %}Extension{% endtrans %}</dt>
-        <dd>{{ vc_room.vidyo_extension.value }}</dd>
+        <dd>{{ vc_room.vidyo_extension.extension }}</dd>
     {% endif %}
     <dt>{% trans %}Moderator{% endtrans %}</dt>
     <dd>{{ owner.getFullName() }}</dd>

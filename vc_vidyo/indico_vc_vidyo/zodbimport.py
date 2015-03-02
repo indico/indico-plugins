@@ -60,7 +60,8 @@ class VidyoImporter(Importer):
             for event_id, csbm in committing_iterator(self.booking_root.iteritems(), n=1000):
                 for bid, booking in csbm._bookings.iteritems():
                     if booking._type == 'Vidyo':
-                        vc_room = VCRoom.find(VidyoExtension.value == booking._extension).join(VidyoExtension).first()
+                        vc_room = VCRoom.find_first(VidyoExtension.extension == booking._extension,
+                                                    _join=VidyoExtension)
                         if not vc_room:
                             vc_room = self.migrate_vidyo_room(booking)
                         self.migrate_event_booking(vc_room, booking)
@@ -122,7 +123,8 @@ class VidyoImporter(Importer):
 
         db.session.add(vc_room)
 
-        vidyo_ext = VidyoExtension(vc_room=vc_room, value=booking._extension)
+        vidyo_ext = VidyoExtension(vc_room=vc_room, extension=int(booking._extension),
+                                   owned_by_id=int(booking._owner.id))
 
         db.session.add(vidyo_ext)
         db.session.flush()
