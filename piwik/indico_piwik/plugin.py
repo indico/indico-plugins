@@ -107,8 +107,9 @@ class PiwikPlugin(IndicoPlugin):
         if request.blueprint == 'event':
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contribId')
-            if contrib_id:
-                contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
+            event = ConferenceHolder().getById(params['event_id'], True)
+            if event is not None and contrib_id is not None:
+                contribution = event.getContributionById(contrib_id)
                 if contribution:
                     params['contrib_id'] = contribution.getUniqueId()
         return params
