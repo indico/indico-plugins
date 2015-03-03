@@ -62,14 +62,14 @@ class LiveSyncImporter(Importer):
             if old_agent_class == 'InvenioBatchUploaderAgent':
                 agent.backend_name = 'invenio'
                 agent.settings = {
-                    'invenio_url': old_agent._url
+                    'server_url': old_agent._url
                 }
             elif old_agent_class == 'CERNSearchUploadAgent':
                 agent.backend_name = 'cernsearch'
                 agent.settings = {
-                    'service_url': old_agent._url,
-                    'service_username': old_agent._username,
-                    'service_password': old_agent._password,
+                    'server_url': old_agent._url,
+                    'username': old_agent._username,
+                    'password': old_agent._password,
                 }
             else:
                 print cformat('%{red!}skipping unknown agent type: {}%{reset}').format(old_agent_class)
