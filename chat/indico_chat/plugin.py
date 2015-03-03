@@ -32,7 +32,6 @@ from indico.util.user import principals_merge_users
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.wcomponents import SideMenuItem
@@ -143,7 +142,7 @@ class ChatPlugin(IndicoPlugin):
                               visible=self._has_visible_chatrooms)
 
     def extend_event_management_menu(self, event, **kwargs):
-        if event.canModify(AccessWrapper(session.user)) or is_chat_admin(session.user):
+        if event.canUserModify(session.user) or is_chat_admin(session.user):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
 
     def extend_event_management_clone(self, event, **kwargs):
