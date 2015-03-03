@@ -109,7 +109,8 @@ class PiwikPlugin(IndicoPlugin):
             contrib_id = request.view_args.get('contribId')
             if contrib_id:
                 contribution = ConferenceHolder().getById(params['event_id']).getContributionById(contrib_id)
-                params['contrib_id'] = contribution.getUniqueId()
+                if contribution:
+                    params['contrib_id'] = contribution.getUniqueId()
         return params
 
     def _get_tracking_url(self):
