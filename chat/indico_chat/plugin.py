@@ -117,6 +117,8 @@ class ChatPlugin(IndicoPlugin):
         self.register_js_bundle('chat_js', 'js/chat.js')
 
     def inject_event_header(self, event, **kwargs):
+        if not event.id.isdigit():
+            return ''
         chatrooms = ChatroomEventAssociation.find_for_event(event).all()
         if not chatrooms:
             return ''
@@ -135,6 +137,8 @@ class ChatPlugin(IndicoPlugin):
         }
 
     def _has_visible_chatrooms(self, event):
+        if not event.id.isdigit():
+            return False
         return bool(ChatroomEventAssociation.find_for_event(event).count())
 
     def extend_event_menu(self, sender, **kwargs):
@@ -153,6 +157,8 @@ class ChatPlugin(IndicoPlugin):
             return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):
+        if not event.id.isdigit():
+            return
         for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
             chatroom_deleted = event_chatroom.delete()
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
