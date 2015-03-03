@@ -33,6 +33,12 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('chat-event-page'))
 
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+
 
 class WPChatEventMgmt(WPJinjaMixinPlugin, WPConferenceModifBase):
     def _setActiveSideMenuItem(self):
