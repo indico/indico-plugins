@@ -36,4 +36,4 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
 
 class WPChatEventMgmt(WPJinjaMixinPlugin, WPConferenceModifBase):
     def _setActiveSideMenuItem(self):
-        self._pluginMenuItems['chat-management'].setActive(True)
+        self.extra_menu_items['chat-management'].setActive(True)
