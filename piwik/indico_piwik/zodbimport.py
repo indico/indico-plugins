@@ -40,7 +40,7 @@ class PiwikImporter(Importer):
         opts = self.zodb_root['plugins']['statistics']._PluginType__plugins['piwik']._PluginBase__options
         settings_map = {'serverAPIUrl': 'server_api_url',
                         'serverUrl': 'server_url',
-                        'serverSiteID': 'site_id_general',
+                        'serverSiteID': 'site_id_events',
                         'serverTok': 'server_token',
                         'useOnlyServerURL': 'use_only_server_url',
                         'jsHookEnabled': 'enabled_for_events',
