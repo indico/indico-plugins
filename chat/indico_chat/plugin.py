@@ -166,7 +166,7 @@ class ChatPlugin(IndicoPlugin):
 class ChatroomCloner(EventCloner):
     def get_options(self):
         enabled = bool(ChatroomEventAssociation.find_for_event(self.event, include_hidden=True).count())
-        return {'chatrooms': (_('Chatrooms'), enabled)}
+        return {'chatrooms': (_('Chatrooms'), enabled, False)}
 
     def clone(self, new_event, options):
         """Called when the event is being cloned"""
