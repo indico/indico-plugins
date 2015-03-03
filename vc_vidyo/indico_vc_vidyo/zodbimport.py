@@ -56,12 +56,12 @@ class VidyoImporter(Importer):
         self.migrate_event_bookings()
 
     def migrate_event_bookings(self):
+        self.vc_rooms_by_extension = {}
         with VidyoPlugin.instance.plugin_context():
             for event_id, csbm in committing_iterator(self.booking_root.iteritems(), n=1000):
                 for bid, booking in csbm._bookings.iteritems():
                     if booking._type == 'Vidyo':
-                        vc_room = VCRoom.find_first(VidyoExtension.extension == booking._extension,
-                                                    _join=VidyoExtension)
+                        vc_room = self.vc_rooms_by_extension.get(int(booking._extension))
                         if not vc_room:
                             vc_room = self.migrate_vidyo_room(booking)
                         self.migrate_event_booking(vc_room, booking)
@@ -128,6 +128,7 @@ class VidyoImporter(Importer):
 
         db.session.add(vidyo_ext)
         db.session.flush()
+        self.vc_rooms_by_extension[vidyo_ext.extension] = vc_room
 
         print cformat('%{green}+++%{reset} %{cyan}{}%{reset} [%{yellow!}{}%{reset}]').format(
             vc_room.name, booking._roomId)
