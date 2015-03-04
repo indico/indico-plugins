@@ -14,7 +14,7 @@
                         <div class="event-service-toolbar toolbar right">
                             {% if chat_links %}
                                 <div class="group">
-                                    <a class="i-button i-button-small arrow event-service-right-button dropDownMenu highlight join-button" data-toggle="dropdown"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                                    <a class="i-button i-button-small arrow event-service-right-button dropDownMenu highlight join-button" data-toggle="dropdown" target="_blank"><strong>{% trans %}Join{% endtrans %}</strong></a>
                                     <ul class="dropdown">
                                         {% for chat_link in chat_links %}
                                             <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
