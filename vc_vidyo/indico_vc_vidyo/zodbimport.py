@@ -107,7 +107,6 @@ class VidyoImporter(Importer):
         vc_room.type = 'vidyo'
         vc_room.status = VCRoomStatus.created if booking._created else VCRoomStatus.deleted
         vc_room.name = booking_params['roomName']
-        vc_room.show = not booking._hidden
         vc_room.data = {
             'description': booking_params['roomDescription'],
             'room_pin': booking._pin,
@@ -164,7 +163,8 @@ class VidyoImporter(Importer):
             event_id=booking._conf.id,
             vc_room=vc_room,
             link_type=link_type,
-            link_id=extracted_id
+            link_id=extracted_id,
+            show=not booking._hidden
         )
         event_vc_room.data = {
             'show_pin': booking_params['displayPin'],
