@@ -27,42 +27,9 @@ class DummyBackend(LiveSyncBackendBase):
     A dummy agent for testing
     """
 
-    def _get_excluded_categories(self):
-        return set()
-
 
 class NonDescriptiveAgent(LiveSyncBackendBase):
     """Nondescriptive agent"""
-
-
-class MockCategory(object):
-    def __init__(self, id_, subcategories=None):
-        self.id = id_
-        self.subcategories = subcategories or set()
-
-    def getId(self):
-        return self.id
-
-
-class MockCategoryManager(object):
-    # a
-    # |- b
-    # `- c
-    #    |- d
-    #       |- e
-    #       `- f
-    categories = {
-        'a': MockCategory('a', {'b', 'c'}),
-        'b': MockCategory('b'),
-        'c': MockCategory('c', {'d'}),
-        'd': MockCategory('d', {'e', 'f'}),
-        'e': MockCategory('e'),
-        'f': MockCategory('f')
-    }
-
-    @classmethod
-    def getById(cls, id_):
-        return cls.categories[id_]
 
 
 def test_title_description():
@@ -96,7 +63,6 @@ def test_run(mocker):
 
 def test_fetch_records(db, mocker):
     """Test if the correct records are fetched"""
-    mocker.patch.object(DummyBackend, '_is_entry_excluded', return_value=False)
     agent = LiveSyncAgent(backend_name='dummy', name='dummy')
     backend = DummyBackend(agent)
     db.session.add(agent)
@@ -105,14 +71,3 @@ def test_fetch_records(db, mocker):
     agent.queue = queue
     db.session.flush()
     assert backend.fetch_records() == [queue[1]]
-    assert backend._is_entry_excluded.call_count == 1
-    backend._is_entry_excluded.assert_called_with(queue[1])
-
-
-def test_excluded_categories(mocker, monkeypatch):
-    """Test if category exclusions work"""
-    monkeypatch.setattr('indico_livesync.base.CategoryManager', MockCategoryManager)
-    plugin = mocker.patch('indico_livesync.base.LiveSyncPlugin')
-    plugin.settings.get.return_value = [{'id': 'invalid'}, {'id': 'c'}, {'id': 'd'}]
-    backend = LiveSyncBackendBase(MagicMock())
-    assert backend.excluded_categories == {'c', 'd', 'e', 'f'}

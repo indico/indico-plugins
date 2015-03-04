@@ -22,10 +22,10 @@ from flask import g
 
 from indico.core import signals
 from MaKaC.accessControl import AccessController
-from MaKaC.conference import Conference, Contribution, SubContribution, Category, Session
+from MaKaC.conference import ConferenceHolder, Conference, Contribution, SubContribution, Category, Session
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
-from indico_livesync.util import obj_ref
+from indico_livesync.util import obj_ref, is_ref_excluded
 
 
 def connect_signals(plugin):
@@ -119,6 +119,8 @@ def _apply_changes(sender, **kwargs):
     if not hasattr(g, 'livesync_changes'):
         return
     for ref, changes in g.livesync_changes.iteritems():
+        if is_ref_excluded(ref):
+            continue
         LiveSyncQueueEntry.create(changes, ref)
 
 
@@ -151,6 +153,9 @@ def _register_deletion(obj, parent):
 
 
 def _register_change(obj, action):
+    if isinstance(obj, Conference) and ConferenceHolder().getById(obj.id, True) is None:
+        # When deleting an event we get data change signals afterwards. We can simple ignore them.
+        return
     _init_livesync_g()
     g.livesync_changes[obj_ref(obj)].add(action)
 

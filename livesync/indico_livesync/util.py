@@ -20,6 +20,7 @@ from datetime import timedelta
 
 from werkzeug.datastructures import ImmutableDict
 
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from MaKaC.conference import Conference, Contribution, SubContribution, Category, CategoryManager, ConferenceHolder
 
@@ -29,14 +30,16 @@ def obj_ref(obj, parent=None):
     if isinstance(obj, Category):
         ref = {'type': 'category', 'category_id': obj.id}
     elif isinstance(obj, Conference):
-        ref = {'type': 'event', 'event_id': obj.id}
+        ref = {'type': 'event', 'category_id': obj.getOwner().id, 'event_id': obj.id}
     elif isinstance(obj, Contribution):
         event = parent or obj.getConference()
-        ref = {'type': 'contribution', 'event_id': event.id, 'contrib_id': obj.id}
+        ref = {'type': 'contribution', 'category_id': event.getOwner().id, 'event_id': event.id, 'contrib_id': obj.id}
     elif isinstance(obj, SubContribution):
         contrib = parent or obj.getContribution()
+        event = contrib.getConference()
         ref = {'type': 'subcontribution',
-               'event_id': contrib.getConference().id, 'contrib_id': contrib.id, 'subcontrib_id': obj.id}
+               'category_id': event.getOwner().id,
+               'event_id': event.id, 'contrib_id': contrib.id, 'subcontrib_id': obj.id}
     else:
         raise ValueError('Unexpected object: {}'.format(obj.__class__.__name__))
     return ImmutableDict(ref)
@@ -86,3 +89,24 @@ def clean_old_entries():
     expire_threshold = now_utc() - timedelta(days=queue_entry_ttl)
     LiveSyncQueueEntry.find(LiveSyncQueueEntry.processed,
                             LiveSyncQueueEntry.timestamp < expire_threshold).delete(synchronize_session='fetch')
+
+
+@memoize_request
+def get_excluded_categories():
+    """Get all excluded category IDs"""
+    from indico_livesync.plugin import LiveSyncPlugin
+    todo = {x['id'] for x in LiveSyncPlugin.settings.get('excluded_categories')}
+    excluded = set()
+    while todo:
+        category_id = todo.pop()
+        try:
+            category = CategoryManager().getById(category_id)
+        except KeyError:
+            continue
+        excluded.add(category.getId())
+        todo.update(category.subcategories)
+    return excluded
+
+
+def is_ref_excluded(ref):
+    return ref['category_id'] in get_excluded_categories()

@@ -23,7 +23,37 @@ from indico.util.date_time import now_utc
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.plugin import LiveSyncPlugin
-from indico_livesync.util import make_compound_id, clean_old_entries
+from indico_livesync.util import make_compound_id, clean_old_entries, get_excluded_categories
+
+
+class MockCategory(object):
+    def __init__(self, id_, subcategories=None):
+        self.id = id_
+        self.subcategories = subcategories or set()
+
+    def getId(self):
+        return self.id
+
+
+class MockCategoryManager(object):
+    # a
+    # |- b
+    # `- c
+    #    |- d
+    #       |- e
+    #       `- f
+    categories = {
+        'a': MockCategory('a', {'b', 'c'}),
+        'b': MockCategory('b'),
+        'c': MockCategory('c', {'d'}),
+        'd': MockCategory('d', {'e', 'f'}),
+        'e': MockCategory('e'),
+        'f': MockCategory('f')
+    }
+
+    @classmethod
+    def getById(cls, id_):
+        return cls.categories[id_]
 
 
 @pytest.mark.parametrize(('ref', 'expected'), (
@@ -61,3 +91,11 @@ def test_clean_old_entries(db):
     clean_old_entries()
     assert LiveSyncQueueEntry.find(processed=False).count() == 10
     assert LiveSyncQueueEntry.find(processed=True).count() == 3
+
+
+def test_excluded_categories(mocker, monkeypatch):
+    """Test if category exclusions work"""
+    monkeypatch.setattr('indico_livesync.util.CategoryManager', MockCategoryManager)
+    plugin = mocker.patch('indico_livesync.plugin.LiveSyncPlugin')
+    plugin.settings.get.return_value = [{'id': 'invalid'}, {'id': 'c'}, {'id': 'd'}]
+    assert get_excluded_categories() == {'c', 'd', 'e', 'f'}
