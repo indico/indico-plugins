@@ -5,7 +5,7 @@ $(function() {
         }
     });
 
-    $('.vc-toolbar .action-make-moderator').click(function() {
+    $('.vc-toolbar .action-make-owner').click(function() {
         var $this = $(this);
 
         $.ajax({

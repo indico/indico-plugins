@@ -4,9 +4,9 @@
         <ul class="dropdown" data-level="level1">
             <li>
                 <a href="#"
-                   title="{% trans name=vc_room.data.owner_identity %}You will be the moderator of this Vidyo room, replacing {{name}}.{% endtrans %}"
-                   class="action-make-moderator" data-href="{{ url_for('vc.vc_room_modify', event_vc_room) }}">
-                    {% trans %}Make me moderator{% endtrans %}
+                   title="{% trans name=vc_room.data.owner_identity %}You will be the owner of this Vidyo room, replacing {{name}}.{% endtrans %}"
+                   class="action-make-owner" data-href="{{ url_for('vc.vc_room_modify', event_vc_room) }}">
+                    {% trans %}Make me owner{% endtrans %}
                 </a>
             </li>
         </ul>
