@@ -58,7 +58,8 @@ def agents():
             backend_title = cformat('%{red!}invalid backend ({})%{reset}').format(agent.backend_name)
         else:
             backend_title = agent.backend.title
-        table_data.append([unicode(agent.id), agent.name, backend_title, initial, unicode(agent.queue.count())])
+        table_data.append([unicode(agent.id), agent.name, backend_title, initial,
+                           unicode(agent.queue.filter_by(processed=False).count())])
     table = AsciiTable(table_data)
     table.justify_columns[4] = 'right'
     print table.table
