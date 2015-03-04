@@ -88,6 +88,8 @@ class MARCXMLGenerator:
                 self.xml_generator.xml += self._contrib_to_marcxml(obj)
             elif ref['type'] == 'subcontribution':
                 self.xml_generator.xml += self._subcontrib_to_marcxml(obj)
+        elif ref['type'] == 'category':
+            pass  # we don't send category updates
         else:
             raise ValueError('unknown object ref: {}'.format(ref['type']))
         return self.xml_generator.getXml()
