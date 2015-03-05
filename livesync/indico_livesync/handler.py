@@ -153,8 +153,10 @@ def _register_deletion(obj, parent):
 
 
 def _register_change(obj, action):
-    if isinstance(obj, Conference) and ConferenceHolder().getById(obj.id, True) is None:
+    if isinstance(obj, Conference) and (ConferenceHolder().getById(obj.id, True) is None or obj.getOwner() is None):
         # When deleting an event we get data change signals afterwards. We can simple ignore them.
+        # When moving an event it's even worse, we get a data change notification in the middle of the move while the
+        # event has no category...
         return
     _init_livesync_g()
     g.livesync_changes[obj_ref(obj)].add(action)
