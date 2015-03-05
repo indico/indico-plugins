@@ -146,7 +146,7 @@ class ChatPlugin(IndicoPlugin):
                               visible=self._has_visible_chatrooms)
 
     def extend_event_management_menu(self, event, **kwargs):
-        if event.canUserModify(session.user) or is_chat_admin(session.user):
+        if event.canModify(session.user) or is_chat_admin(session.user):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
 
     def extend_event_management_clone(self, event, **kwargs):

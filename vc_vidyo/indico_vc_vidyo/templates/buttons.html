@@ -1,5 +1,5 @@
 {% macro render_make_me_moderator(event, vc_room, event_vc_room) %}
-    {% if event.canUserModify(session.user) and session.user.id != vc_room.data['owner'][1] %}
+    {% if event.canModify(session.user) and session.user.id != vc_room.data['owner'][1] %}
         <a class="i-button i-button-small highlight arrow" data-toggle="dropdown"></a>
         <ul class="dropdown" data-level="level1">
             <li>
