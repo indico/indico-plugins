@@ -48,8 +48,10 @@ class PiwikRequest(object):
         query_url = self.get_query_url(**query_params)
         return self._perform_call(query_url, default_response)
 
-    def get_query(self, query_params={}):
+    def get_query(self, query_params=None):
         """Return a query string"""
+        if query_params is None:
+            query_params = {}
         query = ''
         query_params['idSite'] = self.site_id
         if self.api_token is not None:
