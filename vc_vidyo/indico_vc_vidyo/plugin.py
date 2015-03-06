@@ -98,7 +98,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'indico_room_prefix': 10,
             'room_group_name': 'Indico',
             'authenticators': ', '.join(auth[0] for auth in Config.getInstance().getAuthenticatorList()),
-            'num_days_old': 180,
+            'num_days_old': 365,
             'max_rooms_warning': 5000,
             'vidyo_phone_link': None,
             'creation_email_footer': None
