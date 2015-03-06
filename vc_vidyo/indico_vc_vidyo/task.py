@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-import sqlalchemy
 from sqlalchemy.sql.expression import cast
 
 from indico.core.db import db
@@ -30,7 +29,7 @@ from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
 from indico.util.user import retrieve_principal
-from indico_vc_vidyo.api import RoomNotFoundAPIException
+from indico_vc_vidyo.api import APIException, RoomNotFoundAPIException
 
 
 def find_old_vidyo_rooms(max_room_event_age):
@@ -42,11 +41,11 @@ def find_old_vidyo_rooms(max_room_event_age):
         VCRoom.type == 'vidyo',
         IndexedEvent.end_date > (now_utc() - timedelta(days=max_room_event_age))
     ).join(VCRoomEventAssociation).join(
-        IndexedEvent, IndexedEvent.id == cast(VCRoomEventAssociation.event_id, sqlalchemy.String)
+        IndexedEvent, IndexedEvent.id == cast(VCRoomEventAssociation.event_id, db.String)
     ).group_by(VCRoom.id)
 
     # non-deleted rooms with no recent associations
-    return VCRoom.find(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used)).all()
+    return VCRoom.find_all(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used))
 
 
 def notify_moderator(plugin, vc_room):
@@ -96,5 +95,5 @@ class VidyoCleanupTask(PeriodicUniqueTask):
                 except RoomNotFoundAPIException:
                     self.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
                     vc_room.status = VCRoomStatus.deleted
-                except:
+                except APIException:
                     self.logger.exception('Impossible to delete Vidyo room {}'.format(vc_room))

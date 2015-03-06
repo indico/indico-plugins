@@ -46,7 +46,8 @@ def create_dummy_room(db, dummy_user):
             type="vidyo",
             status=kwargs.pop('status', VCRoomStatus.created),
             created_by_id=kwargs.pop('created_by_id', dummy_user.id),
-            **kwargs)
+            **kwargs
+        )
         db.session.add(vc_room)
         db.session.flush()
         extension = VidyoExtension(
@@ -63,29 +64,26 @@ def create_dummy_room(db, dummy_user):
 def test_room_cleanup(create_dummy_room, dummy_user, freeze_time, db):
     """Test that 'old' Vidyo rooms are correctly detected"""
     freeze_time(datetime(2015, 2, 1))
-    events = {}
 
-    for id_, args in enumerate((('Event one', datetime(2012, 1, 1)),
-                                ('Event two', datetime(2013, 1, 1)),
-                                ('Event three', datetime(2014, 1, 1)),
-                                ('Event four', datetime(2015, 1, 1))), start=1):
-        event = DummyEvent(id_, *args)
-        events[id_] = event
-        idx = IndexedEvent(id=id_, title=args[0], end_date=args[1], start_date=args[1])
+    for id_, (evt_name, end_date) in enumerate((('Event one', datetime(2012, 1, 1)),
+                                                ('Event two', datetime(2013, 1, 1)),
+                                                ('Event three', datetime(2014, 1, 1)),
+                                                ('Event four', datetime(2015, 1, 1))), start=1):
+        idx = IndexedEvent(id=id_, title=evt_name, end_date=end_date, start_date=end_date)
         db.session.add(idx)
 
-    for id_, args in enumerate(((1234, 5678, (1, 2, 3, 4)),
-                                (1235, 5679, (1, 2)),
-                                (1235, 5679, (2,)),
-                                (1236, 5670, (4,)),
-                                (1237, 5671, ())), start=1):
-        room = create_dummy_room('test_room_{}'.format(id_), args[0], dummy_user, {
-            'vidyo_id': args[1]
+    for id_, (vidyo_id, extension, evt_ids) in enumerate(((1234, 5678, (1, 2, 3, 4)),
+                                                          (1235, 5679, (1, 2)),
+                                                          (1235, 5679, (2,)),
+                                                          (1236, 5670, (4,)),
+                                                          (1237, 5671, ())), start=1):
+        room = create_dummy_room('test_room_{}'.format(id_), extension, dummy_user, {
+            'vidyo_id': vidyo_id
         })
-        for evt_id in args[2]:
-            VCRoomEventAssociation(vc_room=room, event=events[evt_id], link_type=VCRoomLinkType.event)
+        for evt_id in evt_ids:
+            VCRoomEventAssociation(vc_room=room, event_id=evt_id, link_type=VCRoomLinkType.event)
             db.session.flush()
 
     from indico_vc_vidyo.task import find_old_vidyo_rooms
 
-    assert [r.id for r in find_old_vidyo_rooms(180)] == [2, 3, 5]
+    assert {r.id for r in find_old_vidyo_rooms(180)} == {2, 3, 5}

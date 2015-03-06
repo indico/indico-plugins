@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 import sys
-
 from dateutil import rrule
+
+from click import Choice
 from flask_script import Manager
 from terminaltables import AsciiTable
 
@@ -33,18 +34,15 @@ cli_manager = Manager(usage="Manages the Vidyo plugin")
 
 
 @cli_manager.command
-@cli_manager.option('--deleted', action='store_true')
-@cli_manager.option('--created', action='store_true')
-def rooms(deleted=False, created=False):
+@cli_manager.option('--status', type=Choice(['deleted', 'created']))
+def rooms(status=None):
     """Lists all Vidyo rooms"""
 
     room_query = VCRoom.find(type='vidyo')
     table_data = [['ID', 'Name', 'Status', 'Vidyo ID', 'Extension']]
 
-    if deleted:
-        room_query = room_query.filter(VCRoom.status == VCRoomStatus.deleted)
-    if created:
-        room_query = room_query.filter(VCRoom.status == VCRoomStatus.created)
+    if status:
+        room_query = room_query.filter(VCRoom.status == VCRoomStatus.get(status))
 
     for room in room_query:
         table_data.append([unicode(room.id), room.name, room.status.name,
