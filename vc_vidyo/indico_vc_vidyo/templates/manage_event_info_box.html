@@ -6,7 +6,8 @@
     <dt>{% trans %}Extension{% endtrans %}</dt>
     <dd>{{ vc_room.vidyo_extension.extension }}</dd>
     <dt>{% trans %}Moderator{% endtrans %}</dt>
-    <dd>{% if owner %}
+    <dd>
+        {% if owner %}
             {{ owner.getFullName() }}
         {% else %}
             {{ vc_room.data.owner_account }} <em>(deleted)</em>
@@ -16,12 +17,15 @@
     <dd>{{ vc_room.data.vidyo_id }}</dd>
     <dt>{% trans %}Linked to{% endtrans %}</dt>
     <dd>
-        {% if event_vc_room.link_type.name == 'event' %}
+        {% set obj = event_vc_room.link_object %}
+        {% if obj is none %}
+            <em>(missing {{ event_vc_room.link_type.name }})</em>
+        {% elif event_vc_room.link_type.name == 'event' %}
             {% trans %}the whole event{% endtrans %}
         {% elif event_vc_room.link_type.name == 'contribution' %}
-            {% trans %}Contribution{% endtrans %}: {{ event_vc_room.link_object.getTitle() }}
+            {% trans %}Contribution{% endtrans %}: {{ obj.getTitle() }}
         {% elif event_vc_room.link_type.name == 'block' %}
-            {% trans %}Session{% endtrans %}: {{ event_vc_room.link_object.getFullTitle() }}
+            {% trans %}Session{% endtrans %}: {{ obj.getFullTitle() }}
         {% endif %}
     </dd>
     {% if vc_room.data.room_pin %}
