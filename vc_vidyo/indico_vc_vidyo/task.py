@@ -22,11 +22,14 @@ import sqlalchemy
 from sqlalchemy.sql.expression import cast
 
 from indico.core.db import db
+from indico.core.plugins import get_plugin_template_module
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoom, VCRoomStatus
+from indico.modules.vc.notifications import _send
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
+from indico.util.user import retrieve_principal
 from indico_vc_vidyo.api import RoomNotFoundAPIException
 
 
@@ -44,6 +47,20 @@ def find_old_vidyo_rooms(max_room_event_age):
 
     # non-deleted rooms with no recent associations
     return VCRoom.find(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used)).all()
+
+
+def notify_moderator(plugin, vc_room):
+    """Notifies about the deletion of a Vidyo room from the Vidyo server.
+
+    :param room: the vc_room
+    :param event: the event
+    :param user: the user performing the action
+    """
+    user = retrieve_principal(vc_room.data['owner'])
+
+    tpl = get_plugin_template_module('emails/remote_deleted.html', plugin=plugin, vc_room=vc_room, event=None,
+                                     vc_room_event=None, user=user)
+    _send('delete', user, plugin, None, vc_room, tpl.get_subject(), tpl.get_body())
 
 
 class VidyoCleanupTask(PeriodicUniqueTask):
@@ -74,6 +91,7 @@ class VidyoCleanupTask(PeriodicUniqueTask):
                 try:
                     plugin.delete_room(vc_room, None)
                     self.logger.info('Room {} deleted from Vidyo server'.format(vc_room))
+                    notify_moderator(plugin, vc_room)
                     vc_room.status = VCRoomStatus.deleted
                 except RoomNotFoundAPIException:
                     self.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
