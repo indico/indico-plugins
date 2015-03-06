@@ -24,7 +24,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
-from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
+from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint, wrap_cli_manager
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
@@ -34,6 +34,7 @@ from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
+from indico_vc_vidyo.cli import cli_manager
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
@@ -275,12 +276,15 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         client = AdminClient(self.settings)
         return client.get_room(vc_room.data['vidyo_id'])
 
+    def get_blueprints(self):
+        return IndicoPluginBlueprint('vc_vidyo', __name__)
+
     def register_assets(self):
         self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
-    def get_blueprints(self):
-        return IndicoPluginBlueprint('vc_vidyo', __name__)
+    def add_cli_command(self, manager):
+        manager.add_command('vidyo', wrap_cli_manager(cli_manager, self))
 
     def get_vc_room_form_defaults(self, event):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
