@@ -97,7 +97,7 @@ class VidyoImporter(Importer):
                     continue
                 value = match.group(0)
             elif old == 'additionalEmails':
-                value = list(set(value) | {x.getEmail() for x in option_value(opts['admins'])})
+                value = list(set(value) | {x.email for x in option_value(opts['admins'])})
             VidyoPlugin.settings.set(new, value)
         db.session.commit()
 
