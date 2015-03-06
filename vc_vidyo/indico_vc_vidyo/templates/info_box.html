@@ -20,18 +20,16 @@
         <dd>{{ vc_room.data.room_pin }}</dd>
     {% endif %}
     {% if event_vc_room.data.show_autojoin %}
-        <dt class="large-row">Auto-join URL</dt>
+        <dt class="large-row">{% trans %}Auto-join URL{% endtrans %}</dt>
         <dd class="large-row">
-            <div class="form-field-with-addon">
-                <div class="form-field-with-addon-wrapper">
-                    <input name="vc-room-url" type="text" value="{{ vc_room.data.url }}" readonly>
-                    {%- if not for_tooltip -%}
-                        <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button"
-                                title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
-                    {%- endif -%}
-                </div>
-                <span class="button-info-message">Copied!</span>
+            <div class="i-action-input">
+                <input name="vc-room-url-{{ event_vc_room.id }}" type="text" value="{{ vc_room.data.url }}" readonly>
+                {%- if not for_tooltip -%}
+                    <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button"
+                            title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
+                {%- endif -%}
             </div>
+            <span class="i-action-message">{% trans %}Copied!{% endtrans %}</span>
         </dd>
     {% endif %}
     {% if event_vc_room.data.show_phone_numbers and phone_link %}
