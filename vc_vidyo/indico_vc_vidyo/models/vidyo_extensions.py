@@ -29,8 +29,7 @@ class VidyoExtension(db.Model):
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
-        primary_key=True,
-        index=True
+        primary_key=True
     )
     extension = db.Column(
         db.BigInteger,
