@@ -27,7 +27,6 @@ from indico.core.db import db, DBMgr
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.scheduler import Client
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
-
 from indico_vc_vidyo.task import VidyoCleanupTask
 
 cli_manager = Manager(usage="Manages the Vidyo plugin")
@@ -53,15 +52,12 @@ def rooms(status=None):
     print table.table
 
 
-@cli_manager.command
+@cli_manager.option('interval', type=int)
 def create_task(interval):
     """Creates a Vidyo cleanup task running every N days"""
     update_session_options(db)
-    try:
-        interval = int(interval)
-        if interval < 1:
-            raise ValueError
-    except ValueError:
+    if interval < 1:
+        raise ValueError
         print 'Invalid interval, must be a number >=1'
         sys.exit(1)
     with DBMgr.getInstance().global_connection(commit=True):
