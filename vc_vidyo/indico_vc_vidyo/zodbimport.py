@@ -41,6 +41,17 @@ def extract_id(full_id):
     return LINKED_ID_RE.match(full_id).group(1).replace('l', ':')
 
 
+def is_valid_link(event, link_type, link_id):
+    if link_type == VCRoomLinkType.block:
+        session_id, slot_id = link_id.split(':')
+        session = event.sessions.get(session_id)
+        if session is None:
+            return False
+        return slot_id in session.slots
+    elif link_type == VCRoomLinkType.contribution:
+        return str(link_id) in event.contributions
+
+
 class VidyoImporter(Importer):
     plugins = {'vc_vidyo'}
 
@@ -158,6 +169,14 @@ class VidyoImporter(Importer):
             link_type = VCRoomLinkType.event
         else:
             extracted_id = extract_id(booking._linkVideoId)
+
+        if link_type != VCRoomLinkType.event and not is_valid_link(booking._conf, link_type, extracted_id):
+            print cformat(
+                "[%{red!}WARNING%{reset}] %{yellow!}{} is linked to a {} but it does not exist%{reset}. "
+                "Linking to event."
+            ).format(vc_room, link_type.name)
+            link_type = VCRoomLinkType.event
+            extracted_id = None
 
         event_vc_room = VCRoomEventAssociation(
             event_id=booking._conf.id,
