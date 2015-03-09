@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 import sys
 from dateutil import rrule
 
-from click import Choice
 from flask_script import Manager
 from terminaltables import AsciiTable
 
@@ -32,8 +31,7 @@ from indico_vc_vidyo.task import VidyoCleanupTask
 cli_manager = Manager(usage="Manages the Vidyo plugin")
 
 
-@cli_manager.command
-@cli_manager.option('--status', type=Choice(['deleted', 'created']))
+@cli_manager.option('--status', choices=(b'deleted', b'created'))
 def rooms(status=None):
     """Lists all Vidyo rooms"""
 
@@ -48,7 +46,8 @@ def rooms(status=None):
                            unicode(room.data['vidyo_id']), unicode(room.vidyo_extension.extension)])
 
     table = AsciiTable(table_data)
-    table.justify_columns[4] = 'right'
+    for col in (0, 3, 4):
+        table.justify_columns[col] = 'right'
     print table.table
 
 
@@ -57,7 +56,6 @@ def create_task(interval):
     """Creates a Vidyo cleanup task running every N days"""
     update_session_options(db)
     if interval < 1:
-        raise ValueError
         print 'Invalid interval, must be a number >=1'
         sys.exit(1)
     with DBMgr.getInstance().global_connection(commit=True):
