@@ -121,7 +121,7 @@ class VidyoImporter(Importer):
         vc_room.data = {
             'description': booking_params['roomDescription'],
             'room_pin': booking._pin,
-            'moderation_pin': booking._moderatorPin,
+            'moderation_pin': getattr(booking, '_moderatorPin', ''),
             'vidyo_id': booking._roomId,
             'url': booking._url,
             'owner': ('Avatar', booking._owner.id),
