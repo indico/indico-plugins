@@ -35,18 +35,13 @@
         </dd>
     {% endif %}
     {% if event_vc_room.data.show_phone_numbers and phone_link %}
-        <dt class="large-row"><a href="{{ phone_link }}" target="_blank">Phone numbers</a></dt>
+        <dt class="large-row">
+            {% trans %}Useful links{% endtrans %}
+        </dt>
         <dd class="large-row">
-            <div class="form-field-with-addon">
-                <div class="form-field-with-addon-wrapper">
-                    <input name="vc-room-phones-url" type="text" value="{{ phone_link }}" readonly>
-                    {%- if not for_tooltip -%}
-                        <button id="vc-room-phones-url" type="button" class="i-button icon-clipboard clip_button"
-                                title="Click to copy the URL" data-link="{{ phone_link }}"></button>
-                    {%- endif -%}
-                </div>
-                <span class="button-info-message">Copied!</span>
-            </div>
+            <a href="{{ phone_link }}" target="_blank">
+                {% trans %}Phone numbers{% endtrans %}
+            </a>
         </dd>
     {% endif %}
 </dl>
