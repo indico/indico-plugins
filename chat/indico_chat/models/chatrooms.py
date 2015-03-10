@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.ext.declarative import declared_attr
-
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
@@ -29,11 +27,8 @@ from indico_chat.xmpp import delete_room
 
 class Chatroom(db.Model):
     __tablename__ = 'chatrooms'
-
-    @declared_attr
-    def __table_args__(cls):
-        return (db.UniqueConstraint(cls.jid_node, cls.custom_server),
-                {'schema': 'plugin_chat'})
+    __table_args__ = (db.UniqueConstraint('jid_node', 'custom_server'),
+                      {'schema': 'plugin_chat'})
 
     #: Chatroom ID
     id = db.Column(
