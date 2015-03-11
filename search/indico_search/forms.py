@@ -20,8 +20,9 @@ from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import StringField, SelectField
 from wtforms.validators import Optional
 
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+
+from indico_search import _
 
 
 FIELD_CHOICES = [('', _('Anywhere')),

@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from indico.util.i18n import make_bound_gettext
+
+_ = make_bound_gettext('search')
 __all__ = ('SearchPluginBase', 'SearchEngine', 'SearchForm')
 
 from .base import SearchPluginBase, SearchEngine
