@@ -19,8 +19,9 @@ from __future__ import unicode_literals
 from wtforms.fields.html5 import URLField
 from wtforms.validators import URL
 
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+
+from indico_importer_invenio import _
 
 
 class SettingsForm(IndicoForm):
