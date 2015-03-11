@@ -1,3 +1,4 @@
 graft indico_vc_vidyo/static
-graft indico_vc_vidyo/templates
 graft indico_vc_vidyo/migrations
+graft indico_vc_vidyo/templates
+graft indico_vc_vidyo/translations

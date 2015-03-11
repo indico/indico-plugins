@@ -28,11 +28,11 @@ from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBluepr
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
-from indico.util.i18n import _
 from indico.util.user import retrieve_principal, principal_to_tuple
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
+from indico_vc_vidyo import _
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.cli import cli_manager
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm

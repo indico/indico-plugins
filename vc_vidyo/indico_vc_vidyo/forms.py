@@ -23,10 +23,11 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Optional, ValidationError
 
 from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
-from indico.util.i18n import _
 from indico.util.user import retrieve_principal
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField
 from indico.web.forms.widgets import SwitchWidget
+
+from indico_vc_vidyo import _
 from indico_vc_vidyo.util import iter_user_identities
 
 PIN_RE = re.compile(r'^\d+$')
