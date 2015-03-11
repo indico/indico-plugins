@@ -13,9 +13,9 @@ $(function() {
         var plotOptions = {
             axes: {
                 xaxis: {
-                    renderer:$.jqplot.DateAxisRenderer,
-                    min: reportDates.start,
-                    max: reportDates.end
+                    renderer: $.jqplot.DateAxisRenderer,
+                    min: window.piwikReportDates.start,
+                    max: window.piwikReportDates.end
                 },
                 yaxis: {
                     min: 0,
@@ -224,10 +224,16 @@ $(function() {
     };
 
     var init = function() {
-        $('#statsModify').click(function() {
-            var text = ($.trim($(this).html()) == str_modif_query) ? str_hide_query : str_modif_query;
-            $(this).html(text);
-            $('#statsFilter').slideToggle('fast');
+        $('#statsModify').click(function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var filter = $('#statsFilter');
+            if (filter.is(':visible')) {  // hiding it
+                $this.text($this.data('msgShow'));
+            } else {
+                $this.text($this.data('msgHide'));
+            }
+            filter.slideToggle('fast');
         });
 
         $('.statsDates').datepicker({

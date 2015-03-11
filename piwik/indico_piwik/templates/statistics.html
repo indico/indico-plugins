@@ -13,9 +13,11 @@
             {% trans %}Selection Information{% endtrans %}
             {% trans start=report.start_date, end=report.end_date %}({{ start }} to {{ end }}){% endtrans %}
             <span style="float:right;padding-right:5px;">
-                <span id="statsModify" class="fakeLink">
-                    {{ str_modif_query }}
-                </span>
+                <a href="#" id="statsModify"
+                   data-msg-show="{% trans %}Modify Query{% endtrans %}"
+                   data-msg-hide="{% trans %}Hide{% endtrans %}">
+                    {%- trans -%}Modify Query{%- endtrans -%}
+                </a>
             </span>
             <div style="clear:both;"></div>
         </div>
@@ -53,7 +55,7 @@
                     {% endif %}
                     </div>
                     <div class="statsFilterOption statsTopBordered">
-                        <input type="button" id="updateQuery" value="{% trans %}Update Query{% endtrans %}">
+                        <input type="button" id="updateQuery" class="i-button" value="{% trans %}Update Query{% endtrans %}">
                     </div>
                 </div>
             </span>
@@ -200,7 +202,7 @@
                         ({% trans %}Total{% endtrans %}: <span id="materialTotalDownloads">0</span>)
                     </div>
                     <div id="materialInfo">
-                        <div id='materialDownloadChart'>
+                        <div id="materialDownloadChart">
                             {% trans %}No material selected{% endtrans %}
                         </div>
                     </div>
@@ -219,7 +221,7 @@
 
 <!--  Container for popup content -->
 <div style="display:none; visibility: false;">
-    <div id='dialogNoGraphData' title="{% trans %}Unable to Retrieve Graph Data{% endtrans %}">
+    <div id="dialogNoGraphData" title="{% trans %}Unable to retrieve Graph Data{% endtrans %}">
         <p>
             {% trans -%}
                 The server did not respond in a timely manner.
@@ -229,11 +231,10 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    // i18n'd strings for statistics.js
-    var str_modif_query = '{{ str_modif_query }}';
-    var str_hide_query = '{{ str_hide_query }}';
-
+<script>
     // Data for jqPlot
-    var reportDates = {'start': "{{ report.start_date}}", 'end': "{{ report.end_date }}"};
+    window.piwikReportDates = {
+        start: {{ report.start_date | tojson }},
+        end: {{ report.end_date | tojson }}
+    };
 </script>

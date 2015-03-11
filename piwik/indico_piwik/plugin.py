@@ -21,10 +21,10 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
-from indico.util.i18n import _
 from MaKaC.conference import ConferenceHolder, LocalFile
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
+from indico_piwik import _
 from indico_piwik.controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
                                       RHApiEventGraphCountries, RHApiEventGraphDevices)
 from indico_piwik.forms import SettingsForm

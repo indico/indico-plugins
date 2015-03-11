@@ -16,8 +16,9 @@
 
 from wtforms import BooleanField, IntegerField, StringField
 
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+
+from indico_piwik import _
 
 
 class SettingsForm(IndicoForm):

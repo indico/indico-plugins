@@ -17,7 +17,6 @@
 from flask import jsonify
 
 from indico.core.config import Config
-from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico_piwik.views import WPStatistics
@@ -30,9 +29,6 @@ class RHStatistics(RHConferenceModifBase):
         RHConferenceModifBase._checkParams(self, params)
         self._params = params
         self._params['loading_gif'] = '{}/images/loading.gif'.format(Config.getInstance().getBaseURL())
-        self._params['str_modif_query'] = _('Modify Query')
-        self._params['str_hide_query'] = _('Hide Modify Query')
-        self._params['str_no_graph'] = _('No graph data was returned by the server, please alter the date range.')
         self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
                                                    start_date=params.get('start_date'), end_date=params.get('end_date'))
 
