@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, PluginCategory
 from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
-from indico.util.i18n import _
 
-from .controllers import RHGetImporters, RHImportData
+from indico_importer import _
+from indico_importer.controllers import RHGetImporters, RHImportData
 
 
 class ImporterPlugin(IndicoPlugin):
