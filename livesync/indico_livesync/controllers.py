@@ -20,11 +20,11 @@ from flask import request, redirect, flash
 from flask_pluginengine import render_plugin_template, current_plugin
 
 from indico.core.db import db
-from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
+from indico_livesync import _
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.views import WPLiveSync
 

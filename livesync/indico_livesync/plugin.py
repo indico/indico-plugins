@@ -23,10 +23,10 @@ from wtforms.fields.html5 import IntegerField
 
 from indico.core.plugins import IndicoPlugin, PluginCategory, wrap_cli_manager
 from indico.core.plugins.views import WPPlugins
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 
+from indico_livesync import _
 from indico_livesync.blueprint import blueprint
 from indico_livesync.cli import cli_manager
 from indico_livesync.controllers import extend_plugin_details
