@@ -21,8 +21,9 @@ from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
-from indico.util.i18n import _
 from indico.web.forms.validators import UsedIf
+
+from indico_payment_manual import _
 
 
 DETAILS_DESC = _('The details the user needs to make their payment. This usually includes the bank account details '

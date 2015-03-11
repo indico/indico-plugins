@@ -1,2 +1,3 @@
 graft indico_payment_manual/static
 graft indico_payment_manual/templates
+graft indico_payment_manual/translations
