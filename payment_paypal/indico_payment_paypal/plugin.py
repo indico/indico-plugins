@@ -23,9 +23,9 @@ from wtforms.validators import DataRequired, Optional
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
 from indico.modules.payment.util import get_registrant_params
-from indico.util.i18n import _
 from indico.util.string import remove_accents
 
+from indico_payment_paypal import _
 from indico_payment_paypal.blueprint import blueprint
 from indico_payment_paypal.util import validate_business
 

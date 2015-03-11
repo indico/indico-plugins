@@ -1,2 +1,3 @@
 graft indico_payment_paypal/static
 graft indico_payment_paypal/templates
+graft indico_payment_paypal/translations

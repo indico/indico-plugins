@@ -26,11 +26,12 @@ from werkzeug.exceptions import BadRequest
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.modules.payment.notifications import notify_amount_inconsistency
 from indico.modules.payment.util import register_transaction, get_registrant_params
-from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegistrantBase
+
+from indico_payment_paypal import _
 
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
