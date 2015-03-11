@@ -1,3 +1,4 @@
 graft indico_search_invenio/static
 graft indico_search_invenio/templates
+graft indico_search_invenio/translations
 include indico_search_invenio/marc2short.xsl

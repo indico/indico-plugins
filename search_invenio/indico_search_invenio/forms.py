@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from wtforms.fields.core import SelectField
 
-from indico.util.i18n import _
 from indico_search import SearchForm
+
+from indico_search_invenio import _
 
 
 COLLECTION_CHOICES = [('', _('Both (Events + Contributions)')),

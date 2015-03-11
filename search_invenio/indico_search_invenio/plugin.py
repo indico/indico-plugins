@@ -21,11 +21,11 @@ from wtforms.fields.html5 import URLField, IntegerField
 from wtforms.validators import URL, NumberRange
 
 from indico.core.plugins import IndicoPluginBlueprint
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico_search import SearchPluginBase
 from indico_search.views import WPSearchCategory, WPSearchConference
 
+from indico_search_invenio import _
 from indico_search_invenio.engine import InvenioSearchEngine
 from indico_search_invenio.forms import InvenioSearchForm
 
