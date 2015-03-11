@@ -1,10 +1,9 @@
+{% from '_clipboard_input.html' import clipboard_input %}
 {% set owner = retrieve_principal(vc_room.data.owner) %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
-<dl>
-    {% if for_tooltip %}
-        <dt>{% trans %}Name{% endtrans %}</dt>
-        <dd>{{ vc_room.name }}</dd>
-    {% endif %}
+<dl class="zeroclicboard-init">
+    <dt>{% trans %}Name{% endtrans %}</dt>
+    <dd>{{ vc_room.name }}</dd>
     <dt>{% trans %}Description{% endtrans %}</dt>
     <dd>{{ vc_room.data.description }}</dd>
     {% if vc_room.vidyo_extension %}
@@ -22,21 +21,14 @@
     {% if event_vc_room.data.show_autojoin %}
         <dt class="large-row">{% trans %}Auto-join URL{% endtrans %}</dt>
         <dd class="large-row">
-            <div class="i-action-input">
-                <input name="vc-room-url-{{ event_vc_room.id }}" type="text" value="{{ vc_room.data.url }}" readonly>
-                {%- if not for_tooltip -%}
-                    <button id="vc-room-url-copy" type="button" class="i-button icon-clipboard clip_button"
-                            title="Click to copy the URL" data-link="{{ vc_room.data.url }}"></button>
-                {%- endif -%}
-            </div>
-            <span class="i-action-message">{% trans %}Copied!{% endtrans %}</span>
+            {{ clipboard_input(vc_room.data.url, name="vc-room-url-%s"|format(event_vc_room.id)) }}
         </dd>
     {% endif %}
     {% if event_vc_room.data.show_phone_numbers and phone_link %}
-        <dt class="large-row">
+        <dt>
             {% trans %}Useful links{% endtrans %}
         </dt>
-        <dd class="large-row">
+        <dd>
             <a href="{{ phone_link }}" target="_blank">
                 {% trans %}Phone numbers{% endtrans %}
             </a>
