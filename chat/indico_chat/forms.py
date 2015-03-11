@@ -23,8 +23,8 @@ from wtforms.validators import DataRequired, ValidationError
 
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.validators import UsedIf
-from indico.util.i18n import _
 
+from indico_chat import _
 from indico_chat.models.chatrooms import Chatroom
 from indico_chat.xmpp import generate_jid, room_exists
 

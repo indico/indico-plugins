@@ -24,10 +24,10 @@ from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
 from indico.util.date_time import now_utc
-from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.forms.base import FormDefaults
 
+from indico_chat import _
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
 from indico_chat.forms import AddChatroomForm, EditChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom

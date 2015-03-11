@@ -27,7 +27,6 @@ from wtforms.validators import DataRequired
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.util.i18n import _
 from indico.util.user import principals_merge_users
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, IndicoPasswordField
@@ -36,6 +35,7 @@ from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
+from indico_chat import _
 from indico_chat.blueprint import blueprint
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.notifications import notify_deleted

@@ -18,11 +18,10 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-
 from indico.core.errors import IndicoError
-from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
+from indico_chat import _
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.views import WPChatEventPage
 

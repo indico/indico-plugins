@@ -24,10 +24,10 @@ from werkzeug.utils import secure_filename
 
 from indico.core.config import Config
 from indico.core.plugins import url_for_plugin
-from indico.util.i18n import _
 from MaKaC.common.log import ModuleNames
 from MaKaC.conference import LocalFile
 
+from indico_chat import _
 from indico_chat.controllers.base import RHEventChatroomMixin, RHChatManageEventBase
 from indico_chat.views import WPChatEventMgmt
 from indico_chat.xmpp import retrieve_logs

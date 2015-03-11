@@ -1,3 +1,4 @@
 graft indico_chat/static
 graft indico_chat/migrations
 graft indico_chat/templates
+graft indico_chat/translations

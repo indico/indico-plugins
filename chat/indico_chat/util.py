@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 from indico.core.errors import IndicoError
 
-from indico.util.i18n import _
 from indico.util.user import retrieve_principals
+
+from indico_chat import _
 
 
 def check_config(quiet=False):

@@ -14,12 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import session, request
 
 from indico.core.errors import IndicoError
-from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
+from indico_chat import _
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.util import is_chat_admin
 
