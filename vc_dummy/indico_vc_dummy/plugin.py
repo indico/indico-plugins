@@ -21,14 +21,13 @@ from wtforms.fields.core import BooleanField
 from indico.core.plugins import IndicoPlugin
 from indico.modules.vc import VCPluginMixin
 from indico.modules.vc.forms import VCRoomFormBase
-from indico.util.i18n import _
 from indico.web.forms.widgets import SwitchWidget
 
 
 class VCRoomForm(VCRoomFormBase):
-    show_phone_numbers = BooleanField(_('What is your favorite color?'),
+    show_phone_numbers = BooleanField('What is your favorite color?',
                                       widget=SwitchWidget(),
-                                      description=_("Yes. It doesn't make any sense."))
+                                      description="Yes. It doesn't make any sense.")
 
 
 class DummyPlugin(VCPluginMixin, IndicoPlugin):
