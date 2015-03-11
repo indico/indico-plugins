@@ -1,0 +1,134 @@
+[main]
+host = https://www.transifex.com
+
+[indico.vc-vidyo-messages]
+file_filter = vc_vidyo/indico_vc_vidyo/translations/<lang>/LC_MESSAGES/messages.po
+source_file = vc_vidyo/indico_vc_vidyo/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.vc-vidyo-messages-js]
+file_filter = vc_vidyo/indico_vc_vidyo/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = vc_vidyo/indico_vc_vidyo/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.search-messages]
+file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages.po
+source_file = search/indico_search/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.search-messages-js]
+file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = search/indico_search/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.search-invenio-messages]
+file_filter = search_invenio/indico_search_invenio/translations/<lang>/LC_MESSAGES/messages.po
+source_file = search_invenio/indico_search_invenio/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.search-invenio-messages-js]
+file_filter = search_invenio/indico_search_invenio/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = search_invenio/indico_search_invenio/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.piwik-messages]
+file_filter = piwik/indico_piwik/translations/<lang>/LC_MESSAGES/messages.po
+source_file = piwik/indico_piwik/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.piwik-messages-js]
+file_filter = piwik/indico_piwik/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = piwik/indico_piwik/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.chat-messages]
+file_filter = chat/indico_chat/translations/<lang>/LC_MESSAGES/messages.po
+source_file = chat/indico_chat/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.chat-messages-js]
+file_filter = chat/indico_chat/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = chat/indico_chat/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.payment-paypal-messages]
+file_filter = payment_paypal/indico_payment_paypal/translations/<lang>/LC_MESSAGES/messages.po
+source_file = payment_paypal/indico_payment_paypal/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.payment-paypal-messages-js]
+file_filter = payment_paypal/indico_payment_paypal/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = payment_paypal/indico_payment_paypal/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.payment-manual-messages]
+file_filter = payment_manual/indico_payment_manual/translations/<lang>/LC_MESSAGES/messages.po
+source_file = payment_manual/indico_payment_manual/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.payment-manual-messages-js]
+file_filter = payment_manual/indico_payment_manual/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = payment_manual/indico_payment_manual/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.livesync-messages]
+file_filter = livesync/indico_livesync/translations/<lang>/LC_MESSAGES/messages.po
+source_file = livesync/indico_livesync/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.livesync-messages-js]
+file_filter = livesync/indico_livesync/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = livesync/indico_livesync/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.livesync-invenio-messages]
+file_filter = livesync_invenio/indico_livesync_invenio/translations/<lang>/LC_MESSAGES/messages.po
+source_file = livesync_invenio/indico_livesync_invenio/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.livesync-invenio-messages-js]
+file_filter = livesync_invenio/indico_livesync_invenio/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = livesync_invenio/indico_livesync_invenio/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.importer-messages]
+file_filter = importer/indico_importer/translations/<lang>/LC_MESSAGES/messages.po
+source_file = importer/indico_importer/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.importer-messages-js]
+file_filter = importer/indico_importer/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = importer/indico_importer/translations/messages-js.pot
+source_lang = en
+type = PO
+
+[indico.importer-invenio-messages]
+file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_MESSAGES/messages.po
+source_file = importer_invenio/indico_importer_invenio/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.importer-invenio-messages-js]
+file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = importer_invenio/indico_importer_invenio/translations/messages-js.pot
+source_lang = en
+type = PO
