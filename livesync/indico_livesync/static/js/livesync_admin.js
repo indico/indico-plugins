@@ -1,10 +1,11 @@
 (function(global) {
+    var $t = $T.domain('livesync');
     global.liveSyncPluginPage = function liveSyncPluginPage() {
         $('.js-delete-agent').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            var msg = $T('Do you really want to delete this agent and all its queue entries?');
-            new ConfirmPopup($T('Delete this agent?'), msg, function(confirmed) {
+            var msg = $t.gettext('Do you really want to delete this agent and all its queue entries?');
+            new ConfirmPopup($t.gettext('Delete this agent?'), msg, function(confirmed) {
                 if (!confirmed) {
                     return;
                 }
