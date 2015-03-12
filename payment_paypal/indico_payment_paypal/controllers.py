@@ -54,8 +54,7 @@ class RHPaypalIPN(RH):
             raise BadRequest
 
     def _process(self):
-        if not self._verify_business():
-            return
+        self._verify_business()
         verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':

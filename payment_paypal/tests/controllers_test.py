@@ -75,7 +75,6 @@ def test_ipn_is_transaction_duplicated(mocker, txn_id, payment_status, expected)
 
 @pytest.mark.usefixtures('db', 'request_context')
 @pytest.mark.parametrize('fail', (
-    'business',
     'verify',
     'dup_txn',
     'fail',
@@ -89,7 +88,6 @@ def test_ipn_process(mocker, fail):
     post = mocker.patch('indico_payment_paypal.controllers.requests.post')
     post.return_value.text = 'INVALID' if fail == 'verify' else 'VERIFIED'
     rh = RHPaypalIPN()
-    rh._verify_business = lambda: fail != 'business'
     rh._is_transaction_duplicated = lambda: fail == 'dup_txn'
     rh.event = MagicMock(id=1)
     rh.registrant = MagicMock()
@@ -99,8 +97,8 @@ def test_ipn_process(mocker, fail):
     request.view_args = {'confId': rh.event.id}
     request.args = {'registrantId': '1'}
     request.form = {'payment_status': payment_status, 'txn_id': '12345', 'mc_gross': amount,
-                    'mc_currency': 'EUR'}
+                    'mc_currency': 'EUR', 'business': 'foo@bar.com'}
     with PaypalPaymentPlugin.instance.plugin_context():
         rh._process()
-        assert post.called == (fail != 'business')
+        assert post.called
         assert rt.called == (fail is None)
