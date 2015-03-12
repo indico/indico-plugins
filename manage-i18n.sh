@@ -2,7 +2,7 @@
 
 USAGE="$0 [init <locale>|extract|update <locale>|compile <locale>]"
 
-if [[ "$1" == '-h' || "$1" == '--help' ]]; then
+if [[ $# -eq 0 || "$1" == '-h' || "$1" == '--help' ]]; then
     echo "$USAGE"
     exit 0
 fi
