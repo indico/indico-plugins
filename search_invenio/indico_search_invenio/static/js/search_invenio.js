@@ -18,15 +18,17 @@
 (function(global) {
     'use strict';
 
+    var $t = $T.domain('search_invenio');
+
     global.invenioSearchResults = function invenioSearchResults(options) {
         // expected options: queryData, url, hasEvents, hasContribs
 
         var tabList = [];
         if (options.hasEvents) {
-            tabList.push([$T('Events'), $E('results-events')]);
+            tabList.push([$t.gettext('Events'), $E('results-events')]);
         }
         if (options.hasContribs) {
-            tabList.push([$T('Contributions'), $E('results-contribs')]);
+            tabList.push([$t.gettext('Contributions'), $E('results-contribs')]);
         }
         var tabCtrl = new JTabWidget(tabList);
         $E('result-tabs').set(tabCtrl.draw());
