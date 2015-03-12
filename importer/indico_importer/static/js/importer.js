@@ -1213,9 +1213,8 @@
              * Attaches buttons to the dom object which hide/show it when clicked.
              */
             _drawShowHideButtons: function(div) {
-                var self = this;
-                var showButton = Html.img({src:imageSrc("collapsd.png"), style:{display:'block'}});
-                var hideButton = Html.img({src:imageSrc("exploded.png"), style:{display:"none"}});
+                var showButton = Html.img({src: imageSrc("collapsd"), style: {display: 'block'}});
+                var hideButton = Html.img({src: imageSrc("exploded"), style: {display: 'none'}});
                 showButton.observeClick(function(evt) {
                     div.dom.style.display = "block";
                     showButton.dom.style.display = "none";
