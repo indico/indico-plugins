@@ -30,7 +30,11 @@
                     </div>
 
                     <div class="toggle-advanced-options-container">
-                        <a id="toggle-advanced-options" href="#">{% trans %}Show advanced options{% endtrans %}</a>
+                        <a id="toggle-advanced-options" href="#"
+                           data-msg-show="{% trans %}Show advanced options{% endtrans %}"
+                           data-msg-hide="{% trans %}Hide advanced options{% endtrans %}">
+                            {%- trans %}Show advanced options{% endtrans -%}
+                        </a>
                     </div>
 
                     <div id="advanced-options" class="advanced-options" style="display: none;">
@@ -71,8 +75,9 @@
 <script>
     $('#toggle-advanced-options').on('click', function(e) {
         e.preventDefault();
+        var $this = $(this);
         var container = $('#advanced-options').toggle();
-        var text = container.is(':hidden') ? $T('Show advanced options') : $T('Hide advanced options');
+        var text = container.is(':hidden') ? $this.data('msgShow') : $this.data('msgHide');
         $('#toggle-advanced-options').text(text);
     });
 
