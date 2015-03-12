@@ -29,6 +29,7 @@ for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;
         pybabel init -l "$LOCALE" -i "./indico_${plugin}/translations/messages.pot" -d "./indico_${plugin}/translations/"
     elif [[ "$ACTION" == "extract" ]]; then
         TRANSLATIONS_DIR="./indico_${plugin}/translations"
+        [[ ! -d "$TRANSLATIONS_DIR" ]] && mkdir "$TRANSLATIONS_DIR"
         pybabel extract -o "${TRANSLATIONS_DIR}/messages.pot" "indico_${plugin}" -F ../babel.cfg
         pybabel extract -o "${TRANSLATIONS_DIR}/messages-js.pot" "indico_${plugin}" -k 'gettext' -k 'ngettext' -k '$T' -F ../babel-js.cfg
     elif [[ "$ACTION" == "update" ]]; then
