@@ -1,4 +1,5 @@
 $(function() {
+    var $t = $T.domain('piwik');
     var treeDOMTarget = '#materialTree';
 
     /**
@@ -43,12 +44,12 @@ $(function() {
                 showMarker:false,
                 lineWidth: 1,
                 color: '#CCCCCC',
-                label: $T('Total Hits')
+                label: $t.gettext('Total Hits')
             }, {
                 showMarker:false,
                 lineWidth: 1,
                 color: '#0B63A5',
-                label: $T('Unique Hits')
+                label: $t.gettext('Unique Hits')
             }]
         };
 
@@ -168,7 +169,7 @@ $(function() {
                 if (data.material.tree !== null) {
                     draw_jqTree(data.material.tree);
                 } else {
-                    $(treeDOMTarget).html($T('No material found'));
+                    $(treeDOMTarget).html($t.gettext('No material found'));
                 }
             }
         });
@@ -215,7 +216,7 @@ $(function() {
                     if (data.graphs[request.report] !== null) {
                         graph_holder.attr('src', data.graphs[request.report]);
                     } else {
-                        var error = $('<div>').text($T("No graph data received"));
+                        var error = $('<div>').text($t.gettext("No graph data received"));
                         graph_holder.replaceWith(error);
                     }
                 }
