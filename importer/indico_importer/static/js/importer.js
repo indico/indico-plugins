@@ -15,9 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+(function() {
+    var $t = $T.domain('piwik');
+
     /** Namespace for importer utility functions and variables */
-    global.ImporterUtils = {
+    var ImporterUtils = {
          /** Possible extensions for resources */
          resourcesExtensionList : {'pdf' : 1, 'doc' : 1, 'docx' : 1, 'ppt' : 1},
 
@@ -26,18 +28,18 @@
                                "dummy" : "Dummy"},
 
          /** Short names of the months. */
-         shortMonthsNames : [$T("Jan"),
-                             $T("Feb"),
-                             $T("Mar"),
-                             $T("Apr"),
-                             $T("May"),
-                             $T("Jun"),
-                             $T("Jul"),
-                             $T("Aug"),
-                             $T("Sep"),
-                             $T("Oct"),
-                             $T("Nov"),
-                             $T("Dec")],
+         shortMonthsNames : [$t.gettext("Jan"),
+                             $t.gettext("Feb"),
+                             $t.gettext("Mar"),
+                             $t.gettext("Apr"),
+                             $t.gettext("May"),
+                             $t.gettext("Jun"),
+                             $t.gettext("Jul"),
+                             $t.gettext("Aug"),
+                             $t.gettext("Sep"),
+                             $t.gettext("Oct"),
+                             $t.gettext("Nov"),
+                             $t.gettext("Dec")],
         /**
          * Converts minutes to the hour string (format HH:MM).
          * If minutes are greater than 1440 (24:00) value '00:00' is returned.
@@ -259,7 +261,7 @@
                         self._showLists();
                     }]);
                 };
-                var searchButton = Html.input('button', {}, $T('search'));
+                var searchButton = Html.input('button', {}, $t.gettext('search'));
                 searchButton.observeClick(search);
                 var importFrom = Html.select({});
                 for (var importer in this.importers)
@@ -290,14 +292,14 @@
                         {"height" : this.height - 80, "width" : this.width / 2 - 20, "cssFloat" : "right"},
                         'treeList', 'treeListDayName', 'treeListEntry', true, _observeInsertButton);
                 return Html.div({},
-                        Html.div({className:'importDialogHeader', style:{width:pixels(this.width * 0.9)}}, query, searchButton, $T(" in "), importFrom),
+                        Html.div({className:'importDialogHeader', style:{width:pixels(this.width * 0.9)}}, query, searchButton, ' ', $t.gettext("in"), ' ', importFrom),
                         this.emptySearchDiv.draw(), this.importerList.draw(), this.timetableList.draw());
             },
 
             _getButtons: function() {
                 var self = this;
                 return [
-                    [$T('Proceed...'), function() {
+                    [$t.gettext('Proceed...'), function() {
                         var destination = self.timetableList.getSelection();
                         var entries = self.importerList.getSelectedList();
                         var importer = self.importerList.getLastImporter();
@@ -312,7 +314,7 @@
                             }
                         });
                     }],
-                    [$T('Close'), function() {
+                    [$t.gettext('Close'), function() {
                         self.close();
                     }]
                 ];
@@ -321,7 +323,7 @@
             draw: function() {
                 this.insertButton = this.buttons.eq(0);
                 this.insertButton.disabledButtonWithTooltip({
-                    tooltip: $T('Please select contributions to be added and their destination.'),
+                    tooltip: $t.gettext('Please select contributions to be added and their destination.'),
                     disabled: true
                 });
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent());
@@ -339,7 +341,7 @@
          */
         function(timetable) {
             var self = this;
-            this.ExclusivePopupWithButtons($T("Import Entries"));
+            this.ExclusivePopupWithButtons($t.gettext("Import Entries"));
             this.timetable = timetable?timetable:window.timetable;
             this.topTimetable = this.timetable.parentTimetable ? this.timetable.parentTimetable : this.timetable;
             this.confId = this.topTimetable.contextInfo.id;
@@ -379,10 +381,13 @@
             },
 
             draw: function() {
-                this.firstSearch = Html.span({style:{display:"inline"}}, $T("Please type your search phrase and press 'search'."));
-                var hereLink = Html.span({className: 'fakeLink'}, $T("here"));
+                this.firstSearch = Html.span({style:{display:"inline"}}, $t.gettext("Please type your search phrase and press 'search'."));
+                var hereLink = Html.span({className: 'fakeLink'}, $t.gettext("here"));
                 hereLink.observeClick(this.afterSearchAction);
-                this.afterSearch = Html.span({style:{display:"none"}}, $T("Your entries were inserted "), Html.span({style:{fontWeight:'bold'}}, $T("successfully")), $T(". Please specify a new query or click "), hereLink, $T(" to see the previous results."));
+                this.afterSearch = Html.span(
+                    {style: {display: 'none'}},
+                    $t.gettext("Your entries were inserted <strong>successfully</strong>. Please specify a new query or click"), ' ', hereLink, ' ', $t.gettext("to see the previous results.")
+                );
                 this.contentDiv = Html.div({className:'presearchContainer', style:{"height" : pixels(this.height - 130)}}, this.firstSearch, this.afterSearch);
                 return this.contentDiv;
             }
@@ -449,9 +454,9 @@
                 $B(this.info.accessor("redirect"), redirectCheckbox);
 
                 return IndicoUtil.createFormFromMap([
-                    [$T("Duration time of every inserted contribution:"), durationField],
-                    [$T("Start time of the first contribution:"), timeField],
-                    [$T("Show me the destination:"), redirectCheckbox]
+                    [$t.gettext("Duration time of every inserted contribution:"), durationField],
+                    [$t.gettext("Start time of the first contribution:"), timeField],
+                    [$t.gettext("Show me the destination:"), redirectCheckbox]
                 ]);
             },
 
@@ -490,7 +495,7 @@
             _getButtons: function() {
                 var self = this;
                 return [
-                    [$T('Insert'), function() {
+                    [$t.gettext('Insert'), function() {
                         if (!self.parameterManager.check()) {
                             return;
                         }
@@ -556,7 +561,7 @@
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
                         }
                     }],
-                    [$T('Cancel'), function() {
+                    [$t.gettext('Cancel'), function() {
                         self.close();
                     }]
                 ];
@@ -578,7 +583,7 @@
          */
         function(entries, destination, confId, timetable, importer, successFunction) {
             var self = this;
-            this.ExclusivePopupWithButtons($T('Adjust entries'));
+            this.ExclusivePopupWithButtons($t.gettext('Adjust entries'));
             this.confId = confId;
             this.entries = entries;
             this.destination = destination;
@@ -813,37 +818,37 @@
                 record = record.get();
                 // Empty fields are not displayed.
                 if (record.get("reportNumbers")) {
-                    var reportNumber = Html.div({}, Html.em({}, $T("Report number(s)")), ":");
+                    var reportNumber = Html.div({}, Html.em({}, $t.gettext("Report number(s)")), ":");
                     each(record.get("reportNumbers"), function(id) {
                         reportNumber.append(" " + id);
                     });
                     recordDiv.append(reportNumber);
                 }
                 if (record.get("title")) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Title")), ": ", record.get("title")));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Title")), ": ", record.get("title")));
                 }
                 if (record.get("meetingName")) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Meeting")), ": ", record.get("meetingName")));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Meeting")), ": ", record.get("meetingName")));
                 }
                 // Speaker, primary and secondary authors are stored in dictionaries. Their property have to be checked.
                 if (ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Primary author")), ": ", this._getPersonString(record.get("primaryAuthor"))));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Primary author")), ": ", this._getPersonString(record.get("primaryAuthor"))));
                 }
                 if (ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Secondary author")), ": ", this._getPersonString(record.get("secondaryAuthor"))));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Secondary author")), ": ", this._getPersonString(record.get("secondaryAuthor"))));
                 }
                 if (ImporterUtils.isPersonEmpty(record.get("speaker"))) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Speaker")), ": ", this._getPersonString(record.get("speaker"))));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Speaker")), ": ", this._getPersonString(record.get("speaker"))));
                 }
                 if (record.get("summary")) {
                     var summary = record.get("summary");
                     //If summary is too long it need to be truncated.
                     if (summary.length < 200) {
-                        recordDiv.append(Html.div({}, Html.em({}, $T("Summary")), ": " , summary));
+                        recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Summary")), ": " , summary));
                     } else {
                         var summaryBeg = Html.span({}, summary.substr(0, 200));
                         var summaryEnd = Html.span({style:{display:'none'}}, summary.substr(200));
-                        var showLink = Html.span({className:'fakeLink'}, $T(" (show all)"));
+                        var showLink = Html.span({className:'fakeLink'}, $t.gettext(" (show all)"));
                         showLink.observeClick(function(evt) {
                             summaryEnd.dom.style.display = "inline";
                             showLink.dom.style.display = "none";
@@ -853,7 +858,7 @@
                             //Recalculating position of the selection number
                             self.observeSelection(self.selectedList);
                         });
-                        var hideLink = Html.span({className:'fakeLink', style:{display:'none'}}, $T(" (hide)"));
+                        var hideLink = Html.span({className:'fakeLink', style:{display:'none'}}, $t.gettext(" (hide)"));
                         hideLink.observeClick(function(evt) {
                             summaryEnd.dom.style.display = "none";
                             showLink.dom.style.display = "inline";
@@ -863,16 +868,16 @@
                             //Recalculating position of the selection number
                             self.observeSelection(self.selectedList);
                         });
-                        var sumamaryDiv = Html.div({}, Html.em({}, $T("Summary")), ": " , summaryBeg, showLink, summaryEnd, hideLink);
+                        var sumamaryDiv = Html.div({}, Html.em({}, $t.gettext("Summary")), ": " , summaryBeg, showLink, summaryEnd, hideLink);
                         recordDiv.append(sumamaryDiv);
                     }
                 }
                 if (record.get("place")) {
-                    recordDiv.append(Html.div({}, Html.em({}, $T("Place")), ": ", record.get("place")));
+                    recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Place")), ": ", record.get("place")));
                 }
                 if (record.get("materials")) {
                     record.set("materials", this._convertMaterials(record.get("materials")));
-                    var materials = Html.div({}, Html.em({}, $T("Materials")), ":");
+                    var materials = Html.div({}, Html.em({}, $t.gettext("Materials")), ":");
                     for (var mat in record.get("materials")) {
                         var materialType = Html.div({}, mat + ":");
                         each(record.get("materials")[mat], function(resource) {
@@ -913,16 +918,16 @@
                     record.dom.lastChild.innerHTML = seq;
                     switch(seq) {
                         case 1:
-                            record.dom.lastChild.innerHTML += $T('st');
+                            record.dom.lastChild.innerHTML += $t.gettext('st');
                             break;
                         case 2:
-                            record.dom.lastChild.innerHTML += $T('nd');
+                            record.dom.lastChild.innerHTML += $t.gettext('nd');
                             break;
                         case 3:
-                            record.dom.lastChild.innerHTML += $T('rd');
+                            record.dom.lastChild.innerHTML += $t.gettext('rd');
                             break;
                         default:
-                            record.dom.lastChild.innerHTML += $T('th');
+                            record.dom.lastChild.innerHTML += $t.gettext('th');
                             break;
                     }
                     ++seq;
@@ -1005,8 +1010,7 @@
                         this.emptyDescriptionDiv.dom.style.display = 'block';
                         this.moreEntriesDiv.dom.style.display = 'none';
                     } else {
-                        this.entriesCount.dom.innerHTML = this.importerWidget.getLength() == 1?
-                                $T("1 entry was found. "):this.importerWidget.getLength() + $T(" entries were found. ");
+                        this.entriesCount.dom.innerHTML = $t.ngettext("One entry was found. ", "{0} entries were found. ", this.importerWidget.getLength()).format(this.importerWidget.getLength());
                         this.descriptionDiv.dom.style.display = 'block';
                         this.emptyDescriptionDiv.dom.style.display = 'none';
                         if (this.importerWidget.isMoreToImport()) {
@@ -1071,14 +1075,14 @@
 
             _drawHeader: function() {
                 this.entriesCount = Html.span({}, '0');
-                this.descriptionDiv = Html.div({className:'entryListDesctiption'}, this.entriesCount, $T("Please select the results you want to insert."));
-                this.emptyDescriptionDiv = Html.div({className:'entryListDesctiption'}, $T("No result were found. Please change the search phrase."));
-                return Html.div({}, Html.div({className:'entryListHeader'}, $T("Step 1: Search results:")), this.descriptionDiv, this.emptyDescriptionDiv);
+                this.descriptionDiv = Html.div({className:'entryListDesctiption'}, this.entriesCount, $t.gettext("Please select the results you want to insert."));
+                this.emptyDescriptionDiv = Html.div({className:'entryListDesctiption'}, $t.gettext("No results were found. Please change the search phrase."));
+                return Html.div({}, Html.div({className:'entryListHeader'}, $t.gettext("Step 1: Search results:")), this.descriptionDiv, this.emptyDescriptionDiv);
             },
 
             _drawImporterDiv: function() {
                 var self = this;
-                this.moreEntriesDiv = Html.div({className:'fakeLink', style:{paddingBottom:pixels(15), textAlign:'center', clear: 'both', marginTop: pixels(15)}}, $T("more results"));
+                this.moreEntriesDiv = Html.div({className:'fakeLink', style:{paddingBottom:pixels(15), textAlign:'center', clear: 'both', marginTop: pixels(15)}}, $t.gettext("more results"));
                 this.moreEntriesDiv.observeClick(function() {
                     self.append(20);
                 });
@@ -1315,8 +1319,8 @@
             },
 
             draw: function() {
-                this.contentDiv = Html.div({className:'treeListContainer'}, Html.div({className:'treeListHeader'}, $T("Step 2: Choose destination:")),
-                        Html.div({className:'treeListDescription'}, $T("Please select the place in which the contributions will be inserted.")));
+                this.contentDiv = Html.div({className:'treeListContainer'}, Html.div({className:'treeListHeader'}, $t.gettext("Step 2: Choose destination:")),
+                        Html.div({className:'treeListDescription'}, $t.gettext("Please select the place in which the contributions will be inserted.")));
                 var treeDiv = Html.div({style:{overflow:'auto'}}, this.timetableList.draw());
                 for (var style in this.style) {
                     this.contentDiv.setStyle(style, this.style[style]);
@@ -1356,4 +1360,4 @@
             new ImportDialog(timetable);
         });
     });
-})(window);
+})();
