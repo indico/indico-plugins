@@ -16,6 +16,8 @@
  */
 
 (function(global) {
+    var $t = $T.domain('search');
+
     type('IntelligentSearchBox', ['RealtimeTextBox'], {
         _highlight: function(elem, token) {
             // Code for highlighting the matched part of the string
@@ -45,7 +47,7 @@
                 this.totalNumber = new WatchValue(totalNumber);
                 this.suggestionList = Html.ul();
 
-                var infoBox = Html.div('help', $T("Some category suggestions..."));
+                var infoBox = Html.div('help', $t.gettext("Some category suggestions..."));
 
                 // Create the suggestion box
                 this.suggestionBox = Html.div({
@@ -59,7 +61,7 @@
                 infoBox,
                 this.suggestionList,
                 $B(Html.div('other-results'), this.totalNumber, function(number) {
-                    return number === 0 ? '' : number + ' ' + $T('other results - please write more...');
+                    return number === 0 ? '' : number + ' ' + $t.gettext('other results - please write more...');
                 }));
 
                 this.container.append(this.suggestionBox);
@@ -340,7 +342,7 @@
             '</div>');
 
             var $tag = this.$tag = $(tag_template({
-                categ_title: this.options.everywhere ? $T('Everywhere') : this.options.categ_title
+                categ_title: this.options.everywhere ? $t.gettext('Everywhere') : this.options.categ_title
             }));
 
             $(this.element).replaceWith($tag);
@@ -400,7 +402,7 @@
         search_everywhere: function() {
             $('.cross', this.$tag).hide();
             this.$tag.addClass('everywhere').removeClass('in-category');
-            this._transition($T('Everywhere'), true);
+            this._transition($t.gettext('Everywhere'), true);
             this.options.form.attr('action', this.options.search_url);
         },
 
@@ -419,7 +421,7 @@
 
         show_tip: function(event) {
             this.$tag.qtip({
-                content: format($T('Click to search inside <span class="label">{title}</span>'), {title: this.options.categ_title}),
+                content: format($t.gettext('Click to search inside <span class="label">{title}</span>'), {title: this.options.categ_title}),
                 position: {
                     at: 'bottom center',
                     my: 'top center'
@@ -442,7 +444,7 @@
             $where.removeData('hasFocus');
             setTimeout(function() {
                 if (!$where.data('hasFocus')) {
-                    self._transition($T('Everywhere'), true);
+                    self._transition($t.gettext('Everywhere'), true);
                     self.$tag.addClass('everywhere');
                 }
             }, 200);
