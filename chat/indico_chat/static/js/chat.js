@@ -17,6 +17,7 @@
 
 (function(global) {
     'use strict';
+    var $t = $T.domain('chat');
 
     global.eventManageChat = function eventManageChat() {
         $('.toggle-details').on('click', function(e) {
@@ -32,16 +33,16 @@
         $('.js-chat-remove-room').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            var msg = $T('Do you really want to remove this chatroom from the event?');
+            var msg = $t.gettext('Do you really want to remove this chatroom from the event?');
             if ($this.data('numEvents') == 1) {
                 msg += '<br>';
                 if ($this.data('customServer')) {
-                    msg += $T('Since it is on an external server, it will not be deleted on that server.');
+                    msg += $t.gettext('Since it is on an external server, it will not be deleted on that server.');
                 } else {
-                    msg += $T('Since it is only used in this event, it will be deleted from the Jabber server, too!');
+                    msg += $t.gettext('Since it is only used in this event, it will be deleted from the Jabber server, too!');
                 }
             }
-            new ConfirmPopup($T('Delete this chatroom?'), msg, function(confirmed) {
+            new ConfirmPopup($t.gettext('Delete this chatroom?'), msg, function(confirmed) {
                 if (!confirmed) {
                     return;
                 }
@@ -65,9 +66,9 @@
                         return;
                     }
                     if (data.result == 'not-found') {
-                        new AlertPopup($T('Chatroom not found'), $T('The chatroom does not exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
+                        new AlertPopup($t.gettext('Chatroom not found'), $t.gettext('The chatroom does not exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
                     } else if (data.result == 'changed') {
-                        new AlertPopup($T('Chatroom updated'), $T('The chatroom data has been updated.'), function() {
+                        new AlertPopup($t.gettext('Chatroom updated'), $t.gettext('The chatroom data has been updated.'), function() {
                             window.location.href = window.location.href;
                         }).open();
                     }
@@ -95,7 +96,7 @@
                     return;
                 }
                 else if (!data.success) {
-                    new AlertPopup($T('No logs available'), data.msg).open();
+                    new AlertPopup($t.gettext('No logs available'), data.msg).open();
                     return;
                 }
                 var doc = iframe[0].contentWindow.document;
@@ -131,11 +132,11 @@
                         return;
                     }
                     else if (!data.success) {
-                        new AlertPopup($T('Could not create material'), data.msg).open();
+                        new AlertPopup($t.gettext('Could not create material'), data.msg).open();
                         return;
                     }
                     $('#chat-log-material').find('input, button').prop('disabled', true).blur();
-                    new AlertPopup($T('Material created'), $T('The chat logs have been attached to the event.')).open();
+                    new AlertPopup($t.gettext('Material created'), $t.gettext('The chat logs have been attached to the event.')).open();
                 }
             });
         });
