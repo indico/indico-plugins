@@ -11,7 +11,7 @@
                      <tr>
                         <th class="small-column"></th>
                         <th>{% trans %}Name{% endtrans %}</th>
-                        <th class="col-50">Actions</th>
+                        <th class="col-50">{% trans %}Actions{% endtrans %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,15 +54,15 @@
                                     <dt>{% trans %}Server{% endtrans %}</dt>
                                     <dd><span class="{% if chatroom.custom_server %}chat-custom-server{% endif %}">{{ server }}</span></dd>
                                     {% if chatroom.description %}
-                                        <dt>Description</dt>
+                                        <dt>{% trans %}Description{% endtrans %}</dt>
                                         <dd>{{ chatroom.description }}</dd>
                                     {% endif %}
                                     <dt>{% trans %}Hidden{% endtrans %}</dt>
                                     <dd>{% if event_chatroom.hidden %}Yes{% else %}No{% endif %}</dd>
                                     {% if chatroom.password %}
-                                        <dt>Password</dt>
+                                        <dt>{% trans %}Password{% endtrans %}</dt>
                                         <dd>{{ chatroom.password }}</dd>
-                                        <dt>Password visible</dt>
+                                        <dt>{% trans %}Password{% endtrans %} visible</dt>
                                         <dd>{% if event_chatroom.show_password %}Yes{% else %}No{% endif %}</dd>
                                     {% endif %}
                                     <dt>{% trans %}Created by{% endtrans %}</dt>
