@@ -18,6 +18,7 @@ from urllib2 import urlopen, urlparse, URLError
 
 from flask_pluginengine import current_plugin
 
+
 class PiwikRequest(object):
     """Wrapper for Piwik API requests"""
 
