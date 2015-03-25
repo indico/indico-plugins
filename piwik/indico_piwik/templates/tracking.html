@@ -1,7 +1,9 @@
 <!-- Piwik -->
-<script type="text/javascript">
-
+<script>
+    var _paq = _paq || [];
     (function() {
+        'use strict';
+
         var url = '//{{ server_url }}';
         var g = document.createElement('script');
         var s = document.getElementsByTagName('script')[0];
@@ -9,9 +11,10 @@
         g.defer = true;
         g.async = true;
         g.src = url + 'piwik.js';
+        g.onload = init_tracking;
         s.parentNode.insertBefore(g, s);
 
-        window.piwikAsyncInit = function() {
+        function init_tracking() {
             try {
                 track_site();
                 {% if event_id %}
@@ -20,14 +23,14 @@
             } catch(err) {}
         }
 
-        track_site = function() {
+        function track_site() {
             var general_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_general }});
             general_tracker.enableLinkTracking();
             general_tracker.trackPageView();
         }
 
         {% if event_id %}
-            track_event = function() {
+            function track_event() {
                 var event_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_events }});
                 event_tracker.enableLinkTracking();
                 event_tracker.setCustomVariable(1, 'Conference', '{{ event_id }}', 'page');
