@@ -134,6 +134,16 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         flag_modified(vc_room, 'data')
 
     def create_room(self, vc_room, event):
+        """Create a new Vidyo room for an event, given a VC room.
+
+        In order to create the Vidyo room, the function will try to do so with
+        all the available identities of the user based on the authenticators
+        defined in Vidyo plugin's settings, in that order.
+
+        :param vc_room: VCRoom -- The VC room from which to create the Vidyo
+            room
+        :param event: Conference -- The event to the Vidyo room will be attached
+        """
         client = AdminClient(self.settings)
 
         owner = retrieve_principal(vc_room.data['owner'])
