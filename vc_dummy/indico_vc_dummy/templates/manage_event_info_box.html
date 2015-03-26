@@ -1,0 +1,13 @@
+<dl class="details-container">
+    <dt>{% trans %}Plugin type{% endtrans %}</dt>
+    <dd>{{ vc_room.type }}</dd>
+    <dt>{% trans %}Favorite color{% endtrans %}</dt>
+    <dd><i
+        {% if event_vc_room.data.show_phone_numbers %}
+            class="icon-checkbox-checked"
+        {% else %}
+            class="icon-checkbox-unchecked"
+        {% endif %}
+        ></i>
+    </dd>
+</dl>

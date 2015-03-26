@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields.core import BooleanField
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
 from indico.modules.vc import VCPluginMixin
 from indico.modules.vc.forms import VCRoomFormBase
 from indico.web.forms.widgets import SwitchWidget
@@ -37,7 +38,32 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
     """
     configurable = True
     vc_room_form = VCRoomForm
+    friendly_name = "Dummy"
 
     @property
     def logo_url(self):
-        return "http://fc05.deviantart.net/fs70/f/2011/257/7/7/_dummy__vector_by_phlum-d49u7mk.png"
+        return url_for_plugin(self.name + '.static', filename='images/dummy_logo.png')
+
+    @property
+    def icon_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/dummy_icon.png')
+
+    def get_blueprints(self):
+        return IndicoPluginBlueprint('vc_dummy', __name__)
+
+    def create_room(self, vc_room, event):
+        pass
+
+    def delete_room(self, vc_room, event):
+        pass
+
+    def update_room(self, vc_room, event):
+        pass
+
+    def update_data_association(self, event, vc_room, event_vc_room, data):
+        super(DummyPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
+        event_vc_room.data.update({key: data.pop(key) for key in [
+            'show_phone_numbers'
+        ]})
+
+        flag_modified(event_vc_room, 'data')
