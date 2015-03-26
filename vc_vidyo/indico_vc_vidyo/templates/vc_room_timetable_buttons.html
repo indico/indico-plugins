@@ -1,44 +1,8 @@
+{% extends 'vc/vc_room_timetable_buttons.html' %}
 {% from 'vc_vidyo:buttons.html' import render_join_button, render_make_me_moderator  %}
 {% set vc_room = event_vc_room.vc_room %}
-{% set plugin = vc_room.plugin %}
-<div class="toolbar right vc-toolbar">
-    <div class="group">
-        <span id="vc-room-{{ vc_room.id }}" class="i-button i-button-small label vc-room-info">
-            <img src="{{ plugin.icon_url }}" style="width: 18px;">
-        </span>
-        <div style="display: none;">
-            <span>{{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}</span>
-        </div>
-        {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
-        {{ render_make_me_moderator(event, vc_room, event_vc_room) }}
-    </div>
-    {{ template_hook('vidyo-event-timetable-buttons', event_vc_room=event_vc_room) }}
-</div>
-<script>
-$(function() {
-    $('#vc-room-{{ vc_room.id }}').qtip({
-        content: {
-            text: $('#vc-room-{{ vc_room.id }}').next('div')
-        },
-        position: {
-            my: 'top middle',
-            at: 'bottom middle'
-        },
-        show: {
-            solo: true
-        },
-        hide: {
-            event: 'mouseleave',
-            leave: false,
-            fixed: true,
-            delay: 500,
-            effect: function() {
-                $(this).fadeOut(300);
-            }
-        },
-        style: {
-            classes: 'qtip-rounded qtip-shadow qtip-popup vc-room-info-qtip'
-        }
-    });
-});
-</script>
+
+{% block buttons %}
+    {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
+    {{ render_make_me_moderator(event, vc_room, event_vc_room) }}
+{% endblock %}

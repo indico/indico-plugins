@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session
+from flask_pluginengine import render_plugin_template
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
@@ -316,3 +317,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         new_id = int(user.id)
         old_id = int(merged.id)
         VidyoExtension.find(owned_by_id=old_id).update({'owned_by_id': new_id})
+
+    def get_notification_cc_list(self, action, vc_room, event):
+        owner = retrieve_principal(vc_room.data['owner'])
+        return {owner.getEmail()} if owner else set()
