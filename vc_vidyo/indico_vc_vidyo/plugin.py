@@ -53,11 +53,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     indico_room_prefix = IntegerField(_('Indico tenant prefix'), [NumberRange(min=0)],
                                       description=_('The tenant prefix for Indico rooms created on this server'))
     room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
-                                  description=_('Group name for public video conference rooms created by Indico'))
+                                  description=_('Group name for public videoconference rooms created by Indico'))
     authenticators = StringField(_('Authenticators'), [DataRequired()],
                                  description=_('Authenticators to convert Indico users to Vidyo accounts'))
     num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
-                                description=_('Number of days after an Indico event when a video conference room is '
+                                description=_('Number of days after an Indico event when a videoconference room is '
                                               'considered old'))
     max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1), DataRequired()],
                                      description=_('Maximum number of rooms until a warning is sent to the managers'))
@@ -70,7 +70,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     """Vidyo
 
-    Video conferencing with Vidyo
+    Videoconferencing with Vidyo
     """
     configurable = True
     strict_settings = True
