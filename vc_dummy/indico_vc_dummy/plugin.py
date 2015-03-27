@@ -34,7 +34,7 @@ class VCRoomForm(VCRoomFormBase):
 class DummyPlugin(VCPluginMixin, IndicoPlugin):
     """Dummy
 
-    Dummy Video conferencing plugin
+    Dummy videoconferencing plugin
     """
     configurable = True
     vc_room_form = VCRoomForm

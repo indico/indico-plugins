@@ -25,7 +25,7 @@ class VidyoExtension(db.Model):
     __tablename__ = 'vidyo_extensions'
     __table_args__ = {'schema': 'plugin_vc_vidyo'}
 
-    #: ID of the video conference room
+    #: ID of the videoconference room
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
