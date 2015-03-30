@@ -81,7 +81,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def init(self):
         super(VidyoPlugin, self).init()
-        self.inject_css('vc_vidyo_css', WPVCManageEvent)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
 
@@ -281,7 +280,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return IndicoPluginBlueprint('vc_vidyo', __name__)
 
     def register_assets(self):
-        self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
     def add_cli_command(self, manager):
