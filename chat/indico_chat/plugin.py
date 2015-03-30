@@ -129,10 +129,12 @@ class ChatPlugin(IndicoPlugin):
     def extend_indico_help(self, sender, **kwargs):
         return {
             _('Chat Guides'): {
-                _('Chat User Guide'): ('ihelp/html/Chat/ChatUserGuide.html',
-                                       'ihelp/pdf/IndicoChatUserGuide.pdf'),
-                _('Recommended Chat Clients'): ('ihelp/html/Chat/XMPPClients.html',
-                                                'ihelp/pdf/IndicoChatXMPPClients.pdf')
+                _('Chat User Guide'):
+                    (url_for_plugin(self.name + '.static', filename='help/html/ChatUserGuide.html'),
+                     url_for_plugin(self.name + '.static', filename='help/pdf/ChatUserGuide.pdf')),
+                _('Recommended Chat Clients'):
+                    (url_for_plugin(self.name + '.static', filename='help/html/XMPPClients.html'),
+                     url_for_plugin(self.name + '.static', filename='help/pdf/XMPPClients.pdf'))
             }
         }
 

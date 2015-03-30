@@ -10,3 +10,4 @@ htmlcov/
 dist/
 build/
 wheelhouse/
+**/static/help/
