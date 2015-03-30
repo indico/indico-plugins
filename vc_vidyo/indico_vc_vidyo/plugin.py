@@ -28,7 +28,7 @@ from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBluepr
 from indico.core import signals
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
-from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
+from indico.modules.vc.views import WPVCEventPage
 from indico.util.user import retrieve_principal, principal_to_tuple
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
@@ -82,7 +82,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.connect(signals.indico_help, self._extend_indico_help)
-        self.inject_css('vc_vidyo_css', WPVCManageEvent)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
 
@@ -302,7 +301,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return IndicoPluginBlueprint('vc_vidyo', __name__)
 
     def register_assets(self):
-        self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
     def add_cli_command(self, manager):
