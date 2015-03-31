@@ -5,7 +5,8 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = $(filter-out $(wildcard ../*.egg-info), $(wildcard ../indico_*))/static/help
+BUILDDIR      = build
+INSTALLDIR    = $(filter-out %.egg-info, $(wildcard ../indico_*))/static/help
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -14,7 +15,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) sou
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 
-.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help clean install html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf pdf text man changes linkcheck doctest gettext
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -29,6 +30,7 @@ help:
 	@echo "  epub       to make an epub"
 	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  latexpdf   to make LaTeX files and run them through pdflatex"
+	@echo "  pdf        to make standalone PDF files"
 	@echo "  text       to make text files"
 	@echo "  man        to make manual pages"
 	@echo "  texinfo    to make Texinfo files"
@@ -38,8 +40,19 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
+
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(INSTALLDIR)/*
+
+install: html pdf
+	mkdir -p $(INSTALLDIR)
+	cp -r $(BUILDDIR)/html $(INSTALLDIR)/html
+	cp -r $(BUILDDIR)/pdf $(INSTALLDIR)/pdf
+	-rm -rf $(INSTALLDIR)/html/_sources
+	-rm $(INSTALLDIR)/html/*.inv
+	@echo
+	@echo "Docs installed in $(INSTALLDIR)."
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -106,9 +119,12 @@ latexpdf:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through pdflatex..."
 	$(MAKE) -C $(BUILDDIR)/latex all-pdf
+	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
+
+pdf: latexpdf
 	mkdir -p $(BUILDDIR)/pdf
-	cp $(BUILDDIR)/latex/*.pdf $(BUILDDIR)/pdf/
-	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/pdf."
+	mv $(BUILDDIR)/latex/*.pdf $(BUILDDIR)/pdf/
+	@echo "pdf finished; the PDF files have been moved to $(BUILDDIR)/pdf."
 
 text:
 	$(SPHINXBUILD) -b text $(ALLSPHINXOPTS) $(BUILDDIR)/text
