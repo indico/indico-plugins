@@ -1,9 +1,7 @@
+{% extends 'vc/event_buttons.html' %}
 {% from 'vc_vidyo:buttons.html' import render_join_button, render_make_me_moderator  %}
 
-<div class="event-service-toolbar vc-toolbar toolbar right">
-    <div class="group">
-        {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
-        {{ render_make_me_moderator(event, vc_room, event_vc_room) }}
-    </div>
-    {{ template_hook('vidyo-event-buttons', event_vc_room=event_vc_room) }}
-</div>
+{% block buttons %}
+    {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
+    {{ render_make_me_moderator(event, vc_room, event_vc_room) }}
+{% endblock %}

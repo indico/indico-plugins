@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session
+from flask_pluginengine import render_plugin_template
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
@@ -52,11 +53,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     indico_room_prefix = IntegerField(_('Indico tenant prefix'), [NumberRange(min=0)],
                                       description=_('The tenant prefix for Indico rooms created on this server'))
     room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
-                                  description=_('Group name for public video conference rooms created by Indico'))
+                                  description=_('Group name for public videoconference rooms created by Indico'))
     authenticators = StringField(_('Authenticators'), [DataRequired()],
                                  description=_('Authenticators to convert Indico users to Vidyo accounts'))
     num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
-                                description=_('Number of days after an Indico event when a video conference room is '
+                                description=_('Number of days after an Indico event when a videoconference room is '
                                               'considered old'))
     max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1), DataRequired()],
                                      description=_('Maximum number of rooms until a warning is sent to the managers'))
@@ -69,7 +70,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     """Vidyo
 
-    Video conferencing with Vidyo
+    Videoconferencing with Vidyo
     """
     configurable = True
     strict_settings = True
@@ -80,7 +81,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def init(self):
         super(VidyoPlugin, self).init()
-        self.inject_css('vc_vidyo_css', WPVCManageEvent)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
 
@@ -280,7 +280,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return IndicoPluginBlueprint('vc_vidyo', __name__)
 
     def register_assets(self):
-        self.register_css_bundle('vc_vidyo_css', 'css/vc_vidyo.scss')
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
     def add_cli_command(self, manager):
@@ -316,3 +315,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         new_id = int(user.id)
         old_id = int(merged.id)
         VidyoExtension.find(owned_by_id=old_id).update({'owned_by_id': new_id})
+
+    def get_notification_cc_list(self, action, vc_room, event):
+        owner = retrieve_principal(vc_room.data['owner'])
+        return {owner.getEmail()} if owner else set()
