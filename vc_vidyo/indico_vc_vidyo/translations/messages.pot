@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,192 +17,192 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_vc_vidyo/forms.py:33
+#: indico_vc_vidyo/forms.py:34
 msgid "The PIN must be a number"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:38
+#: indico_vc_vidyo/forms.py:39
 msgid "Show PIN"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:40
+#: indico_vc_vidyo/forms.py:41
 msgid "Show the VC Room PIN on the event page (insecure!)"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:41
+#: indico_vc_vidyo/forms.py:42
 msgid "Show Auto-join URL"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:43
+#: indico_vc_vidyo/forms.py:44
 msgid "Show the auto-join URL on the event page"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:44
+#: indico_vc_vidyo/forms.py:45
 msgid "Show Phone Access numbers"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:46
+#: indico_vc_vidyo/forms.py:47
 msgid "Show a link to the list of phone access numbers"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:59 indico_vc_vidyo/templates/info_box.html:8
-#: indico_vc_vidyo/templates/manage_event_info_box.html:4
+#: indico_vc_vidyo/forms.py:60 indico_vc_vidyo/templates/info_box.html:7
+#: indico_vc_vidyo/templates/manage_event_info_box.html:6
 msgid "Description"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:59
+#: indico_vc_vidyo/forms.py:60
 msgid "The description of the room"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:60
+#: indico_vc_vidyo/forms.py:61
 msgid "Owner"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:61
+#: indico_vc_vidyo/forms.py:62
 msgid "The owner of the room"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:62
-#: indico_vc_vidyo/templates/manage_event_info_box.html:42
+#: indico_vc_vidyo/forms.py:63
+#: indico_vc_vidyo/templates/manage_event_info_box.html:38
 msgid "Moderation PIN"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:64
+#: indico_vc_vidyo/forms.py:65
 msgid "Used to moderate the VC Room"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:66 indico_vc_vidyo/templates/info_box.html:19
+#: indico_vc_vidyo/forms.py:67 indico_vc_vidyo/templates/info_box.html:18
 #: indico_vc_vidyo/templates/manage_event_info_box.html:32
 msgid "Room PIN"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:67
+#: indico_vc_vidyo/forms.py:68
 msgid "Used to protect the access to the VC Room (leave blank for open access)"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:68
+#: indico_vc_vidyo/forms.py:69
 msgid "Auto mute"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:69
+#: indico_vc_vidyo/forms.py:70
 msgid "On"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:69
+#: indico_vc_vidyo/forms.py:70
 msgid "Off"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:70
+#: indico_vc_vidyo/forms.py:71
 msgid ""
 "The VidyoDesktop clients will join the VC room muted by default (audio "
 "and video)"
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:76
+#: indico_vc_vidyo/forms.py:77
 msgid "Unable to find this user in Indico."
 msgstr ""
 
-#: indico_vc_vidyo/forms.py:79
+#: indico_vc_vidyo/forms.py:80
 msgid "This user does not have a suitable account to use Vidyo."
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:46
+#: indico_vc_vidyo/plugin.py:47
 msgid "Vidyo email support"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:47
+#: indico_vc_vidyo/plugin.py:48
 msgid "Username"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:47
+#: indico_vc_vidyo/plugin.py:48
 msgid "Indico username for Vidyo"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:48
+#: indico_vc_vidyo/plugin.py:49
 msgid "Password"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:49
+#: indico_vc_vidyo/plugin.py:50
 msgid "Indico password for Vidyo"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:50
+#: indico_vc_vidyo/plugin.py:51
 msgid "Admin API WSDL URL"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:51
+#: indico_vc_vidyo/plugin.py:52
 msgid "User API WSDL URL"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:52
+#: indico_vc_vidyo/plugin.py:53
 msgid "Indico tenant prefix"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:53
+#: indico_vc_vidyo/plugin.py:54
 msgid "The tenant prefix for Indico rooms created on this server"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:54
+#: indico_vc_vidyo/plugin.py:55
 msgid "Public rooms' group name"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:55
-msgid "Group name for public video conference rooms created by Indico"
-msgstr ""
-
 #: indico_vc_vidyo/plugin.py:56
-msgid "Authenticators"
+msgid "Group name for public videoconference rooms created by Indico"
 msgstr ""
 
 #: indico_vc_vidyo/plugin.py:57
-msgid "Authenticators to convert Indico users to Vidyo accounts"
+msgid "Authenticators"
 msgstr ""
 
 #: indico_vc_vidyo/plugin.py:58
-msgid "VC room age threshold"
+msgid "Authenticators to convert Indico users to Vidyo accounts"
 msgstr ""
 
 #: indico_vc_vidyo/plugin.py:59
+msgid "VC room age threshold"
+msgstr ""
+
+#: indico_vc_vidyo/plugin.py:60
 msgid ""
-"Number of days after an Indico event when a video conference room is "
+"Number of days after an Indico event when a videoconference room is "
 "considered old"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:61
+#: indico_vc_vidyo/plugin.py:62
 msgid "Max. num. VC rooms before warning"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:62
+#: indico_vc_vidyo/plugin.py:63
 msgid "Maximum number of rooms until a warning is sent to the managers"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:63
+#: indico_vc_vidyo/plugin.py:64
 msgid "VidyoVoice phone number"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:64
+#: indico_vc_vidyo/plugin.py:65
 msgid "Link to the list of VidyoVoice phone numbers"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:65
+#: indico_vc_vidyo/plugin.py:66
 msgid "Creation email footer"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:66
+#: indico_vc_vidyo/plugin.py:67
 msgid "Footer to append to emails sent upon creation of a VC room"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:143 indico_vc_vidyo/plugin.py:176
-#: indico_vc_vidyo/plugin.py:212 indico_vc_vidyo/plugin.py:241
+#: indico_vc_vidyo/plugin.py:144 indico_vc_vidyo/plugin.py:177
+#: indico_vc_vidyo/plugin.py:213 indico_vc_vidyo/plugin.py:242
 msgid "No valid Vidyo account found for this user"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:172 indico_vc_vidyo/plugin.py:235
+#: indico_vc_vidyo/plugin.py:173 indico_vc_vidyo/plugin.py:236
 msgid "Room name already in use"
 msgstr ""
 
-#: indico_vc_vidyo/plugin.py:203 indico_vc_vidyo/plugin.py:231
-#: indico_vc_vidyo/plugin.py:260
+#: indico_vc_vidyo/plugin.py:204 indico_vc_vidyo/plugin.py:232
+#: indico_vc_vidyo/plugin.py:261
 msgid "This room has been deleted from Vidyo"
 msgstr ""
 
@@ -227,21 +227,26 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: indico_vc_vidyo/templates/info_box.html:11
-#: indico_vc_vidyo/templates/manage_event_info_box.html:6
+#: indico_vc_vidyo/templates/info_box.html:10
+#: indico_vc_vidyo/templates/manage_event_info_box.html:8
 msgid "Extension"
 msgstr ""
 
-#: indico_vc_vidyo/templates/info_box.html:15
-#: indico_vc_vidyo/templates/manage_event_info_box.html:8
+#: indico_vc_vidyo/templates/info_box.html:14
+#: indico_vc_vidyo/templates/manage_event_info_box.html:10
 msgid "Moderator"
 msgstr ""
 
-#: indico_vc_vidyo/templates/info_box.html:39
+#: indico_vc_vidyo/templates/info_box.html:22
+#: indico_vc_vidyo/templates/manage_event_info_box.html:44
+msgid "Auto-join URL"
+msgstr ""
+
+#: indico_vc_vidyo/templates/info_box.html:29
 msgid "Useful links"
 msgstr ""
 
-#: indico_vc_vidyo/templates/info_box.html:43
+#: indico_vc_vidyo/templates/info_box.html:33
 msgid "Phone numbers"
 msgstr ""
 
@@ -261,11 +266,11 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-#: indico_vc_vidyo/templates/manage_event_info_box.html:60
+#: indico_vc_vidyo/templates/manage_event_info_box.html:48
 msgid "Created on"
 msgstr ""
 
-#: indico_vc_vidyo/templates/manage_event_info_box.html:63
+#: indico_vc_vidyo/templates/manage_event_info_box.html:51
 msgid "Modified on"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,55 +17,55 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_chat/static/js/chat.js:35
+#: indico_chat/static/js/chat.js:36
 msgid "Do you really want to remove this chatroom from the event?"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:39
+#: indico_chat/static/js/chat.js:40
 msgid "Since it is on an external server, it will not be deleted on that server."
 msgstr ""
 
-#: indico_chat/static/js/chat.js:41
+#: indico_chat/static/js/chat.js:42
 msgid ""
 "Since it is only used in this event, it will be deleted from the Jabber "
 "server, too!"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:44
+#: indico_chat/static/js/chat.js:45
 msgid "Delete this chatroom?"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:68
+#: indico_chat/static/js/chat.js:69
 msgid "Chatroom not found"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:68
+#: indico_chat/static/js/chat.js:69
 msgid ""
 "The chatroom does not exist on the Jabber server anymore. We recommend "
 "you to delete it chatroom from Indico as well."
 msgstr ""
 
-#: indico_chat/static/js/chat.js:70
+#: indico_chat/static/js/chat.js:71
 msgid "Chatroom updated"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:70
+#: indico_chat/static/js/chat.js:71
 msgid "The chatroom data has been updated."
 msgstr ""
 
-#: indico_chat/static/js/chat.js:98
+#: indico_chat/static/js/chat.js:99
 msgid "No logs available"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:134
+#: indico_chat/static/js/chat.js:135
 msgid "Could not create material"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:138
+#: indico_chat/static/js/chat.js:139
 msgid "Material created"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:138
+#: indico_chat/static/js/chat.js:139
 msgid "The chat logs have been attached to the event."
 msgstr ""
 

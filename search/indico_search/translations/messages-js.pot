@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_search/static/js/search.js:47
+#: indico_search/static/js/search.js:50
 msgid "Some category suggestions..."
 msgstr ""
 
-#: indico_search/static/js/search.js:61
+#: indico_search/static/js/search.js:64
 msgid "other results - please write more..."
 msgstr ""
 
-#: indico_search/static/js/search.js:342 indico_search/static/js/search.js:402
-#: indico_search/static/js/search.js:444
+#: indico_search/static/js/search.js:345 indico_search/static/js/search.js:405
+#: indico_search/static/js/search.js:447
 msgid "Everywhere"
 msgstr ""
 
-#: indico_search/static/js/search.js:421
+#: indico_search/static/js/search.js:424
 msgid "Click to search inside <span class=\"label\">{title}</span>"
 msgstr ""
 

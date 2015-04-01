@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_payment_manual/plugin.py:28
+#: indico_payment_manual/plugin.py:29
 msgid ""
 "The details the user needs to make their payment. This usually includes "
 "the bank account details the IBAN and payment reference."
 msgstr ""
 
-#: indico_payment_manual/plugin.py:33 indico_payment_manual/plugin.py:37
+#: indico_payment_manual/plugin.py:34 indico_payment_manual/plugin.py:38
 msgid "Payment details"
 msgstr ""
 
