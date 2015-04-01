@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_vc_dummy/plugin.py:29
-msgid "What is your favorite color?"
+#: indico_vc_dummy/templates/info_box.html:2
+#: indico_vc_dummy/templates/manage_event_info_box.html:2
+msgid "Plugin type"
 msgstr ""
 
-#: indico_vc_dummy/plugin.py:31
-msgid "Yes. It doesn't make any sense."
+#: indico_vc_dummy/templates/info_box.html:4
+#: indico_vc_dummy/templates/manage_event_info_box.html:4
+msgid "Favorite color"
 msgstr ""
 
 #: indico_vc_dummy/templates/manage_event_create_room.html:14

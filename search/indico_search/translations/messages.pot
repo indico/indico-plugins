@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_search/forms.py:27
+#: indico_search/forms.py:28
 msgid "Anywhere"
 msgstr ""
 
-#: indico_search/forms.py:28
+#: indico_search/forms.py:29
 msgid "Title"
 msgstr ""
 
-#: indico_search/forms.py:29
+#: indico_search/forms.py:30
 msgid "Description/Abstract"
 msgstr ""
 
-#: indico_search/forms.py:30
+#: indico_search/forms.py:31
 msgid "Author/Speaker"
 msgstr ""
 
-#: indico_search/forms.py:31
+#: indico_search/forms.py:32
 msgid "Affiliation"
 msgstr ""
 
-#: indico_search/forms.py:32
+#: indico_search/forms.py:33
 msgid "Keyword"
 msgstr ""
 
-#: indico_search/forms.py:36
+#: indico_search/forms.py:37
 msgid "Phrase"
 msgstr ""
 
-#: indico_search/forms.py:37
+#: indico_search/forms.py:38
 msgid "Search in"
 msgstr ""
 
@@ -69,8 +69,13 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
-#: indico_search/templates/results.html:33
+#: indico_search/templates/results.html:34
+#: indico_search/templates/results.html:36
 msgid "Show advanced options"
+msgstr ""
+
+#: indico_search/templates/results.html:35
+msgid "Hide advanced options"
 msgstr ""
 
 #: indico_search/templates/searchbox_category.html:11

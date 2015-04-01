@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,12 +37,12 @@ msgstr ""
 msgid "Agent updated"
 msgstr ""
 
-#: indico_livesync/forms.py:27
+#: indico_livesync/forms.py:28
 #: indico_livesync/templates/plugin_details_extra.html:9
 msgid "Name"
 msgstr ""
 
-#: indico_livesync/forms.py:28
+#: indico_livesync/forms.py:29
 msgid "The name of the agent. Only used in the administration interface."
 msgstr ""
 
@@ -77,8 +77,9 @@ msgid "Edit Agent"
 msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:10
+#: indico_livesync/templates/plugin_details_extra.html:62
 #, python-format
-msgid "Add %(backend)s Agent"
+msgid "Add %(backend)s agent"
 msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:24
@@ -136,11 +137,6 @@ msgstr ""
 
 #: indico_livesync/templates/plugin_details_extra.html:57
 msgid "No agents have been added yet."
-msgstr ""
-
-#: indico_livesync/templates/plugin_details_extra.html:62
-#, python-format
-msgid "Add %(backend)s agent"
 msgstr ""
 
 #: indico_livesync/templates/plugin_details_extra.html:68

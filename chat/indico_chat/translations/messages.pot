@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,6 +27,7 @@ msgstr ""
 
 #: indico_chat/forms.py:37 indico_chat/templates/event_header.html:36
 #: indico_chat/templates/event_page.html:34
+#: indico_chat/templates/manage_event.html:57
 msgid "Description"
 msgstr ""
 
@@ -36,6 +37,8 @@ msgstr ""
 
 #: indico_chat/forms.py:38 indico_chat/templates/event_header.html:40
 #: indico_chat/templates/event_page.html:38
+#: indico_chat/templates/manage_event.html:63
+#: indico_chat/templates/manage_event.html:65
 msgid "Password"
 msgstr ""
 
@@ -190,19 +193,19 @@ msgstr ""
 msgid "Chat User Guide"
 msgstr ""
 
-#: indico_chat/plugin.py:134
+#: indico_chat/plugin.py:135
 msgid "Recommended Chat Clients"
 msgstr ""
 
-#: indico_chat/plugin.py:175
+#: indico_chat/plugin.py:177
 msgid "Chatrooms"
 msgstr ""
 
-#: indico_chat/util.py:34
+#: indico_chat/util.py:35
 msgid "Chat plugin is not configured properly"
 msgstr ""
 
-#: indico_chat/controllers/base.py:33 indico_chat/controllers/event.py:37
+#: indico_chat/controllers/base.py:35 indico_chat/controllers/event.py:36
 msgid "This page is not available for legacy events."
 msgstr ""
 
@@ -281,6 +284,10 @@ msgstr ""
 
 #: indico_chat/templates/manage_event.html:8
 msgid "Current chat rooms"
+msgstr ""
+
+#: indico_chat/templates/manage_event.html:14
+msgid "Actions"
 msgstr ""
 
 #: indico_chat/templates/manage_event.html:28

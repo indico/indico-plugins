@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-11 19:01+0100\n"
+"POT-Creation-Date: 2015-04-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: indico_piwik/static/js/statistics.js:46
+#: indico_piwik/static/js/statistics.js:47
 msgid "Total Hits"
 msgstr ""
 
-#: indico_piwik/static/js/statistics.js:51
+#: indico_piwik/static/js/statistics.js:52
 msgid "Unique Hits"
 msgstr ""
 
-#: indico_piwik/static/js/statistics.js:171
+#: indico_piwik/static/js/statistics.js:172
 msgid "No material found"
 msgstr ""
 
-#: indico_piwik/static/js/statistics.js:218
+#: indico_piwik/static/js/statistics.js:219
 msgid "No graph data received"
 msgstr ""
 
