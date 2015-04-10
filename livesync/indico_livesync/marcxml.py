@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from MaKaC.accessControl import AccessWrapper, AdminList
+from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
+from indico.modules.users import User
 
 from indico_livesync import process_records, SimpleChange
 from indico_livesync.util import make_compound_id, obj_deref, obj_ref
@@ -53,7 +54,7 @@ class MARCXMLGenerator:
         self.xml_generator.openTag(b'collection', [[b'xmlns', b'http://www.loc.gov/MARC21/slim']])
         # This is horrible. but refactoring all the code in the indico core would be just as bad.
         aw = AccessWrapper()
-        aw.setUser(AdminList().getInstance().getList()[0])
+        aw.setUser(User.find_first(is_admin=True).as_avatar)
         self.output_generator = outputGenerator(aw, self.xml_generator)
 
     def safe_add_object(self, ref, deleted=False):
