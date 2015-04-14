@@ -43,7 +43,7 @@ class RHChatManageEvent(RHChatManageEventBase):
         chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True,
                                                             _eager='chatroom.events').all()
         chatroom_filter = (~Chatroom.id.in_(x.chatroom_id for x in chatrooms)) if chatrooms else True
-        available_chatrooms = Chatroom.find_all(Chatroom.created_by_id == int(session.user.id), chatroom_filter)
+        available_chatrooms = Chatroom.find_all(Chatroom.created_by_id == int(session.avatar.id), chatroom_filter)
         logs_enabled = current_plugin.settings.get('log_url')
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
                                                event=self.event, chat_links=current_plugin.settings.get('chat_links'),
@@ -68,7 +68,7 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             self.chatroom.modified_dt = now_utc()
             if attrs_changed(self.chatroom, 'name', 'description', 'password'):
                 update_room(self.chatroom)
-            notify_modified(self.chatroom, self.event, session.user)
+            notify_modified(self.chatroom, self.event, session.avatar)
             flash(_('Chatroom updated'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
@@ -108,7 +108,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
         form = AddChatroomForm(obj=FormDefaults(name=to_unicode(self.event.title)),
                                date=self.event.getAdjustedStartDate())
         if form.validate_on_submit():
-            chatroom = Chatroom(created_by_user=session.user)
+            chatroom = Chatroom(created_by_user=session.avatar)
             event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=chatroom)
             form.populate_obj(event_chatroom, fields=form.event_specific_fields)
             form.populate_obj(chatroom, skip=form.event_specific_fields)
@@ -116,7 +116,7 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             db.session.add_all((chatroom, event_chatroom))
             db.session.flush()
             create_room(chatroom)
-            notify_created(chatroom, self.event, session.user)
+            notify_created(chatroom, self.event, session.avatar)
             flash(_('Chatroom created'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form, event=self.event)
@@ -132,7 +132,7 @@ class RHChatManageEventAttach(RHChatManageEventBase):
     def _process(self):
         event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=self.chatroom)
         db.session.add(event_chatroom)
-        notify_attached(self.chatroom, self.event, session.user)
+        notify_attached(self.chatroom, self.event, session.avatar)
         flash(_('Chatroom added'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
@@ -145,9 +145,9 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
         RHEventChatroomMixin._checkParams(self)
 
     def _process(self):
-        reason = '{} has requested to delete this room.'.format(to_unicode(session.user.getStraightFullName()))
+        reason = '{} has requested to delete this room.'.format(to_unicode(session.avatar.getStraightFullName()))
         chatroom_deleted = self.event_chatroom.delete(reason)
-        notify_deleted(self.chatroom, self.event, session.user, chatroom_deleted)
+        notify_deleted(self.chatroom, self.event, session.avatar, chatroom_deleted)
         if chatroom_deleted:
             flash(_('Chatroom deleted'), 'success')
         else:

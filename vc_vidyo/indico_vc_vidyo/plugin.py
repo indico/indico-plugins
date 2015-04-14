@@ -313,7 +313,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'show_pin': False,
             'show_autojoin': True,
             'show_phone_numbers': True,
-            'owner': principal_to_tuple(session.user)
+            'owner': principal_to_tuple(session.avatar)
         })
 
         return defaults

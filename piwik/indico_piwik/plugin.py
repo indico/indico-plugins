@@ -72,7 +72,7 @@ class PiwikPlugin(IndicoPlugin):
                                       **event_tracking_params)
 
     def add_sidemenu_item(self, event, **kwargs):
-        if event.canModify(session.user):
+        if event.canModify(session.avatar):
             menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event))
             return 'statistics', menu_item
 

@@ -36,7 +36,7 @@ class RHChatManageEventBase(RHConferenceModifBase):
         self.event = self._conf
 
     def _checkProtection(self):
-        if not is_chat_admin(session.user):
+        if not is_chat_admin(session.avatar):
             RHConferenceModifBase._checkProtection(self)
 
 

@@ -40,7 +40,7 @@ class SearchPluginBase(IndicoPlugin):
     @property
     def only_public(self):
         """If the search engine only returns public events"""
-        return session.user is None
+        return session.avatar is None
 
     def perform_search(self, values, obj=None):
         """Performs the search.
@@ -61,7 +61,7 @@ class SearchEngine(object):
         """
         self.values = values
         self.obj = obj
-        self.user = session.user
+        self.user = session.avatar
 
     def process(self):
         """Executes the search

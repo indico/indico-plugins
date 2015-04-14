@@ -148,14 +148,14 @@ class ChatPlugin(IndicoPlugin):
                               visible=self._has_visible_chatrooms)
 
     def extend_event_management_menu(self, event, **kwargs):
-        if event.canModify(session.user) or is_chat_admin(session.user):
+        if event.canModify(session.avatar) or is_chat_admin(session.avatar):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(event, self)
 
     def get_event_management_url(self, event, **kwargs):
-        if is_chat_admin(session.user):
+        if is_chat_admin(session.avatar):
             return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):
