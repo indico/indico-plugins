@@ -80,7 +80,7 @@ area. You can identify Vidyo rooms by the Vidyo logo on the left hand side of a 
 You can see the Vidyo specific options by clicking on the arrow at the very left of the Vidyo logo.
 
 Edit a Vidyo room
----------------------------
+-----------------
 You can edit a Vidyo room like any other videoconference room by clicking on the pencil icon next to the room's name.
 This will bring you to the room edit form, where you will be able to set all the base and Vidyo specific options.
 
@@ -108,13 +108,13 @@ Join
 You can join a Vidyo room by clicking the blue Join button next to a room's name. This will connect you to the Vidyo
 room through am available Vidyo client, usually the VidyoDesktop™ or VidyoMobile™ client.
 
-Make me moderator
------------------
+Make me owner
+-------------
 This action is only available on the event page or from the event's videoconference page in the case of conferences. It
-allows someone to replace the current moderator of a room with himself. This is equivalent to editing the room and set
+allows someone to replace the current owner of a room with himself. This is equivalent to editing the room and set
 the owner of the room as yourself.
 
-The action is only be available to event managers who are not the moderator of the room. If available it will be shown
+The action is only be available to event managers who are not the owner of the room. If available it will be shown
 as a drop-down next to the `join`. Clicking on the drop-down arrow, a menu with the `Make me owner` will appear. Then
 click on `Make me an owner` to set yourself as the owner of the room.
 
@@ -125,6 +125,6 @@ conferences. They are accessible in the same way as any videoconference room det
 ``LINK_TO_VC_MODULE_SEE_ROOM_DETAILS``)
 
     **NOTE**: The auto-join URL is intended to be copied and pasted in emails and other places to give people a way to
-    automatically join the Vidyo room. To join the room from the Indico page, you should instead use the `join`_ button.
+    automatically join the Vidyo room. To join the room from the Indico page, you should instead use the `Join`_ button.
     The link might appear to be cut if it is very long as it overflows, the easiest way to make sure you have copied the
     entire link correctly is to use the copy button to the right of the link.

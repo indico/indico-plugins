@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import session
-from flask_pluginengine import render_plugin_template
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import URLField, EmailField
@@ -26,6 +25,7 @@ from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint, wrap_cli_manager
+from indico.core import signals
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
@@ -81,6 +81,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def init(self):
         super(VidyoPlugin, self).init()
+        self.connect(signals.indico_help, self._extend_indico_help)
         self.inject_css('vc_vidyo_css', WPVCManageEvent)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
@@ -112,6 +113,16 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     @property
     def icon_url(self):
         return url_for_plugin(self.name + '.static', filename='images/vidyo_logo_notext.png')
+
+    def _extend_indico_help(self, sender, **kwargs):
+        return {
+            _('Videoconference'): {
+                _('Vidyo'): (
+                    url_for_plugin(self.name + '.static', filename='help/html/user.html'),
+                    url_for_plugin(self.name + '.static', filename='help/pdf/user.pdf')
+                )
+            }
+        }
 
     def update_data_association(self, event, vc_room, event_vc_room, data):
         super(VidyoPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
