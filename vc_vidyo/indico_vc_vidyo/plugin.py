@@ -29,7 +29,7 @@ from indico.core import signals
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCEventPage
-from indico.util.user import retrieve_principal, principal_to_tuple
+from indico.util.user import retrieve_principal
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -313,7 +313,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'show_pin': False,
             'show_autojoin': True,
             'show_phone_numbers': True,
-            'owner': principal_to_tuple(session.avatar)
+            'owner': session.user.as_principal
         })
 
         return defaults

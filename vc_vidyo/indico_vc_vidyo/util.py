@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.util.user import retrieve_principals, principal_to_tuple
+from indico.util.user import retrieve_principals
 from indico.core.config import Config
 
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
@@ -75,8 +75,8 @@ def update_room_from_obj(settings, vc_room, room_obj):
         avatar = get_avatar_from_identity(settings, room_obj.ownerName)
         # if the owner does not exist any more (e.g. was changed on the server),
         # use the janitor user as a placeholder
-        vc_room.data['owner'] = (('Avatar', config.getJanitorUserId()) if avatar is None
-                                 else principal_to_tuple(avatar))
+        vc_room.data['owner'] = (('User', config.getJanitorUserId()) if avatar is None
+                                 else avatar.user.as_principal)
 
     vc_room.data.update({
         'description': room_obj.description,
