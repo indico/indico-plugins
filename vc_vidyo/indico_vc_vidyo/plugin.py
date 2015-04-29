@@ -87,11 +87,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     @property
     def default_settings(self):
-        return {
-            'managers': [],
-            'acl': [],
+        return dict(VCPluginMixin.default_settings, **{
             'support_email': Config.getInstance().getSupportEmail(),
-            'notification_emails': [],
             'username': 'indico',
             'password': None,
             'admin_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalAdminService?wsdl',
@@ -103,7 +100,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'max_rooms_warning': 5000,
             'vidyo_phone_link': None,
             'creation_email_footer': None
-        }
+        })
 
     @property
     def logo_url(self):
