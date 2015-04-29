@@ -83,8 +83,6 @@ class VidyoImporter(Importer):
         opts = self.zodb_root['plugins']['Collaboration']._PluginType__plugins['Vidyo']._PluginBase__options
         VidyoPlugin.settings.set('managers', convert_principal_list(opts['admins']))
         VidyoPlugin.settings.set('acl', convert_principal_list(opts['AuthorisedUsersGroups']))
-        VidyoPlugin.settings.set('authenticators', ', '.join(map(convert_to_unicode,
-                                                                 option_value(opts['authenticatorList']))))
         settings_map = {
             'adminAPIURL': 'admin_api_wsdl',
             'userAPIURL': 'user_api_wsdl',
