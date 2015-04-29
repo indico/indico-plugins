@@ -23,6 +23,7 @@ from wtforms.fields.html5 import URLField, EmailField
 from wtforms.fields.simple import StringField
 from wtforms.validators import NumberRange, DataRequired
 
+from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint, wrap_cli_manager
 from indico.core import signals
@@ -95,7 +96,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'user_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalUserService?wsdl',
             'indico_room_prefix': 10,
             'room_group_name': 'Indico',
-            'authenticators': ', '.join(auth[0] for auth in Config.getInstance().getAuthenticatorList()),
+            # we skip identity providers in the default list if they don't support get_identity.
+            # these providers (local accounts, oauth) are unlikely be the correct ones to integrate
+            # with the vidyo infrastructure.
+            'authenticators': ', '.join(p.name for p in multipass.identity_providers.itervalues() if p.supports_get),
             'num_days_old': 365,
             'max_rooms_warning': 5000,
             'vidyo_phone_link': None,
