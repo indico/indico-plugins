@@ -55,7 +55,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
                                   description=_('Group name for public videoconference rooms created by Indico'))
     authenticators = StringField(_('Authenticators'), [DataRequired()],
-                                 description=_('Authenticators to convert Indico users to Vidyo accounts'))
+                                 description=_('Identity providers to convert Indico users to Vidyo accounts'))
     num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
                                 description=_('Number of days after an Indico event when a videoconference room is '
                                               'considered old'))

@@ -16,10 +16,19 @@
 
 from __future__ import unicode_literals
 
+import re
+
+from flask_multipass import IdentityRetrievalFailed
+
+from indico.core.auth import multipass
+from indico.core.db import db
+from indico.modules.auth import Identity
+from indico.modules.users import User
 from indico.util.user import retrieve_principals
 from indico.core.config import Config
 
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
+
+authenticators_re = re.compile(r'\s*,\s*')
 
 
 def get_auth_users():
@@ -39,19 +48,37 @@ def is_auth_user(user):
 def iter_user_identities(avatar):
     """Iterates over all existing user identities that can be used with Vidyo"""
     from indico_vc_vidyo.plugin import VidyoPlugin
+    providers = authenticators_re.split(VidyoPlugin.settings.get('authenticators'))
+    done = set()
+    for provider in providers:
+        for _, identifier in avatar.user.iter_identifiers(check_providers=True, providers={provider}):
+            if identifier in done:
+                continue
+            done.add(identifier)
+            yield identifier
 
-    authenticators = (a.strip() for a in VidyoPlugin.settings.get('authenticators').split(','))
-    return (identity.getLogin()
-            for auth in authenticators
-            for identity in avatar.getIdentityByAuthenticatorId(auth))
 
-
-def get_avatar_from_identity(settings, identity):
-    """Get an actual avatar object from an auth identity"""
-    authenticators = list(auth.strip() for auth in settings.get('authenticators').split(','))
-    return next((avatar for auth_id, avatar in AuthenticatorMgr().getAvatarByLogin(identity, authenticators).iteritems()
-                if avatar is not None), None)
-
+def get_user_from_identifier(settings, identifier):
+    """Get an actual User object from an identifier"""
+    providers = list(auth.strip() for auth in settings.get('authenticators').split(','))
+    identities = Identity.find_all(Identity.provider.in_(providers), Identity.identifier == identifier)
+    if identities:
+        return sorted(identities, key=lambda x: providers.index(x.provider))[0].user
+    for provider in providers:
+        try:
+            identity_info = multipass.get_identity(provider, identifier)
+        except IdentityRetrievalFailed:
+            continue
+        if identity_info is None:
+            continue
+        if not identity_info.provider.settings.get('trusted_email'):
+            continue
+        emails = {email.lower() for email in identity_info.data.getlist('email') if email}
+        if not emails:
+            continue
+        user = User.find_first(~User.is_deleted, User.all_emails.contains(db.func.any(list(emails))))
+        if user:
+            return user
 
 def iter_extensions(prefix, event_id):
     """Return extension (prefix + event_id) with an optional suffix which is
@@ -72,11 +99,11 @@ def update_room_from_obj(settings, vc_room, room_obj):
     vc_room.name = room_obj.name
 
     if room_obj.ownerName != vc_room.data['owner_identity']:
-        avatar = get_avatar_from_identity(settings, room_obj.ownerName)
+        user = get_user_from_identifier(settings, room_obj.ownerName)
         # if the owner does not exist any more (e.g. was changed on the server),
         # use the janitor user as a placeholder
-        vc_room.data['owner'] = (('User', config.getJanitorUserId()) if avatar is None
-                                 else avatar.user.as_principal)
+        vc_room.data['owner'] = (('User', config.getJanitorUserId()) if user is None
+                                 else user.as_principal)
 
     vc_room.data.update({
         'description': room_obj.description,
