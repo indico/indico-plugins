@@ -337,7 +337,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         super(VidyoPlugin, self)._merge_users(user, merged, **kwargs)
         new_id = int(user.id)
         old_id = int(merged.id)
-        VidyoExtension.find(owned_by_id=old_id).update({'owned_by_id': new_id})
+        for ext in VidyoExtension.find(owned_by_id=old_id):
+            ext.owned_by_id = new_id
+            ext.vc_room.data['owner'] = principal_to_tuple(user)
+            flag_modified(ext.vc_room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
         owner = retrieve_principal(vc_room.data['owner'])
