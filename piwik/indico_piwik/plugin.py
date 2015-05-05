@@ -95,6 +95,9 @@ class PiwikPlugin(IndicoPlugin):
     def track_download(self, event, resource, **kwargs):
         tracker = PiwikQueryTrackDownload()
         resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
+        if not resource_url:
+            # Some very old events apparently have link resources with an empty URL
+            return
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = 'Download - {}'.format(resource_title)
         tracker.call(resource_url, resource_title)
