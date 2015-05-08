@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_rows %}
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows %}
 {% set chatroom = event_chatroom.chatroom if event_chatroom %}
 
 {% block title %}{% trans %}Chat Rooms{% endtrans %}{% endblock %}
