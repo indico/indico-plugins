@@ -58,8 +58,7 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
-    owner = PrincipalField(_('Owner'), [DataRequired()], multiple=False,
-                           description=_('The owner of the room'))
+    owner = PrincipalField(_('Owner'), [DataRequired()], description=_('The owner of the room'))
     moderation_pin = IndicoPasswordField(_('Moderation PIN'),
                                          [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
                                          toggle=True, description=_('Used to moderate the VC Room'))

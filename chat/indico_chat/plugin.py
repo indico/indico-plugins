@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import session
 from flask_pluginengine import render_plugin_template
 from wtforms import ValidationError
-from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired
@@ -29,7 +28,7 @@ from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.util.user import principals_merge_users
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalField, MultipleItemsField, EmailListField, IndicoPasswordField
+from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.displayMgr import EventMenuEntry
@@ -44,8 +43,8 @@ from indico_chat.views import WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalField(_('Administrators'), groups=True,
-                            description=_('List of users/groups who can manage chatrooms for all events'))
+    admins = PrincipalListField(_('Administrators'), groups=True,
+                                description=_('List of users/groups who can manage chatrooms for all events'))
     server = StringField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
     muc_server = StringField(_('XMPP MUC server'), [DataRequired()],
                              description=_("The hostname of the XMPP MUC server"))
