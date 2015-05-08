@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 import re
 
+from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.users import User
 from indico.util.console import cformat
 from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator
@@ -50,11 +52,11 @@ class ChatImporter(Importer):
         type_opts = self.zodb_root['plugins']['InstantMessaging']._PluginBase__options
         opts = self.zodb_root['plugins']['InstantMessaging']._PluginType__plugins['XMPP']._PluginBase__options
         host = convert_to_unicode(opts['chatServerHost']._PluginOption__value)
+        admin_emails = [x.email for x in opts['admins']._PluginOption__value]
         ChatPlugin.settings.set('admins', convert_principal_list(opts['admins']))
         ChatPlugin.settings.set('server', host)
         ChatPlugin.settings.set('muc_server', 'conference.{}'.format(host))
         settings_map = {
-            'sendMailNotifications': 'notify_admins',
             'additionalEmails': 'notify_emails',
             'indicoUsername': 'bot_jid',
             'indicoPassword': 'bot_password',
@@ -65,7 +67,7 @@ class ChatImporter(Importer):
             if isinstance(value, basestring):
                 value = convert_to_unicode(value).strip()
             elif new == 'notify_emails':
-                value = [email for email in value if is_valid_mail(email, multi=False)]
+                value = [email for email in set(value + admin_emails) if is_valid_mail(email, multi=False)]
             ChatPlugin.settings.set(new, value)
         if opts['activateLogs']._PluginOption__value:
             ChatPlugin.settings.set('log_url', 'https://{}/logs/'.format(host))
@@ -90,12 +92,13 @@ class ChatImporter(Importer):
             if room:
                 print cformat('- %{cyan}{}   %{yellow!}DUPLICATE%{reset}').format(room.name)
             else:
+                user = User.get(int(old_room._owner.id)) or User.get(Config.getInstance().getJanitorUserId())
                 room = Chatroom(jid_node=convert_to_unicode(old_room._name.lower()),
                                 name=convert_to_unicode(old_room._name),
                                 description=convert_to_unicode(old_room._description),
                                 password=convert_to_unicode(old_room._password),
                                 custom_server=custom_server,
-                                created_by_user=old_room._owner,
+                                created_by_user=user,
                                 created_dt=old_room._creationDate,
                                 modified_dt=old_room._modificationDate)
                 chatrooms[identifier] = room

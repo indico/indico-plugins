@@ -44,7 +44,8 @@ from indico_chat.views import WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalField(_('Administrators'), description=_('Users who can manage chatrooms for all events'))
+    admins = PrincipalField(_('Administrators'), groups=True,
+                            description=_('List of users/groups who can manage chatrooms for all events'))
     server = StringField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
     muc_server = StringField(_('XMPP MUC server'), [DataRequired()],
                              description=_("The hostname of the XMPP MUC server"))
@@ -53,10 +54,8 @@ class SettingsForm(IndicoForm):
                                         "server is assumed) or a username@server."))
     bot_password = IndicoPasswordField(_('Bot Password'), [DataRequired()], toggle=True,
                                        description=_("Password for the bot"))
-    notify_admins = BooleanField(_('Notify admins'),
-                                 description=_("Should chat administrators receive email notifications?"))
     notify_emails = EmailListField(_('Notification emails'),
-                                   description=_("Additional email addresses to sent notifications to (one per line)"))
+                                   description=_("Email addresses to sent notifications to (one per line)"))
     log_url = URLField(_('Log URL'), description=_('You can set this to the URL of the '
                                                    '<a href="https://github.com/indico/jabber-logs/">jabber-logs '
                                                    'app</a>, running on the jabber server to let event managers can '
@@ -91,7 +90,6 @@ class ChatPlugin(IndicoPlugin):
     @property
     def default_settings(self):
         return {'admins': [],
-                'notify_admins': False,
                 'notify_emails': [],
                 'how_to_connect': render_plugin_template('how_to_connect.html'),
                 'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
@@ -148,14 +146,14 @@ class ChatPlugin(IndicoPlugin):
                               visible=self._has_visible_chatrooms)
 
     def extend_event_management_menu(self, event, **kwargs):
-        if event.canModify(session.avatar) or is_chat_admin(session.avatar):
+        if event.canModify(session.user) or is_chat_admin(session.user):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(event, self)
 
     def get_event_management_url(self, event, **kwargs):
-        if is_chat_admin(session.avatar):
+        if is_chat_admin(session.user):
             return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):

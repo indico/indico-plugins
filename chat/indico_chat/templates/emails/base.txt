@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro get_body() -%}
-A chatroom has been {{ self.action() }}{% if user %} by {{ user.getStraightFullName() }}{% endif %}:
+A chatroom has been {{ self.action() }}{% if user %} by {{ user.full_name }}{% endif %}:
 
 Chatroom: {{ chatroom.name }}
 Event:    {{ event.getTitle() }}

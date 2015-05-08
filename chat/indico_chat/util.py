@@ -36,15 +36,8 @@ def check_config(quiet=False):
     return not missing
 
 
-def get_chat_admins():
-    """Returns a list of chat admins
-
-    :return: list of Avatar/Group objects
-    """
-    from indico_chat.plugin import ChatPlugin
-    return retrieve_principals(ChatPlugin.settings.get('admins'))
-
-
 def is_chat_admin(user):
     """Checks if a user is a chat admin"""
-    return any(principal.containsUser(user) for principal in get_chat_admins())
+    from indico_chat.plugin import ChatPlugin
+    principals = retrieve_principals(ChatPlugin.settings.get('admins'), legacy=False)
+    return any(user in principal for principal in principals)

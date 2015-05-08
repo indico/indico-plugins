@@ -66,7 +66,7 @@
                                         <dd>{% if event_chatroom.show_password %}Yes{% else %}No{% endif %}</dd>
                                     {% endif %}
                                     <dt>{% trans %}Created by{% endtrans %}</dt>
-                                    <dd>{{ chatroom.created_by_user.getStraightFullName() }}</dd>
+                                    <dd>{{ chatroom.created_by_user.full_name }}</dd>
                                     <dt>{% trans %}Created on{% endtrans %}:</dt>
                                     <dd>{{ chatroom.created_dt | format_datetime('long') }}</dd>
                                     <dt>{% trans %}Modified on{% endtrans %}</dt>

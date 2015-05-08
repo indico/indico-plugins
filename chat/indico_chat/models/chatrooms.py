@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 from indico_chat.xmpp import delete_room
@@ -66,8 +65,9 @@ class Chatroom(db.Model):
     #: ID of the creator
     created_by_id = db.Column(
         db.Integer,
-        nullable=False,
-        index=True
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=False
     )
     #: Creation timestamp of the chatroom
     created_dt = db.Column(
@@ -80,18 +80,19 @@ class Chatroom(db.Model):
         UTCDateTime
     )
 
+    #: The user who created the chatroom
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'chatrooms',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def locator(self):
         return {'chatroom_id': self.id}
-
-    @property
-    def created_by_user(self):
-        """The Avatar who created the chatroom."""
-        return AvatarHolder().getById(str(self.created_by_id))
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = int(user.getId())
 
     @property
     def server(self):

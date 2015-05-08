@@ -21,8 +21,6 @@ from indico.core.plugins import get_plugin_template_module
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 
-from indico_chat.util import get_chat_admins
-
 
 def notify_created(room, event, user):
     """Notifies about the creation of a chatroom.
@@ -74,8 +72,6 @@ def _send(event, subject, body):
     from indico_chat.plugin import ChatPlugin
 
     to_list = set(ChatPlugin.settings.get('notify_emails'))
-    if ChatPlugin.settings.get('notify_admins'):
-        to_list |= {u.getEmail() for u in get_chat_admins()}
     if not to_list:
         return
     notification = {
