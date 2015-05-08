@@ -71,7 +71,7 @@ class SearchResult(object):
         if not obj:
             current_plugin.logger.warning('referenced element {} does not exist'.format(self.compound_id))
             return False
-        return obj.canView(AccessWrapper(user))
+        return obj.canView(AccessWrapper(user.as_avatar if user else None))
 
     def __repr__(self):
         return '<{}({})>'.format(type(self).__name__, self.compound_id)
