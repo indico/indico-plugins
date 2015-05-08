@@ -122,7 +122,7 @@ class VidyoImporter(Importer):
             'moderation_pin': getattr(booking, '_moderatorPin', ''),
             'vidyo_id': booking._roomId,
             'url': booking._url,
-            'owner': ('Avatar', booking._owner.id),
+            'owner': ('User', int(booking._owner.id)),
             'owner_identity': booking._ownerVidyoAccount,
             'auto_mute': booking_params.get('autoMute', True)
         }

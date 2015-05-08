@@ -34,24 +34,24 @@ authenticators_re = re.compile(r'\s*,\s*')
 def get_auth_users():
     """Returns a list of authorized users
 
-    :return: list of Avatar/Group objects
+    :return: list of User/GroupProxy objects
     """
     from indico_vc_vidyo.plugin import VidyoPlugin
-    return retrieve_principals(VidyoPlugin.settings.get('authorized_users'))
+    return retrieve_principals(VidyoPlugin.settings.get('authorized_users'), legacy=False)
 
 
 def is_auth_user(user):
     """Checks if a user is authorized"""
-    return any(principal.containsUser(user) for principal in get_auth_users())
+    return any(user in principal for principal in get_auth_users())
 
 
-def iter_user_identities(avatar):
+def iter_user_identities(user):
     """Iterates over all existing user identities that can be used with Vidyo"""
     from indico_vc_vidyo.plugin import VidyoPlugin
     providers = authenticators_re.split(VidyoPlugin.settings.get('authenticators'))
     done = set()
     for provider in providers:
-        for _, identifier in avatar.user.iter_identifiers(check_providers=True, providers={provider}):
+        for _, identifier in user.iter_identifiers(check_providers=True, providers={provider}):
             if identifier in done:
                 continue
             done.add(identifier)

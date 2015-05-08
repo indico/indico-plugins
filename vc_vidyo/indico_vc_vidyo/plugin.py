@@ -158,7 +158,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         """
         client = AdminClient(self.settings)
 
-        owner = retrieve_principal(vc_room.data['owner'])
+        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
 
         login_gen = iter_user_identities(owner)
         login = next(login_gen, None)
@@ -225,8 +225,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         except RoomNotFoundAPIException:
             raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
 
-        owner = retrieve_principal(vc_room.data['owner'])
-
+        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
         changed_owner = room_obj.ownerName not in iter_user_identities(owner)
         if changed_owner:
             login_gen = iter_user_identities(owner)
@@ -330,18 +329,18 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def can_manage_vc_room(self, user, room):
-        return (user == retrieve_principal(room.data['owner']) or
+        return (user == retrieve_principal(room.data['owner'], allow_groups=False, legacy=False) or
                 super(VidyoPlugin, self).can_manage_vc_room(user, room))
 
     def _merge_users(self, user, merged, **kwargs):
         super(VidyoPlugin, self)._merge_users(user, merged, **kwargs)
-        new_id = int(user.id)
-        old_id = int(merged.id)
-        for ext in VidyoExtension.find(owned_by_id=old_id):
-            ext.owned_by_id = new_id
+        target = user.user
+        source = merged.user
+        for ext in VidyoExtension.find(owned_by_user=source):
+            ext.owned_by_user = target
             ext.vc_room.data['owner'] = user.user.as_principal
             flag_modified(ext.vc_room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
-        owner = retrieve_principal(vc_room.data['owner'])
-        return {owner.getEmail()} if owner else set()
+        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
+        return {owner.email} if owner else set()

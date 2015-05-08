@@ -1,5 +1,5 @@
 {% from '_clipboard_input.html' import clipboard_input %}
-{% set owner = retrieve_principal(vc_room.data.owner) %}
+{% set owner = retrieve_principal(vc_room.data.owner, allow_groups=False, legacy=False) %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
 <dl class="zeroclicboard-init">
     <dt>{% trans %}Name{% endtrans %}</dt>
@@ -12,7 +12,7 @@
     {% endif %}
     {% if owner %}
         <dt>{% trans %}Moderator{% endtrans %}</dt>
-        <dd>{{ owner.getFullName() }}</dd>
+        <dd>{{ owner.full_name }}</dd>
     {% endif %}
     {% if event_vc_room.data.show_pin %}
         <dt>{% trans %}Room PIN{% endtrans %}</dt>

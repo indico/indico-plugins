@@ -72,9 +72,8 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
                                            '(audio and video)'))
 
     def validate_owner(self, field):
-        avatar = retrieve_principal(field.data)
-        if not avatar:
+        user = retrieve_principal(field.data, allow_groups=False, legacy=False)
+        if not user:
             raise ValidationError(_("Unable to find this user in Indico."))
-
-        if not next(iter_user_identities(avatar), None):
+        if not next(iter_user_identities(user), None):
             raise ValidationError(_("This user does not have a suitable account to use Vidyo."))

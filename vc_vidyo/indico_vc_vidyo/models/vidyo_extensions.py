@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder
 
 
 class VidyoExtension(db.Model):
@@ -37,7 +36,9 @@ class VidyoExtension(db.Model):
     )
     owned_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
         index=True,
+        nullable=False
     )
     vc_room = db.relationship(
         'VCRoom',
@@ -45,15 +46,16 @@ class VidyoExtension(db.Model):
         lazy=False
     )
 
-    @property
-    def owned_by_user(self):
-        """The Avatar who owns the vidyo room."""
-        return AvatarHolder().getById(str(self.owned_by_id))
-
-    @owned_by_user.setter
-    def owned_by_user(self, user):
-        self.owned_by_id = int(user.getId())
+    #: The user who owns the Vidyo room
+    owned_by_user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'vc_rooms_vidyo',
+            lazy='dynamic'
+        )
+    )
 
     @return_ascii
     def __repr__(self):
-        return '<VidyoExtension({}, {}, {})>'.format(self.vc_room, self.extension, self.owned_by_id)
+        return '<VidyoExtension({}, {}, {})>'.format(self.vc_room, self.extension, self.owned_by_user)

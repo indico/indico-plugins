@@ -1,6 +1,6 @@
 {% from '_password.html' import password %}
 {% from '_clipboard_input.html' import clipboard_input %}
-{% set owner = retrieve_principal(vc_room.data.owner) %}
+{% set owner = retrieve_principal(vc_room.data.owner, allow_groups=False, legacy=False) %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
 <dl class="details-container zeroclicboard-init">
     <dt>{% trans %}Description{% endtrans %}</dt>
@@ -10,7 +10,7 @@
     <dt>{% trans %}Moderator{% endtrans %}</dt>
     <dd>
         {% if owner %}
-            {{ owner.getFullName() }}
+            {{ owner.full_name }}
         {% else %}
             {{ vc_room.data.owner_account }} <em>(deleted)</em>
         {% endif %}

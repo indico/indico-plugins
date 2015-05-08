@@ -15,7 +15,7 @@ $(function() {
             contentType: 'application/json',
             data: JSON.stringify({
                 data: {
-                    owner: ['Avatar', $('body').data('userId')]
+                    owner: ['User', $('body').data('userId')]
                 }
             })
         }).done(function(result) {
