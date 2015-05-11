@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='indico_search_invenio',
-    version='0.1',
+    version='0.2',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'indico>=1.9.1',
+        'indico>=1.9.2',
         'indico_search'
     ],
     classifiers=[
