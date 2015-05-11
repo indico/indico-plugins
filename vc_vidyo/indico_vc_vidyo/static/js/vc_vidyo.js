@@ -11,13 +11,7 @@ $(function() {
         $.ajax({
             url: $this.data('href'),
             method: 'POST',
-            complete: IndicoUI.Dialogs.Util.progress(),
-            contentType: 'application/json',
-            data: JSON.stringify({
-                data: {
-                    owner: ['User', $('body').data('userId')]
-                }
-            })
+            complete: IndicoUI.Dialogs.Util.progress()
         }).done(function(result) {
             if (handleAjaxError(result)) {
                 return;

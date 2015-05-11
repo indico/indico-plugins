@@ -1,11 +1,11 @@
-{% macro render_make_me_moderator(event, vc_room, event_vc_room, extra_classes='') %}
+{% macro render_make_me_owner(event, vc_room, event_vc_room, extra_classes='') %}
     {% if session.user != vc_room.vidyo_extension.owned_by_user and event.canModify(session.user) %}
         <a class="i-button highlight arrow {{ extra_classes }}" data-toggle="dropdown"></a>
         <ul class="dropdown" data-level="level1">
             <li>
                 <a href="#"
                    title="{% trans name=vc_room.data.owner_identity %}You will be the owner of this Vidyo room, replacing {{name}}.{% endtrans %}"
-                   class="action-make-owner" data-href="{{ url_for('vc.vc_room_modify', event_vc_room) }}">
+                   class="action-make-owner" data-href="{{ url_for_plugin('vc_vidyo.set_room_owner', event_vc_room) }}">
                     {% trans %}Make me owner{% endtrans %}
                 </a>
             </li>

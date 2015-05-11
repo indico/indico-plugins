@@ -25,7 +25,7 @@ from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.auth import multipass
 from indico.core.config import Config
-from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint, wrap_cli_manager
+from indico.core.plugins import IndicoPlugin, url_for_plugin, wrap_cli_manager
 from indico.core import signals
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
@@ -36,6 +36,7 @@ from indico.web.forms.widgets import CKEditorWidget
 
 from indico_vc_vidyo import _
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
+from indico_vc_vidyo.blueprint import blueprint
 from indico_vc_vidyo.cli import cli_manager
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
@@ -298,7 +299,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return client.get_room(vc_room.data['vidyo_id'])
 
     def get_blueprints(self):
-        return IndicoPluginBlueprint('vc_vidyo', __name__)
+        return blueprint
 
     def register_assets(self):
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
