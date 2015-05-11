@@ -47,7 +47,7 @@ def find_old_vidyo_rooms(max_room_event_age):
     return VCRoom.find_all(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used))
 
 
-def notify_moderator(plugin, vc_room):
+def notify_owner(plugin, vc_room):
     """Notifies about the deletion of a Vidyo room from the Vidyo server."""
     user = vc_room.vidyo_extension.owned_by_user
     tpl = get_plugin_template_module('emails/remote_deleted.html', plugin=plugin, vc_room=vc_room, event=None,
@@ -68,7 +68,6 @@ class VidyoCleanupTask(PeriodicUniqueTask):
 
         plugin = VidyoPlugin.instance  # RuntimeError if not active
         with plugin.plugin_context():
-
             max_room_event_age = plugin.settings.get('num_days_old')
 
             self.logger.info('Deleting Vidyo rooms that are not used or linked to events all older than {} days'.format(
@@ -82,7 +81,7 @@ class VidyoCleanupTask(PeriodicUniqueTask):
                 try:
                     plugin.delete_room(vc_room, None)
                     self.logger.info('Room {} deleted from Vidyo server'.format(vc_room))
-                    notify_moderator(plugin, vc_room)
+                    notify_owner(plugin, vc_room)
                     vc_room.status = VCRoomStatus.deleted
                 except RoomNotFoundAPIException:
                     self.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
