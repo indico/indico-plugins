@@ -1,5 +1,5 @@
 {% from '_clipboard_input.html' import clipboard_input %}
-{% set owner = retrieve_principal(vc_room.data.owner, allow_groups=False, legacy=False) %}
+{% set owner = vc_room.vidyo_extension.owned_by_user %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
 <dl class="zeroclicboard-init">
     <dt>{% trans %}Name{% endtrans %}</dt>

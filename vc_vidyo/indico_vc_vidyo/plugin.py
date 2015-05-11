@@ -157,9 +157,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         :param event: Conference -- The event to the Vidyo room will be attached
         """
         client = AdminClient(self.settings)
-
         owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
-
         login_gen = iter_user_identities(owner)
         login = next(login_gen, None)
         if login is None:
@@ -329,8 +327,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def can_manage_vc_room(self, user, room):
-        return (user == retrieve_principal(room.data['owner'], allow_groups=False, legacy=False) or
-                super(VidyoPlugin, self).can_manage_vc_room(user, room))
+        return user == room.vidyo_extension.owned_by_user or super(VidyoPlugin, self).can_manage_vc_room(user, room)
 
     def _merge_users(self, user, merged, **kwargs):
         super(VidyoPlugin, self)._merge_users(user, merged, **kwargs)
@@ -338,9 +335,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         source = merged.user
         for ext in VidyoExtension.find(owned_by_user=source):
             ext.owned_by_user = target
-            ext.vc_room.data['owner'] = user.user.as_principal
             flag_modified(ext.vc_room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
-        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
-        return {owner.email} if owner else set()
+        return {vc_room.vidyo_extension.owned_by_user.email}

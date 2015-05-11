@@ -28,7 +28,6 @@ from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
-from indico.util.user import retrieve_principal
 from indico_vc_vidyo.api import APIException, RoomNotFoundAPIException
 
 
@@ -50,7 +49,7 @@ def find_old_vidyo_rooms(max_room_event_age):
 
 def notify_moderator(plugin, vc_room):
     """Notifies about the deletion of a Vidyo room from the Vidyo server."""
-    user = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
+    user = vc_room.vidyo_extension.owned_by_user
     tpl = get_plugin_template_module('emails/remote_deleted.html', plugin=plugin, vc_room=vc_room, event=None,
                                      vc_room_event=None, user=user)
     _send('delete', user, plugin, None, vc_room, tpl.get_subject(), tpl.get_body())

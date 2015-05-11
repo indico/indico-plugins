@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
+from sqlalchemy.orm.attributes import flag_modified
+
 from indico.core.db.sqlalchemy import db
 from indico.util.string import return_ascii
 
@@ -59,3 +62,10 @@ class VidyoExtension(db.Model):
     @return_ascii
     def __repr__(self):
         return '<VidyoExtension({}, {}, {})>'.format(self.vc_room, self.extension, self.owned_by_user)
+
+
+@listens_for(VidyoExtension.owned_by_user, 'set')
+def _owned_by_user_set(target, user, *unused):
+    if target.vc_room and user.as_principal != tuple(target.vc_room.data['owner']):
+        target.vc_room.data['owner'] = user.as_principal
+        flag_modified(target.vc_room, 'data')

@@ -80,6 +80,7 @@ def get_user_from_identifier(settings, identifier):
         if user:
             return user
 
+
 def iter_extensions(prefix, event_id):
     """Return extension (prefix + event_id) with an optional suffix which is
        incremented step by step in case of collision
@@ -94,16 +95,14 @@ def iter_extensions(prefix, event_id):
 
 def update_room_from_obj(settings, vc_room, room_obj):
     """Updates a VCRoom DB object using a SOAP room object returned by the API"""
-    config = Config.getInstance()
-
     vc_room.name = room_obj.name
-
     if room_obj.ownerName != vc_room.data['owner_identity']:
-        user = get_user_from_identifier(settings, room_obj.ownerName)
-        # if the owner does not exist any more (e.g. was changed on the server),
+        owner = get_user_from_identifier(settings, room_obj.ownerName)
+        # if the owner does not exist anymore (e.g. was changed on the server),
         # use the janitor user as a placeholder
-        vc_room.data['owner'] = (('User', config.getJanitorUserId()) if user is None
-                                 else user.as_principal)
+        if not owner:
+            owner = User.get(Config.getInstance().getJanitorUserId())
+        vc_room.vidyo_extension.owned_by_user = owner
 
     vc_room.data.update({
         'description': room_obj.description,
@@ -114,4 +113,3 @@ def update_room_from_obj(settings, vc_room, room_obj):
         'moderation_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
     })
     vc_room.vidyo_extension.extension = int(room_obj.extension)
-    vc_room.vidyo_extension.owned_by_id = vc_room.data['owner'][1]
