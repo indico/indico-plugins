@@ -330,10 +330,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def can_manage_vc_room(self, user, room):
         return user == room.vidyo_extension.owned_by_user or super(VidyoPlugin, self).can_manage_vc_room(user, room)
 
-    def _merge_users(self, user, merged, **kwargs):
-        super(VidyoPlugin, self)._merge_users(user, merged, **kwargs)
-        target = user.user
-        source = merged.user
+    def _merge_users(self, target, source, **kwargs):
+        super(VidyoPlugin, self)._merge_users(target, source, **kwargs)
         for ext in VidyoExtension.find(owned_by_user=source):
             ext.owned_by_user = target
             flag_modified(ext.vc_room, 'data')

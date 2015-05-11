@@ -101,7 +101,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_management.sidemenu, self.extend_event_management_menu)
         self.connect(signals.event_management.clone, self.extend_event_management_clone)
         self.connect(signals.event_management.management_url, self.get_event_management_url)
-        self.connect(signals.merge_users, self._merge_users)
+        self.connect(signals.users.merged, self._merge_users)
         self.template_hook('event-header', self.inject_event_header)
         self.inject_css('chat_css', WPChatEventMgmt)
         self.inject_js('chat_js', WPChatEventMgmt)
@@ -162,10 +162,8 @@ class ChatPlugin(IndicoPlugin):
             chatroom_deleted = event_chatroom.delete()
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
 
-    def _merge_users(self, user, merged, **kwargs):
-        new_id = int(user.id)
-        old_id = int(merged.id)
-        self.settings.set('admins', principals_merge_users(self.settings.get('admins'), new_id, old_id))
+    def _merge_users(self, target, source, **kwargs):
+        self.settings.set('admins', principals_merge_users(self.settings.get('admins'), target.id, source.id))
 
 
 class ChatroomCloner(EventCloner):
