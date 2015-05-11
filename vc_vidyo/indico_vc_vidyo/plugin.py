@@ -209,6 +209,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                     'url': created_room.RoomMode.roomURL,
                     'owner_identity': created_room.ownerName
                 })
+                flag_modified(vc_room, 'data')
                 vc_room.vidyo_extension = VidyoExtension(vc_room_id=vc_room.id, extension=int(created_room.extension),
                                                          owned_by_user=owner)
 
