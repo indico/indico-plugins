@@ -24,25 +24,10 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
-from indico.util.user import retrieve_principals
 from indico.core.config import Config
 
 
 authenticators_re = re.compile(r'\s*,\s*')
-
-
-def get_auth_users():
-    """Returns a list of authorized users
-
-    :return: list of User/GroupProxy objects
-    """
-    from indico_vc_vidyo.plugin import VidyoPlugin
-    return retrieve_principals(VidyoPlugin.settings.get('authorized_users'), legacy=False)
-
-
-def is_auth_user(user):
-    """Checks if a user is authorized"""
-    return any(user in principal for principal in get_auth_users())
 
 
 def iter_user_identities(user):
