@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=1.9.2',
-        'terminaltables==1.0.2',
+        'terminaltables==1.1.1',
         'suds-jurko'
     ],
     classifiers=[
