@@ -17,8 +17,6 @@
 from __future__ import unicode_literals
 from indico.core.errors import IndicoError
 
-from indico.util.user import retrieve_principals
-
 from indico_chat import _
 
 
@@ -39,5 +37,4 @@ def check_config(quiet=False):
 def is_chat_admin(user):
     """Checks if a user is a chat admin"""
     from indico_chat.plugin import ChatPlugin
-    principals = retrieve_principals(ChatPlugin.settings.get('admins'), legacy=False)
-    return any(user in principal for principal in principals)
+    return ChatPlugin.settings.acls.contains_user('admins', user)

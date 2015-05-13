@@ -26,7 +26,6 @@ from wtforms.validators import DataRequired
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.util.user import principals_merge_users
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
@@ -43,7 +42,7 @@ from indico_chat.views import WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalListField(_('Administrators'), groups=True,
+    admins = PrincipalListField(_('Administrators'), groups=True, serializable=False,
                                 description=_('List of users/groups who can manage chatrooms for all events'))
     server = StringField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
     muc_server = StringField(_('XMPP MUC server'), [DataRequired()],
@@ -85,11 +84,11 @@ class ChatPlugin(IndicoPlugin):
         'bot_jid': {'autocomplete': 'off'},
         'bot_password': {'autocomplete': 'off'}
     }
+    acl_settings = {'admins'}
 
     @property
     def default_settings(self):
-        return {'admins': [],
-                'notify_emails': [],
+        return {'notify_emails': [],
                 'how_to_connect': render_plugin_template('how_to_connect.html'),
                 'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
 
@@ -163,7 +162,7 @@ class ChatPlugin(IndicoPlugin):
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
 
     def _merge_users(self, target, source, **kwargs):
-        self.settings.set('admins', principals_merge_users(self.settings.get('admins'), target.id, source.id))
+        self.settings.acls.merge_users(target, source)
 
 
 class ChatroomCloner(EventCloner):
