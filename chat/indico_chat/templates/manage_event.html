@@ -6,7 +6,7 @@
     <div class="plugin-chat chat-mgmt" style="margin-bottom: 2em;">
         {% if event_chatrooms %}
             <h2>{% trans %}Current chat rooms{% endtrans %}</h2>
-            <table class="i-table-widget fixed-width">
+            <table class="i-table-widget">
                 <thead>
                      <tr>
                         <th class="small-column"></th>
@@ -84,7 +84,7 @@
                 </tbody>
             </table>
         {% else %}
-            <div class="info-message-box fixed-width">
+            <div class="info-message-box">
                 <div class="message-text">{% trans %}No chatrooms have been added yet.{% endtrans %}</div>
             </div>
         {% endif %}
@@ -94,7 +94,7 @@
     {% if available_chatrooms %}
         <div>
             <h2>{% trans %}Add existing chat room{% endtrans %}</h2>
-            <div class="fixed-width">
+            <div>
                 {{ form_header(action=url_for_plugin('.manage_rooms_attach', event), method='post') }}
                 <div class="form-group">
                     <div class="form-label form-block form-label-middle">{% trans %}Available chatrooms{% endtrans %}</div>
