@@ -28,7 +28,7 @@ from indico_piwik import _
 from indico_piwik.controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
                                       RHApiEventGraphCountries, RHApiEventGraphDevices)
 from indico_piwik.forms import SettingsForm
-from indico_piwik.queries.tracking import PiwikQueryTrackDownload
+from indico_piwik.queries.tracking import track_download_request
 
 
 class PiwikPlugin(IndicoPlugin):
@@ -93,14 +93,13 @@ class PiwikPlugin(IndicoPlugin):
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
     def track_download(self, event, resource, **kwargs):
-        tracker = PiwikQueryTrackDownload()
         resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
         if not resource_url:
             # Some very old events apparently have link resources with an empty URL
             return
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = 'Download - {}'.format(resource_title)
-        tracker.call(resource_url, resource_title)
+        track_download_request.delay(resource_url, resource_title)
 
     def _get_event_tracking_params(self):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
