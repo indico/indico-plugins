@@ -16,22 +16,17 @@
 
 from __future__ import unicode_literals
 
-import sys
-
 import transaction
-from dateutil import rrule
 from flask_pluginengine import current_plugin
 from flask_script import Manager
 from terminaltables import AsciiTable
 
 from indico.core.db import db, DBMgr
 from indico.core.db.sqlalchemy.util.session import update_session_options
-from indico.modules.scheduler import Client
 from indico.util.console import cformat, conferenceHolderIterator
 from MaKaC.conference import ConferenceHolder
 
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.task import LiveSyncTask
 
 
 cli_manager = Manager(usage="Manages LiveSync")
@@ -130,19 +125,3 @@ def run(agent_id, force=False):
                 db.session.commit()
             finally:
                 transaction.abort()
-
-
-@cli_manager.command
-def create_task(interval):
-    """Creates a livesync task running every N minutes"""
-    update_session_options(db)
-    try:
-        interval = int(interval)
-        if interval < 1:
-            raise ValueError
-    except ValueError:
-        print 'Invalid interval, must be a number >=1'
-        sys.exit(1)
-    with DBMgr.getInstance().global_connection(commit=True):
-        Client().enqueue(LiveSyncTask(rrule.MINUTELY, interval=interval))
-    print 'Task created'

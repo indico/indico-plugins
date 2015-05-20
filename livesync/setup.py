@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='indico_livesync',
-    version='0.2',
+    version='0.3',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'terminaltables==1.1.1',
-        'indico>=1.9.2'
+        'indico>=1.9.3'
     ],
     classifiers=[
         'Environment :: Plugins',

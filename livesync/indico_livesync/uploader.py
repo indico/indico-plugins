@@ -34,8 +34,7 @@ class Uploader(object):
 
     def __init__(self, backend):
         self.backend = backend
-        self.task = backend.task
-        self.logger = backend.task.logger if backend.task else backend.plugin.logger
+        self.logger = backend.plugin.logger
 
     def run(self, records):
         """Runs the batch upload
@@ -51,8 +50,6 @@ class Uploader(object):
                 self.logger.exception('{} could not upload batch'.format(self_name))
                 return
             self.processed_records(batch)
-            if self.task:
-                self.task.extend_runtime()
 
     def run_initial(self, events):
         """Runs the initial batch upload

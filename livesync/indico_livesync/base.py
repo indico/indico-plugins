@@ -69,13 +69,11 @@ class LiveSyncBackendBase(object):
         except IndexError:
             return 'no description available'
 
-    def __init__(self, agent, task=None):
+    def __init__(self, agent):
         """
         :param agent: a `LiveSyncAgent` instance
-        :param task: a `LiveSyncTask` instance if running as a task
         """
         self.agent = agent
-        self.task = task
 
     def fetch_records(self, count=None):
         query = (self.agent.queue

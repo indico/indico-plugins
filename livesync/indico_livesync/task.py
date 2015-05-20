@@ -16,41 +16,27 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db import DBMgr, db
-from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
-from indico.util.date_time import now_utc
+from celery.schedules import crontab
+
+from indico.core.celery import celery
+from indico.core.db import db
 
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import clean_old_entries
 
 
-class LiveSyncTask(PeriodicUniqueTask):
-    DISABLE_ZODB_HOOK = True
-
-    @property
-    def logger(self):
-        return self.getLogger()
-
-    def extend_runtime(self):
-        # Make the task manager believe the task is running since a much shorter time
-        self.setOnRunningListSince(now_utc())
-        DBMgr.getInstance().commit()
-
-    def run(self):
-        from indico_livesync.plugin import LiveSyncPlugin
-
-        plugin = LiveSyncPlugin.instance  # RuntimeError if not active
-        with plugin.plugin_context():
-            clean_old_entries()
-
-            for agent in LiveSyncAgent.find_all():
-                if agent.backend is None:
-                    self.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
-                    continue
-                if not agent.initial_data_exported:
-                    self.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
-                    continue
-                with DBMgr.getInstance().global_connection():
-                    self.logger.info('Running agent {}'.format(agent.name))
-                    agent.create_backend(self).run()
-                    db.session.commit()
+@celery.periodic_task(run_every=crontab(minute='*/15'))
+def scheduled_update():
+    from indico_livesync.plugin import LiveSyncPlugin
+    with LiveSyncPlugin.instance.plugin_context():
+        clean_old_entries()
+        for agent in LiveSyncAgent.find_all():
+            if agent.backend is None:
+                LiveSyncPlugin.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
+                continue
+            if not agent.initial_data_exported:
+                LiveSyncPlugin.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
+                continue
+            LiveSyncPlugin.logger.info('Running agent {}'.format(agent.name))
+            agent.create_backend().run()
+            db.session.commit()
