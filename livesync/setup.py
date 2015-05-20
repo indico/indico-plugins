@@ -31,7 +31,6 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'terminaltables==1.1.1',
         'indico>=1.9.3'
     ],
     classifiers=[
