@@ -22,11 +22,7 @@ from dateutil import rrule
 from flask_script import Manager
 from terminaltables import AsciiTable
 
-from indico.core.db import db, DBMgr
-from indico.core.db.sqlalchemy.util.session import update_session_options
-from indico.modules.scheduler import Client
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
-from indico_vc_vidyo.task import VidyoCleanupTask
 
 cli_manager = Manager(usage="Manages the Vidyo plugin")
 
@@ -49,15 +45,3 @@ def rooms(status=None):
     for col in (0, 3, 4):
         table.justify_columns[col] = 'right'
     print table.table
-
-
-@cli_manager.option('interval', type=int)
-def create_task(interval):
-    """Creates a Vidyo cleanup task running every N days"""
-    update_session_options(db)
-    if interval < 1:
-        print 'Invalid interval, must be a number >=1'
-        sys.exit(1)
-    with DBMgr.getInstance().global_connection(commit=True):
-        Client().enqueue(VidyoCleanupTask(rrule.DAILY, interval=interval))
-    print 'Task created'

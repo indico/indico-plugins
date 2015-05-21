@@ -18,14 +18,15 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+from celery.schedules import crontab
 from sqlalchemy.sql.expression import cast
 
+from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.plugins import get_plugin_template_module
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoom, VCRoomStatus
 from indico.modules.vc.notifications import _send
 from indico.modules.fulltextindexes.models.events import IndexedEvent
-from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
 from indico_vc_vidyo.api import APIException, RoomNotFoundAPIException
@@ -55,36 +56,26 @@ def notify_owner(plugin, vc_room):
     _send('delete', user, plugin, None, vc_room, tpl.get_subject(), tpl.get_body())
 
 
-class VidyoCleanupTask(PeriodicUniqueTask):
-    """Gets rid of 'old' Vidyo rooms (not used in recent events)"""
-    DISABLE_ZODB_HOOK = True
+@celery.periodic_task(run_every=crontab(minute='0', hour='3', day_of_week='monday'))
+def vidyo_cleanup():
+    from indico_vc_vidyo.plugin import VidyoPlugin
+    plugin = VidyoPlugin.instance
+    with plugin.plugin_context():
+        max_room_event_age = plugin.settings.get('num_days_old')
 
-    @property
-    def logger(self):
-        return self.getLogger()
+        VidyoPlugin.logger.info('Deleting Vidyo rooms that are not used or linked to events all older than {} days'
+                                .format(max_room_event_age))
+        candidate_rooms = find_old_vidyo_rooms(max_room_event_age)
+        VidyoPlugin.logger.info('{} rooms found'.format(len(candidate_rooms)))
 
-    def run(self):
-        from indico_vc_vidyo.plugin import VidyoPlugin
-
-        plugin = VidyoPlugin.instance  # RuntimeError if not active
-        with plugin.plugin_context():
-            max_room_event_age = plugin.settings.get('num_days_old')
-
-            self.logger.info('Deleting Vidyo rooms that are not used or linked to events all older than {} days'.format(
-                max_room_event_age))
-
-            candidate_rooms = find_old_vidyo_rooms(max_room_event_age)
-
-            self.logger.info('{} rooms found'.format(len(candidate_rooms)))
-
-            for vc_room in committing_iterator(candidate_rooms, n=20):
-                try:
-                    plugin.delete_room(vc_room, None)
-                    self.logger.info('Room {} deleted from Vidyo server'.format(vc_room))
-                    notify_owner(plugin, vc_room)
-                    vc_room.status = VCRoomStatus.deleted
-                except RoomNotFoundAPIException:
-                    self.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
-                    vc_room.status = VCRoomStatus.deleted
-                except APIException:
-                    self.logger.exception('Impossible to delete Vidyo room {}'.format(vc_room))
+        for vc_room in committing_iterator(candidate_rooms, n=20):
+            try:
+                plugin.delete_room(vc_room, None)
+                VidyoPlugin.logger.info('Room {} deleted from Vidyo server'.format(vc_room))
+                notify_owner(plugin, vc_room)
+                vc_room.status = VCRoomStatus.deleted
+            except RoomNotFoundAPIException:
+                VidyoPlugin.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
+                vc_room.status = VCRoomStatus.deleted
+            except APIException:
+                VidyoPlugin.logger.exception('Impossible to delete Vidyo room {}'.format(vc_room))
