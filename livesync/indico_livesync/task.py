@@ -25,18 +25,17 @@ from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import clean_old_entries
 
 
-@celery.periodic_task(run_every=crontab(minute='*/15'))
+@celery.periodic_task(run_every=crontab(minute='*/15'), plugin='livesync')
 def scheduled_update():
     from indico_livesync.plugin import LiveSyncPlugin
-    with LiveSyncPlugin.instance.plugin_context():
-        clean_old_entries()
-        for agent in LiveSyncAgent.find_all():
-            if agent.backend is None:
-                LiveSyncPlugin.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
-                continue
-            if not agent.initial_data_exported:
-                LiveSyncPlugin.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
-                continue
-            LiveSyncPlugin.logger.info('Running agent {}'.format(agent.name))
-            agent.create_backend().run()
-            db.session.commit()
+    clean_old_entries()
+    for agent in LiveSyncAgent.find_all():
+        if agent.backend is None:
+            LiveSyncPlugin.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
+            continue
+        if not agent.initial_data_exported:
+            LiveSyncPlugin.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
+            continue
+        LiveSyncPlugin.logger.info('Running agent {}'.format(agent.name))
+        agent.create_backend().run()
+        db.session.commit()
