@@ -45,8 +45,13 @@ class VidyoExtension(db.Model):
     )
     vc_room = db.relationship(
         'VCRoom',
-        backref=db.backref('vidyo_extension', cascade='all, delete-orphan', uselist=False, lazy=False),
-        lazy=False
+        lazy=False,
+        backref=db.backref(
+            'vidyo_extension',
+            cascade='all, delete-orphan',
+            uselist=False,
+            lazy=False
+        )
     )
 
     #: The user who owns the Vidyo room
