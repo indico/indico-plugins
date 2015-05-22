@@ -83,7 +83,7 @@ class Chatroom(db.Model):
     #: The user who created the chatroom
     created_by_user = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'chatrooms',
             lazy='dynamic'
