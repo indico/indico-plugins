@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import re
 
-from indico.core.models.settings import EventSetting
+from indico.modules.events.models.settings import EventSetting
 from indico.util.console import cformat
 from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator
