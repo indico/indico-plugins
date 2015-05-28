@@ -18,21 +18,18 @@ from __future__ import unicode_literals
 
 from flask import session, request
 
-from indico.core.errors import IndicoError
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-from indico_chat import _
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.util import is_chat_admin
 
 
 class RHChatManageEventBase(RHConferenceModifBase):
+    ALLOW_LEGACY_IDS = False
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        try:
-            self.event_id = int(self._conf.id)
-        except ValueError:
-            raise IndicoError(_('This page is not available for legacy events.'))
+        self.event_id = int(self._conf.id)
         self.event = self._conf
 
     def _checkProtection(self):

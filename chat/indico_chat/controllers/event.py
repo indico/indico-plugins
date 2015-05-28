@@ -18,10 +18,8 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from indico.core.errors import IndicoError
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
-from indico_chat import _
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.views import WPChatEventPage
 
@@ -29,11 +27,10 @@ from indico_chat.views import WPChatEventPage
 class RHChatEventPage(RHConferenceBaseDisplay):
     """Lists the public chatrooms in a conference"""
 
+    ALLOW_LEGACY_IDS = False
+
     def _process(self):
-        try:
-            chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
-        except ValueError:
-            raise IndicoError(_('This page is not available for legacy events.'))
+        chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
         cols = set()
         if any(c.chatroom.description for c in chatrooms):
             cols.add('description')
