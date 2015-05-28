@@ -53,7 +53,7 @@ def notify_owner(plugin, vc_room):
     user = vc_room.vidyo_extension.owned_by_user
     tpl = get_plugin_template_module('emails/remote_deleted.html', plugin=plugin, vc_room=vc_room, event=None,
                                      vc_room_event=None, user=user)
-    _send('delete', user, plugin, None, vc_room, tpl.get_subject(), tpl.get_body())
+    _send('delete', user, plugin, None, vc_room, tpl)
 
 
 @celery.periodic_task(run_every=crontab(minute='0', hour='3', day_of_week='monday'), plugin='vc_vidyo')
