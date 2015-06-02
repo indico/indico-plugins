@@ -57,7 +57,7 @@ def notify_owner(plugin, vc_room):
 
 
 @celery.periodic_task(run_every=crontab(minute='0', hour='3', day_of_week='monday'), plugin='vc_vidyo')
-def vidyo_cleanup():
+def vidyo_cleanup(dry_run=False):
     from indico_vc_vidyo.plugin import VidyoPlugin
     max_room_event_age = VidyoPlugin.settings.get('num_days_old')
 
@@ -65,6 +65,11 @@ def vidyo_cleanup():
                             .format(max_room_event_age))
     candidate_rooms = find_old_vidyo_rooms(max_room_event_age)
     VidyoPlugin.logger.info('{} rooms found'.format(len(candidate_rooms)))
+
+    if dry_run:
+        for vc_room in candidate_rooms:
+            VidyoPlugin.logger.info('Would delete Vidyo room {} from server'.format(vc_room))
+        return
 
     for vc_room in committing_iterator(candidate_rooms, n=20):
         try:
