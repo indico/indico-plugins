@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import socket
 from urllib2 import urlopen, urlparse, URLError
 
 from flask_pluginengine import current_plugin
@@ -74,6 +75,8 @@ class PiwikRequest(object):
         except URLError:
             current_plugin.logger.exception("Unable to retrieve data")
             return default_response
+        except socket.timeout:
+            current_plugin.logger.warning("Timeout contacting Piwik server")
         except Exception:
             current_plugin.logger.exception("Unable to connect")
             return default_response
