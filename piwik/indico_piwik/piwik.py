@@ -15,9 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import socket
-from urllib2 import urlopen, urlparse, URLError
+from urllib2 import urlparse
 
 from flask_pluginengine import current_plugin
+import requests
 
 
 class PiwikRequest(object):
@@ -71,15 +72,11 @@ class PiwikRequest(object):
     def _perform_call(self, query_url, default_response=None, timeout=10):
         """Returns the raw results from the API"""
         try:
-            response = urlopen(url=query_url, timeout=timeout)
-        except URLError:
-            current_plugin.logger.exception("Unable to retrieve data")
-            return default_response
+            response = requests.get(query_url, timeout=timeout)
         except socket.timeout:
             current_plugin.logger.warning("Timeout contacting Piwik server")
+            return default_response
         except Exception:
             current_plugin.logger.exception("Unable to connect")
             return default_response
-        value = response.read()
-        response.close()
-        return value
+        return response.text
