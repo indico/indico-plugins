@@ -96,6 +96,7 @@ class LiveSyncBackendBase(object):
 
         records = self.fetch_records()
         uploader = self.uploader(self)
+        LiveSyncPlugin.logger.info('Uploading {} records'.format(len(records)))
         uploader.run(records)
         self.update_last_run()
 
