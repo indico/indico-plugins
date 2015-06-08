@@ -120,8 +120,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return {
             _('Videoconference'): {
                 _('Vidyo'): (
-                    url_for_plugin(self.name + '.static', filename='help/html/user.html'),
-                    url_for_plugin(self.name + '.static', filename='help/pdf/user.pdf')
+                    url_for_plugin(self.name + '.static', filename='help/html/index.html'),
+                    url_for_plugin(self.name + '.static', filename='help/pdf/index.pdf')
                 )
             }
         }
