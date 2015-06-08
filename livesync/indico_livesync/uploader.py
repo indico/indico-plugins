@@ -49,7 +49,9 @@ class Uploader(object):
             except Exception:
                 self.logger.exception('{} could not upload batch'.format(self_name))
                 return
+            self.logger.info('{} finished batch {}'.format(self_name, i))
             self.processed_records(batch)
+        self.logger.info('{} finished'.format(self_name))
 
     def run_initial(self, events):
         """Runs the initial batch upload
