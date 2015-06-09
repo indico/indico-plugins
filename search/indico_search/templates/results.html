@@ -1,3 +1,5 @@
+{% from 'forms/_form.html' import form_header, form_footer %}
+
 <div class="container search-container">
     {% if only_public %}
         <div class="search-public-warning">
@@ -22,7 +24,7 @@
                     {% block banner %}{% endblock %}
                 </div>
 
-                <form method="post" action="">
+                {{ form_header(form, i_form=false) }}
                     <div>
                         {{ form.phrase() }}
                         <input type="submit" value="{% trans %}Search{% endtrans %}">
@@ -55,7 +57,7 @@
                             {% block sort_fields %}{% endblock %}
                         </table>
                     </div>
-                </form>
+                {{ form_footer(form, i_form=false) }}
             </div>
         </div>
         {% set errors = form.error_list %}

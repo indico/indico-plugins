@@ -1,7 +1,9 @@
+{% from 'forms/_form.html' import form_header, form_footer %}
+
 <div class="confSearchBox">
-    <form class="UIForm" method="post" action="{{ url_for_plugin('search.search', event) }}" style="margin: 0; padding: 0;">
+    {{ form_header(form, action=url_for_plugin('search.search', event), classes='UIForm', i_form=false) }}
         <input class="searchButton" type="submit" value="{% trans %}Search{% endtrans %}">
         {{ form.phrase(class_='searchField', id='conference-search-phrase') }}
         {% block extra_fields %}{% endblock %}
-    </form>
+    {{ form_footer(form, i_form=false) }}
 </div>
