@@ -58,6 +58,7 @@ class PiwikPlugin(IndicoPlugin):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management.sidemenu, self.add_sidemenu_item)
         self.connect(signals.event.material_downloaded, self.track_download)
+        self.connect(signals.indico_help, self._extend_indico_help)
         self.template_hook('html-head', self.inject_tracking)
 
     def inject_tracking(self, template, **kwargs):
@@ -100,6 +101,16 @@ class PiwikPlugin(IndicoPlugin):
         resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
         resource_title = 'Download - {}'.format(resource_title)
         track_download_request.delay(resource_url, resource_title)
+
+    def _extend_indico_help(self, sender, **kwargs):
+        return {
+            _('Statistics'): {
+                _('Piwik'): (
+                    url_for_plugin(self.name + '.static', filename='help/html/index.html'),
+                    url_for_plugin(self.name + '.static', filename='help/pdf/index.pdf')
+                )
+            }
+        }
 
     def _get_event_tracking_params(self):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
