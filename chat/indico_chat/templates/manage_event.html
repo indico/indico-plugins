@@ -91,22 +91,13 @@
         <a class="i-button bottom i-form-button icon-plus" href="{{ url_for_plugin('.manage_rooms_create', event) }}">{% trans %}Create new room{% endtrans %}</a>
     </div>
 
-    {% if available_chatrooms %}
+    {% if attach_form %}
         <div>
             <h2>{% trans %}Add existing chat room{% endtrans %}</h2>
             <div>
-                {{ form_header(action=url_for_plugin('.manage_rooms_attach', event), method='post') }}
-                <div class="form-group">
-                    <div class="form-label form-block form-label-middle">{% trans %}Available chatrooms{% endtrans %}</div>
-                    <div class="form-field form-block">
-                        <select name="chatroom_id">
-                            {% for chatroom in available_chatrooms -%}
-                                <option value="{{ chatroom.id }}">{{ chatroom.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                {% call form_footer() %}
+                {{ form_header(attach_form, action=url_for_plugin('.manage_rooms_attach', event)) }}
+                {{ form_row(attach_form.chatroom) }}
+                {% call form_footer(attach_form) %}
                     <input class="i-button big highlight" type="submit" value="{% trans %}Attach existing room{% endtrans %}">
                 {% endcall %}
             </div>

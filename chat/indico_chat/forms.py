@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
@@ -27,6 +28,10 @@ from indico.web.forms.validators import UsedIf
 from indico_chat import _
 from indico_chat.models.chatrooms import Chatroom
 from indico_chat.xmpp import generate_jid, room_exists
+
+
+class AttachChatroomForm(IndicoForm):
+    chatroom = QuerySelectField(_('Available chatrooms'), [DataRequired()], get_label='name')
 
 
 class EditChatroomForm(IndicoForm):

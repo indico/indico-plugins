@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request, flash, redirect, jsonify
+from flask import session, flash, redirect, jsonify
 from flask_pluginengine import current_plugin
 
 from indico.core.db import db
@@ -29,25 +29,34 @@ from indico.web.forms.base import FormDefaults
 
 from indico_chat import _
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
-from indico_chat.forms import AddChatroomForm, EditChatroomForm
+from indico_chat.forms import AddChatroomForm, EditChatroomForm, AttachChatroomForm
 from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
 from indico_chat.notifications import notify_created, notify_attached, notify_modified, notify_deleted
 from indico_chat.views import WPChatEventMgmt
 from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists
 
 
-class RHChatManageEvent(RHChatManageEventBase):
+class AttachChatroomMixin:
+    def _get_attach_form(self):
+        form = AttachChatroomForm()
+        form.chatroom.query = Chatroom.find(Chatroom.created_by_user == session.user,
+                                            ~Chatroom.events.any(ChatroomEventAssociation.event_id == self.event_id))
+        return form
+
+
+class RHChatManageEvent(AttachChatroomMixin, RHChatManageEventBase):
     """Lists the chatrooms of an event"""
 
     def _process(self):
         chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True,
                                                             _eager='chatroom.events').all()
-        chatroom_filter = (~Chatroom.id.in_(x.chatroom_id for x in chatrooms)) if chatrooms else True
-        available_chatrooms = Chatroom.find_all(Chatroom.created_by_user == session.user, chatroom_filter)
         logs_enabled = current_plugin.settings.get('log_url')
+        attach_form = self._get_attach_form()
+        if not attach_form.chatroom._get_object_list():
+            attach_form = None
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
                                                event=self.event, chat_links=current_plugin.settings.get('chat_links'),
-                                               available_chatrooms=available_chatrooms, logs_enabled=logs_enabled)
+                                               logs_enabled=logs_enabled, attach_form=attach_form)
 
 
 class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
@@ -122,18 +131,19 @@ class RHChatManageEventCreate(RHChatManageEventBase):
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form, event=self.event)
 
 
-class RHChatManageEventAttach(RHChatManageEventBase):
+class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
     """Attaches an existing chatroom to an event"""
 
     def _checkParams(self, params):
         RHChatManageEventBase._checkParams(self, params)
-        self.chatroom = Chatroom.find_one(id=request.form['chatroom_id'])
 
     def _process(self):
-        event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=self.chatroom)
-        db.session.add(event_chatroom)
-        notify_attached(self.chatroom, self.event, session.user)
-        flash(_('Chatroom added'), 'success')
+        form = self._get_attach_form()
+        if form.validate_on_submit():
+            event_chatroom = ChatroomEventAssociation(event_id=self.event_id, chatroom=form.chatroom.data)
+            db.session.add(event_chatroom)
+            notify_attached(form.chatroom.data, self.event, session.user)
+            flash(_('Chatroom added'), 'success')
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
