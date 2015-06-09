@@ -37,7 +37,7 @@ class DummyEvent(object):
 
 
 @pytest.fixture
-def create_dummy_room(db, dummy_user):
+def create_dummy_room(db, dummy_avatar):
     """Returns a callable which lets you create dummy Vidyo room occurrences"""
     def _create_room(name, extension, owner, data, **kwargs):
         vc_room = VCRoom(
@@ -45,7 +45,7 @@ def create_dummy_room(db, dummy_user):
             data=data,
             type="vidyo",
             status=kwargs.pop('status', VCRoomStatus.created),
-            created_by_id=kwargs.pop('created_by_id', dummy_user.id),
+            created_by_id=kwargs.pop('created_by_id', dummy_avatar.id),
             **kwargs
         )
         db.session.add(vc_room)
@@ -61,7 +61,7 @@ def create_dummy_room(db, dummy_user):
     return _create_room
 
 
-def test_room_cleanup(create_dummy_room, dummy_user, freeze_time, db):
+def test_room_cleanup(create_dummy_room, dummy_avatar, freeze_time, db):
     """Test that 'old' Vidyo rooms are correctly detected"""
     freeze_time(datetime(2015, 2, 1))
 
@@ -77,7 +77,7 @@ def test_room_cleanup(create_dummy_room, dummy_user, freeze_time, db):
                                                           (1235, 5679, (2,)),
                                                           (1236, 5670, (4,)),
                                                           (1237, 5671, ())), start=1):
-        room = create_dummy_room('test_room_{}'.format(id_), extension, dummy_user, {
+        room = create_dummy_room('test_room_{}'.format(id_), extension, dummy_avatar, {
             'vidyo_id': vidyo_id
         })
         for evt_id in evt_ids:
