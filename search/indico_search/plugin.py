@@ -64,10 +64,10 @@ class SearchPlugin(IndicoPlugin):
 
     def _add_conference_search_box(self, event, **kwargs):
         if event.getDisplayMgr().getSearchEnabled():
-            form = self.engine_plugin.search_form(prefix='search-')
+            form = self.engine_plugin.search_form(prefix='search-', csrf_enabled=False)
             return render_engine_or_search_template('searchbox_conference.html', event=event, form=form)
 
     def _add_category_search_box(self, category, **kwargs):
         if request.blueprint != 'plugin_search':
-            form = self.engine_plugin.search_form(prefix='search-')
+            form = self.engine_plugin.search_form(prefix='search-', csrf_enabled=False)
             return render_engine_or_search_template('searchbox_category.html', category=category, form=form)

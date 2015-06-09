@@ -45,7 +45,7 @@ class RHSearch(RHCustomizable):
 
     def _process(self):
         with current_plugin.engine_plugin.plugin_context():
-            form = current_plugin.search_form(prefix='search-')
+            form = current_plugin.search_form(prefix='search-', csrf_enabled=False)
             result = None
             if form.validate_on_submit():
                 result = current_plugin.perform_search(form.data, self.obj)
