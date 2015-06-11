@@ -94,7 +94,7 @@ class PiwikPlugin(IndicoPlugin):
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
     def track_download(self, event, resource, **kwargs):
-        resource_url = request.url if isinstance(resource, LocalFile) else resource.getURL()
+        resource_url = request.base_url if isinstance(resource, LocalFile) else resource.getURL()
         if not resource_url:
             # Some very old events apparently have link resources with an empty URL
             return
