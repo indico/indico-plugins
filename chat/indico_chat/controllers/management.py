@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.forms.base import FormDefaults
@@ -79,6 +80,8 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
                 update_room(self.chatroom)
             notify_modified(self.chatroom, self.event, session.user)
             flash(_('Chatroom updated'), 'success')
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                           'Chatroom updated: {}'.format(self.chatroom.name), session.user)
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
                                                event_chatroom=self.event_chatroom, event=self.event)
@@ -107,6 +110,10 @@ class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
                 changed = True
                 setattr(self.chatroom, key, value)
 
+        if changed:
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                           'Chatroom updated during refresh: {}'.format(self.chatroom.name), session.user)
+
         return jsonify(result='changed' if changed else '')
 
 
@@ -126,6 +133,8 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             db.session.flush()
             create_room(chatroom)
             notify_created(chatroom, self.event, session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                           'Chatroom created: {}'.format(chatroom.name), session.user)
             flash(_('Chatroom created'), 'success')
             return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form, event=self.event)
@@ -144,6 +153,8 @@ class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
             db.session.add(event_chatroom)
             notify_attached(form.chatroom.data, self.event, session.user)
             flash(_('Chatroom added'), 'success')
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                           'Chatroom attached: {}'.format(event_chatroom.chatroom.name), session.user)
         return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
@@ -162,4 +173,7 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
             flash(_('Chatroom deleted'), 'success')
         else:
             flash(_('Chatroom removed from event'), 'success')
+        self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                       'Chatroom removed: {}'.format(self.chatroom.name), session.user,
+                       data={'Deleted from server': 'Yes' if chatroom_deleted else 'No'})
         return redirect(url_for_plugin('.manage_rooms', self.event))

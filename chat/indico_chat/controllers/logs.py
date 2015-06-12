@@ -19,12 +19,13 @@ from __future__ import unicode_literals
 from datetime import datetime
 from tempfile import NamedTemporaryFile
 
-from flask import request, flash, redirect, jsonify
+from flask import request, flash, redirect, jsonify, session
 from werkzeug.utils import secure_filename
 
 from indico.core.config import Config
 from indico.core.plugins import url_for_plugin
-from MaKaC.common.log import ModuleNames
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.util.date_time import format_date
 from MaKaC.conference import LocalFile
 
 from indico_chat import _
@@ -127,5 +128,9 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
         self.file_repo_id = resource.getRepositoryId()
 
         # Log the action
-        log_info = {b'subject': b"Added file {} (chat logs)".format(filename)}
-        self.event.getLogHandler().logAction(log_info, ModuleNames.MATERIAL)
+        log_data = [
+            ('Range', 'Everything' if not self.date_filter else
+                      '{} - {}'.format(format_date(self.start_date), format_date(self.end_date))),
+        ]
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                       'Created material: {}'.format(filename), session.user, data=log_data)
