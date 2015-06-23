@@ -29,7 +29,7 @@
                                         {% endif %}
                                         <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}" class="i-button icon-edit" title="{%- trans %}Edit{% endtrans -%}"></a>
                                         {% if not chatroom.custom_server %}
-                                            <a href="#" class="i-button icon-refresh js-chat-refresh-room" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}" title="{% trans %}Refresh{% endtrans %}"></a>
+                                            <a href="#" class="i-button icon-loop js-chat-refresh-room" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}" title="{% trans %}Refresh{% endtrans %}"></a>
                                         {% endif %}
                                         <a href="#" class="i-button icon-remove js-chat-remove-room" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}" title="{%- trans %}Remove{% endtrans -%}"></a>
                                     </div>
