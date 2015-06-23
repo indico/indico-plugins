@@ -14,10 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from mock import MagicMock
+import pytest
+from mock import MagicMock, Mock
+from werkzeug.datastructures import ImmutableDict
 
+from indico_livesync import SimpleChange
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.uploader import Uploader, MARCXMLUploader
+from indico_livesync.util import obj_ref
+
+from MaKaC.conference import Conference
+
+
+def _rm_none(dict_):
+    return ImmutableDict((k, v) for k, v in dict_.iteritems() if v is not None)
 
 
 class RecordingUploader(Uploader):
@@ -28,7 +38,14 @@ class RecordingUploader(Uploader):
         self.logger = MagicMock()
 
     def upload_records(self, records, from_queue):
-        self._uploaded.append((records, from_queue))
+        if from_queue:
+            self._uploaded.append((set((_rm_none(rec), op) for rec, op in records.iteritems()), from_queue))
+        else:
+            self._uploaded.append((set(records), from_queue))
+
+    @property
+    def all_uploaded(self):
+        return self._uploaded
 
 
 class FailingUploader(RecordingUploader):
@@ -44,17 +61,21 @@ class FailingUploader(RecordingUploader):
             raise Exception('All your data are belong to us!')
 
 
+@pytest.fixture(autouse=True)
+def mock_resolved_zodb_objects(mocker):
+        mocker.patch.object(LiveSyncQueueEntry, 'object', autospec=True)
+
+
 def test_run_initial(mocker):
     """Test the initial upload"""
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
     uploader = RecordingUploader(MagicMock())
     uploader.INITIAL_BATCH_SIZE = 3
-    events = tuple(range(4))
-    uploader.run_initial(events)
+    records = tuple(Mock(spec=Conference, id=evt_id) for evt_id in xrange(4))
+    uploader.run_initial(records)
     # We expect two batches, with the second one being smaller (i.e. no None padding, just the events)
-    batches = events[:3], events[3:]
-    assert len(batches[0]) > len(batches[1])
-    assert uploader._uploaded == [(batches[0], False), (batches[1], False)]
+    batches = set(records[:3]), set(records[3:])
+    assert uploader.all_uploaded == [(batches[0], False), (batches[1], False)]
     # During an initial export there are no records to mark as processed
     assert not uploader.processed_records.called
 
@@ -64,10 +85,12 @@ def test_run(mocker):
     db = mocker.patch('indico_livesync.uploader.db')
     uploader = RecordingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
-    records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(4))
+    records = tuple(
+        LiveSyncQueueEntry(change=ChangeType.created, type='event', event_id=evt_id) for evt_id in xrange(4))
     uploader.run(records)
-    batches = records[:3], records[3:]
-    assert uploader._uploaded == [(batches[0], True), (batches[1], True)]
+    refs = tuple((_rm_none(record.object_ref), int(SimpleChange.created)) for record in records)
+    batches = set(refs[:3]), set(refs[3:])
+    assert uploader.all_uploaded == [(batches[0], True), (batches[1], True)]
     # All records should be marked as processed
     assert all(record.processed for record in records)
     # Marking records as processed is committed immediately
@@ -79,11 +102,13 @@ def test_run_failing(mocker):
     db = mocker.patch('indico_livesync.uploader.db')
     uploader = FailingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
-    records = tuple(LiveSyncQueueEntry(change=ChangeType.created) for _ in xrange(10))
+    records = tuple(
+        LiveSyncQueueEntry(change=ChangeType.created, type='event', event_id=evt_id) for evt_id in xrange(10))
     uploader.run(records)
+    refs = tuple((_rm_none(record.object_ref), int(SimpleChange.created)) for record in records)
     assert uploader.logger.exception.called
     # No uploads should happen after a failed batch
-    assert uploader._uploaded == [(records[:3], True), (records[3:6], True)]
+    assert uploader._uploaded == [(set(refs[:3]), True), (set(refs[3:6]), True)]
     # Only successful records should be marked as processed
     assert all(record.processed for record in records[:3])
     assert not any(record.processed for record in records[3:])

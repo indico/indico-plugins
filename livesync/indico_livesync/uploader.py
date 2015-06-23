@@ -20,8 +20,7 @@ import transaction
 
 from indico.core.db import db
 from indico.util.struct.iterables import grouper
-
-from indico_livesync import MARCXMLGenerator
+from indico_livesync import MARCXMLGenerator, process_records
 
 
 class Uploader(object):
@@ -45,7 +44,10 @@ class Uploader(object):
         for i, batch in enumerate(grouper(records, self.BATCH_SIZE, skip_missing=True), 1):
             self.logger.info('{} processing batch {}'.format(self_name, i))
             try:
-                self.upload_records(batch, from_queue=True)
+                for j, proc_batch in enumerate(grouper(
+                        process_records(batch).iteritems(), self.BATCH_SIZE, skip_missing=True), 1):
+                    self.logger.info('{} uploading chunk #{} (batch {})'.format(self_name, j, i))
+                    self.upload_records({k: v for k, v in proc_batch}, from_queue=True)
             except Exception:
                 self.logger.exception('{} could not upload batch'.format(self_name))
                 return
@@ -58,9 +60,14 @@ class Uploader(object):
 
         :param events: an iterable containing events
         """
+        self_name = type(self).__name__
         for i, batch in enumerate(grouper(events, self.INITIAL_BATCH_SIZE, skip_missing=True), 1):
-            self.logger.debug('{} processing initial batch {}'.format(type(self).__name__, i))
-            self.upload_records(batch, from_queue=False)
+            self.logger.debug('{} processing initial batch {}'.format(self_name, i))
+
+            for j, processed_batch in enumerate(grouper(
+                    batch, self.BATCH_SIZE, skip_missing=True), 1):
+                self.logger.info('{} uploading initial chunk #{} (batch {})'.format(self_name, j, i))
+                self.upload_records(processed_batch, from_queue=False)
 
     def upload_records(self, records, from_queue):
         """Executed for a batch of up to `BATCH_SIZE` records

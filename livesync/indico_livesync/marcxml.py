@@ -23,7 +23,7 @@ from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
 from indico.modules.users import User
 
-from indico_livesync import process_records, SimpleChange
+from indico_livesync import SimpleChange
 from indico_livesync.util import make_compound_id, obj_deref, obj_ref
 
 
@@ -32,11 +32,8 @@ class MARCXMLGenerator:
 
     @classmethod
     def records_to_xml(cls, records):
-        processed = process_records(records)
-        if not processed:
-            return None
         mg = MARCXMLGenerator()
-        for ref, change in processed.iteritems():
+        for ref, change in records.iteritems():
             mg.safe_add_object(ref, bool(change & SimpleChange.deleted))
         return mg.get_xml()
 
