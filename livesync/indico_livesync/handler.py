@@ -69,6 +69,10 @@ def connect_signals(plugin):
     plugin.connect(signals.category.domain_access_revoked, _domain_changed)
     plugin.connect(signals.event.domain_access_granted, _domain_changed)
     plugin.connect(signals.event.domain_access_revoked, _domain_changed)
+    # notes
+    plugin.connect(signals.event.notes.note_added, _note_changed)
+    plugin.connect(signals.event.notes.note_deleted, _note_changed)
+    plugin.connect(signals.event.notes.note_modified, _note_changed)
 
 
 def _moved(obj, old_parent, new_parent, **kwargs):
@@ -113,6 +117,13 @@ def _acl_changed(obj, principal, **kwargs):
 
 def _domain_changed(obj, **kwargs):
     _register_change(obj, ChangeType.protection_changed)
+
+
+def _note_changed(note, **kwargs):
+    obj = note.linked_object
+    if isinstance(obj, Session):
+        obj = ConferenceHolder().getById(note.event_id)
+    _register_change(obj, ChangeType.data_changed)
 
 
 def _apply_changes(sender, **kwargs):
