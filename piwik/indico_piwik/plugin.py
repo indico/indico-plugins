@@ -21,7 +21,8 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
-from MaKaC.conference import ConferenceHolder, LocalFile
+from indico.modules.attachments.models.attachments import AttachmentType
+from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_piwik import _
@@ -57,7 +58,7 @@ class PiwikPlugin(IndicoPlugin):
     def init(self):
         super(PiwikPlugin, self).init()
         self.connect(signals.event_management.sidemenu, self.add_sidemenu_item)
-        self.connect(signals.event.material_downloaded, self.track_download)
+        self.connect(signals.attachments.attachment_accessed, self.track_download)
         self.connect(signals.indico_help, self._extend_indico_help)
         self.template_hook('html-head', self.inject_tracking)
 
@@ -93,13 +94,13 @@ class PiwikPlugin(IndicoPlugin):
         self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
-    def track_download(self, event, resource, **kwargs):
-        resource_url = request.base_url if isinstance(resource, LocalFile) else resource.getURL()
-        if not resource_url:
-            # Some very old events apparently have link resources with an empty URL
-            return
-        resource_title = resource.getFileName() if isinstance(resource, LocalFile) else resource.getURL()
-        resource_title = 'Download - {}'.format(resource_title)
+    def track_download(self, attachment, user, **kwargs):
+        if attachment.type == AttachmentType.link:
+            resource_url = attachment.link_url
+            resource_title = 'Link - {0.title}'.format(attachment)
+        else:
+            resource_url = request.base_url
+            resource_title = 'Download - {0.title}'.format(attachment)
         track_download_request.delay(resource_url, resource_title)
 
     def _extend_indico_help(self, sender, **kwargs):
