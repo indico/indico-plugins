@@ -91,6 +91,7 @@
                 materialWidget.hide();
                 killProgress = IndicoUI.Dialogs.Util.progress();
             },
+            error: handleAjaxError,
             success: function(data) {
                 if (handleAjaxError(data)) {
                     return;
@@ -127,6 +128,8 @@
                 type: 'POST',
                 data: params,
                 dataType: 'json',
+                error: handleAjaxError,
+                complete: IndicoUI.Dialogs.Util.progress(),
                 success: function(data) {
                     if (handleAjaxError(data)) {
                         return;
