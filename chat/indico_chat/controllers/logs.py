@@ -17,16 +17,18 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from tempfile import NamedTemporaryFile
 
 from flask import request, flash, redirect, jsonify, session
 from werkzeug.utils import secure_filename
 
-from indico.core.config import Config
+from indico.core import signals
+from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.plugins import url_for_plugin
+from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.date_time import format_date
-from MaKaC.conference import LocalFile
 
 from indico_chat import _
 from indico_chat.controllers.base import RHEventChatroomMixin, RHChatManageEventBase
@@ -99,35 +101,19 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
         return jsonify(success=True)
 
     def _create_material(self, logs):
-        tmpfile = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir())
-        tmpfile.write(logs)
-        tmpfile.flush()
-        filename = secure_filename('{}.html'.format(self.material_name))
-        registry = self.event.getMaterialRegistry()
+        folder = AttachmentFolder.find_first(linked_object=self.event, is_default=False, title='Chat Logs',
+                                             is_deleted=False)
+        if folder is None:
+            folder = AttachmentFolder(protection_mode=ProtectionMode.protected, linked_object=self.event,
+                                      title='Chat Logs', description='Chat logs for this event')
+            db.session.add(folder)
 
-        # Create the material type. The ID must match the title besides casing or we end up
-        # creating new types all the time...
-        mf = registry.getById(b'chat logs')
-        mat = mf.get(self.event)
-        if mat is None:
-            mat = mf.create(self.event)
-            mat.setProtection(1)
-            mat.setTitle(b'Chat Logs')
-            mat.setDescription(b'Chat logs for this event')
-
-        # Create the actual material
-        resource = LocalFile()
-        resource.setName(filename)
-        resource.setDescription("Chat logs for the chat room '{}'".format(self.chatroom.name).encode('utf-8'))
-        resource.setFileName(filename)
-        resource.setFilePath(tmpfile.name)
-        resource.setProtection(0)
-
-        # Store the file in the file repository. self.file_repo_id is set in case of a retry
-        mat.addResource(resource, forcedFileId=self.file_repo_id)
-        self.file_repo_id = resource.getRepositoryId()
-
-        # Log the action
+        filename = '{}.html'.format(secure_filename(self.material_name) or 'logs')
+        attachment = Attachment(folder=folder, user=session.user, title=self.material_name, type=AttachmentType.file,
+                                description="Chat logs for the chat room '{}'".format(self.chatroom.name))
+        attachment.file = AttachmentFile(user=session.user, filename=filename, content_type='text/html')
+        attachment.file.save(logs.encode('utf-8'))
+        signals.attachments.attachment_created.send(attachment, user=session.user)
         log_data = [
             ('Range', 'Everything' if not self.date_filter else
                       '{} - {}'.format(format_date(self.start_date), format_date(self.end_date))),
