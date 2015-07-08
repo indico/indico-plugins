@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from celery.schedules import crontab
-from sqlalchemy.sql.expression import cast
 
 from indico.core.celery import celery
 from indico.core.db import db
@@ -41,7 +40,7 @@ def find_old_vidyo_rooms(max_room_event_age):
         VCRoom.type == 'vidyo',
         IndexedEvent.end_date > (now_utc() - timedelta(days=max_room_event_age))
     ).join(VCRoomEventAssociation).join(
-        IndexedEvent, IndexedEvent.id == cast(VCRoomEventAssociation.event_id, db.String)
+        IndexedEvent, IndexedEvent.id == VCRoomEventAssociation.event_id
     ).group_by(VCRoom.id)
 
     # non-deleted rooms with no recent associations
