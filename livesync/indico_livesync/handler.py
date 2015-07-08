@@ -73,6 +73,11 @@ def connect_signals(plugin):
     plugin.connect(signals.event.notes.note_added, _note_changed)
     plugin.connect(signals.event.notes.note_deleted, _note_changed)
     plugin.connect(signals.event.notes.note_modified, _note_changed)
+    # attachments
+    plugin.connect(signals.attachments.folder_deleted, _attachment_changed)
+    plugin.connect(signals.attachments.attachment_created, _attachment_changed)
+    plugin.connect(signals.attachments.attachment_deleted, _attachment_changed)
+    plugin.connect(signals.attachments.attachment_updated, _attachment_changed)
 
 
 def _moved(obj, old_parent, new_parent, **kwargs):
@@ -123,6 +128,14 @@ def _note_changed(note, **kwargs):
     obj = note.linked_object
     if isinstance(obj, Session):
         obj = ConferenceHolder().getById(note.event_id)
+    _register_change(obj, ChangeType.data_changed)
+
+
+def _attachment_changed(attachment_or_folder, **kwargs):
+    folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
+    obj = folder.linked_object
+    if isinstance(obj, Session):
+        obj = ConferenceHolder().getById(folder.event_id)
     _register_change(obj, ChangeType.data_changed)
 
 
