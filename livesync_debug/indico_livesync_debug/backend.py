@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.util.console import cformat, strip_ansi
+from indico.util.console import cformat
 from indico.util.struct.iterables import grouper
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
@@ -34,12 +34,7 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
     """
 
     def _print(self, msg=''):
-        if not self.task:
-            print msg
-        elif msg:
-            if not isinstance(msg, basestring):
-                msg = repr(msg)
-            self.task.logger.info(strip_ansi(msg))
+        print msg
 
     def run(self):
         records = self.fetch_records()
