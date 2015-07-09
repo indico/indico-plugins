@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from flask import request, flash, redirect, jsonify, session
-from werkzeug.utils import secure_filename
+
 
 from indico.core import signals
 from indico.core.db import db
@@ -29,6 +29,7 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.date_time import format_date
+from indico.util.fs import secure_filename
 
 from indico_chat import _
 from indico_chat.controllers.base import RHEventChatroomMixin, RHChatManageEventBase
@@ -108,7 +109,7 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
                                       title='Chat Logs', description='Chat logs for this event')
             db.session.add(folder)
 
-        filename = '{}.html'.format(secure_filename(self.material_name) or 'logs')
+        filename = '{}.html'.format(secure_filename(self.material_name, 'logs'))
         attachment = Attachment(folder=folder, user=session.user, title=self.material_name, type=AttachmentType.file,
                                 description="Chat logs for the chat room '{}'".format(self.chatroom.name))
         attachment.file = AttachmentFile(user=session.user, filename=filename, content_type='text/html')
