@@ -17,6 +17,7 @@
 from collections import defaultdict
 from datetime import timedelta
 
+from indico.modules.attachments.util import get_nested_attached_items
 from indico.util.date_time import format_time
 from indico.util.serializer import Serializer
 from MaKaC.common.cache import GenericCache
@@ -141,47 +142,30 @@ class ReportGeneral(ReportBase):
 
 class ReportMaterial(ReportBase):
     __public__ = ['material']
-    tree_string_length = 24
 
     def _build_report(self):
         event = ConferenceHolder().getById(self.params['event_id'])
-        material = event.getAllMaterialDict()
-        self.material = {'tree': self._format_data(material, as_list=True)}
+        new_material = get_nested_attached_items(event)
+        self.material = {'tree': [self._format_data(new_material)]}
 
-    def _format_data(self, child, as_list=False):
-        node = {'label': child['title'],
+    def _format_data(self, raw_node):
+        if 'object' not in raw_node:
+            return None
+        node = {'label': raw_node['object'].getTitle(),
                 'children': []}
-
-        for key, value in child.iteritems():
-            if key not in ['children', 'material']:
-                continue
-
-            children = []
-            if key == 'children' and value:
-                for child in value:
-                    new_node = self._format_data(child)
-                    if new_node:
-                        children.append(new_node)
-            if key == 'material' and value:
-                for material in value:
-                    new_node = {'label': material['title'],
-                                'id': material['url']}
-                    children.append(new_node)
-            if children:
-                node['children'].extend(children)
-
+        if 'files' in raw_node:
+            node['children'] += self._format_data_files(raw_node['files'])
+        if 'folders' in raw_node:
+            for folder in raw_node['folders']:
+                node['children'] += [{'label': folder.title, 'children': self._format_data_files(folder.attachments)}]
+        if 'children' in raw_node:
+            node['children'] += [self._format_data(child) for child in raw_node['children']]
         if not node['children']:
             return None
+        return node
 
-        self._truncate_node_label(node)
-        for child in node['children']:
-            self._truncate_node_label(child)
-
-        return [node] if as_list else node
-
-    def _truncate_node_label(self, node):
-        if len(node['label']) > self.tree_string_length:
-            node['label'] = node['label'][:self.tree_string_length] + '...'
+    def _format_data_files(self, files):
+        return [{'id': f.absolute_download_url, 'label': f.title} for f in files]
 
 
 class ReportVisitsPerDay(ReportBase):
