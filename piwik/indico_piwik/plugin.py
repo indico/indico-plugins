@@ -94,8 +94,8 @@ class PiwikPlugin(IndicoPlugin):
         self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
         self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
 
-    def track_download(self, attachment, user, **kwargs):
-        if not self.settings.get('enabled_for_downloads'):
+    def track_download(self, attachment, from_preview, **kwargs):
+        if from_preview or not self.settings.get('enabled_for_downloads'):
             return
         if attachment.type == AttachmentType.link:
             resource_url = attachment.link_url
