@@ -788,10 +788,11 @@
             _convertMaterials: function(materials) {
                 var materialsDict = {};
                 each(materials, function(mat) {
-                    if (!materialsDict[mat.name]) {
-                        materialsDict[mat.name] = [];
+                    var key = mat.name || '';
+                    if (!materialsDict[key]) {
+                        materialsDict[key] = [];
                     }
-                    materialsDict[mat.name].push(mat.url);
+                    materialsDict[key].push(mat.url);
                 });
                 return materialsDict;
             },
@@ -879,7 +880,7 @@
                     record.set("materials", this._convertMaterials(record.get("materials")));
                     var materials = Html.div({}, Html.em({}, $t.gettext("Materials")), ":");
                     for (var mat in record.get("materials")) {
-                        var materialType = Html.div({}, mat + ":");
+                        var materialType = Html.div({}, mat ? (mat + ":") : '');
                         each(record.get("materials")[mat], function(resource) {
                             var link = Html.a({href:resource, target: "_new"}, self._getResourceName(resource));
                             link.observeClick(function(evt) {
