@@ -114,6 +114,7 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
                                 description="Chat logs for the chat room '{}'".format(self.chatroom.name))
         attachment.file = AttachmentFile(user=session.user, filename=filename, content_type='text/html')
         attachment.file.save(logs.encode('utf-8'))
+        db.session.flush()
         signals.attachments.attachment_created.send(attachment, user=session.user)
         log_data = [
             ('Range', 'Everything' if not self.date_filter else
