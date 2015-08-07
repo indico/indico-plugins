@@ -21,6 +21,9 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase,
 
 
 class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
+    menu_entry_plugin = 'chat'
+    menu_entry_name = 'chatrooms'
+
     def __init__(self, rh, conf, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
         self._conf = conf
@@ -28,10 +31,6 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('chat-event-page'))
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()

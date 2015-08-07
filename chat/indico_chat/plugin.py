@@ -26,11 +26,11 @@ from wtforms.validators import DataRequired
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
+from indico.modules.events.layout.util import MenuEntryData
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from MaKaC.conference import EventCloner
-from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_chat import _
@@ -134,14 +134,9 @@ class ChatPlugin(IndicoPlugin):
             }
         }
 
-    def _has_visible_chatrooms(self, event):
-        if event.has_legacy_id:
-            return False
-        return bool(ChatroomEventAssociation.find_for_event(event).count())
-
     def extend_event_menu(self, sender, **kwargs):
-        return EventMenuEntry('chat.event_page', 'Chat Rooms', name='chat-event-page', plugin=True,
-                              visible=self._has_visible_chatrooms)
+        return MenuEntryData(_('Chat Rooms'), 'chatrooms', 'chat.event_page', position=-1,
+                             visible=lambda event: bool(ChatroomEventAssociation.find_for_event(event).count()))
 
     def extend_event_management_menu(self, event, **kwargs):
         if event.canModify(session.user) or is_chat_admin(session.user):
