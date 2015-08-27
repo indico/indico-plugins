@@ -20,6 +20,7 @@ from flask import request
 from flask_pluginengine import plugins_loaded
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
+from indico.modules.events.layout import layout_settings
 
 from indico_search.blueprint import blueprint
 from indico_search.util import render_engine_or_search_template
@@ -63,7 +64,7 @@ class SearchPlugin(IndicoPlugin):
         return blueprint
 
     def _add_conference_search_box(self, event, **kwargs):
-        if event.getDisplayMgr().getSearchEnabled():
+        if layout_settings.get(event, 'is_searchable'):
             form = self.engine_plugin.search_form(prefix='search-', csrf_enabled=False)
             return render_engine_or_search_template('searchbox_conference.html', event=event, form=form)
 
