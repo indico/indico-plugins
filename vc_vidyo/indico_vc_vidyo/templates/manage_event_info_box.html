@@ -2,7 +2,7 @@
 {% from '_clipboard_input.html' import clipboard_input %}
 {% set owner = vc_room.vidyo_extension.owned_by_user %}
 {% set phone_link = settings.get('vidyo_phone_link') %}
-<dl class="details-container zeroclicboard-init">
+<dl class="details-container zeroclipboard-init">
     <dt>{% trans %}Description{% endtrans %}</dt>
     <dd>{{ vc_room.data.description }}</dd>
     <dt>{% trans %}Extension{% endtrans %}</dt>
