@@ -138,7 +138,8 @@ class ChatPlugin(IndicoPlugin):
 
     def extend_event_management_menu(self, event, **kwargs):
         if event.canModify(session.user) or is_chat_admin(session.user):
-            return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event))
+            return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event),
+                                                   section='advanced')
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(event, self)
