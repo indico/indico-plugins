@@ -25,8 +25,6 @@ from indico_chat.util import is_chat_admin
 
 
 class RHChatManageEventBase(RHConferenceModifBase):
-    ALLOW_LEGACY_IDS = False
-
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event_id = int(self._conf.id)

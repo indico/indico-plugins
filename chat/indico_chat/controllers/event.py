@@ -27,8 +27,6 @@ from indico_chat.views import WPChatEventPage
 class RHChatEventPage(RHConferenceBaseDisplay):
     """Lists the public chatrooms in a conference"""
 
-    ALLOW_LEGACY_IDS = False
-
     def _process(self):
         chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
         cols = set()

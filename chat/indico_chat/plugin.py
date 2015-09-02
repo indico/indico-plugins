@@ -113,8 +113,6 @@ class ChatPlugin(IndicoPlugin):
         self.register_js_bundle('chat_js', 'js/chat.js')
 
     def inject_event_header(self, event, **kwargs):
-        if event.has_legacy_id:
-            return ''
         chatrooms = ChatroomEventAssociation.find_for_event(event).all()
         if not chatrooms:
             return ''
@@ -150,8 +148,6 @@ class ChatPlugin(IndicoPlugin):
             return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):
-        if event.has_legacy_id:
-            return
         for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
             chatroom_deleted = event_chatroom.delete()
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
@@ -162,8 +158,7 @@ class ChatPlugin(IndicoPlugin):
 
 class ChatroomCloner(EventCloner):
     def get_options(self):
-        enabled = (not self.event.has_legacy_id and
-                   bool(ChatroomEventAssociation.find_for_event(self.event, include_hidden=True).count()))
+        enabled = bool(ChatroomEventAssociation.find_for_event(self.event, include_hidden=True).count())
         return {'chatrooms': (_('Chatrooms'), enabled, False)}
 
     def clone(self, new_event, options):
