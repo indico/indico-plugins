@@ -30,8 +30,8 @@ from indico.modules.events.layout.util import MenuEntryData
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
+from indico.web.menu import SideMenuItem
 from MaKaC.conference import EventCloner
-from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_chat import _
 from indico_chat.blueprint import blueprint
@@ -97,7 +97,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.indico_help, self.extend_indico_help)
         self.connect(signals.event.sidemenu, self.extend_event_menu)
         self.connect(signals.event.deleted, self.event_deleted)
-        self.connect(signals.event_management.sidemenu, self.extend_event_management_menu)
+        self.connect(signals.menu.items, self.extend_event_management_menu, sender='event-management-sidemenu')
         self.connect(signals.event_management.clone, self.extend_event_management_clone)
         self.connect(signals.event_management.management_url, self.get_event_management_url)
         self.connect(signals.users.merged, self._merge_users)
@@ -136,10 +136,10 @@ class ChatPlugin(IndicoPlugin):
         return MenuEntryData(_('Chat Rooms'), 'chatrooms', 'chat.event_page', position=-1,
                              visible=lambda event: bool(ChatroomEventAssociation.find_for_event(event).count()))
 
-    def extend_event_management_menu(self, event, **kwargs):
+    def extend_event_management_menu(self, sender, event, **kwargs):
         if event.canModify(session.user) or is_chat_admin(session.user):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event),
-                                                   section='advanced')
+                                                   section='services')
 
     def extend_event_management_clone(self, event, **kwargs):
         return ChatroomCloner(event, self)

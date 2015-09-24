@@ -22,8 +22,8 @@ from flask_pluginengine import render_plugin_template
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
 from indico.modules.attachments.models.attachments import AttachmentType
+from indico.web.menu import SideMenuItem
 from MaKaC.conference import ConferenceHolder
-from MaKaC.webinterface.wcomponents import SideMenuItem
 
 from indico_piwik import _
 from indico_piwik.controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
@@ -57,7 +57,7 @@ class PiwikPlugin(IndicoPlugin):
 
     def init(self):
         super(PiwikPlugin, self).init()
-        self.connect(signals.event_management.sidemenu, self.add_sidemenu_item)
+        self.connect(signals.menu.items, self.add_sidemenu_item, sender='event-management-sidemenu')
         self.connect(signals.attachments.attachment_accessed, self.track_download)
         self.connect(signals.indico_help, self._extend_indico_help)
         self.template_hook('html-head', self.inject_tracking)
@@ -73,9 +73,9 @@ class PiwikPlugin(IndicoPlugin):
                                       server_url=server_url,
                                       **event_tracking_params)
 
-    def add_sidemenu_item(self, event, **kwargs):
+    def add_sidemenu_item(self, sender, event, **kwargs):
         if event.canModify(session.user):
-            menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event), section='advanced')
+            menu_item = SideMenuItem(_("Statistics"), url_for_plugin('piwik.view', event), section='reports')
             return 'statistics', menu_item
 
     def get_blueprints(self):

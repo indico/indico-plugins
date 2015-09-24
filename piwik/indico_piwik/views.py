@@ -19,5 +19,4 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
 class WPStatistics(WPJinjaMixinPlugin, WPConferenceModifBase):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['statistics'].setActive()
+    active_menu_item = 'statistics'
