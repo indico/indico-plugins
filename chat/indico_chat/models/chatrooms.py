@@ -123,6 +123,7 @@ class ChatroomEventAssociation(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         primary_key=True,
         index=True,
         autoincrement=False
@@ -146,24 +147,26 @@ class ChatroomEventAssociation(db.Model):
         nullable=False,
         default=False
     )
+
     #: The associated :class:Chatroom
     chatroom = db.relationship(
         'Chatroom',
         lazy=False,
         backref=db.backref('events', cascade='all, delete-orphan')
     )
+    #: The associated event
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'chatroom_associations',
+            lazy='dynamic'
+        )
+    )
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), **self.chatroom.locator)
-
-    @property
-    def event(self):
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
+        return dict(self.chatroom.locator, confId=self.event_id)
 
     @return_ascii
     def __repr__(self):
