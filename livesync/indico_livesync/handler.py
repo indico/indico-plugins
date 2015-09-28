@@ -21,6 +21,7 @@ from collections import defaultdict
 from flask import g
 
 from indico.core import signals
+from indico.modules.events import Event
 from MaKaC.accessControl import AccessController
 from MaKaC.conference import ConferenceHolder, Conference, Contribution, SubContribution, Category, Session
 
@@ -64,6 +65,7 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.access_revoked, _acl_changed)
     plugin.connect(signals.acl.modification_granted, _acl_changed)
     plugin.connect(signals.acl.modification_revoked, _acl_changed)
+    plugin.connect(signals.acl.entry_changed, _event_acl_changed, sender=Event)
     # domain access
     plugin.connect(signals.category.domain_access_granted, _domain_changed)
     plugin.connect(signals.category.domain_access_revoked, _domain_changed)
@@ -118,6 +120,10 @@ def _protection_changed(obj, old, new, **kwargs):
 
 def _acl_changed(obj, principal, **kwargs):
     _handle_acl_change(obj)
+
+
+def _event_acl_changed(sender, obj, **kwargs):
+    _register_change(obj.as_legacy, ChangeType.protection_changed)
 
 
 def _domain_changed(obj, **kwargs):
