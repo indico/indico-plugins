@@ -1,5 +1,5 @@
 {% macro render_make_me_owner(event, vc_room, event_vc_room, extra_classes='') %}
-    {% if session.user != vc_room.vidyo_extension.owned_by_user and event.canModify(session.user) %}
+    {% if session.user != vc_room.vidyo_extension.owned_by_user and event.as_event.can_manage(session.user) %}
         <a class="i-button highlight arrow {{ extra_classes }}" data-toggle="dropdown"></a>
         <ul class="dropdown" data-level="level1">
             <li>
