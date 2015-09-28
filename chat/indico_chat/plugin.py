@@ -137,7 +137,7 @@ class ChatPlugin(IndicoPlugin):
                              visible=lambda event: bool(ChatroomEventAssociation.find_for_event(event).count()))
 
     def extend_event_management_menu(self, sender, event, **kwargs):
-        if event.canModify(session.user) or is_chat_admin(session.user):
+        if event.can_manage(session.user) or is_chat_admin(session.user):
             return 'chat-management', SideMenuItem('Chat Rooms', url_for_plugin('chat.manage_rooms', event),
                                                    section='services')
 
