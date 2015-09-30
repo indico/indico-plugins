@@ -40,4 +40,4 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
 
 
 class WPChatEventMgmt(WPJinjaMixinPlugin, WPConferenceModifBase):
-    sidemenu_option = 'chat-management'
+    sidemenu_option = 'chat'
