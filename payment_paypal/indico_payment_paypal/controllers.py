@@ -23,13 +23,13 @@ from flask import request, flash, redirect
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
 
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
+from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.notifications import notify_amount_inconsistency
-from indico.modules.payment.util import register_transaction, get_registrant_params
+from indico.modules.payment.util import register_transaction
 from indico.web.flask.util import url_for
-from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegistrantBase
 
 from indico_payment_paypal import _
 
@@ -46,11 +46,9 @@ class RHPaypalIPN(RH):
     """Process the notification sent by the PayPal"""
 
     def _checkParams(self):
-        self.event = ConferenceHolder().getById(request.view_args['confId'])
-        self.registrant = self.event.getRegistrantById(request.args['registrantId'])
-        if self.registrant is None:
-            raise BadRequest
-        if self.registrant.getRandomId() != request.args['authkey']:
+        self.token = request.args['token']
+        self.registration = Registration.find_first(uuid=self.token)
+        if not self.registration:
             raise BadRequest
 
     def _process(self):
@@ -78,7 +76,7 @@ class RHPaypalIPN(RH):
                                           "Data received: {}".format(payment_status, request.form))
             return
         self._verify_amount()
-        register_transaction(registrant=self.registrant,
+        register_transaction(registration=self.registration,
                              amount=float(request.form['mc_gross']),
                              currency=request.form['mc_currency'],
                              action=paypal_transaction_action_mapping[payment_status],
@@ -95,33 +93,33 @@ class RHPaypalIPN(RH):
         return False
 
     def _verify_amount(self):
-        expected = self.registrant.getTotal()
+        expected = self.registration.price
         amount = float(request.form['mc_gross'])
         if expected == amount:
             return True
         current_plugin.logger.warning("Paid amount doesn't match event's fee: {} != {}".format(amount, expected))
-        notify_amount_inconsistency(self.registrant, amount)
+        notify_amount_inconsistency(self.registration, amount)
         return False
 
     def _is_transaction_duplicated(self):
-        transaction = PaymentTransaction.find_latest_for_registrant(self.registrant)
+        transaction = self.registration.transaction
         if not transaction or transaction.provider != 'paypal':
             return False
         return (transaction.data['payment_status'] == request.form.get('payment_status') and
                 transaction.data['txn_id'] == request.form.get('txn_id'))
 
 
-class RHPaypalSuccess(RHRegistrationFormRegistrantBase):
+class RHPaypalSuccess(RHRegistrationFormRegistrationBase):
     """Confirmation message after successful payment"""
 
     def _process(self):
         flash(_('Your payment request has been processed.'), 'success')
-        return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
+        return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
 
 
-class RHPaypalCancel(RHRegistrationFormRegistrantBase):
+class RHPaypalCancel(RHRegistrationFormRegistrationBase):
     """Cancellation message"""
 
     def _process(self):
         flash(_('You cancelled the payment process.'), 'info')
-        return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
+        return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))

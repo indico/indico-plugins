@@ -47,8 +47,8 @@ def test_ipn_verify_amount(mocker, amount, expected):
     nai = mocker.patch('indico_payment_paypal.controllers.notify_amount_inconsistency')
     rh = RHPaypalIPN()
     rh.event = MagicMock(id=1)
-    rh.registrant = MagicMock()
-    rh.registrant.getTotal.return_value = 13.37
+    rh.registration = MagicMock()
+    rh.registration.price = 13.37
     request.form = {'mc_gross': amount}
     with PaypalPaymentPlugin.instance.plugin_context():
         assert rh._verify_amount() == expected
@@ -63,13 +63,13 @@ def test_ipn_verify_amount(mocker, amount, expected):
     ('123456', 'Pending',   False),
 ))
 def test_ipn_is_transaction_duplicated(mocker, txn_id, payment_status, expected):
-    flfr = mocker.patch('indico_payment_paypal.controllers.PaymentTransaction.find_latest_for_registrant')
     request.form = {'payment_status': 'Completed', 'txn_id': '12345'}
     rh = RHPaypalIPN()
-    rh.registrant = MagicMock()
-    flfr.return_value = None
+    rh.registration = MagicMock()
+    rh.registration.transaction = None
     assert not rh._is_transaction_duplicated()
-    flfr.return_value = PaymentTransaction(provider='paypal', data={'payment_status': payment_status, 'txn_id': txn_id})
+    transaction = PaymentTransaction(provider='paypal', data={'payment_status': payment_status, 'txn_id': txn_id})
+    rh.registration.transaction = transaction
     assert rh._is_transaction_duplicated() == expected
 
 
@@ -90,8 +90,8 @@ def test_ipn_process(mocker, fail):
     rh = RHPaypalIPN()
     rh._is_transaction_duplicated = lambda: fail == 'dup_txn'
     rh.event = MagicMock(id=1)
-    rh.registrant = MagicMock()
-    rh.registrant.getTotal.return_value = 10.00
+    rh.registration = MagicMock()
+    rh.registration.getTotal.return_value = 10.00
     payment_status = {'fail': 'Failed', 'refund': 'Refunded', 'status': 'Foobar'}.get(fail, 'Completed')
     amount = '-10.00' if fail == 'negative' else '10.00'
     request.view_args = {'confId': rh.event.id}
