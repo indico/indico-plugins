@@ -62,7 +62,7 @@ def test_ipn_verify_amount(mocker, amount, expected):
     ('123456', 'Completed', False),
     ('123456', 'Pending',   False),
 ))
-def test_ipn_is_transaction_duplicated(mocker, txn_id, payment_status, expected):
+def test_ipn_is_transaction_duplicated(txn_id, payment_status, expected):
     request.form = {'payment_status': 'Completed', 'txn_id': '12345'}
     rh = RHPaypalIPN()
     rh.registration = MagicMock()
@@ -86,6 +86,7 @@ def test_ipn_is_transaction_duplicated(mocker, txn_id, payment_status, expected)
 def test_ipn_process(mocker, fail):
     rt = mocker.patch('indico_payment_paypal.controllers.register_transaction')
     post = mocker.patch('indico_payment_paypal.controllers.requests.post')
+    mocker.patch('indico_payment_paypal.controllers.notify_amount_inconsistency')
     post.return_value.text = 'INVALID' if fail == 'verify' else 'VERIFIED'
     rh = RHPaypalIPN()
     rh._is_transaction_duplicated = lambda: fail == 'dup_txn'
