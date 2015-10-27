@@ -32,6 +32,8 @@ from indico_payment_paypal.plugin import PaypalPaymentPlugin
 def test_ipn_verify_business(business, expected, dummy_event):
     rh = RHPaypalIPN()
     rh.event = dummy_event
+    rh.registration = MagicMock()
+    rh.registration.registration_form.event = dummy_event
     PaypalPaymentPlugin.event_settings.set(dummy_event, 'business', 'test')
     request.form = {'business': business}
     with PaypalPaymentPlugin.instance.plugin_context():
