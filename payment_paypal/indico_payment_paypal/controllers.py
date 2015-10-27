@@ -24,7 +24,6 @@ from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.notifications import notify_amount_inconsistency
 from indico.modules.payment.util import register_transaction
@@ -84,7 +83,7 @@ class RHPaypalIPN(RH):
                              data=request.form)
 
     def _verify_business(self):
-        expected = current_plugin.event_settings.get(self.event, 'business')
+        expected = current_plugin.event_settings.get(self.registration.registration_form.event, 'business')
         business = request.form.get('business')
         if expected == business:
             return True
@@ -109,7 +108,7 @@ class RHPaypalIPN(RH):
                 transaction.data['txn_id'] == request.form.get('txn_id'))
 
 
-class RHPaypalSuccess(RHRegistrationFormRegistrationBase):
+class RHPaypalSuccess(RHPaypalIPN):
     """Confirmation message after successful payment"""
 
     def _process(self):
@@ -117,7 +116,7 @@ class RHPaypalSuccess(RHRegistrationFormRegistrationBase):
         return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
 
 
-class RHPaypalCancel(RHRegistrationFormRegistrationBase):
+class RHPaypalCancel(RHPaypalIPN):
     """Cancellation message"""
 
     def _process(self):
