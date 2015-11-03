@@ -49,5 +49,13 @@ class RHEventPreviewIPyNB(RH):
         body, resources = html_exporter.from_notebook_node(notebook)
         css_code = '\n'.join(resources['inlining'].get('css', []))
 
+        # Use CSP to restrict access to possibly malicious scripts or inline JS
+        csp_header = "script-src 'self' cdn.mathjax.org cdnjs.cloudflare.com;"
+        self._responseUtil.headers['Content-Security-Policy'] = csp_header
+        self._responseUtil.headers['X-Webkit-CSP'] = csp_header
+
+        # IE10 doesn't have proper CSP support, so we need to be more strict
+        self._responseUtil.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
+
         return render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
                                html_code=body, css_code=css_code)
