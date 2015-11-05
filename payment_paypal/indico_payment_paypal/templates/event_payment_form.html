@@ -16,7 +16,7 @@ Clicking on the <strong>Pay now</strong> button you will get redirected to the P
             <input type="hidden" name="amount" value="{{ amount }}">
             <input type="hidden" name="currency_code" value="{{ currency }}">
             <input type="hidden" name="charset" value="utf-8">
-            <input type="hidden" name="invoice" value="{{ registration.id }}">
+            <input type="hidden" name="invoice" value="{{ registration.event_id }}_{{ registration.id }}">
             <input type="hidden" name="return" value="{{ return_url }}">
             <input type="hidden" name="cancel_return" value="{{ cancel_url }}">
             <input type="hidden" name="notify_url" value="{{ notify_url }}">
