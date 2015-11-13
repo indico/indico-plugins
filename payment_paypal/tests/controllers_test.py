@@ -18,7 +18,7 @@ import pytest
 from flask import request
 from mock import MagicMock
 
-from indico.modules.payment.models.transactions import PaymentTransaction
+from indico.modules.events.payment.models.transactions import PaymentTransaction
 
 from indico_payment_paypal.controllers import RHPaypalIPN
 from indico_payment_paypal.plugin import PaypalPaymentPlugin

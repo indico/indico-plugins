@@ -20,7 +20,8 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
-from indico.modules.payment import PaymentPluginMixin, PaymentPluginSettingsFormBase, PaymentEventSettingsFormBase
+from indico.modules.events.payment import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
+                                           PaymentEventSettingsFormBase)
 from indico.web.forms.validators import UsedIf
 
 from indico_payment_manual import _
