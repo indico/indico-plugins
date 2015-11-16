@@ -41,17 +41,20 @@ def test_ipn_verify_business(business, expected, dummy_event):
 
 
 @pytest.mark.usefixtures('request_context')
-@pytest.mark.parametrize(('amount', 'expected'), (
-    ('13.37', True),
-    ('10.00', False)
+@pytest.mark.parametrize(('amount', 'currency', 'expected'), (
+    ('13.37', 'EUR', True),
+    ('13.37', 'CHF', False),
+    ('10.00', 'CHF', False),
+    ('10.00', 'CHF', False),
 ))
-def test_ipn_verify_amount(mocker, amount, expected):
+def test_ipn_verify_amount(mocker, amount, currency, expected):
     nai = mocker.patch('indico_payment_paypal.controllers.notify_amount_inconsistency')
     rh = RHPaypalIPN()
     rh.event = MagicMock(id=1)
     rh.registration = MagicMock()
     rh.registration.price = 13.37
-    request.form = {'mc_gross': amount}
+    rh.registration.currency = currency
+    request.form = {'mc_gross': amount, 'mc_currency': 'EUR'}
     with PaypalPaymentPlugin.instance.plugin_context():
         assert rh._verify_amount() == expected
         assert nai.called == (not expected)

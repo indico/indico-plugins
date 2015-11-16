@@ -92,12 +92,15 @@ class RHPaypalIPN(RH):
         return False
 
     def _verify_amount(self):
-        expected = self.registration.price
+        expected_amount = self.registration.price
+        expected_currency = self.registration.currency
         amount = float(request.form['mc_gross'])
-        if expected == amount:
+        currency = request.form['mc_currency']
+        if expected_amount == amount and expected_currency == currency:
             return True
-        current_plugin.logger.warning("Paid amount doesn't match event's fee: {} != {}".format(amount, expected))
-        notify_amount_inconsistency(self.registration, amount)
+        current_plugin.logger.warning("Payment doesn't match event's fee: {} {} != {} {}"
+                                      .format(amount, currency, expected_amount, expected_currency))
+        notify_amount_inconsistency(self.registration, amount, currency)
         return False
 
     def _is_transaction_duplicated(self):
