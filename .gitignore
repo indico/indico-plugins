@@ -11,3 +11,4 @@ dist/
 build/
 wheelhouse/
 **/static/help/
+.cache/
