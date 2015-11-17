@@ -24,7 +24,7 @@
             </p>
             <p>
                 {%- trans %}Required: {% endtrans -%}
-                {{- format_currency(transaction.registration.price, transaction.currency, locale=session.lang) -}}
+                {{- transaction.registration.render_price() -}}
             </p>
         {% endcall %}
     {% endif %}
