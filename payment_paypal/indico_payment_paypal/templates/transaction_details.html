@@ -1,5 +1,5 @@
 {% extends 'payment/transaction_details.html' %}
-{% from 'payment/macros.html' import warning_message %}
+{% from 'message_box.html' import message_box %}
 
 {% block details %}
     {% if not transaction.data._migrated %}
@@ -14,7 +14,7 @@
 
 {% block warning_box %}
     {% if transaction.amount != transaction.registration.price %}
-        {% call warning_message() %}
+        {% call message_box('warning') %}
             <p>
                 {%- trans %}The paid amount does not match the required amount. Please contact the registrant to solve the issue.{% endtrans -%}
             </p>
