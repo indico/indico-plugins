@@ -16,7 +16,7 @@
  */
 
 (function() {
-    var $t = $T.domain('piwik');
+    var $t = $T.domain('importer');
 
     /** Namespace for importer utility functions and variables */
     var ImporterUtils = {
