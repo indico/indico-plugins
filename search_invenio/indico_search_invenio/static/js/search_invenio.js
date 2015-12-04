@@ -47,7 +47,6 @@
             $.ajax({
                 url: options.url,
                 type: 'POST',
-                traditional: true,  // we don't want foo[] for list data!
                 data: $.extend({}, options.queryData, {
                     'offset': $this.data('offset'),
                     'search-collection': collection
