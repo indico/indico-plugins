@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import nbformat
-from flask import session, render_template, request
+from flask import session, render_template, request, current_app
 from nbconvert.exporters import HTMLExporter
 from traitlets.config import Config
 from werkzeug.exceptions import Forbidden
@@ -49,13 +49,15 @@ class RHEventPreviewIPyNB(RH):
         body, resources = html_exporter.from_notebook_node(notebook)
         css_code = '\n'.join(resources['inlining'].get('css', []))
 
+        html = render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
+                               html_code=body, css_code=css_code)
+
+        response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
         csp_header = "script-src 'self' cdn.mathjax.org cdnjs.cloudflare.com 'unsafe-eval';"
-        self._responseUtil.headers['Content-Security-Policy'] = csp_header
-        self._responseUtil.headers['X-Webkit-CSP'] = csp_header
-
+        response.headers['Content-Security-Policy'] = csp_header
+        response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
-        self._responseUtil.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
+        response.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
 
-        return render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
-                               html_code=body, css_code=css_code)
+        return response
