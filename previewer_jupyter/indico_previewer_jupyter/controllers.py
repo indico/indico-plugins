@@ -50,7 +50,7 @@ class RHEventPreviewIPyNB(RH):
         css_code = '\n'.join(resources['inlining'].get('css', []))
 
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        csp_header = "script-src 'self' cdn.mathjax.org cdnjs.cloudflare.com;"
+        csp_header = "script-src 'self' cdn.mathjax.org cdnjs.cloudflare.com 'unsafe-eval';"
         self._responseUtil.headers['Content-Security-Policy'] = csp_header
         self._responseUtil.headers['X-Webkit-CSP'] = csp_header
 
