@@ -102,10 +102,10 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
         return jsonify(success=True)
 
     def _create_material(self, logs):
-        folder = AttachmentFolder.find_first(linked_object=self.event, is_default=False, title='Chat Logs',
+        folder = AttachmentFolder.find_first(object=self.event_new, is_default=False, title='Chat Logs',
                                              is_deleted=False)
         if folder is None:
-            folder = AttachmentFolder(protection_mode=ProtectionMode.protected, linked_object=self.event,
+            folder = AttachmentFolder(protection_mode=ProtectionMode.protected, linked_object=self.event_new,
                                       title='Chat Logs', description='Chat logs for this event')
             db.session.add(folder)
 
