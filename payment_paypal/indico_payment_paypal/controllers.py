@@ -55,24 +55,23 @@ class RHPaypalIPN(RH):
         verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':
-            current_plugin.logger.warning("Paypal IPN string {} did not validate ({})".format(verify_params, result))
+            current_plugin.logger.warning("Paypal IPN string %s did not validate (%s)", verify_params, result)
             return
         if self._is_transaction_duplicated():
-            current_plugin.logger.info("Payment not recorded because transaction was duplicated\n"
-                                       "Data received: {}".format(request.form))
+            current_plugin.logger.info("Payment not recorded because transaction was duplicated\nData received: %s",
+                                       request.form)
             return
         payment_status = request.form.get('payment_status')
         if payment_status == 'Failed':
-            current_plugin.logger.info("Payment failed (status: {})\n"
-                                       "Data received: {}".format(payment_status, request.form))
+            current_plugin.logger.info("Payment failed (status: %s)\nData received: %s", payment_status, request.form)
             return
         if payment_status == 'Refunded' or float(request.form.get('mc_gross')) <= 0:
-            current_plugin.logger.warning("Payment refunded (status: {})\n"
-                                          "Data received: {}".format(payment_status, request.form))
+            current_plugin.logger.warning("Payment refunded (status: %s)\nData received: %s",
+                                          payment_status, request.form)
             return
         if payment_status not in paypal_transaction_action_mapping:
-            current_plugin.logger.warning("Payment status '{}' not recognized\n"
-                                          "Data received: {}".format(payment_status, request.form))
+            current_plugin.logger.warning("Payment status '%s' not recognized\nData received: %s",
+                                          payment_status, request.form)
             return
         self._verify_amount()
         register_transaction(registration=self.registration,
@@ -87,8 +86,8 @@ class RHPaypalIPN(RH):
         business = request.form.get('business')
         if expected == business:
             return True
-        current_plugin.logger.warning("Unexpected business: {} != {}".format(business, expected))
-        current_plugin.logger.warning("Request data was: {}".format(request.form))
+        current_plugin.logger.warning("Unexpected business: %s != %s", business, expected)
+        current_plugin.logger.warning("Request data was: %s", request.form)
         return False
 
     def _verify_amount(self):
@@ -98,8 +97,8 @@ class RHPaypalIPN(RH):
         currency = request.form['mc_currency']
         if expected_amount == amount and expected_currency == currency:
             return True
-        current_plugin.logger.warning("Payment doesn't match event's fee: {} {} != {} {}"
-                                      .format(amount, currency, expected_amount, expected_currency))
+        current_plugin.logger.warning("Payment doesn't match event's fee: %s %s != %s %s",
+                                      amount, currency, expected_amount, expected_currency)
         notify_amount_inconsistency(self.registration, amount, currency)
         return False
 

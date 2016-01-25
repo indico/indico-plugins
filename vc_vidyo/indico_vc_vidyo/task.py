@@ -60,24 +60,24 @@ def vidyo_cleanup(dry_run=False):
     from indico_vc_vidyo.plugin import VidyoPlugin
     max_room_event_age = VidyoPlugin.settings.get('num_days_old')
 
-    VidyoPlugin.logger.info('Deleting Vidyo rooms that are not used or linked to events all older than {} days'
-                            .format(max_room_event_age))
+    VidyoPlugin.logger.info('Deleting Vidyo rooms that are not used or linked to events all older than %d days',
+                            max_room_event_age)
     candidate_rooms = find_old_vidyo_rooms(max_room_event_age)
-    VidyoPlugin.logger.info('{} rooms found'.format(len(candidate_rooms)))
+    VidyoPlugin.logger.info('%d rooms found', len(candidate_rooms))
 
     if dry_run:
         for vc_room in candidate_rooms:
-            VidyoPlugin.logger.info('Would delete Vidyo room {} from server'.format(vc_room))
+            VidyoPlugin.logger.info('Would delete Vidyo room %s from server', vc_room)
         return
 
     for vc_room in committing_iterator(candidate_rooms, n=20):
         try:
             VidyoPlugin.instance.delete_room(vc_room, None)
-            VidyoPlugin.logger.info('Room {} deleted from Vidyo server'.format(vc_room))
+            VidyoPlugin.logger.info('Room %s deleted from Vidyo server', vc_room)
             notify_owner(VidyoPlugin.instance, vc_room)
             vc_room.status = VCRoomStatus.deleted
         except RoomNotFoundAPIException:
-            VidyoPlugin.logger.warning('Room {} had been already deleted from the Vidyo server'.format(vc_room))
+            VidyoPlugin.logger.warning('Room %s had been already deleted from the Vidyo server', vc_room)
             vc_room.status = VCRoomStatus.deleted
         except APIException:
-            VidyoPlugin.logger.exception('Impossible to delete Vidyo room {}'.format(vc_room))
+            VidyoPlugin.logger.exception('Impossible to delete Vidyo room %s', vc_room)

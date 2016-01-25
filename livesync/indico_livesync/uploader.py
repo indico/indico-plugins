@@ -42,18 +42,18 @@ class Uploader(object):
         """
         self_name = type(self).__name__
         for i, batch in enumerate(grouper(records, self.BATCH_SIZE, skip_missing=True), 1):
-            self.logger.info('{} processing batch {}'.format(self_name, i))
+            self.logger.info('%s processing batch %d', self_name, i)
             try:
                 for j, proc_batch in enumerate(grouper(
                         process_records(batch).iteritems(), self.BATCH_SIZE, skip_missing=True), 1):
-                    self.logger.info('{} uploading chunk #{} (batch {})'.format(self_name, j, i))
+                    self.logger.info('%s uploading chunk #%d (batch %d)', self_name, j, i)
                     self.upload_records({k: v for k, v in proc_batch}, from_queue=True)
             except Exception:
-                self.logger.exception('{} could not upload batch'.format(self_name))
+                self.logger.exception('%s could not upload batch', self_name)
                 return
-            self.logger.info('{} finished batch {}'.format(self_name, i))
+            self.logger.info('%s finished batch %d', self_name, i)
             self.processed_records(batch)
-        self.logger.info('{} finished'.format(self_name))
+        self.logger.info('%s finished', self_name)
 
     def run_initial(self, events):
         """Runs the initial batch upload
@@ -62,11 +62,11 @@ class Uploader(object):
         """
         self_name = type(self).__name__
         for i, batch in enumerate(grouper(events, self.INITIAL_BATCH_SIZE, skip_missing=True), 1):
-            self.logger.debug('{} processing initial batch {}'.format(self_name, i))
+            self.logger.debug('%s processing initial batch %d', self_name, i)
 
             for j, processed_batch in enumerate(grouper(
                     batch, self.BATCH_SIZE, skip_missing=True), 1):
-                self.logger.info('{} uploading initial chunk #{} (batch {})'.format(self_name, j, i))
+                self.logger.info('%s uploading initial chunk #%d (batch %d)', self_name, j, i)
                 self.upload_records(processed_batch, from_queue=False)
 
     def upload_records(self, records, from_queue):
@@ -84,7 +84,7 @@ class Uploader(object):
         :param records: a list of queue entries
         """
         for record in records:
-            self.logger.debug('Marking as processed: {}'.format(record))
+            self.logger.debug('Marking as processed: %s', record)
             record.processed = True
         db.session.commit()
         transaction.abort()  # clear ZEO cache

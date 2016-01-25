@@ -44,7 +44,7 @@ def create_room(room):
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
         muc.configureRoom(room.jid, _set_form_values(xmpp, room))
 
-    current_plugin.logger.info('Creating room {}'.format(room.jid))
+    current_plugin.logger.info('Creating room %s', room.jid)
     _execute_xmpp(_create_room)
 
 
@@ -59,7 +59,7 @@ def update_room(room):
         muc.joinMUC(room.jid, xmpp.requested_jid.user)
         muc.configureRoom(room.jid, _set_form_values(xmpp, room, muc.getRoomConfig(room.jid)))
 
-    current_plugin.logger.info('Updating room {}'.format(room.jid))
+    current_plugin.logger.info('Updating room %s', room.jid)
     _execute_xmpp(_update_room)
 
 
@@ -73,7 +73,7 @@ def delete_room(room, reason=''):
         muc = xmpp.plugin['xep_0045']
         muc.destroy(room.jid, reason=reason)
 
-    current_plugin.logger.info('Deleting room {}'.format(room.jid))
+    current_plugin.logger.info('Deleting room %s', room.jid)
     _execute_xmpp(_delete_room)
     delete_logs(room)
 
@@ -189,7 +189,7 @@ def _execute_xmpp(connected_callback):
         except Exception as e:
             result[1] = e
             if isinstance(e, IqError):
-                current_plugin.logger.exception('XMPP callback failed: {}'.format(e.condition))
+                current_plugin.logger.exception('XMPP callback failed: %s', e.condition)
             else:
                 current_plugin.logger.exception('XMPP callback failed')
         finally:
@@ -242,11 +242,10 @@ def retrieve_logs(room, start_date=None, end_date=None):
     try:
         response = requests.get(base_url, params=params)
     except RequestException:
-        current_plugin.logger.exception('Could not retrieve logs for {}'.format(room.jid))
+        current_plugin.logger.exception('Could not retrieve logs for %s', room.jid)
         return None
     if response.headers.get('content-type') == 'application/json':
-        current_plugin.logger.warning('Could not retrieve logs for {}: {}'.format(room.jid,
-                                                                                  response.json().get('error')))
+        current_plugin.logger.warning('Could not retrieve logs for %s: %s', room.jid, response.json().get('error'))
         return None
     return response.text
 
@@ -262,7 +261,7 @@ def delete_logs(room):
     try:
         response = requests.get(posixpath.join(base_url, 'delete'), params={'cr': room.jid}).json()
     except (RequestException, ValueError):
-        current_plugin.logger.exception('Could not delete logs for {}'.format(room.jid))
+        current_plugin.logger.exception('Could not delete logs for %s', room.jid)
         return
     if not response.get('success'):
-        current_plugin.logger.warning('Could not delete logs for {}: {}'.format(room.jid), response.get('error'))
+        current_plugin.logger.warning('Could not delete logs for %s: %s', room.jid, response.get('error'))

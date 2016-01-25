@@ -28,11 +28,11 @@ def get_json_from_remote_server(func, default={}, **kwargs):
     try:
         data = json.loads(rawjson)
         if isinstance(data, dict) and data.get('result') == 'error':
-            current_plugin.logger.error('The Piwik server responded with an error: {}'.format(data['message']))
+            current_plugin.logger.error('The Piwik server responded with an error: %s', data['message'])
             return {}
         return data
     except Exception:
-        current_plugin.logger.exception('Unable to load JSON from source {}'.format(str(rawjson)))
+        current_plugin.logger.exception('Unable to load JSON from source %s', rawjson)
         return default
 
 

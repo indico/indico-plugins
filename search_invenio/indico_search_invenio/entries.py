@@ -69,7 +69,7 @@ class SearchResult(object):
     def is_visible(self, user):
         obj = self.object
         if not obj:
-            current_plugin.logger.warning('referenced element {} does not exist'.format(self.compound_id))
+            current_plugin.logger.warning('referenced element %s does not exist', self.compound_id)
             return False
         return obj.canView(AccessWrapper(user.as_avatar if user else None))
 

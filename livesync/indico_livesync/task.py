@@ -31,11 +31,11 @@ def scheduled_update():
     clean_old_entries()
     for agent in LiveSyncAgent.find_all():
         if agent.backend is None:
-            LiveSyncPlugin.logger.warning('Skipping agent {}; backend not found'.format(agent.name))
+            LiveSyncPlugin.logger.warning('Skipping agent %s; backend not found', agent.name)
             continue
         if not agent.initial_data_exported:
-            LiveSyncPlugin.logger.warning('Skipping agent {}; initial export not performed yet'.format(agent.name))
+            LiveSyncPlugin.logger.warning('Skipping agent %s; initial export not performed yet', agent.name)
             continue
-        LiveSyncPlugin.logger.info('Running agent {}'.format(agent.name))
+        LiveSyncPlugin.logger.info('Running agent %s', agent.name)
         agent.create_backend().run()
         db.session.commit()

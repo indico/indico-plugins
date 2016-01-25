@@ -58,7 +58,7 @@ class MARCXMLGenerator:
         try:
             self.add_object(ref, deleted)
         except Exception:
-            current_plugin.logger.exception('Could not process {}'.format(ref))
+            current_plugin.logger.exception('Could not process %s', ref)
 
     def add_object(self, ref, deleted=False):
         if self.closed:
