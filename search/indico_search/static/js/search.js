@@ -426,9 +426,6 @@
                     at: 'bottom center',
                     my: 'top center'
                 },
-                style: {
-                    classes: 'qtip-shadow'
-                },
                 show: {
                     event: event.type,
                     ready: true
