@@ -5,9 +5,11 @@
         <style>
             {{ css_code }}
         </style>
-        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-        <script type="text/x-mathjax-config">
-            MathJax.Hub.Config({
+    </head>
+    <body>
+        {{ html_code | safe }}
+        <script type="text/javascript" nonce="{{ nonce }}">
+            var MathJax = {
                 tex2jax: {
                     inlineMath: [ ['$','$'], ["\\(","\\)"] ],
                     displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
@@ -21,10 +23,9 @@
                     styles: {'.MathJax_Display': {"margin": 0}},
                     linebreaks: { automatic: true }
                 }
-            });
+            };
         </script>
-    </head>
-    <body>
-        {{ html_code | safe }}
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
+        </script>
     </body>
 </html>
