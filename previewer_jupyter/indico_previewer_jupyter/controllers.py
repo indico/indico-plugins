@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from uuid import uuid4
+
 import nbformat
 from flask import session, render_template, request, current_app
 from nbconvert.exporters import HTMLExporter
@@ -40,7 +42,7 @@ class RHEventPreviewIPyNB(RH):
     def _process(self):
         config = Config()
         config.HTMLExporter.preprocessors = [CppHighlighter]
-        config.HTMLExporter.template_file = 'full'
+        config.HTMLExporter.template_file = 'basic'
 
         with self.attachment.file.open() as f:
             notebook = nbformat.read(f, as_version=4)
@@ -49,12 +51,13 @@ class RHEventPreviewIPyNB(RH):
         body, resources = html_exporter.from_notebook_node(notebook)
         css_code = '\n'.join(resources['inlining'].get('css', []))
 
+        nonce = str(uuid4())
         html = render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
-                               html_code=body, css_code=css_code)
+                               html_code=body, css_code=css_code, nonce=nonce)
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        csp_header = "script-src cdn.mathjax.org cdnjs.cloudflare.com 'unsafe-eval';"
+        csp_header = "script-src cdn.mathjax.org cdnjs.cloudflare.com 'nonce-{}';".format(nonce)
         response.headers['Content-Security-Policy'] = csp_header
         response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
