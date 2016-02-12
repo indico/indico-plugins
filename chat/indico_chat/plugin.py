@@ -26,12 +26,12 @@ from wtforms.validators import DataRequired
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin, url_for_plugin
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout.util import MenuEntryData
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.menu import SideMenuItem
-from MaKaC.conference import EventCloner
 
 from indico_chat import _
 from indico_chat.blueprint import blueprint
@@ -98,7 +98,7 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event.sidemenu, self.extend_event_menu)
         self.connect(signals.event.deleted, self.event_deleted)
         self.connect(signals.menu.items, self.extend_event_management_menu, sender='event-management-sidemenu')
-        self.connect(signals.event_management.clone, self.extend_event_management_clone)
+        self.connect(signals.event_management.get_cloners, self._get_event_cloners)
         self.connect(signals.event_management.management_url, self.get_event_management_url)
         self.connect(signals.users.merged, self._merge_users)
         self.template_hook('event-header', self.inject_event_header)
@@ -140,8 +140,8 @@ class ChatPlugin(IndicoPlugin):
         if event.can_manage(session.user) or is_chat_admin(session.user):
             return SideMenuItem('chat', 'Chat Rooms', url_for_plugin('chat.manage_rooms', event), section='services')
 
-    def extend_event_management_clone(self, event, **kwargs):
-        return ChatroomCloner(event, self)
+    def _get_event_cloners(self, sender, **kwargs):
+        return ChatroomCloner
 
     def get_event_management_url(self, event, **kwargs):
         if is_chat_admin(session.user):
@@ -157,17 +157,17 @@ class ChatPlugin(IndicoPlugin):
 
 
 class ChatroomCloner(EventCloner):
-    def get_options(self):
-        enabled = bool(ChatroomEventAssociation.find_for_event(self.event, include_hidden=True).count())
-        return {'chatrooms': (_('Chatrooms'), enabled, False)}
+    name = 'chatrooms'
+    friendly_name = _('Chatrooms')
 
-    def clone(self, new_event, options):
-        """Called when the event is being cloned"""
-        if 'chatrooms' not in options:
-            return
-        for old_event_chatroom in ChatroomEventAssociation.find_for_event(self.event, include_hidden=True):
+    @property
+    def is_available(self):
+        return bool(self.old_event.chatroom_associations.count())
+
+    def run(self, new_event, cloners, shared_data):
+        for old_event_chatroom in self.old_event.chatroom_associations:
             event_chatroom = ChatroomEventAssociation(chatroom=old_event_chatroom.chatroom,
-                                                      event_id=int(new_event.id),
                                                       hidden=old_event_chatroom.hidden,
                                                       show_password=old_event_chatroom.show_password)
-            db.session.add(event_chatroom)
+            new_event.chatroom_associations.append(event_chatroom)
+        db.session.flush()
