@@ -58,7 +58,9 @@ class SettingsForm(IndicoForm):
                                                    '<a href="https://github.com/indico/jabber-logs/">jabber-logs '
                                                    'app</a>, running on the jabber server to let event managers can '
                                                    'retrieve chat logs for rooms on that server.'))
-    chat_links = MultipleItemsField(_('Chatroom links'), fields=(('title', 'Title'), ('link', 'Link')),
+    chat_links = MultipleItemsField(_('Chatroom links'),
+                                    fields=[{'id': 'title', 'caption': _("Title"), 'required': True},
+                                            {'id': 'link', 'caption': _("Link"), 'required': True}],
                                     description=_("Links to join the chatroom. You can use the placeholders {room} for "
                                                   "the room name and {server} for the MUC server."))
     how_to_connect = TextAreaField(_('How to connect'), widget=CKEditorWidget(),

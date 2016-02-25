@@ -40,7 +40,8 @@ class SettingsForm(IndicoForm):
                                                  "LiveSync task is not running for some time, queue entries may be "
                                                  "deleted during the next run after processing them. Setting it to 0 "
                                                  "disables automatic deletion."))
-    excluded_categories = MultipleItemsField(_('Excluded categories'), fields=(('id', _('Category ID')),),
+    excluded_categories = MultipleItemsField(_('Excluded categories'),
+                                             fields=[{'id': 'id', 'caption': _("Category ID"), 'required': True}],
                                              description=_("Changes to objects inside these categories or any of their "
                                                            "subcategories are excluded."))
 
