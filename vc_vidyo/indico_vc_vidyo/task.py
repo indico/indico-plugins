@@ -23,9 +23,9 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.plugins import get_plugin_template_module
+from indico.modules.events import Event
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoom, VCRoomStatus
 from indico.modules.vc.notifications import _send
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
 from indico_vc_vidyo.api import APIException, RoomNotFoundAPIException
@@ -36,12 +36,12 @@ def find_old_vidyo_rooms(max_room_event_age):
        - linked to no events
        - linked only to events whose start date precedes today - max_room_event_age days
     """
-    recently_used = db.session.query(VCRoom.id).filter(
-        VCRoom.type == 'vidyo',
-        IndexedEvent.end_date > (now_utc() - timedelta(days=max_room_event_age))
-    ).join(VCRoomEventAssociation).join(
-        IndexedEvent, IndexedEvent.id == VCRoomEventAssociation.event_id
-    ).group_by(VCRoom.id)
+    recently_used = (db.session.query(VCRoom.id)
+                     .filter(VCRoom.type == 'vidyo',
+                             Event.end_dt > (now_utc() - timedelta(days=max_room_event_age)))
+                     .join(VCRoomEventAssociation)
+                     .join(Event)
+                     .group_by(VCRoom.id))
 
     # non-deleted rooms with no recent associations
     return VCRoom.find_all(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used))

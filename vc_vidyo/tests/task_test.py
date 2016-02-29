@@ -17,9 +17,10 @@
 from datetime import datetime
 
 import pytest
+from pytz import utc
 
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
+
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
@@ -61,16 +62,15 @@ def create_dummy_room(db, dummy_avatar):
     return _create_room
 
 
-def test_room_cleanup(create_dummy_room, dummy_avatar, freeze_time, db):
+def test_room_cleanup(create_event, create_dummy_room, dummy_avatar, freeze_time, db):
     """Test that 'old' Vidyo rooms are correctly detected"""
     freeze_time(datetime(2015, 2, 1))
 
-    for id_, (evt_name, end_date) in enumerate((('Event one', datetime(2012, 1, 1)),
-                                                ('Event two', datetime(2013, 1, 1)),
-                                                ('Event three', datetime(2014, 1, 1)),
-                                                ('Event four', datetime(2015, 1, 1))), start=1):
-        idx = IndexedEvent(id=id_, title=evt_name, end_date=end_date, start_date=end_date)
-        db.session.add(idx)
+    for id_, (evt_name, end_date) in enumerate((('Event one', datetime(2012, 1, 1, tzinfo=utc)),
+                                                ('Event two', datetime(2013, 1, 1, tzinfo=utc)),
+                                                ('Event three', datetime(2014, 1, 1, tzinfo=utc)),
+                                                ('Event four', datetime(2015, 1, 1, tzinfo=utc))), start=1):
+        create_event(id_, title=evt_name, end_dt=end_date, start_dt=end_date)
 
     for id_, (vidyo_id, extension, evt_ids) in enumerate(((1234, 5678, (1, 2, 3, 4)),
                                                           (1235, 5679, (1, 2)),
