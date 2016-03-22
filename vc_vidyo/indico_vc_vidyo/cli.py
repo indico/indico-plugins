@@ -16,9 +16,6 @@
 
 from __future__ import unicode_literals
 
-import sys
-from dateutil import rrule
-
 from flask_script import Manager
 from terminaltables import AsciiTable
 

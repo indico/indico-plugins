@@ -154,8 +154,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         defined in Vidyo plugin's settings, in that order.
 
         :param vc_room: VCRoom -- The VC room from which to create the Vidyo
-            room
-        :param event: Conference -- The event to the Vidyo room will be attached
+                        room
+        :param event: Event -- The event to the Vidyo room will be attached
         """
         client = AdminClient(self.settings)
         owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)

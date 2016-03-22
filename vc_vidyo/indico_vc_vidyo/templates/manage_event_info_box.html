@@ -23,9 +23,9 @@
         {% elif event_vc_room.link_type.name == 'event' %}
             {% trans %}the whole event{% endtrans %}
         {% elif event_vc_room.link_type.name == 'contribution' %}
-            {% trans %}Contribution{% endtrans %}: {{ obj.getTitle() }}
+            {% trans %}Contribution{% endtrans %}: {{ obj.title }}
         {% elif event_vc_room.link_type.name == 'block' %}
-            {% trans %}Session{% endtrans %}: {{ obj.getFullTitle() }}
+            {% trans %}Session{% endtrans %}: {{ obj.full_title }}
         {% endif %}
     </dd>
     {% if vc_room.data.room_pin %}

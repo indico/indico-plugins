@@ -24,19 +24,6 @@ from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VC
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
-class DummyEvent(object):
-    def __init__(self, id_, title, end_date):
-        self.id = id_
-        self.title = title
-        self.end_date = end_date
-
-    def getEndDate(self):
-        return self.end_date
-
-    def getId(self):
-        return self.id
-
-
 @pytest.fixture
 def create_dummy_room(db, dummy_avatar):
     """Returns a callable which lets you create dummy Vidyo room occurrences"""
@@ -66,11 +53,12 @@ def test_room_cleanup(create_event, create_dummy_room, dummy_avatar, freeze_time
     """Test that 'old' Vidyo rooms are correctly detected"""
     freeze_time(datetime(2015, 2, 1))
 
+    events = {}
     for id_, (evt_name, end_date) in enumerate((('Event one', datetime(2012, 1, 1, tzinfo=utc)),
                                                 ('Event two', datetime(2013, 1, 1, tzinfo=utc)),
                                                 ('Event three', datetime(2014, 1, 1, tzinfo=utc)),
                                                 ('Event four', datetime(2015, 1, 1, tzinfo=utc))), start=1):
-        create_event(id_, title=evt_name, end_dt=end_date, start_dt=end_date)
+        events[id_] = create_event(id_, title=evt_name, end_dt=end_date, start_dt=end_date)
 
     for id_, (vidyo_id, extension, evt_ids) in enumerate(((1234, 5678, (1, 2, 3, 4)),
                                                           (1235, 5679, (1, 2)),
@@ -81,7 +69,7 @@ def test_room_cleanup(create_event, create_dummy_room, dummy_avatar, freeze_time
             'vidyo_id': vidyo_id
         })
         for evt_id in evt_ids:
-            VCRoomEventAssociation(vc_room=room, event_id=evt_id, link_type=VCRoomLinkType.event)
+            VCRoomEventAssociation(vc_room=room, linked_event=events[evt_id])
             db.session.flush()
 
     from indico_vc_vidyo.task import find_old_vidyo_rooms
