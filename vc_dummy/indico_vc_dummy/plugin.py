@@ -67,6 +67,9 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
     def update_room(self, vc_room, event):
         pass
 
+    def refresh_room(self, vc_room, event):
+        pass
+
     def update_data_association(self, event, vc_room, event_vc_room, data):
         super(DummyPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
         event_vc_room.data.update({key: data.pop(key) for key in [
