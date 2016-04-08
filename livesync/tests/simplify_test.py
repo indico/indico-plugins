@@ -30,7 +30,6 @@ def queue_entry_dummy_object(monkeypatch):
     (ChangeType.created,            True),
     (ChangeType.deleted,            True),
     (ChangeType.data_changed,       True),
-    (ChangeType.title_changed,      True),
     (ChangeType.protection_changed, False),
     (ChangeType.moved,              False),
 ))
@@ -52,7 +51,6 @@ def test_process_records_category_ignored(mocker, change, ignored):
     (ChangeType.created,            False),
     (ChangeType.deleted,            False),
     (ChangeType.data_changed,       False),
-    (ChangeType.title_changed,      False),
     (ChangeType.protection_changed, True),
     (ChangeType.moved,              True),
 ))
@@ -83,7 +81,6 @@ def test_process_records_simplify(changes):
         if changes[i][1]:
             queue.append(LiveSyncQueueEntry(change=ChangeType.data_changed, **ref))
             queue.append(LiveSyncQueueEntry(change=ChangeType.data_changed, **ref))
-            queue.append(LiveSyncQueueEntry(change=ChangeType.title_changed, **ref))
             expected[i] |= SimpleChange.updated
         if changes[i][2]:
             queue.append(LiveSyncQueueEntry(change=ChangeType.deleted, **ref))

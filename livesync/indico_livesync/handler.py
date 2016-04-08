@@ -46,11 +46,6 @@ def connect_signals(plugin):
     plugin.connect(signals.event.deleted, _deleted)
     plugin.connect(signals.event.contribution_deleted, _deleted)
     plugin.connect(signals.event.subcontribution_deleted, _deleted)
-    # title
-    plugin.connect(signals.category.title_changed, _title_changed)
-    plugin.connect(signals.event.data_changed, _title_changed)
-    plugin.connect(signals.event.contribution_title_changed, _title_changed)
-    plugin.connect(signals.event.subcontribution_title_changed, _title_changed)
     # data
     plugin.connect(signals.category.data_changed, _data_changed)
     plugin.connect(signals.event.data_changed, _data_changed)
@@ -99,12 +94,6 @@ def _created(obj, parent, **kwargs):
 def _deleted(obj, **kwargs):
     parent = kwargs.pop('parent', None)
     _register_deletion(obj, parent)
-
-
-def _title_changed(obj, **kwargs):
-    if kwargs.pop('attr', 'title') != 'title':
-        return
-    _register_change(obj, ChangeType.title_changed)
 
 
 def _data_changed(obj, **kwargs):

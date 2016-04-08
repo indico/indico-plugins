@@ -60,9 +60,17 @@ def upgrade():
                                'type != 4 OR (category_id IS NULL AND contribution_id IS NULL AND '
                                'event_id IS NULL AND subcontribution_id IS NOT NULL)',
                                schema='plugin_livesync')
+    op.drop_constraint('ck_queues_valid_enum_change', 'queues', schema='plugin_livesync')
+    op.create_check_constraint('valid_enum_change', 'queues',
+                               'change IN (1, 2, 3, 4, 5)',
+                               schema='plugin_livesync')
 
 
 def downgrade():
+    op.drop_constraint('ck_queues_valid_enum_change', 'queues', schema='plugin_livesync')
+    op.create_check_constraint('valid_enum_change', 'queues',
+                               'change IN (1, 2, 3, 4, 5, 6)',
+                               schema='plugin_livesync')
     op.drop_constraint('ck_queues_valid_category_entry', 'queues', schema='plugin_livesync')
     op.drop_constraint('ck_queues_valid_event_entry', 'queues', schema='plugin_livesync')
     op.drop_constraint('ck_queues_valid_contribution_entry', 'queues', schema='plugin_livesync')

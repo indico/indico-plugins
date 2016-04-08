@@ -51,8 +51,6 @@ def process_records(records):
         elif record.change in {ChangeType.moved, ChangeType.protection_changed}:
             for ref in _cascade(record):
                 changes[ref] |= SimpleChange.updated
-        elif record.change == ChangeType.title_changed:
-            pass  # XXX: included in data_changed
         elif record.change == ChangeType.data_changed:
             if record.type != 'category':
                 changes[record.object_ref] |= SimpleChange.updated

@@ -33,8 +33,7 @@ class ChangeType(int, IndicoEnum):
     deleted = 2
     moved = 3
     data_changed = 4
-    title_changed = 5
-    protection_changed = 6
+    protection_changed = 5
 
 
 class EntryType(int, IndicoEnum):
