@@ -18,10 +18,12 @@ from datetime import timedelta
 
 import pytest
 
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.util.date_time import now_utc
 
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
+from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
 from indico_livesync.plugin import LiveSyncPlugin
 from indico_livesync.util import make_compound_id, clean_old_entries, get_excluded_categories
 
@@ -57,11 +59,14 @@ class MockCategoryManager(object):
 
 
 @pytest.mark.parametrize(('ref', 'expected'), (
-    ({'type': 'event', 'event_id': '123'}, '123'),
-    ({'type': 'contribution', 'event_id': '123', 'contrib_id': '456'}, '123.456'),
-    ({'type': 'subcontribution', 'event_id': '123', 'contrib_id': '456', 'subcontrib_id': '789'}, '123.456.789'),
+    ({'type': EntryType.event, 'event_id': '123'}, '123'),
+    ({'type': EntryType.contribution, 'contrib_id': '456'}, '123.456'),
+    ({'type': EntryType.subcontribution, 'subcontrib_id': '789'}, '123.456.789'),
 ))
-def test_make_compound_id(ref, expected):
+def test_make_compound_id(create_event, ref, expected):
+    evt = create_event(123)
+    evt.contributions = [Contribution(id=456, title='test', duration=timedelta(hours=1))]
+    evt.contributions[0].subcontributions = [SubContribution(id=789, title='foo', duration=timedelta(minutes=10))]
     assert make_compound_id(ref) == expected
 
 
@@ -71,12 +76,13 @@ def test_make_compound_id_errors(ref_type):
         make_compound_id({'type': ref_type})
 
 
-def test_clean_old_entries(db):
+def test_clean_old_entries(dummy_event_new, db):
     now = now_utc()
     agent = LiveSyncAgent(name='dummy', backend_name='dummy')
     for processed in (True, False):
         for day in range(10):
-            db.session.add(LiveSyncQueueEntry(agent=agent, change=ChangeType.created, type='dummy', processed=processed,
+            db.session.add(LiveSyncQueueEntry(agent=agent, change=ChangeType.created, type=EntryType.event,
+                                              event=dummy_event_new, processed=processed,
                                               timestamp=now - timedelta(days=day, hours=12)))
     db.session.flush()
     # Nothing deleted with the setting's default value

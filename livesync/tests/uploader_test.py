@@ -19,9 +19,8 @@ from mock import MagicMock, Mock
 from werkzeug.datastructures import ImmutableDict
 
 from indico_livesync import SimpleChange
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
+from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
 from indico_livesync.uploader import Uploader, MARCXMLUploader
-from indico_livesync.util import obj_ref
 
 from MaKaC.conference import Conference
 
@@ -85,8 +84,8 @@ def test_run(mocker):
     db = mocker.patch('indico_livesync.uploader.db')
     uploader = RecordingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
-    records = tuple(
-        LiveSyncQueueEntry(change=ChangeType.created, type='event', event_id=evt_id) for evt_id in xrange(4))
+    records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt_id)
+                    for evt_id in xrange(4))
     uploader.run(records)
     refs = tuple((_rm_none(record.object_ref), int(SimpleChange.created)) for record in records)
     batches = set(refs[:3]), set(refs[3:])
@@ -102,8 +101,8 @@ def test_run_failing(mocker):
     db = mocker.patch('indico_livesync.uploader.db')
     uploader = FailingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
-    records = tuple(
-        LiveSyncQueueEntry(change=ChangeType.created, type='event', event_id=evt_id) for evt_id in xrange(10))
+    records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt_id)
+                    for evt_id in xrange(10))
     uploader.run(records)
     refs = tuple((_rm_none(record.object_ref), int(SimpleChange.created)) for record in records)
     assert uploader.logger.exception.called

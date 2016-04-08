@@ -18,7 +18,7 @@ from mock import MagicMock
 
 from indico_livesync.base import LiveSyncBackendBase
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
+from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
 
 
 class DummyBackend(LiveSyncBackendBase):
@@ -61,13 +61,13 @@ def test_run(mocker):
     assert mock_uploader.run.called
 
 
-def test_fetch_records(db, mocker):
+def test_fetch_records(db, dummy_event_new):
     """Test if the correct records are fetched"""
     agent = LiveSyncAgent(backend_name='dummy', name='dummy')
     backend = DummyBackend(agent)
     db.session.add(agent)
-    queue = [LiveSyncQueueEntry(change=ChangeType.created, type='dummy', processed=True),
-             LiveSyncQueueEntry(change=ChangeType.created, type='dummy')]
+    queue = [LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event_new, processed=True),
+             LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event_new)]
     agent.queue = queue
     db.session.flush()
     assert backend.fetch_records() == [queue[1]]

@@ -18,7 +18,7 @@ from indico.testing.util import bool_matrix
 import pytest
 
 from indico_livesync import process_records, SimpleChange
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
+from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def queue_entry_dummy_object(monkeypatch):
     monkeypatch.setattr(LiveSyncQueueEntry, 'object', object)
 
 
-@pytest.mark.parametrize(('change', 'ignored'), (
+@pytest.mark.parametrize(('change', 'invalid'), (
     (ChangeType.created,            True),
     (ChangeType.deleted,            True),
     (ChangeType.data_changed,       True),
@@ -34,15 +34,16 @@ def queue_entry_dummy_object(monkeypatch):
     (ChangeType.moved,              False),
 ))
 @pytest.mark.usefixtures('queue_entry_dummy_object')
-def test_process_records_category_ignored(mocker, change, ignored):
+def test_process_records_category_ignored(mocker, change, invalid):
     """Test if categories are only kepy for certain changes"""
     cascade = mocker.patch('indico_livesync.simplify._cascade')
     cascade.return_value = [object()]
-    records = [LiveSyncQueueEntry(change=change, type='category')]
-    result = process_records(records)
-    if ignored:
-        assert not result
+    records = [LiveSyncQueueEntry(change=change, type=EntryType.category)]
+    if invalid:
+        with pytest.raises(AssertionError):
+            process_records(records)
     else:
+        result = process_records(records)
         assert len(result) == 1
         assert result.values()[0] == SimpleChange.updated
 
@@ -68,8 +69,8 @@ def test_process_records_cascade(mocker, change, cascade):
 def test_process_records_simplify(changes):
     """Test if queue entries for the same object are properly simplified"""
     refs = (
-        LiveSyncQueueEntry(type='event', event_id='1').object_ref,
-        LiveSyncQueueEntry(type='event', event_id='2').object_ref
+        LiveSyncQueueEntry(type=EntryType.event, event_id=1).object_ref,
+        LiveSyncQueueEntry(type=EntryType.event, event_id=2).object_ref
     )
     queue = []
     changes = changes[:3], changes[3:]
