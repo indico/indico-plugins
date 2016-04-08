@@ -21,9 +21,14 @@ from collections import defaultdict
 from flask import g
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.sessions import Session
+from indico.util.event import unify_event_args
 from MaKaC.accessControl import AccessController
-from MaKaC.conference import ConferenceHolder, Conference, Contribution, SubContribution, Category, Session
+from MaKaC.conference import Category, ConferenceHolder, Conference
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.util import obj_ref, is_ref_excluded
@@ -37,30 +42,34 @@ def connect_signals(plugin):
     plugin.connect(signals.category.moved, _moved)
     plugin.connect(signals.event.moved, _moved)
     # created
-    plugin.connect(signals.category.created, _created)
     plugin.connect(signals.event.created, _created)
     plugin.connect(signals.event.contribution_created, _created)
     plugin.connect(signals.event.subcontribution_created, _created)
     # deleted
-    plugin.connect(signals.category.deleted, _deleted)
     plugin.connect(signals.event.deleted, _deleted)
     plugin.connect(signals.event.contribution_deleted, _deleted)
     plugin.connect(signals.event.subcontribution_deleted, _deleted)
-    # data
-    plugin.connect(signals.category.data_changed, _data_changed)
-    plugin.connect(signals.event.data_changed, _data_changed)
-    plugin.connect(signals.event.contribution_data_changed, _data_changed)
-    plugin.connect(signals.event.subcontribution_data_changed, _data_changed)
+    # updated
+    plugin.connect(signals.event.data_changed, _updated)
+    plugin.connect(signals.event.contribution_updated, _updated)
+    plugin.connect(signals.event.subcontribution_updated, _updated)
+    # timetable
+    plugin.connect(signals.event.timetable_entry_created, _timetable_changed)
+    plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
+    plugin.connect(signals.event.timetable_entry_deleted, _timetable_changed)
     # protection
-    plugin.connect(signals.category.protection_changed, _protection_changed)
-    plugin.connect(signals.event.protection_changed, _protection_changed)
-    plugin.connect(signals.event.contribution_protection_changed, _protection_changed)
+    plugin.connect(signals.category.protection_changed, _protection_changed_legacy)
+    plugin.connect(signals.event.protection_changed, _protection_changed_legacy)
+    plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Session)
+    plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Contribution)
     # ACLs
-    plugin.connect(signals.acl.access_granted, _acl_changed)
-    plugin.connect(signals.acl.access_revoked, _acl_changed)
-    plugin.connect(signals.acl.modification_granted, _acl_changed)
-    plugin.connect(signals.acl.modification_revoked, _acl_changed)
-    plugin.connect(signals.acl.entry_changed, _event_acl_changed, sender=Event)
+    plugin.connect(signals.acl.access_granted, _acl_changed_legacy)
+    plugin.connect(signals.acl.access_revoked, _acl_changed_legacy)
+    plugin.connect(signals.acl.modification_granted, _acl_changed_legacy)
+    plugin.connect(signals.acl.modification_revoked, _acl_changed_legacy)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Event)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Session)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # domain access
     plugin.connect(signals.category.domain_access_granted, _domain_changed)
     plugin.connect(signals.category.domain_access_revoked, _domain_changed)
@@ -86,33 +95,59 @@ def _moved(obj, old_parent, new_parent, **kwargs):
         _register_change(obj, ChangeType.protection_changed)
 
 
-def _created(obj, parent, **kwargs):
-    _register_change(parent, ChangeType.data_changed)
+def _created(obj, **kwargs):
+    if isinstance(obj, Event):
+        parent = None
+    elif isinstance(obj, Contribution):
+        parent = obj.event_new
+    elif isinstance(obj, SubContribution):
+        parent = obj.contribution
+    else:
+        raise TypeError('Unexpected object: {}'.format(type(obj).__name__))
+    if parent:
+        _register_change(parent, ChangeType.data_changed)
     _register_change(obj, ChangeType.created)
 
 
 def _deleted(obj, **kwargs):
-    parent = kwargs.pop('parent', None)
-    _register_deletion(obj, parent)
+    _register_deletion(obj)
 
 
-def _data_changed(obj, **kwargs):
+def _updated(obj, **kwargs):
     _register_change(obj, ChangeType.data_changed)
 
 
-def _protection_changed(obj, old, new, **kwargs):
+def _timetable_changed(entry, **kwargs):
+    _register_change(entry.event_new, ChangeType.data_changed)
+
+
+def _protection_changed_legacy(obj, old, new, **kwargs):
     if new == 0:  # inheriting
         new = 1 if obj.isProtected() else -1
     if old != new:
         _register_change(obj, ChangeType.protection_changed)
 
 
-def _acl_changed(obj, principal, **kwargs):
+def _protection_changed(sender, obj, **kwargs):
+    if isinstance(obj, Session):
+        _register_change(obj.event_new, ChangeType.protection_changed)
+    else:
+        _register_change(obj, ChangeType.protection_changed)
+
+
+def _acl_changed_legacy(obj, **kwargs):
     _handle_acl_change(obj)
 
 
-def _event_acl_changed(sender, obj, **kwargs):
-    _register_change(obj.as_legacy, ChangeType.protection_changed)
+def _acl_entry_changed(sender, obj, **kwargs):
+    if isinstance(obj, Session):
+        # if a session acl is changed we need to update all inheriting
+        # contributions in that session
+        for contrib in obj.contributions:
+            if contrib.protection_mode == ProtectionMode.inheriting:
+                _register_change(contrib, ChangeType.protection_changed)
+    else:
+        _register_change(obj, ChangeType.protection_changed)
 
 
 def _domain_changed(obj, **kwargs):
@@ -120,18 +155,13 @@ def _domain_changed(obj, **kwargs):
 
 
 def _note_changed(note, **kwargs):
-    obj = note.linked_object
-    if isinstance(obj, Session):
-        obj = ConferenceHolder().getById(note.event_id)
-    _register_change(obj, ChangeType.data_changed)
+    _register_change(note.object, ChangeType.data_changed)
 
 
 def _attachment_changed(attachment_or_folder, **kwargs):
     folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
-    obj = folder.linked_object
-    if isinstance(obj, Session):
-        obj = ConferenceHolder().getById(folder.event_id)
-    _register_change(obj, ChangeType.data_changed)
+    if not isinstance(folder.object, Category):
+        _register_change(folder.object.event_new, ChangeType.data_changed)
 
 
 def _apply_changes(sender, **kwargs):
@@ -149,32 +179,28 @@ def _clear_changes(sender, **kwargs):
     del g.livesync_changes
 
 
-def _handle_acl_change(obj, child=False):
-    if isinstance(obj, (Conference, Contribution, SubContribution, Category)):
-        # if it was a child, emit data_changed instead
-        if child:
+def _handle_acl_change(obj):
+    if isinstance(obj, Category):
+        _register_change(obj, ChangeType.protection_changed)
+    elif isinstance(obj, Conference):
+        if obj.getOwner():
             _register_change(obj, ChangeType.data_changed)
-        else:
-            _register_change(obj, ChangeType.protection_changed)
-    elif isinstance(obj, Session):
-        owner = obj.getOwner()
-        if owner:
-            _register_change(owner, ChangeType.data_changed)
     elif isinstance(obj, AccessController):
-        _handle_acl_change(obj.getOwner(), child=False)
+        _handle_acl_change(obj.getOwner())
     else:
-        _handle_acl_change(obj.getOwner(), child=True)
+        raise TypeError('Unexpected object: {}'.format(type(obj).__name__))
 
 
-def _register_deletion(obj, parent):
+def _register_deletion(obj):
     _init_livesync_g()
-    g.livesync_changes[obj_ref(obj, parent)].add(ChangeType.deleted)
+    g.livesync_changes[obj_ref(obj)].add(ChangeType.deleted)
 
 
+@unify_event_args
 def _register_change(obj, action):
     if not isinstance(obj, Category):
-        event = obj.getConference()
-        if event is None or ConferenceHolder().getById(event.id, True) is None or event.getOwner() is None:
+        event = obj.event_new
+        if event is None or event.is_deleted or event.as_legacy is None or event.as_legacy.getOwner() is None:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
             # When moving an event it's even worse, we get a data change notification in the middle of the move while
             # the event has no category...
@@ -185,5 +211,4 @@ def _register_change(obj, action):
 
 
 def _init_livesync_g():
-    if not hasattr(g, 'livesync_changes'):
-        g.livesync_changes = defaultdict(set)
+    g.setdefault('livesync_changes', defaultdict(set))

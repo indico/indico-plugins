@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
+from indico.modules.users import User
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
-from indico.modules.users import User
+from MaKaC.conference import Category
 
 from indico_livesync import SimpleChange
+from indico_livesync.models.queue import EntryType
 from indico_livesync.util import make_compound_id, obj_deref, obj_ref
 
 
@@ -74,19 +76,19 @@ class MARCXMLGenerator:
             xg.closeTag(b'datafield')
             xg.closeTag(b'record')
             self.xml_generator.xml += xg.xml
-        elif ref['type'] in {'event', 'contribution', 'subcontribution'}:
+        elif ref['type'] in {EntryType.event, EntryType.contribution, EntryType.subcontribution}:
             obj = obj_deref(ref)
             if obj is None:
                 raise ValueError('Cannot add deleted object')
-            elif not obj.getOwner():
+            elif isinstance(obj, Category) and not obj.getOwner():
                 raise ValueError('Cannot add object without owner: {}'.format(obj))
-            if ref['type'] == 'event':
+            if ref['type'] == EntryType.event:
                 self.xml_generator.xml += self._event_to_marcxml(obj)
-            elif ref['type'] == 'contribution':
+            elif ref['type'] == EntryType.contribution:
                 self.xml_generator.xml += self._contrib_to_marcxml(obj)
-            elif ref['type'] == 'subcontribution':
+            elif ref['type'] == EntryType.subcontribution:
                 self.xml_generator.xml += self._subcontrib_to_marcxml(obj)
-        elif ref['type'] == 'category':
+        elif ref['type'] == EntryType.category:
             pass  # we don't send category updates
         else:
             raise ValueError('unknown object ref: {}'.format(ref['type']))

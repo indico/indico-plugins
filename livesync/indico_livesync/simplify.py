@@ -20,7 +20,7 @@ from collections import defaultdict
 
 from indico.util.struct.enum import IndicoEnum
 
-from indico_livesync.models.queue import ChangeType
+from indico_livesync.models.queue import ChangeType, EntryType
 
 
 class SimpleChange(int, IndicoEnum):
@@ -43,17 +43,17 @@ def process_records(records):
             # Probably they are updates for objects that got deleted afterwards.
             continue
         if record.change == ChangeType.created:
-            if record.type != 'category':
-                changes[record.object_ref] |= SimpleChange.created
+            assert record.type != EntryType.category
+            changes[record.object_ref] |= SimpleChange.created
         elif record.change == ChangeType.deleted:
-            if record.type != 'category':
-                changes[record.object_ref] |= SimpleChange.deleted
+            assert record.type != EntryType.category
+            changes[record.object_ref] |= SimpleChange.deleted
         elif record.change in {ChangeType.moved, ChangeType.protection_changed}:
             for ref in _cascade(record):
                 changes[ref] |= SimpleChange.updated
         elif record.change == ChangeType.data_changed:
-            if record.type != 'category':
-                changes[record.object_ref] |= SimpleChange.updated
+            assert record.type != EntryType.category
+            changes[record.object_ref] |= SimpleChange.updated
 
     return changes
 

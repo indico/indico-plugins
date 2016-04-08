@@ -25,7 +25,7 @@ from indico.util.struct.enum import IndicoEnum
 from MaKaC.conference import CategoryManager
 
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.util import obj_deref
+from indico_livesync.util import obj_deref, obj_ref
 
 
 class ChangeType(int, IndicoEnum):
@@ -191,7 +191,7 @@ class LiveSyncQueueEntry(db.Model):
     @property
     def object_ref(self):
         """Returns the reference of the changed object"""
-        return ImmutableDict(type=self.type.name, category_id=self.category_id, event_id=self.event_id,
+        return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
                              contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
 
     @return_ascii
@@ -203,18 +203,18 @@ class LiveSyncQueueEntry(db.Model):
         return format_repr(self, 'agent', 'id', 'type', 'change', _text=ref_repr)
 
     @classmethod
-    def create(cls, changes, obj_ref):
+    def create(cls, changes, ref):
         """Creates a new change in all queues
 
         :param changes: the change types, an iterable containing
                         :class:`ChangeType`
-        :param obj_ref: the object reference (returned by `obj_ref`)
+        :param ref: the object reference (returned by `obj_ref`)
                         of the changed object
         """
-        obj_ref = dict(obj_ref)
+        ref = dict(ref)
         for agent in LiveSyncAgent.find():
             for change in changes:
-                entry = cls(agent=agent, change=change, **obj_ref)
+                entry = cls(agent=agent, change=change, **ref)
                 db.session.add(entry)
         db.session.flush()
 
@@ -224,26 +224,14 @@ class LiveSyncQueueEntry(db.Model):
         The only field of the yielded items that should be used are
         `type`, `object` and `object_ref`.
         """
-        if self.type not in {'category', 'event', 'contribution'}:
+        if self.type not in {EntryType.category, EntryType.event, EntryType.contribution}:
             return
-        data = {'change': self.change,
-                'category_id': self.category_id, 'event_id': self.event_id,
-                'contrib_id': self.contrib_id, 'subcontrib_id': self.subcontrib_id}
-        if self.type == 'category':
+        if self.type == EntryType.category:
             for event in self.object.iterAllConferences():
-                new_data = dict(data)
-                new_data['type'] = 'event'
-                new_data['event_id'] = event.getId()
-                yield LiveSyncQueueEntry(**new_data)
-        elif self.type == 'event':
-            for contrib in self.object.iterContributions():
-                new_data = dict(data)
-                new_data['type'] = 'contribution'
-                new_data['contrib_id'] = contrib.getId()
-                yield LiveSyncQueueEntry(**new_data)
-        elif self.type == 'contribution':
-            for subcontrib in self.object.iterSubContributions():
-                new_data = dict(data)
-                new_data['type'] = 'subcontribution'
-                new_data['subcontrib_id'] = subcontrib.getId()
-                yield LiveSyncQueueEntry(**new_data)
+                yield LiveSyncQueueEntry(change=self.change, **obj_ref(event))
+        elif self.type == EntryType.event:
+            for contrib in self.object.contributions:
+                yield LiveSyncQueueEntry(change=self.change, **obj_ref(contrib))
+        elif self.type == EntryType.contribution:
+            for subcontrib in self.object.subcontributions:
+                yield LiveSyncQueueEntry(change=self.change, **obj_ref(subcontrib))

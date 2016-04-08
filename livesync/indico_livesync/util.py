@@ -20,26 +20,27 @@ from datetime import timedelta
 
 from werkzeug.datastructures import ImmutableDict
 
+from indico.modules.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from MaKaC.conference import Conference, Contribution, SubContribution, Category, CategoryManager, ConferenceHolder
+from MaKaC.conference import Category, CategoryManager, Conference
 
 
-def obj_ref(obj, parent=None):
+def obj_ref(obj):
     """Returns a tuple identifying a category/event/contrib/subcontrib"""
+    from indico_livesync.models.queue import EntryType
     if isinstance(obj, Category):
-        ref = {'type': 'category', 'category_id': obj.id}
+        ref = {'type': EntryType.category, 'category_id': obj.id}
+    elif isinstance(obj, Event):
+        ref = {'type': EntryType.event, 'event_id': obj.id}
     elif isinstance(obj, Conference):
-        ref = {'type': 'event', 'category_id': obj.getOwner().id, 'event_id': obj.id}
+        ref = {'type': EntryType.event, 'event_id': int(obj.id)}
     elif isinstance(obj, Contribution):
-        event = parent or obj.getConference()
-        ref = {'type': 'contribution', 'category_id': event.getOwner().id, 'event_id': event.id, 'contrib_id': obj.id}
+        ref = {'type': EntryType.contribution, 'contrib_id': obj.id}
     elif isinstance(obj, SubContribution):
-        contrib = parent or obj.getContribution()
-        event = contrib.getConference()
-        ref = {'type': 'subcontribution',
-               'category_id': event.getOwner().id,
-               'event_id': event.id, 'contrib_id': contrib.id, 'subcontrib_id': obj.id}
+        ref = {'type': EntryType.subcontribution, 'subcontrib_id': obj.id}
     else:
         raise ValueError('Unexpected object: {}'.format(obj.__class__.__name__))
     return ImmutableDict(ref)
@@ -47,35 +48,32 @@ def obj_ref(obj, parent=None):
 
 def obj_deref(ref):
     """Returns the object identified by `ref`"""
-    if ref['type'] == 'category':
-        try:
-            return CategoryManager().getById(ref['category_id'])
-        except KeyError:
-            return None
-    elif ref['type'] in {'event', 'contribution', 'subcontribution'}:
-        event = ConferenceHolder().getById(ref['event_id'], quiet=True)
-        if ref['type'] == 'event' or not event:
-            return event
-        contrib = event.getContributionById(ref['contrib_id'])
-        if ref['type'] == 'contribution' or not contrib:
-            return contrib
-        return contrib.getSubContributionById(ref['subcontrib_id'])
+    from indico_livesync.models.queue import EntryType
+    if ref['type'] == EntryType.category:
+        return CategoryManager().getById(ref['category_id'], True)
+    elif ref['type'] == EntryType.event:
+        return Event.get(ref['event_id'])
+    elif ref['type'] == EntryType.contribution:
+        return Contribution.get(ref['contrib_id'])
+    elif ref['type'] == EntryType.subcontribution:
+        return SubContribution.get(ref['subcontrib_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
 
 def make_compound_id(ref):
     """Returns the compound ID for the referenced object"""
-    if ref['type'] == 'category':
+    from indico_livesync.models.queue import EntryType
+    if ref['type'] == EntryType.category:
         raise ValueError('Compound IDs are not supported for categories')
-    elif ref['type'] == 'event':
-        return ref['event_id']
-    elif ref['type'] == 'contribution':
-        return '{}.{}'.format(ref['event_id'], ref['contrib_id'])
-    elif ref['type'] == 'subcontribution':
-        return '{}.{}.{}'.format(ref['event_id'], ref['contrib_id'], ref['subcontrib_id'])
-    else:
-        raise ValueError('Unexpected object type: {}'.format(ref['type']))
+    obj = obj_deref(ref)
+    if isinstance(obj, Event):
+        return unicode(obj.id)
+    elif isinstance(obj, Contribution):
+        return '{}.{}'.format(obj.event_id, obj.id)
+    elif isinstance(obj, SubContribution):
+        return '{}.{}.{}'.format(obj.contribution.event_id, obj.contribution_id, obj.id)
+    raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
 
 def clean_old_entries():
@@ -109,4 +107,9 @@ def get_excluded_categories():
 
 
 def is_ref_excluded(ref):
-    return ref['category_id'] in get_excluded_categories()
+    from indico_livesync.models.queue import EntryType
+    if ref['type'] == EntryType.category:
+        return ref['category_id'] in get_excluded_categories()
+    else:
+        obj = obj_deref(ref)
+        return unicode(obj.event_new.category_id) in {unicode(x) for x in get_excluded_categories()}
