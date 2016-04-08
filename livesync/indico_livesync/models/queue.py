@@ -20,8 +20,9 @@ from werkzeug.datastructures import ImmutableDict
 
 from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 from indico.util.struct.enum import IndicoEnum
+from MaKaC.conference import CategoryManager
 
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import obj_deref
@@ -36,9 +37,35 @@ class ChangeType(int, IndicoEnum):
     protection_changed = 6
 
 
+class EntryType(int, IndicoEnum):
+    category = 1
+    event = 2
+    contribution = 3
+    subcontribution = 4
+
+
+_column_for_types = {
+    EntryType.category: 'category_id',
+    EntryType.event: 'event_id',
+    EntryType.contribution: 'contribution_id',
+    EntryType.subcontribution: 'subcontribution_id'
+}
+
+
+def _make_checks():
+    available_columns = set(_column_for_types.viewvalues())
+    for link_type in EntryType:
+        required_col = _column_for_types[link_type]
+        forbidden_cols = available_columns - {required_col}
+        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
+        criteria += ['{} IS NOT NULL'.format(required_col)]
+        condition = 'type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
+        yield db.CheckConstraint(condition, 'valid_{}_entry'.format(link_type.name))
+
+
 class LiveSyncQueueEntry(db.Model):
     __tablename__ = 'queues'
-    __table_args__ = {'schema': 'plugin_livesync'}
+    __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_livesync'},)
 
     #: Entry ID
     id = db.Column(
@@ -76,31 +103,40 @@ class LiveSyncQueueEntry(db.Model):
 
     #: The type of the changed object
     type = db.Column(
-        db.String,
+        PyIntEnum(EntryType),
         nullable=False
     )
 
     #: The ID of the changed category
     category_id = db.Column(
-        db.String,
+        db.Integer,
+        index=True,
         nullable=True
     )
 
     #: The event ID of the changed event/contribution/subcontribution
     event_id = db.Column(
-        db.String,
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
         nullable=True
     )
 
     #: The contribution ID of the changed contribution/subcontribution
     contrib_id = db.Column(
-        db.String,
+        'contribution_id',
+        db.Integer,
+        db.ForeignKey('events.contributions.id'),
+        index=True,
         nullable=True
     )
 
     #: The subcontribution ID of the changed subcontribution
     subcontrib_id = db.Column(
-        db.String,
+        'subcontribution_id',
+        db.Integer,
+        db.ForeignKey('events.subcontributions.id'),
+        index=True,
         nullable=True
     )
 
@@ -110,6 +146,44 @@ class LiveSyncQueueEntry(db.Model):
         backref=db.backref('queue', cascade='all, delete-orphan', lazy='dynamic')
     )
 
+    event = db.relationship(
+        'Event',
+        lazy=False,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
+    contribution = db.relationship(
+        'Contribution',
+        lazy=False,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
+    subcontribution = db.relationship(
+        'SubContribution',
+        lazy=False,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
+    @property
+    def category(self):
+        return CategoryManager().getById(str(self.category_id), True)
+
+    @category.setter
+    def category(self, value):
+        self.category_id = int(value.id) if value is not None else None
+
     @property
     def object(self):
         """Returns the changed object"""
@@ -118,7 +192,7 @@ class LiveSyncQueueEntry(db.Model):
     @property
     def object_ref(self):
         """Returns the reference of the changed object"""
-        return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
+        return ImmutableDict(type=self.type.name, category_id=self.category_id, event_id=self.event_id,
                              contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
 
     @return_ascii
@@ -127,8 +201,7 @@ class LiveSyncQueueEntry(db.Model):
                                         self.event_id if self.event_id else 'x',
                                         self.contrib_id if self.contrib_id else 'x',
                                         self.subcontrib_id if self.subcontrib_id else 'x')
-        return '<LiveSyncQueueEntry({}, {}, {}, {}, {})>'.format(self.agent, self.id, self.type,
-                                                                 ChangeType(self.change).name, ref_repr)
+        return format_repr(self, 'agent', 'id', 'type', 'change', _text=ref_repr)
 
     @classmethod
     def create(cls, changes, obj_ref):
