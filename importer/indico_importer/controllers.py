@@ -16,9 +16,17 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
+
+from dateutil.relativedelta import relativedelta
 from flask import jsonify, request
 from flask_pluginengine import current_plugin
+from pytz import timezone, utc
+from werkzeug.exceptions import NotFound
 
+from indico.core.db import db
+from indico.modules.events.timetable.controllers import RHManageTimetableBase
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -36,3 +44,70 @@ class RHImportData(RHProtected):
         with plugin.plugin_context():
             data = {'records': importer.import_data(query, size)}
         return jsonify(data)
+
+
+class RHEndTimeBase(RHManageTimetableBase):
+    """Base class for the importer operations"""
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.event_new
+        },
+        'preserved_args': {
+            'importer_name'
+        }
+    }
+
+    @staticmethod
+    def _find_latest_end_dt(entries):
+        latest_dt = None
+        for entry in entries:
+            if latest_dt is None or entry.end_dt > latest_dt:
+                latest_dt = entry.end_dt
+        return latest_dt
+
+    def _format_date(self, date):
+        return date.astimezone(timezone(self.event_new.timezone)).strftime('%H:%M')
+
+
+class RHDayEndTime(RHEndTimeBase):
+    """Get the end_dt of the latest timetable entry or the event start_dt if no entry exist on that date"""
+
+    def _checkParams(self, params):
+        RHEndTimeBase._checkParams(self, params)
+        self.date = self.event_new.tzinfo.localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d')).date()
+
+    def _process(self):
+        event_start_date = db.cast(TimetableEntry.start_dt.astimezone(self.event_new.tzinfo), db.Date)
+        entries = self.event_new.timetable_entries.filter(event_start_date == self.date)
+        latest_end_dt = self._find_latest_end_dt(entries)
+        if latest_end_dt is None:
+            event_start = self.event_new.start_dt
+            latest_end_dt = utc.localize(datetime.combine(self.date, event_start.time()))
+        return self._format_date(latest_end_dt)
+
+
+class RHBlockEndTime(RHEndTimeBase):
+    """Return the end_dt of the latest timetable entry inside the block or the block start_dt if it is empty"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.timetable_entry
+        },
+        'preserved_args': {
+            'importer_name'
+        }
+    }
+
+    def _checkParams(self, params):
+        RHEndTimeBase._checkParams(self, params)
+        self.date = timezone(self.event_new.timezone).localize(datetime.strptime(request.args['selectedDay'],
+                                                                                 '%Y/%m/%d'))
+        self.timetable_entry = self.event_new.timetable_entries.filter_by(
+            type=TimetableEntryType.SESSION_BLOCK, id=request.view_args['entry_id']).first_or_404()
+
+    def _process(self):
+        entries = self.timetable_entry.children
+        latest_end_dt = self._find_latest_end_dt(entries)
+        if latest_end_dt is None:
+            latest_end_dt = self.timetable_entry.start_dt
+        return self._format_date(latest_end_dt)
