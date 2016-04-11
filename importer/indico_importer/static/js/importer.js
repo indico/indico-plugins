@@ -83,7 +83,10 @@
          * Checks if a dictionary contains empty person data.
          */
         isPersonEmpty: function(person) {
-            return person && (person.firstName || person.familyName);
+            if (person && (person.firstName || person.familyName)) {
+                return false
+            }
+            return true;
         },
 
         /**
@@ -96,6 +99,8 @@
          * @param finalCallback Function executed after finishing all requests.
          */
         multipleIndicoRequest: function(reqList, successCallback, errorCallback, finalCallback) {
+            return ImporterUtils._sendMultipleRequests(reqList, successCallback, errorCallback, finalCallback);
+            /*
             if (reqList.length > 0) {
                 indicoRequest( reqList[0].method, reqList[0].args, function(result, error) {
                     if (result && successCallback) {
@@ -110,7 +115,45 @@
             } else if (finalCallback) {
                 finalCallback();
             }
-        }
+            */
+        },
+
+        _sendMultipleRequests: function(reqList, onSuccess, onError, onComplete) {
+            $.each(reqList, function(index, req) {
+               ImporterUtils._sendRequest(req.url, req.args, onSuccess, onError);
+            });
+            if (onComplete) {
+                onComplete();
+            }
+        },
+
+        _sendRequest: function(url, args, onSuccess, onError, onComplete) {
+            $.ajax({
+                url: url,
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': $('#csrf-token').attr('content')
+                },
+                data: args,
+                success: function(data) {
+                    if (data.success) {
+                        onSuccess(data.entries[0]);
+                    } else {
+                        // FIXME where is the error message?
+                        window.console.log(data);
+                        onError("An error occured while adding the contribution.");
+                    }
+                },
+                error: function(jqxhr, textStatus, errorThrown) {
+                    onError(textStatus + ': ' + errorThrown);
+                },
+                complete: onComplete
+            });
+            if (onComplete) {
+                onComplete();
+            }
+        },
+
     };
 
 
@@ -418,25 +461,28 @@
                         self.info.set("startTime", this.destination.startDate.time.substr(0, 5));
                         hook.set(true);
                     } else {
-                        var method;
+                        var url;
                         if (this.destination.entryType == 'Day') {
-                            method = 'schedule.event.getDayEndDate';
+                            // FIXME build URL in a better way
+                            url = '/importers/indico_importer/event/' + this.confId + '/day-end-date'
                         }
                         if (this.destination.entryType == 'Session') {
-                            method = 'schedule.slot.getDayEndDate';
+                            // FIXME build URL in a better way
+                            url = '/importers/indico_importer/event/' + this.confId + '/entry/' +
+                                this.destination.scheduleEntryId + '/block-end-date';
                         }
-                        indicoRequest(method, {
-                            'confId': this.confId,
-                            'sessionId': this.destination.sessionId,
-                            'slotId': this.destination.sessionSlotId,
-                            'selectedDay': this.destination.startDate.date.replace(/-/g, '/')},
-                            function(result, error) {
-                                if (!error) {
-                                    self.info.set("startTime", result.substr(11, 5));
-                                }
+                        $.ajax({
+                            url: url,
+                            data: {
+                                sessionId: this.destination.sessionId,
+                                slotId: this.destination.sessionSlotId,
+                                selectedDay: this.destination.startDate.date.replace(/-/g, '/')
+                            },
+                            success: function(data) {
+                                self.info.set('startTime', data);
                                 hook.set(true);
                             }
-                        );
+                        });
                     }
                 }
             ],
@@ -492,6 +538,47 @@
                 }
             },
 
+            _getUrl: function(legacy_method, eventId, day, destination) {
+                var params = "?" + $.param({'day': day});
+                if (legacy_method == 'schedule.event.addContribution') {
+                    // FIXME build URL in a better way
+                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                }
+                if (legacy_method == 'schedule.slot.addContribution') {
+                    params += '&' + $.param({'session_block_id': destination.sessionSlotId});
+                    // FIXME build URL in a better way
+                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                }
+                if (legacy_method == 'contribution.addSubContribution') {
+                    // FIXME build URL in a better way
+                    return '/event/' + eventId + '/manage/contributions/' + destination.contributionId +
+                        '/subcontributions/create';
+                }
+                // FIXME
+                alert('Unsupported method: ' + legacy_method);
+            },
+
+            _person_link_data: function(entry) {
+                var link_data_entry = function(author, primary, speaker) {
+                    return $.extend({
+                        'authorType': primary ? 1 : 2,
+                        'isSpeaker': speaker,
+                        'isSubmitter': !speaker
+                    }, author);
+                };
+                var link_data = [];
+                if (!ImporterUtils.isPersonEmpty(entry.primaryAuthor)) {
+                    link_data.push(link_data_entry(entry.primaryAuthor, true, false));
+                }
+                if (!ImporterUtils.isPersonEmpty(entry.secondaryAuthor)) {
+                    link_data.push(link_data_entry(entry.secondaryAuthor, false, false));
+                }
+                if (!ImporterUtils.isPersonEmpty(entry.speaker)) {
+                    link_data.push(link_data_entry(entry.speaker, false, true));
+                }
+                return link_data;
+            },
+
             _getButtons: function() {
                 var self = this;
                 return [
@@ -512,30 +599,40 @@
                             each(self.entries.getValues(), function(entry) {
                                 entry = entry.getAll();
                                 var timeStr = ImporterUtils.minutesToTime(time);
-                                args.push({'method' : method,
-                                           'args' : {'conference' : self.confId,
-                                                     'duration' : duration,
-                                                     'title' : entry.title?entry.title:"Untitled",
-                                                     'sessionId' : self.destination.sessionId,
-                                                     'slotId' : self.destination.sessionSlotId,
-                                                     'contribId' : self.destination.contributionId,
-                                                     'startDate' : date + " " + timeStr,
-                                                     'keywords' : [],
-                                                     'authors':ImporterUtils.isPersonEmpty(entry.primaryAuthor)?[entry.primaryAuthor]:[],
-                                                     'coauthors' : ImporterUtils.isPersonEmpty(entry.secondaryAuthor)?[entry.secondaryAuthor]:[],
-                                                     'presenters' : ImporterUtils.isPersonEmpty(entry.speaker)?[entry.speaker]:[],
-                                                     'roomInfo' : {},
-                                                     'field_content': entry.summary,
-                                                     'reportNumbers': entry.reportNumbers?
-                                                             [{'system': ImporterUtils.reportNumberSystems[self.importer], 'number': entry.reportNumbers}]:[],
-                                                     'materials': entry.materials}
+                                var params = {
+                                    'csrf_token': $('#csrf-token').attr('content'),
+                                    'title': entry.title ? entry.title : "Untitled",
+                                    'description': entry.summary,
+                                    'duration': [duration, 'minutes'],
+                                    'references': '[]'
+                                }
+                                if (self.destination.entryType == "Contribution") {
+                                    $.extend(params, {
+                                        'speakers': Json.write(self._person_link_data(entry))
+                                    });
+                                } else {
+                                    $.extend(params, {
+                                        'time': timeStr,
+                                        //'keywords' : [],
+                                        'person_link_data': Json.write(self._person_link_data(entry)),
+                                        //'roomInfo' : {},
+                                        'location_data': '{"address": "", "inheriting": true}',
+                                        'type': '__None',
+                                        //'reportNumbers': entry.reportNumbers?
+                                        //        [{'system': ImporterUtils.reportNumberSystems[self.importer], 'number': entry.reportNumbers}]:[],
+                                        'materials': Json.write(entry.materials)
+                                    });
+                                }
+                                args.push({
+                                    'url': self._getUrl(method, self.confId, date, self.destination),
+                                    'args': params
                                 });
                                 time += duration;
                             });
                             var successCallback = function(result) {
                                 if (exists(result.slotEntry) && self.timetable.contextInfo.id == result.slotEntry.id) {
                                     self.timetable._updateEntry(result, result.id);
-                                } else{
+                                } else {
                                     var timetable = self.timetable.parentTimetable?self.timetable.parentTimetable:self.timetable;
                                     timetable._updateEntry(result, result.id);
                                 }
@@ -832,13 +929,13 @@
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Meeting")), ": ", record.get("meetingName")));
                 }
                 // Speaker, primary and secondary authors are stored in dictionaries. Their property have to be checked.
-                if (ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Primary author")), ": ", this._getPersonString(record.get("primaryAuthor"))));
                 }
-                if (ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Secondary author")), ": ", this._getPersonString(record.get("secondaryAuthor"))));
                 }
-                if (ImporterUtils.isPersonEmpty(record.get("speaker"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("speaker"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Speaker")), ": ", this._getPersonString(record.get("speaker"))));
                 }
                 if (record.get("summary")) {
@@ -1356,7 +1453,7 @@
 
 
     $(function() {
-        $('#timetableDiv').on('click', '.js-create-importer-dialog', function() {
+        $('#timetable').on('click', '.js-create-importer-dialog', function() {
             var timetable = $(this).data('timetable');
             new ImportDialog(timetable);
         });

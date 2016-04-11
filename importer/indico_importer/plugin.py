@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, PluginCategory
+from indico.modules.events.timetable.views import WPManageTimetable
 
 from indico_importer import _
-from indico_importer.controllers import RHGetImporters, RHImportData
+from indico_importer.controllers import RHGetImporters, RHImportData, RHDayEndTime, RHBlockEndTime
 
 
 class ImporterPlugin(IndicoPlugin):
@@ -33,8 +34,8 @@ class ImporterPlugin(IndicoPlugin):
 
     def init(self):
         super(ImporterPlugin, self).init()
-        # self.inject_js('importer_js', WPConfModifScheduleGraphic)
-        # self.inject_css('importer_css', WPConfModifScheduleGraphic)
+        self.inject_js('importer_js', WPManageTimetable)
+        self.inject_css('importer_css', WPManageTimetable)
         self.connect(signals.event.timetable_buttons, self.get_timetable_buttons)
         self.importer_engines = {}
 
@@ -59,3 +60,7 @@ class ImporterPlugin(IndicoPlugin):
 blueprint = IndicoPluginBlueprint('importer', __name__)
 blueprint.add_url_rule('/importers/<importer_name>/search', 'import_data', RHImportData, methods=('POST',))
 blueprint.add_url_rule('/importers/', 'importers', RHGetImporters)
+
+blueprint.add_url_rule('/importers/<importer_name>/event/<confId>/day-end-date', 'day_end_date', RHDayEndTime)
+blueprint.add_url_rule('/importers/<importer_name>/event/<confId>/entry/<entry_id>/block-end-date', 'block_end_date',
+                       RHBlockEndTime)
