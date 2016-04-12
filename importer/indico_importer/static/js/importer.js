@@ -588,9 +588,11 @@
                         var duration = parseInt(self.info.get('duration'));
                         //If last contribution finishes before 24:00
                         if (time + duration * self.entries.getLength() <= 1440) {
+                            var hasError = false;
                             var killProgress = IndicoUI.Dialogs.Util.progress();
                             var errorCallback = function(error) {
                                 if (error) {
+                                    hasError = true;
                                     IndicoUtil.errorReport(error);
                                 }
                             };
@@ -653,6 +655,9 @@
                             }
                             self.close();
                             killProgress();
+                            if (!hasError) {
+                                location.reload();
+                            }
                         }
                         else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
