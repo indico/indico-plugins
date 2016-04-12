@@ -87,65 +87,30 @@
         },
 
         /**
-         * Handles multiple Indico requests. Requests are sent to the server sequentially.
-         * When a request is finished the next one is sent to the server.
-         * @param reqList List of dictionaries. Each element of the list represents a single request.
-         * Each request has a following format {'method' : nameOfTheMetod(string), 'args': dictionaryOfArguments}
-         * @param successCallback Function executed after every successful request.
-         * @param errorCallback Function executed after every failed request.
-         * @param finalCallback Function executed after finishing all requests.
+         * Send a POST request to indico.
+         * @param url The url where to post the data.
+         * @param data The data to POST.
+         * @param onSuccess Called when the request succeeds.
+         * @param onError Called when an error is encountered while performing the request.
          */
-        multipleIndicoRequest: function(reqList, successCallback, errorCallback, finalCallback) {
-            return ImporterUtils._sendMultipleRequests(reqList, successCallback, errorCallback, finalCallback);
-            /*
-            if (reqList.length > 0) {
-                indicoRequest( reqList[0].method, reqList[0].args, function(result, error) {
-                    if (result && successCallback) {
-                        successCallback(result);
-                    }
-                    if (error && errorCallback) {
-                        errorCallback(error);
-                    }
-                    reqList.splice(0, 1);
-                    ImporterUtils.multipleIndicoRequest(reqList, successCallback, errorCallback, finalCallback);
-                });
-            } else if (finalCallback) {
-                finalCallback();
-            }
-            */
-        },
-
-        _sendMultipleRequests: function(reqList, onSuccess, onError, onComplete) {
-            $.each(reqList, function(index, req) {
-               ImporterUtils._sendRequest(req.url, req.args, onSuccess, onError);
-            });
-            if (onComplete) {
-                onComplete();
-            }
-        },
-
-        _sendRequest: function(url, args, onSuccess, onError, onComplete) {
+        _sendRequest: function(url, args, onSuccess, onError) {
             $.ajax({
+                // There's no synchronisation on the server side yet thus make sure requests are sent serially
+                async: false,
                 url: url,
                 method: 'POST',
                 data: args,
-                success: function(data) {
-                    if (data.success) {
-                        onSuccess(data.entries[0]);
-                    } else {
-                        // FIXME where is the error message?
-                        window.console.log(data);
-                        onError("An error occured while adding the contribution.");
+                success: function(data, textStatus) {
+                    if ($.isFunction(onSuccess)) {
+                        onSuccess(data, textStatus);
                     }
                 },
                 error: function(jqxhr, textStatus, errorThrown) {
-                    onError(textStatus + ': ' + errorThrown);
-                },
-                complete: onComplete
+                    if ($.isFunction(onError)) {
+                        onError(textStatus + ': ' + errorThrown);
+                    }
+                }
             });
-            if (onComplete) {
-                onComplete();
-            }
         },
 
     };
@@ -501,22 +466,6 @@
             },
 
             /**
-             * Returns an insert method name based on the destintion type.
-             */
-            _extractMethod: function() {
-                switch (this.destination.entryType) {
-                    case "Day":
-                        return "schedule.event.addContribution";
-                    case "Contribution":
-                        return "contribution.addSubContribution";
-                    case "Session":
-                        return "schedule.slot.addContribution";
-                    default:
-                        return null;
-                }
-            },
-
-            /**
              * Returns an url of the destination's timetable.
              */
             _extractRedirectUrl: function() {
@@ -532,24 +481,22 @@
                 }
             },
 
-            _getUrl: function(legacy_method, eventId, day, destination) {
+            _getUrl: function(eventId, day, destination) {
                 var params = "?" + $.param({'day': day});
-                if (legacy_method == 'schedule.event.addContribution') {
+                if (destination.entryType == 'Day') {
                     // FIXME build URL in a better way
                     return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
                 }
-                if (legacy_method == 'schedule.slot.addContribution') {
+                if (destination.entryType == 'Session') {
                     params += '&' + $.param({'session_block_id': destination.sessionSlotId});
                     // FIXME build URL in a better way
                     return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
                 }
-                if (legacy_method == 'contribution.addSubContribution') {
+                if (destination.entryType == 'Contribution') {
                     // FIXME build URL in a better way
                     return '/event/' + eventId + '/manage/contributions/' + destination.contributionId +
-                        '/subcontributions/create';
+                        '/subcontributions/';
                 }
-                // FIXME
-                alert('Unsupported method: ' + legacy_method);
             },
 
             _personLinkData: function(entry) {
@@ -573,6 +520,42 @@
                 return linkData;
             },
 
+            _addContributionMaterial: function(title, link_url, eventId, contributionId, subContributionId) {
+                var request_url;
+                if (subContributionId !== undefined) {
+                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
+                        '/subcontribution/' + subContributionId + '/attachments/add/link';
+                } else {
+                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
+                        '/attachments/add/link';
+                }
+                var params = {
+                    'csrf_token': $('#csrf-token').attr('content'),
+                    'link_url': link_url,
+                    'title': title,
+                    'folder': '__None',
+                    'acl': '[]'
+                };
+                ImporterUtils._sendRequest(request_url, params);
+            },
+
+            _addReference: function(type, value, eventId, contributionId, subContributionId) {
+                var url;
+                if (subContributionId !== undefined) {
+                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
+                        '/subcontributions/' + subContributionId + '/references';
+                } else {
+                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
+                        '/references';
+                }
+                var params = {
+                    'csrf_token': $('#csrf-token').attr('content'),
+                    'type': type,
+                    'value': value
+                };
+                ImporterUtils._sendRequest(url, params);
+            },
+
             _getButtons: function() {
                 var self = this;
                 return [
@@ -584,10 +567,14 @@
                         //Using parseFloat because parseInt('08') = 0.
                         var time = parseFloat(self.info.get('startTime').split(':')[0]) * 60 + parseFloat(self.info.get('startTime').split(':')[1]);
                         var duration = parseInt(self.info.get('duration'));
-                        var method = self._extractMethod();
                         //If last contribution finishes before 24:00
                         if (time + duration * self.entries.getLength() <= 1440) {
                             var killProgress = IndicoUI.Dialogs.Util.progress();
+                            var errorCallback = function(error) {
+                                if (error) {
+                                    IndicoUtil.errorReport(error);
+                                }
+                            };
                             var date = self.destination.startDate.date.replace(/-/g, '/');
                             var args = [];
                             each(self.entries.getValues(), function(entry) {
@@ -607,46 +594,46 @@
                                 } else {
                                     $.extend(params, {
                                         'time': timeStr,
-                                        //'keywords' : [],
                                         'person_link_data': Json.write(self._personLinkData(entry)),
-                                        //'roomInfo' : {},
                                         'location_data': '{"address": "", "inheriting": true}',
                                         'type': '__None',
-                                        //'reportNumbers': entry.reportNumbers?
-                                        //        [{'system': ImporterUtils.reportNumberSystems[self.importer], 'number': entry.reportNumbers}]:[],
-                                        'materials': Json.write(entry.materials)
                                     });
                                 }
-                                args.push({
-                                    'url': self._getUrl(method, self.confId, date, self.destination),
-                                    'args': params
-                                });
+                                var url = self._getUrl(self.confId, date, self.destination);
+                                var successCallback = function(result, textStatus) {
+                                    var materials = entry.materials || {};
+                                    var reportNumbers = entry.reportNumbers || [];
+                                    var reportNumbersLabel = ImporterUtils.reportNumberSystems[self.importer]
+                                    if (self.destination.entryType == "Contribution") {
+                                        $.each(materials, function(title, url) {
+                                            self._addContributionMaterial(title, url, result.event_id,
+                                                                          result.contribution_id, result.id);
+                                        });
+                                        $.each(reportNumbers, function(idx, number) {
+                                            self._addReference(reportNumbersLabel, number, self.confId,
+                                                               result.contribution_id, result.id);
+                                        });
+                                    } else {
+                                        var contribution = result.entries[0].entry;
+                                        $.each(materials, function(title, url) {
+                                            self._addContributionMaterial(title, url, self.confId, contribution.contributionId);
+                                        });
+                                        $.each(reportNumbers, function(idx, number) {
+                                            self._addReference(reportNumbersLabel, number, self.confId, contribution.contributionId);
+                                        });
+                                    }
+                                };
+                                ImporterUtils._sendRequest(url, params, successCallback, errorCallback);
                                 time += duration;
                             });
-                            var successCallback = function(result) {
-                                if (exists(result.slotEntry) && self.timetable.contextInfo.id == result.slotEntry.id) {
-                                    self.timetable._updateEntry(result, result.id);
-                                } else {
-                                    var timetable = self.timetable.parentTimetable?self.timetable.parentTimetable:self.timetable;
-                                    timetable._updateEntry(result, result.id);
-                                }
-                            };
-                            var errorCallback = function(error) {
-                                if (error) {
-                                    IndicoUtil.errorReport(error);
-                                }
-                            };
-                            var finalCallback = function() {
-                                if (self.successFunction) {
-                                    self.successFunction(self.info.get('redirect'));
-                                }
-                                if (self.info.get('redirect')) {
-                                    window.location = self._extractRedirectUrl();
-                                }
-                                self.close();
-                                killProgress();
-                            };
-                            ImporterUtils.multipleIndicoRequest(args, successCallback , errorCallback, finalCallback);
+                            if (self.successFunction) {
+                                self.successFunction(self.info.get('redirect'));
+                            }
+                            if (self.info.get('redirect')) {
+                                window.location = self._extractRedirectUrl();
+                            }
+                            self.close();
+                            killProgress();
                         }
                         else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
