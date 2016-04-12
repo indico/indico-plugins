@@ -428,13 +428,17 @@
                     } else {
                         var url;
                         if (this.destination.entryType == 'Day') {
-                            // FIXME build URL in a better way
-                            url = '/importers/indico_importer/event/' + this.confId + '/day-end-date'
+                            url = build_url(ImporterPlugin.urls.day_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId
+                            });
                         }
                         if (this.destination.entryType == 'Session') {
-                            // FIXME build URL in a better way
-                            url = '/importers/indico_importer/event/' + this.confId + '/entry/' +
-                                this.destination.scheduleEntryId + '/block-end-date';
+                            url = build_url(ImporterPlugin.urls.block_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId,
+                                entry_id: this.destination.scheduleEntryId
+                            });
                         }
                         $.ajax({
                             url: url,
@@ -490,18 +494,15 @@
             _getUrl: function(eventId, day, destination) {
                 var params = "?" + $.param({'day': day});
                 if (destination.entryType == 'Day') {
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                    return build_url(ImporterPlugin.urls.add_contrib, {'confId': eventId}) + params;
                 }
                 if (destination.entryType == 'Session') {
                     params += '&' + $.param({'session_block_id': destination.sessionSlotId});
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                    return build_url(ImporterPlugin.urls.add_contrib, {'confId': eventId}) + params;
                 }
                 if (destination.entryType == 'Contribution') {
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/contributions/' + destination.contributionId +
-                        '/subcontributions/';
+                    return build_url(ImporterPlugin.urls.create_subcontrib_rest,
+                                     {'confId': eventId, 'contrib_id': destination.contributionId});
                 }
             },
 
@@ -529,11 +530,18 @@
             _addContributionMaterial(title, link_url, eventId, contributionId, subContributionId) {
                 var request_url;
                 if (subContributionId !== undefined) {
-                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/subcontribution/' + subContributionId + '/attachments/add/link';
+                    request_url = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId,
+                        'object_type': 'subcontribution'
+                    });
                 } else {
-                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/attachments/add/link';
+                    request_url = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'object_type': 'contribution'
+                    });
                 }
                 var params = {
                     'csrf_token': $('#csrf-token').attr('content'),
@@ -548,11 +556,16 @@
             _addReference(type, value, eventId, contributionId, subContributionId) {
                 var url;
                 if (subContributionId !== undefined) {
-                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/subcontributions/' + subContributionId + '/references';
+                    url = build_url(ImporterPlugin.urls.create_subcontrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId
+                    });
                 } else {
-                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/references';
+                    url = build_url(ImporterPlugin.urls.create_contrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId
+                    });
                 }
                 var params = {
                     'csrf_token': $('#csrf-token').attr('content'),
