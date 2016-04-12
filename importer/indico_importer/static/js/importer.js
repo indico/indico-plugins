@@ -422,13 +422,17 @@
                     } else {
                         var url;
                         if (this.destination.entryType == 'Day') {
-                            // FIXME build URL in a better way
-                            url = '/importers/indico_importer/event/' + this.confId + '/day-end-date'
+                            url = build_url(ImporterPlugin.urls.day_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId
+                            });
                         }
                         if (this.destination.entryType == 'Session') {
-                            // FIXME build URL in a better way
-                            url = '/importers/indico_importer/event/' + this.confId + '/entry/' +
-                                this.destination.scheduleEntryId + '/block-end-date';
+                            url = build_url(ImporterPlugin.urls.block_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId,
+                                entry_id: this.destination.scheduleEntryId
+                            });
                         }
                         $.ajax({
                             url: url,
@@ -482,20 +486,21 @@
             },
 
             _getUrl: function(eventId, day, destination) {
-                var params = "?" + $.param({'day': day});
+                var params = {
+                    'confId': eventId,
+                };
                 if (destination.entryType == 'Day') {
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                    params.day =  day;
+                    return build_url(ImporterPlugin.urls.add_contrib, params);
                 }
                 if (destination.entryType == 'Session') {
-                    params += '&' + $.param({'session_block_id': destination.sessionSlotId});
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/timetable/add-contribution' + params;
+                    params.day =  day;
+                    params.session_block_id = destination.sessionSlotId
+                    return build_url(ImporterPlugin.urls.add_contrib, params);
                 }
                 if (destination.entryType == 'Contribution') {
-                    // FIXME build URL in a better way
-                    return '/event/' + eventId + '/manage/contributions/' + destination.contributionId +
-                        '/subcontributions/';
+                    params.contrib_id = destination.contributionId;
+                    return build_url(ImporterPlugin.urls.create_subcontrib_rest, params);
                 }
             },
 
@@ -521,13 +526,20 @@
             },
 
             _addContributionMaterial: function(title, link_url, eventId, contributionId, subContributionId) {
-                var request_url;
+                var requestUrl;
                 if (subContributionId !== undefined) {
-                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/subcontribution/' + subContributionId + '/attachments/add/link';
+                    requestUrl = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId,
+                        'object_type': 'subcontribution'
+                    });
                 } else {
-                    request_url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/attachments/add/link';
+                    requestUrl = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'object_type': 'contribution'
+                    });
                 }
                 var params = {
                     'csrf_token': $('#csrf-token').attr('content'),
@@ -536,17 +548,22 @@
                     'folder': '__None',
                     'acl': '[]'
                 };
-                ImporterUtils._sendRequest(request_url, params);
+                ImporterUtils._sendRequest(requestUrl, params);
             },
 
             _addReference: function(type, value, eventId, contributionId, subContributionId) {
                 var url;
                 if (subContributionId !== undefined) {
-                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/subcontributions/' + subContributionId + '/references';
+                    url = build_url(ImporterPlugin.urls.create_subcontrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId
+                    });
                 } else {
-                    url = '/event/' + eventId + '/manage/contributions/' + contributionId +
-                        '/references';
+                    url = build_url(ImporterPlugin.urls.create_contrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId
+                    });
                 }
                 var params = {
                     'csrf_token': $('#csrf-token').attr('content'),
