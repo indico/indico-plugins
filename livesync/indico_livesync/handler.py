@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import g
+from sqlalchemy import inspect
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -140,6 +141,8 @@ def _acl_changed_legacy(obj, **kwargs):
 
 
 def _acl_entry_changed(sender, obj, **kwargs):
+    if not inspect(obj).persistent:
+        return
     if isinstance(obj, Session):
         # if a session acl is changed we need to update all inheriting
         # contributions in that session
