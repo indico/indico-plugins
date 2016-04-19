@@ -82,7 +82,9 @@ class MARCXMLGenerator:
                 raise ValueError('Cannot add deleted object')
             elif isinstance(obj, Category) and not obj.getOwner():
                 raise ValueError('Cannot add object without owner: {}'.format(obj))
-            if ref['type'] == EntryType.event:
+            if obj.is_deleted or obj.event_new.is_deleted:
+                pass
+            elif ref['type'] == EntryType.event:
                 self.xml_generator.xml += self._event_to_marcxml(obj)
             elif ref['type'] == EntryType.contribution:
                 self.xml_generator.xml += self._contrib_to_marcxml(obj)
