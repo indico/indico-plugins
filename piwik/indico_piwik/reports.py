@@ -17,12 +17,15 @@
 from collections import defaultdict
 from datetime import timedelta
 
+from sqlalchemy.orm import joinedload
+
 from indico.modules.attachments.util import get_nested_attached_items
+from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time
 from indico.util.serializer import Serializer
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.timezoneUtils import nowutc, utc2server
-from MaKaC.conference import ConferenceHolder
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
 from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
@@ -52,7 +55,7 @@ class ReportBase(Serializer):
 
     @property
     def event(self):
-        return ConferenceHolder().getById(self.event_id)
+        return Event.get_one(self.event_id, is_deleted=False)
 
     @classmethod
     def get(cls, *args, **kwargs):
@@ -82,7 +85,7 @@ class ReportBase(Serializer):
         self.start_date = start_date
         if self.end_date is None:
             today = nowutc().date()
-            end_date = self.event.getEndDate().date()
+            end_date = self.event.end_dt.date()
             self.end_date = end_date if end_date < today else today
         if self.start_date is None:
             self.start_date = self.end_date - timedelta(days=ReportBase.default_report_interval)
@@ -129,29 +132,31 @@ class ReportGeneral(ReportBase):
     def _fetch_contribution_info(self):
         """Build the list of information entries for contributions of the event"""
         self.contributions = {}
-
-        contributions = self.event.getContributionList()
-        for contribution in contributions:
-            if not contribution.isScheduled():
+        query = (Contribution.query
+                 .with_parent(self.event)
+                 .options(joinedload('legacy_mapping'),
+                          joinedload('timetable_entry').lazyload('*')))
+        for contribution in query:
+            if not contribution.start_dt:
                 continue
-            time = format_time(contribution.getStartDate())
-            info = '{} ({})'.format(contribution.getTitle(), time)
-            contrib_id = contribution.getUniqueId()
-            self.contributions[contrib_id] = info
+            cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
+                   else contribution.id)
+            key = '{}t{}'.format(contribution.event_id, cid)
+            self.contributions[key] = u'{} ({})'.format(contribution.title, format_time(contribution.start_dt))
 
 
 class ReportMaterial(ReportBase):
     __public__ = ['material']
 
     def _build_report(self):
-        event = ConferenceHolder().getById(self.params['event_id'])
+        event = Event.get_one(self.params['event_id'], is_deleted=False)
         new_material = get_nested_attached_items(event)
         self.material = {'tree': [self._format_data(new_material)]}
 
     def _format_data(self, raw_node):
         if 'object' not in raw_node:
             return None
-        node = {'label': raw_node['object'].getTitle(),
+        node = {'label': raw_node['object'].title,
                 'children': []}
         if 'files' in raw_node:
             node['children'] += self._format_data_files(raw_node['files'])
