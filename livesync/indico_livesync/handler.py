@@ -158,7 +158,8 @@ def _domain_changed(obj, **kwargs):
 
 
 def _note_changed(note, **kwargs):
-    _register_change(note.object, ChangeType.data_changed)
+    obj = note.event_new if isinstance(note.object, Session) else note.object
+    _register_change(obj, ChangeType.data_changed)
 
 
 def _attachment_changed(attachment_or_folder, **kwargs):
