@@ -83,34 +83,42 @@
          * Checks if a dictionary contains empty person data.
          */
         isPersonEmpty: function(person) {
-            return person && (person.firstName || person.familyName);
+            if (person && (person.firstName || person.familyName)) {
+                return false
+            }
+            return true;
         },
 
         /**
-         * Handles multiple Indico requests. Requests are sent to the server sequentially.
-         * When a request is finished the next one is sent to the server.
-         * @param reqList List of dictionaries. Each element of the list represents a single request.
-         * Each request has a following format {'method' : nameOfTheMetod(string), 'args': dictionaryOfArguments}
-         * @param successCallback Function executed after every successful request.
-         * @param errorCallback Function executed after every failed request.
-         * @param finalCallback Function executed after finishing all requests.
+         * Send a POST request to indico.
+         * @param url The url where to post the data.
+         * @param data The data to POST.
+         * @param onSuccess Called when the request succeeds.
+         * @param onError Called when an error is encountered while performing the request.
          */
-        multipleIndicoRequest: function(reqList, successCallback, errorCallback, finalCallback) {
-            if (reqList.length > 0) {
-                indicoRequest( reqList[0].method, reqList[0].args, function(result, error) {
-                    if (result && successCallback) {
-                        successCallback(result);
+        _sendRequest: function(url, args, onSuccess, onError) {
+            $.ajax({
+                // There's no synchronisation on the server side yet thus make sure requests are sent serially
+                async: false,
+                url: url,
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': $('#csrf-token').attr('content')
+                },
+                data: args,
+                success: function(data, textStatus) {
+                    if ($.isFunction(onSuccess)) {
+                        onSuccess(data, textStatus);
                     }
-                    if (error && errorCallback) {
-                        errorCallback(error);
+                },
+                error: function(jqxhr, textStatus, errorThrown) {
+                    if ($.isFunction(onError)) {
+                        onError(textStatus + ': ' + errorThrown);
                     }
-                    reqList.splice(0, 1);
-                    ImporterUtils.multipleIndicoRequest(reqList, successCallback, errorCallback, finalCallback);
-                });
-            } else if (finalCallback) {
-                finalCallback();
-            }
-        }
+                }
+            });
+        },
+
     };
 
 
@@ -418,25 +426,32 @@
                         self.info.set("startTime", this.destination.startDate.time.substr(0, 5));
                         hook.set(true);
                     } else {
-                        var method;
+                        var url;
                         if (this.destination.entryType == 'Day') {
-                            method = 'schedule.event.getDayEndDate';
+                            url = build_url(ImporterPlugin.urls.day_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId
+                            });
                         }
                         if (this.destination.entryType == 'Session') {
-                            method = 'schedule.slot.getDayEndDate';
+                            url = build_url(ImporterPlugin.urls.block_end_date, {
+                                importer_name: 'indico_importer',
+                                confId: this.confId,
+                                entry_id: this.destination.scheduleEntryId
+                            });
                         }
-                        indicoRequest(method, {
-                            'confId': this.confId,
-                            'sessionId': this.destination.sessionId,
-                            'slotId': this.destination.sessionSlotId,
-                            'selectedDay': this.destination.startDate.date.replace(/-/g, '/')},
-                            function(result, error) {
-                                if (!error) {
-                                    self.info.set("startTime", result.substr(11, 5));
-                                }
+                        $.ajax({
+                            url: url,
+                            data: {
+                                sessionId: this.destination.sessionId,
+                                slotId: this.destination.sessionSlotId,
+                                selectedDay: this.destination.startDate.date.replace(/-/g, '/')
+                            },
+                            success: function(data) {
+                                self.info.set('startTime', data);
                                 hook.set(true);
                             }
-                        );
+                        });
                     }
                 }
             ],
@@ -461,22 +476,6 @@
             },
 
             /**
-             * Returns an insert method name based on the destintion type.
-             */
-            _extractMethod: function() {
-                switch (this.destination.entryType) {
-                    case "Day":
-                        return "schedule.event.addContribution";
-                    case "Contribution":
-                        return "contribution.addSubContribution";
-                    case "Session":
-                        return "schedule.slot.addContribution";
-                    default:
-                        return null;
-                }
-            },
-
-            /**
              * Returns an url of the destination's timetable.
              */
             _extractRedirectUrl: function() {
@@ -492,6 +491,90 @@
                 }
             },
 
+            _getUrl: function(eventId, day, destination) {
+                var params = "?" + $.param({'day': day});
+                if (destination.entryType == 'Day') {
+                    return build_url(ImporterPlugin.urls.add_contrib, {'confId': eventId}) + params;
+                }
+                if (destination.entryType == 'Session') {
+                    params += '&' + $.param({'session_block_id': destination.sessionSlotId});
+                    return build_url(ImporterPlugin.urls.add_contrib, {'confId': eventId}) + params;
+                }
+                if (destination.entryType == 'Contribution') {
+                    return build_url(ImporterPlugin.urls.create_subcontrib_rest,
+                                     {'confId': eventId, 'contrib_id': destination.contributionId});
+                }
+            },
+
+            _person_link_data: function(entry) {
+                var link_data_entry = function(author, primary, speaker) {
+                    return $.extend({
+                        'authorType': primary ? 1 : 2,
+                        'isSpeaker': speaker,
+                        'isSubmitter': !speaker
+                    }, author);
+                };
+                var link_data = [];
+                if (!ImporterUtils.isPersonEmpty(entry.primaryAuthor)) {
+                    link_data.push(link_data_entry(entry.primaryAuthor, true, false));
+                }
+                if (!ImporterUtils.isPersonEmpty(entry.secondaryAuthor)) {
+                    link_data.push(link_data_entry(entry.secondaryAuthor, false, false));
+                }
+                if (!ImporterUtils.isPersonEmpty(entry.speaker)) {
+                    link_data.push(link_data_entry(entry.speaker, false, true));
+                }
+                return link_data;
+            },
+
+            _addContributionMaterial(title, link_url, eventId, contributionId, subContributionId) {
+                var request_url;
+                if (subContributionId !== undefined) {
+                    request_url = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId,
+                        'object_type': 'subcontribution'
+                    });
+                } else {
+                    request_url = build_url(ImporterPlugin.urls.add_link, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'object_type': 'contribution'
+                    });
+                }
+                var params = {
+                    'csrf_token': $('#csrf-token').attr('content'),
+                    'link_url': link_url,
+                    'title': title,
+                    'folder': '__None',
+                    'acl': '[]'
+                };
+                ImporterUtils._sendRequest(request_url, params);
+            },
+
+            _addReference(type, value, eventId, contributionId, subContributionId) {
+                var url;
+                if (subContributionId !== undefined) {
+                    url = build_url(ImporterPlugin.urls.create_subcontrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId,
+                        'subcontrib_id': subContributionId
+                    });
+                } else {
+                    url = build_url(ImporterPlugin.urls.create_contrib_reference_rest, {
+                        'confId': eventId,
+                        'contrib_id': contributionId
+                    });
+                }
+                var params = {
+                    'csrf_token': $('#csrf-token').attr('content'),
+                    'type': type,
+                    'value': value
+                };
+                ImporterUtils._sendRequest(url, params);
+            },
+
             _getButtons: function() {
                 var self = this;
                 return [
@@ -503,59 +586,78 @@
                         //Using parseFloat because parseInt('08') = 0.
                         var time = parseFloat(self.info.get('startTime').split(':')[0]) * 60 + parseFloat(self.info.get('startTime').split(':')[1]);
                         var duration = parseInt(self.info.get('duration'));
-                        var method = self._extractMethod();
                         //If last contribution finishes before 24:00
                         if (time + duration * self.entries.getLength() <= 1440) {
+                            var hasError = false;
                             var killProgress = IndicoUI.Dialogs.Util.progress();
+                            var errorCallback = function(error) {
+                                if (error) {
+                                    hasError = true;
+                                    IndicoUtil.errorReport(error);
+                                }
+                            };
                             var date = self.destination.startDate.date.replace(/-/g, '/');
                             var args = [];
                             each(self.entries.getValues(), function(entry) {
                                 entry = entry.getAll();
                                 var timeStr = ImporterUtils.minutesToTime(time);
-                                args.push({'method' : method,
-                                           'args' : {'conference' : self.confId,
-                                                     'duration' : duration,
-                                                     'title' : entry.title?entry.title:"Untitled",
-                                                     'sessionId' : self.destination.sessionId,
-                                                     'slotId' : self.destination.sessionSlotId,
-                                                     'contribId' : self.destination.contributionId,
-                                                     'startDate' : date + " " + timeStr,
-                                                     'keywords' : [],
-                                                     'authors':ImporterUtils.isPersonEmpty(entry.primaryAuthor)?[entry.primaryAuthor]:[],
-                                                     'coauthors' : ImporterUtils.isPersonEmpty(entry.secondaryAuthor)?[entry.secondaryAuthor]:[],
-                                                     'presenters' : ImporterUtils.isPersonEmpty(entry.speaker)?[entry.speaker]:[],
-                                                     'roomInfo' : {},
-                                                     'field_content': entry.summary,
-                                                     'reportNumbers': entry.reportNumbers?
-                                                             [{'system': ImporterUtils.reportNumberSystems[self.importer], 'number': entry.reportNumbers}]:[],
-                                                     'materials': entry.materials}
-                                });
+                                var params = {
+                                    'csrf_token': $('#csrf-token').attr('content'),
+                                    'title': entry.title ? entry.title : "Untitled",
+                                    'description': entry.summary,
+                                    'duration': [duration, 'minutes'],
+                                    'references': '[]'
+                                }
+                                if (self.destination.entryType == "Contribution") {
+                                    $.extend(params, {
+                                        'speakers': Json.write(self._person_link_data(entry))
+                                    });
+                                } else {
+                                    $.extend(params, {
+                                        'time': timeStr,
+                                        'person_link_data': Json.write(self._person_link_data(entry)),
+                                        'location_data': '{"address": "", "inheriting": true}',
+                                        'type': '__None',
+                                    });
+                                }
+                                var url = self._getUrl(self.confId, date, self.destination);
+                                var successCallback = function(result, textStatus) {
+                                    var materials = entry.materials || {};
+                                    var reportNumbers = entry.reportNumbers || [];
+                                    var reportNumbersLabel = ImporterUtils.reportNumberSystems[self.importer]
+                                    if (self.destination.entryType == "Contribution") {
+                                        $.each(entry.materials, function(title, url) {
+                                            self._addContributionMaterial(title, url, result.event_id,
+                                                                          result.contribution_id, result.id);
+                                        });
+                                        $.each(reportNumbers, function(idx, number) {
+                                            self._addReference(reportNumbersLabel, number, self.confId,
+                                                               result.contribution_id, result.id);
+                                        });
+                                    } else {
+                                        var contribution = result.entries[0].entry;
+                                        $.each(materials, function(title, url) {
+                                            self._addContributionMaterial(title, url, self.confId, contribution.contributionId);
+                                        });
+                                        $.each(reportNumbers, function(idx, number) {
+                                            self._addReference(reportNumbersLabel, number, self.confId, contribution.contributionId);
+                                        });
+                                    }
+                                };
+                                ImporterUtils._sendRequest(url, params, successCallback, errorCallback);
                                 time += duration;
                             });
-                            var successCallback = function(result) {
-                                if (exists(result.slotEntry) && self.timetable.contextInfo.id == result.slotEntry.id) {
-                                    self.timetable._updateEntry(result, result.id);
-                                } else{
-                                    var timetable = self.timetable.parentTimetable?self.timetable.parentTimetable:self.timetable;
-                                    timetable._updateEntry(result, result.id);
-                                }
-                            };
-                            var errorCallback = function(error) {
-                                if (error) {
-                                    IndicoUtil.errorReport(error);
-                                }
-                            };
-                            var finalCallback = function() {
-                                if (self.successFunction) {
-                                    self.successFunction(self.info.get('redirect'));
-                                }
-                                if (self.info.get('redirect')) {
-                                    window.location = self._extractRedirectUrl();
-                                }
-                                self.close();
-                                killProgress();
-                            };
-                            ImporterUtils.multipleIndicoRequest(args, successCallback , errorCallback, finalCallback);
+                            if (self.successFunction) {
+                                self.successFunction(self.info.get('redirect'));
+                            }
+                            if (self.info.get('redirect')) {
+                                window.location = self._extractRedirectUrl();
+                            }
+                            self.close();
+                            killProgress();
+                            if (!hasError) {
+                                location.reload();
+                            }
                         }
                         else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
@@ -832,13 +934,13 @@
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Meeting")), ": ", record.get("meetingName")));
                 }
                 // Speaker, primary and secondary authors are stored in dictionaries. Their property have to be checked.
-                if (ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Primary author")), ": ", this._getPersonString(record.get("primaryAuthor"))));
                 }
-                if (ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Secondary author")), ": ", this._getPersonString(record.get("secondaryAuthor"))));
                 }
-                if (ImporterUtils.isPersonEmpty(record.get("speaker"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get("speaker"))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Speaker")), ": ", this._getPersonString(record.get("speaker"))));
                 }
                 if (record.get("summary")) {
@@ -1356,7 +1458,7 @@
 
 
     $(function() {
-        $('#timetableDiv').on('click', '.js-create-importer-dialog', function() {
+        $('#timetable').on('click', '.js-create-importer-dialog', function() {
             var timetable = $(this).data('timetable');
             new ImportDialog(timetable);
         });

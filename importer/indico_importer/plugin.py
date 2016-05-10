@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, PluginCategory
-from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic
+from indico.modules.events.timetable.views import WPManageTimetable
+from indico.web.flask.util import url_rule_to_js
 
 from indico_importer import _
-from indico_importer.controllers import RHGetImporters, RHImportData
+from indico_importer.controllers import RHGetImporters, RHImportData, RHDayEndTime, RHBlockEndTime
 
 
 class ImporterPlugin(IndicoPlugin):
@@ -34,8 +35,8 @@ class ImporterPlugin(IndicoPlugin):
 
     def init(self):
         super(ImporterPlugin, self).init()
-        self.inject_js('importer_js', WPConfModifScheduleGraphic)
-        self.inject_css('importer_css', WPConfModifScheduleGraphic)
+        self.inject_js('importer_js', WPManageTimetable)
+        self.inject_css('importer_css', WPManageTimetable)
         self.connect(signals.event.timetable_buttons, self.get_timetable_buttons)
         self.importer_engines = {}
 
@@ -47,7 +48,15 @@ class ImporterPlugin(IndicoPlugin):
 
     def get_vars_js(self):
         return {'urls': {'import_data': plugin_url_rule_to_js('importer.import_data'),
-                         'importers': plugin_url_rule_to_js('importer.importers')}}
+                         'importers': plugin_url_rule_to_js('importer.importers'),
+                         'day_end_date': plugin_url_rule_to_js('importer.day_end_date'),
+                         'block_end_date': plugin_url_rule_to_js('importer.block_end_date'),
+                         'add_contrib': url_rule_to_js('timetable.add_contribution'),
+                         'create_subcontrib_rest': url_rule_to_js('contributions.create_subcontrib_rest'),
+                         'create_contrib_reference_rest': url_rule_to_js('contributions.create_contrib_reference_rest'),
+                         'create_subcontrib_reference_rest': url_rule_to_js('contributions'
+                                                                            '.create_subcontrib_reference_rest'),
+                         'add_link': url_rule_to_js('attachments.add_link')}}
 
     def register_assets(self):
         self.register_js_bundle('importer_js', 'js/importer.js')
@@ -60,3 +69,7 @@ class ImporterPlugin(IndicoPlugin):
 blueprint = IndicoPluginBlueprint('importer', __name__)
 blueprint.add_url_rule('/importers/<importer_name>/search', 'import_data', RHImportData, methods=('POST',))
 blueprint.add_url_rule('/importers/', 'importers', RHGetImporters)
+
+blueprint.add_url_rule('/importers/<importer_name>/event/<confId>/day-end-date', 'day_end_date', RHDayEndTime)
+blueprint.add_url_rule('/importers/<importer_name>/event/<confId>/entry/<entry_id>/block-end-date', 'block_end_date',
+                       RHBlockEndTime)

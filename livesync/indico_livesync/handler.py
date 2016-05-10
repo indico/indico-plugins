@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import g
+from sqlalchemy import inspect
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -140,6 +141,8 @@ def _acl_changed_legacy(obj, **kwargs):
 
 
 def _acl_entry_changed(sender, obj, **kwargs):
+    if not inspect(obj).persistent:
+        return
     if isinstance(obj, Session):
         # if a session acl is changed we need to update all inheriting
         # contributions in that session
@@ -155,7 +158,8 @@ def _domain_changed(obj, **kwargs):
 
 
 def _note_changed(note, **kwargs):
-    _register_change(note.object, ChangeType.data_changed)
+    obj = note.event_new if isinstance(note.object, Session) else note.object
+    _register_change(obj, ChangeType.data_changed)
 
 
 def _attachment_changed(attachment_or_folder, **kwargs):
