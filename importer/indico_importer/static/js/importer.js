@@ -111,8 +111,7 @@
                     }
                 }
             });
-        },
-
+        }
     };
 
 
@@ -487,15 +486,15 @@
 
             _getUrl: function(eventId, day, destination) {
                 var params = {
-                    'confId': eventId,
+                    'confId': eventId
                 };
                 if (destination.entryType == 'Day') {
-                    params.day =  day;
+                    params.day = day;
                     return build_url(ImporterPlugin.urls.add_contrib, params);
                 }
                 if (destination.entryType == 'Session') {
-                    params.day =  day;
-                    params.session_block_id = destination.sessionSlotId
+                    params.day = day;
+                    params.session_block_id = destination.sessionSlotId;
                     return build_url(ImporterPlugin.urls.add_contrib, params);
                 }
                 if (destination.entryType == 'Contribution') {
@@ -605,8 +604,8 @@
                                     'description': entry.summary,
                                     'duration': [duration, 'minutes'],
                                     'references': '[]'
-                                }
-                                if (self.destination.entryType == "Contribution") {
+                                };
+                                if (self.destination.entryType == 'Contribution') {
                                     $.extend(params, {
                                         'speakers': Json.write(self._personLinkData(entry))
                                     });
@@ -615,15 +614,15 @@
                                         'time': timeStr,
                                         'person_link_data': Json.write(self._personLinkData(entry)),
                                         'location_data': '{"address": "", "inheriting": true}',
-                                        'type': '__None',
+                                        'type': '__None'
                                     });
                                 }
                                 var url = self._getUrl(self.confId, date, self.destination);
-                                var successCallback = function(result, textStatus) {
+                                var successCallback = function(result) {
                                     var materials = entry.materials || {};
                                     var reportNumbers = entry.reportNumbers || [];
-                                    var reportNumbersLabel = ImporterUtils.reportNumberSystems[self.importer]
-                                    if (self.destination.entryType == "Contribution") {
+                                    var reportNumbersLabel = ImporterUtils.reportNumberSystems[self.importer];
+                                    if (self.destination.entryType == 'Contribution') {
                                         $.each(materials, function(title, url) {
                                             self._addContributionMaterial(title, url, result.event_id,
                                                                           result.contribution_id, result.id);
@@ -932,13 +931,13 @@
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Meeting")), ": ", record.get("meetingName")));
                 }
                 // Speaker, primary and secondary authors are stored in dictionaries. Their property have to be checked.
-                if (!ImporterUtils.isPersonEmpty(record.get("primaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get('primaryAuthor'))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Primary author")), ": ", this._getPersonString(record.get("primaryAuthor"))));
                 }
-                if (!ImporterUtils.isPersonEmpty(record.get("secondaryAuthor"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get('secondaryAuthor'))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Secondary author")), ": ", this._getPersonString(record.get("secondaryAuthor"))));
                 }
-                if (!ImporterUtils.isPersonEmpty(record.get("speaker"))) {
+                if (!ImporterUtils.isPersonEmpty(record.get('speaker'))) {
                     recordDiv.append(Html.div({}, Html.em({}, $t.gettext("Speaker")), ": ", this._getPersonString(record.get("speaker"))));
                 }
                 if (record.get("summary")) {
