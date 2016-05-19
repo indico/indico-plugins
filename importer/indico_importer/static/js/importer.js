@@ -516,7 +516,7 @@
                     return $.extend({
                         'authorType': authorType,
                         'isSpeaker': speaker,
-                        'isSubmitter': !speaker
+                        'isSubmitter': false
                     }, author);
                 };
                 var linkData = [];
