@@ -38,7 +38,8 @@ class InvenioAuthorConverter(InvenioRecordConverterBase):
 
     conversion = [('a', 'firstName', lambda x: x[0].split(' ')[0]),
                   ('a', 'familyName', lambda x: ' '.join(x[0].split(' ')[1:])),
-                  ('u', 'affiliation')]
+                  ('u', 'affiliation'),
+                  ('e', APPEND, lambda x: {'isSpeaker': 'speaker' in x})]
 
 
 class InvenioPlaceTimeConverter111(InvenioRecordConverterBase):

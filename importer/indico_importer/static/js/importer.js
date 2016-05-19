@@ -504,22 +504,30 @@
             },
 
             _personLinkData: function(entry) {
-                var linkDataEntry = function(author, primary, speaker) {
+                var authorType = {
+                    'none': 0,
+                    'primary': 1,
+                    'secondary': 2
+                };
+                var linkDataEntry = function(author, authorType, speaker) {
+                    if (speaker === undefined) {
+                        speaker = !!author.isSpeaker;
+                    }
                     return $.extend({
-                        'authorType': primary ? 1 : 2,
+                        'authorType': authorType,
                         'isSpeaker': speaker,
                         'isSubmitter': !speaker
                     }, author);
                 };
                 var linkData = [];
                 if (!ImporterUtils.isPersonEmpty(entry.primaryAuthor)) {
-                    linkData.push(linkDataEntry(entry.primaryAuthor, true, false));
+                    linkData.push(linkDataEntry(entry.primaryAuthor, authorType.primary));
                 }
                 if (!ImporterUtils.isPersonEmpty(entry.secondaryAuthor)) {
-                    linkData.push(linkDataEntry(entry.secondaryAuthor, false, false));
+                    linkData.push(linkDataEntry(entry.secondaryAuthor, authorType.secondary));
                 }
                 if (!ImporterUtils.isPersonEmpty(entry.speaker)) {
-                    linkData.push(linkDataEntry(entry.speaker, false, true));
+                    linkData.push(linkDataEntry(entry.speaker, authorType.none, true));
                 }
                 return linkData;
             },
