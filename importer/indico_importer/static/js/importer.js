@@ -676,7 +676,7 @@
          * Dialog used to set the duration of the each contribution and the start time of the first on.
          * @param entries List of imported entries
          * @param destination Place into which entries will be inserted
-         * @param confIf Id of the current conference
+         * @param confId Id of the current conference
          * @param timetable Indico timetable object of the current conference.
          * @param importer Name of the used importer.
          * @param successFunction Function executed after inserting events.
