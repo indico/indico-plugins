@@ -310,9 +310,8 @@
                                 self.timetableList.clearSelection();
                                 self.importerList.clearSelection();
                                 self.emptySearchDiv.showAfterSearch();
-                            } else {
-                                self.close();
                             }
+                            self.reloadPage = true;
                         });
                     }],
                     [$t.gettext('Close'), function() {
@@ -328,6 +327,14 @@
                     disabled: true
                 });
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent());
+            },
+
+            _onClose: function(evt) {
+                if (this.reloadPage) {
+                    location.reload();
+                    IndicoUI.Dialogs.Util.progress();
+                }
+                return self.ExclusivePopupWithButtons.prototype._onClose.call(this, evt);
             }
         },
 
@@ -672,9 +679,6 @@
                             }
                             self.close();
                             killProgress();
-                            if (!hasError) {
-                                location.reload();
-                            }
                         }
                         else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
