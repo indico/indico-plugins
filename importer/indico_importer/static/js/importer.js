@@ -387,7 +387,7 @@
                 hereLink.observeClick(this.afterSearchAction);
                 this.afterSearch = Html.span(
                     {style: {display: 'none'}},
-                    $t.gettext("Your entries were inserted <strong>successfully</strong>. Please specify a new query or click"), ' ', hereLink, ' ', $t.gettext("to see the previous results.")
+                    $t.gettext("Your entries were inserted successfully. Please specify a new query or click"), ' ', hereLink, ' ', $t.gettext("to see the previous results.")
                 );
                 this.contentDiv = Html.div({className:'presearchContainer', style:{"height" : pixels(this.height - 130)}}, this.firstSearch, this.afterSearch);
                 return this.contentDiv;
