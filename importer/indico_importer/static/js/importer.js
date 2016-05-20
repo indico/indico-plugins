@@ -529,6 +529,18 @@
                 if (!ImporterUtils.isPersonEmpty(entry.speaker)) {
                     linkData.push(linkDataEntry(entry.speaker, authorType.none, true));
                 }
+
+                if (!this.timetable.eventInfo.isConference) {
+                    // Only speakers are allowed in this type of event
+                    var speakersLinkData = [];
+                    $.each(linkData, function() {
+                        if (this.isSpeaker) {
+                            this.authorType = authorType.none;
+                            speakersLinkData.push(this);
+                        }
+                    });
+                    return speakersLinkData;
+                }
                 return linkData;
             },
 
