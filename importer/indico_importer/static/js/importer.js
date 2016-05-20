@@ -475,20 +475,14 @@
                 ]);
             },
 
-            /**
-             * Returns an url of the destination's timetable.
-             */
-            _extractRedirectUrl: function() {
-                switch (this.destination.entryType) {
-                    case "Day":
-                        return build_url(Indico.Urls.ConfModifSchedule, {confId: this.confId}, this.destination.startDate.date.replace(/-/g, ''));
-                    case "Contribution":
-                        return build_url(Indico.Urls.SubcontrModif, {contribId: this.destination.contributionId, confId: this.confId});
-                    case "Session":
-                        return build_url(Indico.Urls.ConfModifSchedule, {confId: this.confId}, this.destination.startDate.date.replace(/-/g, '') + '.' + this.destination.id);
-                    default:
-                        return null;
+            /* Redirect to the timetable containing the created entry. */
+            _performRedirect: function() {
+                var fragment = this.destination.startDate.date.replace(/-/g, '');
+                if (this.destination.entryType == 'Session') {
+                    fragment += '.' + this.destination.id;
                 }
+                location.hash = fragment;
+                location.reload(); // Reload needed since only the fragment is changed
             },
 
             _getUrl: function(eventId, day, destination) {
@@ -675,7 +669,7 @@
                                 self.successFunction(self.info.get('redirect'));
                             }
                             if (self.info.get('redirect')) {
-                                window.location = self._extractRedirectUrl();
+                                self._performRedirect();
                             }
                             self.close();
                             killProgress();
