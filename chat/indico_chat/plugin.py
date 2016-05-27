@@ -42,7 +42,7 @@ from indico_chat.views import WPChatEventMgmt
 
 
 class SettingsForm(IndicoForm):
-    admins = PrincipalListField(_('Administrators'), groups=True, serializable=False,
+    admins = PrincipalListField(_('Administrators'), groups=True,
                                 description=_('List of users/groups who can manage chatrooms for all events'))
     server = StringField(_('XMPP server'), [DataRequired()], description=_('The hostname of the XMPP server'))
     muc_server = StringField(_('XMPP MUC server'), [DataRequired()],
