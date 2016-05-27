@@ -162,7 +162,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         login_gen = iter_user_identities(owner)
         login = next(login_gen, None)
         if login is None:
-            raise VCRoomError(_("No valid Vidyo account found for this user"), 'owner')
+            raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner_user')
 
         extension_gen = iter_extensions(self.settings.get('indico_room_prefix'), event.id)
         extension = next(extension_gen)
@@ -195,7 +195,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 elif err_msg.startswith('Member not found for ownerName'):
                     login = next(login_gen, None)
                     if login is None:
-                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
+                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner_user')
                 elif err_msg.startswith('Room exist for extension'):
                     extension = next(extension_gen)
                 else:
@@ -231,7 +231,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             login_gen = iter_user_identities(owner)
             login = next(login_gen, None)
             if login is None:
-                raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
+                raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner_user')
             room_obj.ownerName = login
 
         room_obj.name = vc_room.name
@@ -260,7 +260,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                     if changed_owner:
                         login = next(login_gen, None)
                     if not changed_owner or login is None:
-                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner')
+                        raise VCRoomError(_("No valid Vidyo account found for this user"), field='owner_user')
                     room_obj.ownerName = login
 
                 else:
@@ -314,7 +314,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'show_pin': False,
             'show_autojoin': True,
             'show_phone_numbers': True,
-            'owner': session.user.as_principal
+            'owner_user': session.user
         })
 
         return defaults

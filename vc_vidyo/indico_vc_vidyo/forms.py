@@ -24,6 +24,7 @@ from wtforms.validators import DataRequired, Length, Regexp, Optional, Validatio
 
 from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
 from indico.util.user import retrieve_principal
+from indico.web.forms.base import generated_data
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField
 from indico.web.forms.widgets import SwitchWidget
 
@@ -58,7 +59,7 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
-    owner = PrincipalField(_('Owner'), [DataRequired()], description=_('The owner of the room'))
+    owner_user = PrincipalField(_('Owner'), [DataRequired()], description=_('The owner of the room'))
     moderation_pin = IndicoPasswordField(_('Moderation PIN'),
                                          [Optional(), Length(min=3, max=10), Regexp(PIN_RE)],
                                          toggle=True, description=_('Used to moderate the VC Room'))
@@ -70,9 +71,18 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
                              description=_('The VidyoDesktop clients will join the VC room muted by default '
                                            '(audio and video)'))
 
-    def validate_owner(self, field):
-        user = retrieve_principal(field.data, allow_groups=False, legacy=False)
-        if not user:
+    def __init__(self, *args, **kwargs):
+        defaults = kwargs['obj']
+        if defaults.owner_user is None and defaults.owner is not None:
+            defaults.owner_user = retrieve_principal(defaults.owner, allow_groups=False, legacy=False)
+        super(VCRoomForm, self).__init__(*args, **kwargs)
+
+    @generated_data
+    def owner(self):
+        return self.owner_user.data.as_principal
+
+    def validate_owner_user(self, field):
+        if not field.data:
             raise ValidationError(_("Unable to find this user in Indico."))
-        if not next(iter_user_identities(user), None):
+        if not next(iter_user_identities(field.data), None):
             raise ValidationError(_("This user does not have a suitable account to use Vidyo."))
