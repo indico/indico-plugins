@@ -20,12 +20,10 @@ from flask import request, jsonify
 from flask_pluginengine import current_plugin
 from werkzeug.wrappers import Response
 
-from indico.util.string import to_unicode
-from MaKaC.common.indexes import IndexesHolder
+from indico.modules.categories import Category
 from MaKaC.conference import ConferenceHolder, Conference, CategoryManager
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.urlHandlers import UHCategoryDisplay
 
 from indico_search.views import WPSearchCategory, WPSearchConference
 
@@ -59,17 +57,13 @@ class RHSearch(RHCustomizable):
 class RHSearchCategoryTitles(RH):
     """Searches for categories with matching titles"""
     def _process(self):
-        matches = IndexesHolder().getIndex('categoryName').search(request.args['term'])
-        results = []
-        for category_id in matches[:7]:
-            try:
-                categ = CategoryManager().getById(category_id)
-            except KeyError:
-                continue
-            results.append({
-                'title': to_unicode(categ.getTitle()),
-                'path': map(to_unicode, categ.getCategoryPathTitles()[1:-1]),
-                'url': unicode(UHCategoryDisplay.getURL(categ))
-            })
-
-        return jsonify(success=True, results=results, count=len(matches))
+        query = (Category.query
+                 .filter(Category.title_matches(request.args['term']),
+                         ~Category.is_deleted)
+                 .order_by(Category.title))
+        results = [{
+            'title': category.title,
+            'path': category.get_chain_titles()[1:-1],
+            'url': unicode(category.url)
+        } for category in query.limit(7)]
+        return jsonify(success=True, results=results, count=query.count())
