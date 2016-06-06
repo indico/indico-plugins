@@ -165,7 +165,7 @@ def _note_changed(note, **kwargs):
 def _attachment_changed(attachment_or_folder, **kwargs):
     folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
     if folder.link_type not in (LinkType.category, LinkType.session):
-        _register_change(folder.object, ChangeType.data_changed)
+        _register_change(folder.object.event_new, ChangeType.data_changed)
 
 
 def _apply_changes(sender, **kwargs):
