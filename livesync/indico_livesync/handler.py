@@ -22,6 +22,7 @@ from flask import g
 from sqlalchemy import inspect
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -164,7 +165,7 @@ def _note_changed(note, **kwargs):
 
 def _attachment_changed(attachment_or_folder, **kwargs):
     folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
-    if not isinstance(folder.object, Category) and not isinstance(folder.object, Session):
+    if folder.link_type not in (LinkType.category, LinkType.session):
         _register_change(folder.object, ChangeType.data_changed)
 
 
