@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request, jsonify
 from flask_pluginengine import current_plugin
+from sqlalchemy.orm import undefer
 from werkzeug.wrappers import Response
 
 from indico.modules.categories import Category
@@ -60,10 +61,11 @@ class RHSearchCategoryTitles(RH):
         query = (Category.query
                  .filter(Category.title_matches(request.args['term']),
                          ~Category.is_deleted)
+                 .options(undefer('chain_titles'))
                  .order_by(Category.title))
         results = [{
             'title': category.title,
-            'path': category.get_chain_titles()[1:-1],
+            'path': category.chain_titles[1:-1],
             'url': unicode(category.url)
         } for category in query.limit(7)]
         return jsonify(success=True, results=results, count=query.count())
