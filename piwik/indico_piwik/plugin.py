@@ -120,7 +120,7 @@ class PiwikPlugin(IndicoPlugin):
         if not self.settings.get('enabled_for_events') or not site_id_events:
             return {}
         params = {'site_id_events': site_id_events}
-        if request.blueprint == 'contributions':
+        if request.blueprint in ('event', 'events', 'contributions') and 'confId' in request.view_args:
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contrib_id')
             if contrib_id is not None:
