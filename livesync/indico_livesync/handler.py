@@ -29,7 +29,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.sessions import Session
 from indico.util.event import unify_event_args
 from MaKaC.accessControl import AccessController
-from MaKaC.conference import Category, ConferenceHolder, Conference
+from MaKaC.conference import Category, Conference
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.util import obj_ref, is_ref_excluded
@@ -164,8 +164,8 @@ def _note_changed(note, **kwargs):
 
 def _attachment_changed(attachment_or_folder, **kwargs):
     folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
-    if not isinstance(folder.object, Category):
-        _register_change(folder.object.event_new, ChangeType.data_changed)
+    if not isinstance(folder.object, Category) and not isinstance(folder.object, Session):
+        _register_change(folder.object, ChangeType.data_changed)
 
 
 def _apply_changes(sender, **kwargs):
