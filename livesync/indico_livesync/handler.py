@@ -41,7 +41,7 @@ def connect_signals(plugin):
     plugin.connect(signals.after_process, _apply_changes)
     plugin.connect(signals.before_retry, _clear_changes)
     # moved
-    plugin.connect(signals.category.moved, _moved)
+    # plugin.connect(signals.category.moved, _moved)
     plugin.connect(signals.event.moved, _moved)
     # created
     plugin.connect(signals.event.created, _created)
@@ -60,23 +60,23 @@ def connect_signals(plugin):
     plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
     plugin.connect(signals.event.timetable_entry_deleted, _timetable_changed)
     # protection
-    plugin.connect(signals.category.protection_changed, _protection_changed_legacy)
-    plugin.connect(signals.event.protection_changed, _protection_changed_legacy)
+    # plugin.connect(signals.category.protection_changed, _protection_changed_legacy)
+    # plugin.connect(signals.event.protection_changed, _protection_changed_legacy)
     plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Session)
     plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Contribution)
     # ACLs
-    plugin.connect(signals.acl.access_granted, _acl_changed_legacy)
-    plugin.connect(signals.acl.access_revoked, _acl_changed_legacy)
-    plugin.connect(signals.acl.modification_granted, _acl_changed_legacy)
-    plugin.connect(signals.acl.modification_revoked, _acl_changed_legacy)
+    # plugin.connect(signals.acl.access_granted, _acl_changed_legacy)
+    # plugin.connect(signals.acl.access_revoked, _acl_changed_legacy)
+    # plugin.connect(signals.acl.modification_granted, _acl_changed_legacy)
+    # plugin.connect(signals.acl.modification_revoked, _acl_changed_legacy)
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Event)
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Session)
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # domain access
-    plugin.connect(signals.category.domain_access_granted, _domain_changed)
-    plugin.connect(signals.category.domain_access_revoked, _domain_changed)
-    plugin.connect(signals.event.domain_access_granted, _domain_changed)
-    plugin.connect(signals.event.domain_access_revoked, _domain_changed)
+    # plugin.connect(signals.category.domain_access_granted, _domain_changed)
+    # plugin.connect(signals.category.domain_access_revoked, _domain_changed)
+    # plugin.connect(signals.event.domain_access_granted, _domain_changed)
+    # plugin.connect(signals.event.domain_access_revoked, _domain_changed)
     # notes
     plugin.connect(signals.event.notes.note_added, _note_changed)
     plugin.connect(signals.event.notes.note_deleted, _note_changed)
