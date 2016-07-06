@@ -37,7 +37,7 @@
         categoryNamesUrl: {{ url_for_plugin('search.category_names') | tojson }},
         searchUrl: {{ url_for_plugin('search.search') | tojson }},
         searchCategoryUrl: {{ url_for_plugin('search.search', category) | tojson }},
-        categoryName: {{ (category.name if category else None) | tojson }},
-        isRoot: {{ (not category or category.isRoot()) | tojson }}
+        categoryName: {{ (category.title if category else None) | tojson }},
+        isRoot: {{ (not category or category.is_root) | tojson }}
     });
 </script>
