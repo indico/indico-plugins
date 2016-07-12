@@ -205,10 +205,8 @@ def _register_deletion(obj):
 def _register_change(obj, action):
     if not isinstance(obj, Category):
         event = obj.event_new
-        if event is None or event.is_deleted or event.as_legacy is None or event.as_legacy.getOwner() is None:
+        if event is None or event.is_deleted or event.as_legacy is None:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
-            # When moving an event it's even worse, we get a data change notification in the middle of the move while
-            # the event has no category...
             # Also, ACL changes during user merges might involve deleted objects which we also don't care about
             return
     _init_livesync_g()
