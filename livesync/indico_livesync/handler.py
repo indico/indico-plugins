@@ -42,7 +42,7 @@ def connect_signals(plugin):
     plugin.connect(signals.before_retry, _clear_changes)
     # moved
     # plugin.connect(signals.category.moved, _moved)
-    plugin.connect(signals.event.moved, _moved)
+    # plugin.connect(signals.event.moved, _moved)
     # created
     plugin.connect(signals.event.created, _created)
     plugin.connect(signals.event.contribution_created, _created)
