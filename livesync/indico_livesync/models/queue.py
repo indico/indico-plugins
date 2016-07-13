@@ -108,6 +108,7 @@ class LiveSyncQueueEntry(db.Model):
     #: The ID of the changed category
     category_id = db.Column(
         db.Integer,
+        db.ForeignKey('categories.categories.id'),
         index=True,
         nullable=True
     )
