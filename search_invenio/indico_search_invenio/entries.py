@@ -17,13 +17,11 @@
 from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
-from pytz import timezone
 
+from indico.modules.events import Event
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.util.date_time import as_utc
 from indico.web.flask.util import url_for
-from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.conference import ConferenceHolder
 
 
 class Author(object):
@@ -45,14 +43,13 @@ class SearchResult(object):
 
     @property
     def event(self):
-        return ConferenceHolder().getById(self.event_id, quiet=True)
+        return Event.get(int(self.event_id), is_deleted=False)
 
     @property
     def start_date(self):
         if not self._start_date:
             return None
-        tz = DisplayTZ(conf=self.event).getDisplayTZ()
-        return self._start_date.astimezone(timezone(tz))
+        return self._start_date.astimezone(self.event.display_tzinfo)
 
     @property
     def object(self):
@@ -71,7 +68,7 @@ class SearchResult(object):
         if not obj:
             current_plugin.logger.warning('referenced element %s does not exist', self.compound_id)
             return False
-        return obj.canView(AccessWrapper(user.as_avatar if user else None))
+        return obj.can_access(user)
 
     def __repr__(self):
         return '<{}({})>'.format(type(self).__name__, self.compound_id)
@@ -96,10 +93,7 @@ class ContributionEntry(SearchResult):
 
     @property
     def object(self):
-        event = self.event
-        if not event:
-            return None
-        return event.getContributionById(self.id)
+        return self.event.get_contribution(self.id) if self.event else None
 
 
 class SubContributionEntry(SearchResult):
@@ -124,13 +118,11 @@ class SubContributionEntry(SearchResult):
 
     @property
     def object(self):
-        event = self.event
-        if not event:
-            return None
-        contribution = event.getContributionById(self.parent)
-        if not contribution:
-            return None
-        return contribution.getSubContributionById(self.id)
+        return (SubContribution.query
+                .filter(SubContribution.id == self.id,
+                        ~SubContribution.is_deleted,
+                        SubContribution.contribution.has(id=self.parent, event_new=self.event, is_deleted=False))
+                .first())
 
 
 class EventEntry(SearchResult):
