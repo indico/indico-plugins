@@ -27,10 +27,9 @@ from lxml import etree
 from werkzeug.urls import url_encode
 from xml.dom import minidom
 
+from indico.core.db import db
 from indico.core.plugins import get_plugin_template_module
-from indico.util.string import to_unicode
 from indico_search import SearchEngine
-from MaKaC.conference import Category, Conference
 
 from indico_search_invenio.entries import Author, SubContributionEntry, ContributionEntry, EventEntry
 
@@ -280,8 +279,8 @@ class InvenioSearchEngine(SearchEngine):
         return '{}.{}'.format(prefix, suffix)
 
     def _make_obj_query(self):
-        if isinstance(self.obj, Category) and not self.obj.isRoot():
-            return '650_7:"{}*"'.format(':'.join(map(to_unicode, self.obj.getCategoryPath())))
-        elif isinstance(self.obj, Conference):
+        if isinstance(self.obj, db.m.Category) and not self.obj.is_root:
+            return '650_7:"{}*"'.format(':'.join(unicode(c['id']) for c in self.obj.chain))
+        elif isinstance(self.obj, db.m.Event):
             # XXX: The old plugin prefixed this with 'AND ' but according to the invenio docs, AND is implied
             return '970__a:"INDICO.{}.*"'.format(self.obj.id)

@@ -22,7 +22,7 @@ from sqlalchemy.orm import undefer
 from werkzeug.wrappers import Response
 
 from indico.modules.categories import Category
-from MaKaC.conference import ConferenceHolder, Conference, CategoryManager
+from indico.modules.events import Event
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 from MaKaC.webinterface.rh.base import RH
 
@@ -33,13 +33,14 @@ class RHSearch(RHCustomizable):
     """Performs a search using the search engine plugin"""
     def _checkParams(self):
         if 'confId' in request.view_args:
-            self.obj = self._conf = ConferenceHolder().getById(request.view_args['confId'])
+            self.obj = Event.get_one(request.view_args['confId'])
+            self._conf = self.obj.as_legacy
             self.obj_type = 'event'
-        elif 'categId' in request.view_args:
-            self.obj = CategoryManager().getById(request.view_args['categId'])
-            self.obj_type = 'category' if not self.obj.isRoot() else None
+        elif 'category_id' in request.view_args:
+            self.obj = Category.get_one(request.view_args['category_id'])
+            self.obj_type = 'category' if not self.obj.is_root else None
         else:
-            self.obj = CategoryManager().getRoot()
+            self.obj = Category.get_root()
             self.obj_type = None
 
     def _process(self):
@@ -50,8 +51,9 @@ class RHSearch(RHCustomizable):
                 result = current_plugin.perform_search(form.data, self.obj)
             if isinstance(result, Response):  # probably a redirect or a json response
                 return result
-            view_class = WPSearchConference if isinstance(self.obj, Conference) else WPSearchCategory
-            return view_class.render_template('results.html', self.obj, only_public=current_plugin.only_public,
+            view_class = WPSearchConference if isinstance(self.obj, Event) else WPSearchCategory
+            obj = self.obj.as_legacy if isinstance(self.obj, Event) else self.obj
+            return view_class.render_template('results.html', obj, only_public=current_plugin.only_public,
                                               form=form, obj_type=self.obj_type, result=result)
 
 

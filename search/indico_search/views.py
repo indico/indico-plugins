@@ -17,11 +17,11 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
+from indico.modules.categories.views import WPCategory
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 
-class WPSearchCategory(WPJinjaMixinPlugin, WPCategoryDisplayBase):
+class WPSearchCategory(WPJinjaMixinPlugin, WPCategory):
     def _getBody(self, params):
         return self._getPageContent(params)
 
