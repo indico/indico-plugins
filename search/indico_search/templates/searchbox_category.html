@@ -33,11 +33,14 @@
 {{ form_footer(form, i_form=false) }}
 
 <script>
-    categorySearchBox({
-        categoryNamesUrl: {{ url_for_plugin('search.category_names') | tojson }},
-        searchUrl: {{ url_for_plugin('search.search') | tojson }},
-        searchCategoryUrl: {{ url_for_plugin('search.search', category) | tojson }},
-        categoryName: {{ (category.title if category else None) | tojson }},
-        isRoot: {{ (not category or category.is_root) | tojson }}
+    $(document).ready(function() {
+        'use strict';
+        categorySearchBox({
+            categoryNamesUrl: {{ url_for_plugin('search.category_names') | tojson }},
+            searchUrl: {{ url_for_plugin('search.search') | tojson }},
+            searchCategoryUrl: {{ url_for_plugin('search.search', category) | tojson }},
+            categoryName: {{ (category.title if category else None) | tojson }},
+            isRoot: {{ (not category or category.is_root) | tojson }}
+        });
     });
 </script>
