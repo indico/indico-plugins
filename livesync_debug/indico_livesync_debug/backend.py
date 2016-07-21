@@ -20,7 +20,6 @@ from indico.util.console import cformat
 from indico.util.struct.iterables import grouper
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
-from indico_livesync.util import obj_deref
 
 
 def _change_str(change):
@@ -48,9 +47,8 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
 
         self._print()
         self._print(cformat('%{white!}Simplified/cascaded changes:%{reset}'))
-        for ref, change in process_records(records).iteritems():
-            obj = obj_deref(ref)
-            self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj or ref))
+        for obj, change in process_records(records).iteritems():
+            self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj))
 
         self._print()
         self._print(cformat('%{white!}Resulting MarcXML:%{reset}'))

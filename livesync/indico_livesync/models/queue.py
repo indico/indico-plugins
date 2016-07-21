@@ -19,12 +19,14 @@ from __future__ import unicode_literals
 from werkzeug.datastructures import ImmutableDict
 
 from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
+from indico.modules.categories.models.categories import Category
+from indico.modules.events.models.events import Event
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii, format_repr
 from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.util import obj_deref, obj_ref
+from indico_livesync.util import obj_deref
 
 
 class ChangeType(int, IndicoEnum):
@@ -40,13 +42,15 @@ class EntryType(int, IndicoEnum):
     event = 2
     contribution = 3
     subcontribution = 4
+    session = 5
 
 
 _column_for_types = {
     EntryType.category: 'category_id',
     EntryType.event: 'event_id',
     EntryType.contribution: 'contribution_id',
-    EntryType.subcontribution: 'subcontribution_id'
+    EntryType.subcontribution: 'subcontribution_id',
+    EntryType.session: 'session_id'
 }
 
 
@@ -113,7 +117,7 @@ class LiveSyncQueueEntry(db.Model):
         nullable=True
     )
 
-    #: The event ID of the changed event/contribution/subcontribution
+    #: ID of the changed event
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
@@ -121,7 +125,7 @@ class LiveSyncQueueEntry(db.Model):
         nullable=True
     )
 
-    #: The contribution ID of the changed contribution/subcontribution
+    #: ID of the changed contribution
     contrib_id = db.Column(
         'contribution_id',
         db.Integer,
@@ -130,7 +134,16 @@ class LiveSyncQueueEntry(db.Model):
         nullable=True
     )
 
-    #: The subcontribution ID of the changed subcontribution
+    #: ID of the changed session
+    session_id = db.Column(
+        'session_id',
+        db.Integer,
+        db.ForeignKey('events.sessions.id'),
+        index=True,
+        nullable=True
+    )
+
+    #: ID of the changed subcontribution
     subcontrib_id = db.Column(
         'subcontribution_id',
         db.Integer,
@@ -145,8 +158,28 @@ class LiveSyncQueueEntry(db.Model):
         backref=db.backref('queue', cascade='all, delete-orphan', lazy='dynamic')
     )
 
-    event = db.relationship(
+    category = db.relationship(
+        'Category',
+        lazy=True,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+
+    event_new = db.relationship(
         'Event',
+        lazy=True,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+
+    session = db.relationship(
+        'Session',
         lazy=False,
         backref=db.backref(
             'livesync_queue_entries',
@@ -176,62 +209,60 @@ class LiveSyncQueueEntry(db.Model):
     )
 
     @property
-    def category(self):
-        return CategoryManager().getById(str(self.category_id), True)
-
-    @category.setter
-    def category(self, value):
-        self.category_id = int(value.id) if value is not None else None
-
-    @property
     def object(self):
-        """Returns the changed object"""
-        return obj_deref(self.object_ref)
+        """Return the changed object."""
+        if self.type == EntryType.category:
+            return self.category
+        elif self.type == EntryType.event:
+            return self.event_new
+        elif self.type == EntryType.session:
+            return self.session
+        elif self.type == EntryType.contribution:
+            return self.contribution
+        elif self.type == EntryType.subcontribution:
+            return self.subcontribution
 
     @property
     def object_ref(self):
-        """Returns the reference of the changed object"""
+        """Return the reference of the changed object."""
         return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
-                             contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
+                             session_id=self.session_id, contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
 
     @return_ascii
     def __repr__(self):
-        ref_repr = '{}.{}.{}.{}'.format(self.category_id if self.category_id else 'x',
-                                        self.event_id if self.event_id else 'x',
-                                        self.contrib_id if self.contrib_id else 'x',
-                                        self.subcontrib_id if self.subcontrib_id else 'x')
+        ref_repr = '{}.{}.{}.{}.{}'.format(self.category_id if self.category_id else 'x',
+                                           self.event_id if self.event_id else 'x',
+                                           self.session_id if self.session_id else 'x',
+                                           self.contrib_id if self.contrib_id else 'x',
+                                           self.subcontrib_id if self.subcontrib_id else 'x')
         return format_repr(self, 'agent', 'id', 'type', 'change', _text=ref_repr)
 
     @classmethod
-    def create(cls, changes, ref):
-        """Creates a new change in all queues
+    def create(cls, changes, ref, excluded_categories=set()):
+        """Create a new change in all queues.
 
         :param changes: the change types, an iterable containing
                         :class:`ChangeType`
         :param ref: the object reference (returned by `obj_ref`)
                         of the changed object
+        :param excluded_categories: set of categories (IDs) whose items
+                                    will not be tracked
         """
         ref = dict(ref)
-        for agent in LiveSyncAgent.find():
-            for change in changes:
+        for change in changes:
+            obj = obj_deref(ref)
+            if isinstance(obj, Category):
+                if excluded_categories & {c.id for c in obj.chain_query}:
+                    continue
+            else:
+                event = obj if isinstance(obj, Event) else obj.event_new
+                if Event.query.filter(
+                        Event.id == event.id,
+                        Event.category_chain_overlaps(excluded_categories)).one_or_none():
+                    continue
+
+            for agent in LiveSyncAgent.find():
                 entry = cls(agent=agent, change=change, **ref)
                 db.session.add(entry)
+
         db.session.flush()
-
-    def iter_subentries(self):
-        """Iterates through all children
-
-        The only field of the yielded items that should be used are
-        `type`, `object` and `object_ref`.
-        """
-        if self.type not in {EntryType.category, EntryType.event, EntryType.contribution}:
-            return
-        if self.type == EntryType.category:
-            for event in self.object.iterAllConferences():
-                yield LiveSyncQueueEntry(change=self.change, **obj_ref(event))
-        elif self.type == EntryType.event:
-            for contrib in self.object.contributions:
-                yield LiveSyncQueueEntry(change=self.change, **obj_ref(contrib))
-        elif self.type == EntryType.contribution:
-            for subcontrib in self.object.subcontributions:
-                yield LiveSyncQueueEntry(change=self.change, **obj_ref(subcontrib))

@@ -87,7 +87,6 @@ class Uploader(object):
             self.logger.debug('Marking as processed: %s', record)
             record.processed = True
         db.session.commit()
-        transaction.abort()  # clear ZEO cache
 
 
 class MARCXMLUploader(Uploader):
