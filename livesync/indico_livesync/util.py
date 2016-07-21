@@ -20,12 +20,13 @@ from datetime import timedelta
 
 from werkzeug.datastructures import ImmutableDict
 
+from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from MaKaC.conference import Conference
 
 
 def obj_ref(obj):
@@ -35,8 +36,8 @@ def obj_ref(obj):
         ref = {'type': EntryType.category, 'category_id': obj.id}
     elif isinstance(obj, Event):
         ref = {'type': EntryType.event, 'event_id': obj.id}
-    elif isinstance(obj, Conference):
-        ref = {'type': EntryType.event, 'event_id': int(obj.id)}
+    elif isinstance(obj, Session):
+        ref = {'type': EntryType.session, 'session_id': obj.id}
     elif isinstance(obj, Contribution):
         ref = {'type': EntryType.contribution, 'contrib_id': obj.id}
     elif isinstance(obj, SubContribution):
@@ -46,34 +47,22 @@ def obj_ref(obj):
     return ImmutableDict(ref)
 
 
+@memoize_request
 def obj_deref(ref):
     """Returns the object identified by `ref`"""
     from indico_livesync.models.queue import EntryType
     if ref['type'] == EntryType.category:
-        return CategoryManager().getById(ref['category_id'], True)
+        return Category.get_one(ref['category_id'])
     elif ref['type'] == EntryType.event:
-        return Event.get(ref['event_id'])
+        return Event.get_one(ref['event_id'])
+    elif ref['type'] == EntryType.session:
+        return Session.get_one(ref['session_id'])
     elif ref['type'] == EntryType.contribution:
-        return Contribution.get(ref['contrib_id'])
+        return Contribution.get_one(ref['contrib_id'])
     elif ref['type'] == EntryType.subcontribution:
-        return SubContribution.get(ref['subcontrib_id'])
+        return SubContribution.get_one(ref['subcontrib_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
-
-
-def make_compound_id(ref):
-    """Returns the compound ID for the referenced object"""
-    from indico_livesync.models.queue import EntryType
-    if ref['type'] == EntryType.category:
-        raise ValueError('Compound IDs are not supported for categories')
-    obj = obj_deref(ref)
-    if isinstance(obj, Event):
-        return unicode(obj.id)
-    elif isinstance(obj, Contribution):
-        return '{}.{}'.format(obj.event_id, obj.id)
-    elif isinstance(obj, SubContribution):
-        return '{}.{}.{}'.format(obj.contribution.event_id, obj.contribution_id, obj.id)
-    raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
 
 def clean_old_entries():
@@ -91,25 +80,18 @@ def clean_old_entries():
 
 @memoize_request
 def get_excluded_categories():
-    """Get all excluded category IDs"""
+    """Get excluded category IDs."""
     from indico_livesync.plugin import LiveSyncPlugin
-    todo = {x['id'] for x in LiveSyncPlugin.settings.get('excluded_categories')}
-    excluded = set()
-    while todo:
-        category_id = todo.pop()
-        try:
-            category = CategoryManager().getById(category_id)
-        except KeyError:
-            continue
-        excluded.add(category.getId())
-        todo.update(category.subcategories)
-    return excluded
+    return {int(x['id']) for x in LiveSyncPlugin.settings.get('excluded_categories')}
 
 
-def is_ref_excluded(ref):
-    from indico_livesync.models.queue import EntryType
-    if ref['type'] == EntryType.category:
-        return ref['category_id'] in get_excluded_categories()
-    else:
-        obj = obj_deref(ref)
-        return unicode(obj.event_new.category_id) in {unicode(x) for x in get_excluded_categories()}
+def compound_id(obj):
+    """Generate a hierarchical compound ID, separated by dots."""
+    if isinstance(obj, (Category, Session)):
+        raise TypeError('Compound IDs are not supported for this entry type')
+    elif isinstance(obj, Event):
+        return unicode(obj.id)
+    elif isinstance(obj, Contribution):
+        return '{}.{}'.format(obj.event_id, obj.id)
+    elif isinstance(obj, SubContribution):
+        return '{}.{}.{}'.format(obj.contribution.event_id, obj.contribution_id, obj.id)

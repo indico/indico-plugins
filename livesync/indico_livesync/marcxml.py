@@ -23,19 +23,23 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
 
+from indico.modules.categories.models.categories import Category
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.events import Event
+
 from indico_livesync import SimpleChange
-from indico_livesync.models.queue import EntryType
-from indico_livesync.util import make_compound_id, obj_deref, obj_ref
+from indico_livesync.util import compound_id, obj_ref
 
 
 class MARCXMLGenerator:
-    """Generates MARCXML based on Indico objects"""
+    """Generate MARCXML based on Indico objects."""
 
     @classmethod
     def records_to_xml(cls, records):
         mg = MARCXMLGenerator()
-        for ref, change in records.iteritems():
-            mg.safe_add_object(ref, bool(change & SimpleChange.deleted))
+        for entry, change in records.iteritems():
+            mg.safe_add_object(entry, bool(change & SimpleChange.deleted))
         return mg.get_xml()
 
     @classmethod
@@ -55,44 +59,39 @@ class MARCXMLGenerator:
         aw.setUser(User.find_first(is_admin=True).as_avatar)
         self.output_generator = outputGenerator(aw, self.xml_generator)
 
-    def safe_add_object(self, ref, deleted=False):
+    def safe_add_object(self, obj, deleted=False):
         try:
-            self.add_object(ref, deleted)
+            self.add_object(obj, deleted)
         except Exception:
-            current_plugin.logger.exception('Could not process %s', ref)
+            current_plugin.logger.exception('Could not process %s', obj)
 
-    def add_object(self, ref, deleted=False):
+    def add_object(self, obj, deleted=False):
         if self.closed:
             raise RuntimeError('Cannot add object to closed xml generator')
         if deleted:
             xg = XMLGen(init=False)
             xg.openTag(b'record')
             xg.openTag(b'datafield', [[b'tag', b'970'], [b'ind1', b' '], [b'ind2', b' ']])
-            xg.writeTag(b'subfield', b'INDICO.{}'.format(make_compound_id(ref)), [[b'code', b'a']])
+            xg.writeTag(b'subfield', b'INDICO.{}'.format(compound_id(obj)), [[b'code', b'a']])
             xg.closeTag(b'datafield')
             xg.openTag(b'datafield', [[b'tag', b'980'], [b'ind1', b' '], [b'ind2', b' ']])
             xg.writeTag(b'subfield', b'DELETED', [[b'code', b'c']])
             xg.closeTag(b'datafield')
             xg.closeTag(b'record')
             self.xml_generator.xml += xg.xml
-        elif ref['type'] in {EntryType.event, EntryType.contribution, EntryType.subcontribution}:
-            obj = obj_deref(ref)
-            if obj is None:
-                raise ValueError('Cannot add deleted object')
-            elif isinstance(obj, Category) and not obj.getOwner():
-                raise ValueError('Cannot add object without owner: {}'.format(obj))
+        elif isinstance(obj, (Event, Contribution, SubContribution)):
             if obj.is_deleted or obj.event_new.is_deleted:
                 pass
-            elif ref['type'] == EntryType.event:
+            elif isinstance(obj, Event):
                 self.xml_generator.xml += self._event_to_marcxml(obj)
-            elif ref['type'] == EntryType.contribution:
+            elif isinstance(obj, Contribution):
                 self.xml_generator.xml += self._contrib_to_marcxml(obj)
-            elif ref['type'] == EntryType.subcontribution:
+            elif isinstance(obj, SubContribution):
                 self.xml_generator.xml += self._subcontrib_to_marcxml(obj)
-        elif ref['type'] == EntryType.category:
+        elif isinstance(obj, Category):
             pass  # we don't send category updates
         else:
-            raise ValueError('unknown object ref: {}'.format(ref['type']))
+            raise ValueError('unknown object ref: {}'.format(obj))
         return self.xml_generator.getXml()
 
     def get_xml(self):

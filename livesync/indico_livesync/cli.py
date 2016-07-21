@@ -23,8 +23,8 @@ from terminaltables import AsciiTable
 
 from indico.core.db import db, DBMgr
 from indico.core.db.sqlalchemy.util.session import update_session_options
-from indico.util.console import cformat, conferenceHolderIterator
-from MaKaC.conference import ConferenceHolder
+from indico.modules.events.models.events import Event
+from indico.util.console import cformat
 
 from indico_livesync.models.agents import LiveSyncAgent
 
@@ -83,22 +83,13 @@ def initial_export(agent_id, force=False):
         print cformat('To re-run it, use %{yellow!}--force%{reset}')
         return
 
-    def _iter_events():
-        for i, (_, event) in enumerate(conferenceHolderIterator(ConferenceHolder(), deepness='event'), 1):
-            yield event
-            if i % 1000 == 0:
-                # Clean local ZEO cache
-                transaction.abort()
-
-    with DBMgr.getInstance().global_connection():
-        agent.create_backend().run_initial_export(_iter_events())
-
+    agent.create_backend().run_initial_export(Event.find(is_deleted=False))
     agent.initial_data_exported = True
     db.session.commit()
 
 
 @cli_manager.option('agent_id')
-@cli_manager.option('--force', action='store_true')
+@cli_manager.option('--force', action='store_true', help="Run even if initial export was not done")
 def run(agent_id, force=False):
     """Runs the livesync agent"""
     update_session_options(db)
