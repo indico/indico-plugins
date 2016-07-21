@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import itertools
 from collections import defaultdict
+
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db

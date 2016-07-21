@@ -249,18 +249,19 @@ class LiveSyncQueueEntry(db.Model):
                                     will not be tracked
         """
         ref = dict(ref)
-        for change in changes:
-            obj = obj_deref(ref)
-            if isinstance(obj, Category):
-                if excluded_categories & {c.id for c in obj.chain_query}:
-                    continue
-            else:
-                event = obj if isinstance(obj, Event) else obj.event_new
-                if Event.query.filter(
-                        Event.id == event.id,
-                        Event.category_chain_overlaps(excluded_categories)).one_or_none():
-                    continue
+        obj = obj_deref(ref)
 
+        if isinstance(obj, Category):
+            if excluded_categories & {c.id for c in obj.chain_query}:
+                return
+        else:
+            event = obj if isinstance(obj, Event) else obj.event_new
+            if (Event.query
+                    .filter(Event.id == event.id, Event.category_chain_overlaps(excluded_categories))
+                    .one_or_none()):
+                return
+
+        for change in changes:
             for agent in LiveSyncAgent.find():
                 entry = cls(agent=agent, change=change, **ref)
                 db.session.add(entry)
