@@ -22,7 +22,6 @@ from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii, format_repr
 from indico.util.struct.enum import IndicoEnum
-from MaKaC.conference import CategoryManager
 
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import obj_deref, obj_ref

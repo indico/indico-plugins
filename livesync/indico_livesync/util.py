@@ -25,7 +25,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from MaKaC.conference import Category, CategoryManager, Conference
+from MaKaC.conference import Conference
 
 
 def obj_ref(obj):

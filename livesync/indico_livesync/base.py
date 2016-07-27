@@ -21,7 +21,6 @@ from flask_pluginengine import depends, trim_docstring
 from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
-from MaKaC.conference import CategoryManager
 
 from indico_livesync.forms import AgentForm
 from indico_livesync.models.queue import LiveSyncQueueEntry

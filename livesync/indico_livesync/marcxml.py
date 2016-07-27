@@ -22,7 +22,6 @@ from indico.modules.users import User
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.conference import Category
 
 from indico_livesync import SimpleChange
 from indico_livesync.models.queue import EntryType

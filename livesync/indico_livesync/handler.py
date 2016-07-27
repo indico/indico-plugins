@@ -29,8 +29,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
 from indico.util.event import unify_event_args
-from MaKaC.accessControl import AccessController
-from MaKaC.conference import Category, Conference
+from MaKaC.conference import Conference
 
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 from indico_livesync.util import obj_ref, is_ref_excluded
