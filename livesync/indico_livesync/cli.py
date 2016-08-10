@@ -66,7 +66,7 @@ def agents():
 
 
 @cli_manager.option('agent_id')
-@cli_manager.option('--force', action='store_true')
+@cli_manager.option('--force', action='store_true', help="Perform export even if it has already been done once.")
 def initial_export(agent_id, force=False):
     """Performs the initial data export for an agent"""
     update_session_options(db)
