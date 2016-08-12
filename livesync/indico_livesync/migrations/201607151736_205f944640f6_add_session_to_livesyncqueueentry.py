@@ -39,7 +39,7 @@ def upgrade():
                                'AND subcontribution_id IS NULL AND event_id IS NOT NULL)',
                                schema='plugin_livesync')
     op.create_check_constraint('valid_session_entry', 'queues',
-                               'type != 5 OR (category_id IS NULL AND event_id IS NULL AND contribution_id IS NULL '
+                               'type != 5 OR (category_id IS NULL AND contribution_id IS NULL AND event_id IS NULL '
                                'AND subcontribution_id IS NULL AND session_id IS NOT NULL)',
                                schema='plugin_livesync')
     op.create_check_constraint('valid_contribution_entry', 'queues',
@@ -47,8 +47,8 @@ def upgrade():
                                'subcontribution_id IS NULL AND contribution_id IS NOT NULL)',
                                schema='plugin_livesync')
     op.create_check_constraint('valid_subcontribution_entry', 'queues',
-                               'type != 4 OR (category_id IS NULL AND contribution_id IS NULL AND session_id IS NULL '
-                               'AND event_id IS NULL AND subcontribution_id IS NOT NULL)',
+                               'type != 4 OR (category_id IS NULL AND contribution_id IS NULL AND event_id IS NULL AND '
+                               'session_id IS NULL AND subcontribution_id IS NOT NULL)',
                                schema='plugin_livesync')
 
 
