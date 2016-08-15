@@ -43,7 +43,7 @@ class PiwikPlugin(IndicoPlugin):
     track_script = 'piwik.php'
 
     default_settings = {
-        'enabled': True,
+        'enabled': False,
         'enabled_for_events': True,
         'enabled_for_downloads': True,
         'cache_enabled': True,
