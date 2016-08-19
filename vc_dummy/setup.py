@@ -31,8 +31,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'indico>=1.9.2',
-        'sleekxmpp'
+        'indico>=1.9.2'
     ],
     classifiers=[
         'Environment :: Plugins',
