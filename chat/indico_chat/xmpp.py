@@ -18,16 +18,23 @@ from __future__ import unicode_literals
 
 import posixpath
 import re
+import sys
 
 import requests
 from flask import current_app
 from flask_pluginengine import current_plugin
 from requests.exceptions import RequestException
-from sleekxmpp import ClientXMPP
-from sleekxmpp.exceptions import IqError
 
 from indico.util.string import unicode_to_ascii
 from indico_chat.util import check_config
+
+
+# XXX: SleekXMPP sets the default encoding to UTF8. We don't want that!
+sys.setdefaultencoding = lambda x: None
+from sleekxmpp import ClientXMPP
+from sleekxmpp.exceptions import IqError
+del sys.setdefaultencoding
+
 
 INVALID_JID_CHARS = re.compile(r'[^-!#()*+,.=^_a-z0-9]')
 WHITESPACE = re.compile(r'\s+')
