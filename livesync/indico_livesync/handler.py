@@ -22,7 +22,6 @@ from flask import g
 from sqlalchemy import inspect
 
 from indico.core import signals
-from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
