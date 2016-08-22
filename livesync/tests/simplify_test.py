@@ -40,7 +40,7 @@ def queue_entry_dummy_object(monkeypatch):
 @pytest.mark.usefixtures('queue_entry_dummy_object')
 def test_process_records_category_ignored(mocker, change, invalid):
     """Test if categories are only kepy for certain changes"""
-    cascade = mocker.patch('indico_livesync.simplify._process_cascaded')
+    cascade = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
     cascade.return_value = [object()]
     records = [LiveSyncQueueEntry(change=change, type=EntryType.category)]
     if invalid:
@@ -62,7 +62,7 @@ def test_process_records_category_ignored(mocker, change, invalid):
 @pytest.mark.usefixtures('queue_entry_dummy_object')
 def test_process_records_cascade(mocker, change, cascade):
     """Test if certain changes cascade to child elements"""
-    cascade_mock = mocker.patch('indico_livesync.simplify._process_cascaded')
+    cascade_mock = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
     records = [LiveSyncQueueEntry(change=change)]
     process_records(records)
     assert cascade_mock.call_args == (({records[0]} if cascade else set(),),)
