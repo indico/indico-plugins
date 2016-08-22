@@ -44,7 +44,8 @@ def process_records(records):
     :return: a dict mapping object references to `SimpleChange` bitsets
     """
     changes = defaultdict(int)
-    cascaded_records = set()
+    cascaded_update_records = set()
+    cascaded_delete_records = set()
 
     for record in records:
         if record.change != ChangeType.deleted and record.object is None:
@@ -57,14 +58,18 @@ def process_records(records):
         elif record.change == ChangeType.deleted:
             assert record.type != EntryType.category
             changes[record.object] |= SimpleChange.deleted
+            cascaded_delete_records.add(record)
         elif record.change in {ChangeType.moved, ChangeType.protection_changed}:
-            cascaded_records.add(record)
+            cascaded_update_records.add(record)
         elif record.change == ChangeType.data_changed:
             assert record.type != EntryType.category
             changes[record.object] |= SimpleChange.updated
 
-    for obj in _process_cascaded(cascaded_records):
+    for obj in _process_cascaded(cascaded_update_records):
         changes[obj] |= SimpleChange.updated
+
+    for obj in _process_cascaded(cascaded_delete_records):
+        changes[obj] |= SimpleChange.deleted
 
     return changes
 
