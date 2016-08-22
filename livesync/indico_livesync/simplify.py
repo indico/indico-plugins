@@ -82,8 +82,8 @@ def _process_cascaded(records):
 
     event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
     session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
-    contribution_records = {rec.contribution_id for rec in records if rec.type == EntryType.contribution}
-    subcontribution_records = {rec.subcontribution_id for rec in records if rec.type == EntryType.subcontribution}
+    contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
+    subcontribution_records = {rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution}
 
     changed_events = set()
     changed_contributions = set()
