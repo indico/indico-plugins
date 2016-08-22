@@ -57,7 +57,6 @@ def process_records(records):
             changes[record.object] |= SimpleChange.created
         elif record.change == ChangeType.deleted:
             assert record.type != EntryType.category
-            changes[record.object] |= SimpleChange.deleted
             cascaded_delete_records.add(record)
         elif record.change in {ChangeType.moved, ChangeType.protection_changed}:
             cascaded_update_records.add(record)
@@ -65,29 +64,30 @@ def process_records(records):
             assert record.type != EntryType.category
             changes[record.object] |= SimpleChange.updated
 
-    for obj in _process_cascaded(cascaded_update_records):
+    for obj in _process_cascaded_category_contents(cascaded_update_records):
         changes[obj] |= SimpleChange.updated
 
-    for obj in _process_cascaded(cascaded_delete_records):
+    for obj in _process_cascaded_event_contents(cascaded_delete_records):
         changes[obj] |= SimpleChange.deleted
 
     return changes
 
 
-def _process_cascaded(records):
+def _process_cascaded_category_contents(records):
+    """
+    Travel from categories to subcontributions, flattening the whole event structure.
+
+    Yields everything that it finds (except for elements whose protection has changed
+    but are not inheriting their protection settings from anywhere).
+
+    :param records: queue records to process
+    """
     category_prot_records = {rec.category_id for rec in records if rec.type == EntryType.category
                              and rec.change == ChangeType.protection_changed}
     category_move_records = {rec.category_id for rec in records if rec.type == EntryType.category
                              and rec.change == ChangeType.moved}
 
-    event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
-    session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
-    contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
-    subcontribution_records = {rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution}
-
     changed_events = set()
-    changed_contributions = set()
-    changed_subcontributions = set()
 
     category_prot_records -= category_move_records  # A move already implies sending the whole record
 
@@ -106,6 +106,30 @@ def _process_cascaded(records):
     # Add move operations and explicitly-passed event records
     if category_move_records:
         changed_events.update(Event.find(Event.category_chain_overlaps(category_move_records)))
+
+    for elem in _process_cascaded_event_contents(records, additional_events=changed_events):
+        yield elem
+
+
+def _process_cascaded_event_contents(records, additional_events=None):
+    """
+    Flatten a series of records into its most basic elements (subcontribution level).
+
+    Yields results.
+
+    :param records: queue records to process
+    :param additional_events: events whose content will be included in addition to those
+                              found in records
+    """
+    changed_events = additional_events or set()
+    changed_contributions = set()
+    changed_subcontributions = set()
+
+    session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
+    contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
+    subcontribution_records = {rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution}
+    event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
+
     if event_records:
         changed_events.update(Event.find(Event.id.in_(event_records)))
 
