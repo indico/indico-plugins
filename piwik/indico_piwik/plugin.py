@@ -99,10 +99,10 @@ class PiwikPlugin(IndicoPlugin):
             return
         if attachment.type == AttachmentType.link:
             resource_url = attachment.link_url
-            resource_title = 'Link - {0.title}'.format(attachment)
+            resource_title = u'Link - {0.title}'.format(attachment)
         else:
             resource_url = request.base_url
-            resource_title = 'Download - {0.title}'.format(attachment)
+            resource_title = u'Download - {0.title}'.format(attachment)
         track_download_request.delay(resource_url, resource_title)
 
     def _extend_indico_help(self, sender, **kwargs):
