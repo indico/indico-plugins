@@ -41,7 +41,7 @@ def track_download_request(download_url, download_title):
     dt = datetime.now()
     request.call(idsite=request.site_id,
                  rec=1,
-                 action_name=quote(download_title),
+                 action_name=quote(download_title.encode('utf-8')),
                  url=action_url,
                  download=action_url,
                  h=dt.hour, m=dt.minute, s=dt.second)
