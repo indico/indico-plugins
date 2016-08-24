@@ -79,4 +79,4 @@ class PiwikRequest(object):
         except Exception:
             current_plugin.logger.exception("Unable to connect")
             return default_response
-        return response.text
+        return response.content
