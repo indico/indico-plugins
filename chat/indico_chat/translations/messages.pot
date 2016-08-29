@@ -1,251 +1,258 @@
 # Translations template for PROJECT.
-# Copyright (C) 2015 ORGANIZATION
+# Copyright (C) 2016 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-04-01 10:56+0200\n"
+"POT-Creation-Date: 2016-08-29 10:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.3.4\n"
 
-#: indico_chat/forms.py:36 indico_chat/templates/manage_event.html:13
+#: indico_chat/forms.py:34
+msgid "Available chatrooms"
+msgstr ""
+
+#: indico_chat/forms.py:41 indico_chat/templates/manage_event.html:13
 msgid "Name"
 msgstr ""
 
-#: indico_chat/forms.py:36
+#: indico_chat/forms.py:41
 msgid "The name of the room"
 msgstr ""
 
-#: indico_chat/forms.py:37 indico_chat/templates/event_header.html:36
+#: indico_chat/forms.py:42 indico_chat/templates/event_header.html:36
 #: indico_chat/templates/event_page.html:34
 #: indico_chat/templates/manage_event.html:57
 msgid "Description"
 msgstr ""
 
-#: indico_chat/forms.py:37
+#: indico_chat/forms.py:42
 msgid "The description of the room"
 msgstr ""
 
-#: indico_chat/forms.py:38 indico_chat/templates/event_header.html:40
+#: indico_chat/forms.py:43 indico_chat/templates/event_header.html:40
 #: indico_chat/templates/event_page.html:38
 #: indico_chat/templates/manage_event.html:63
 #: indico_chat/templates/manage_event.html:65
 msgid "Password"
 msgstr ""
 
-#: indico_chat/forms.py:38
+#: indico_chat/forms.py:43
 msgid "An optional password required to join the room"
 msgstr ""
 
-#: indico_chat/forms.py:40 indico_chat/templates/event_header.html:45
+#: indico_chat/forms.py:45 indico_chat/templates/event_header.html:45
 #: indico_chat/templates/event_page.html:43
 #: indico_chat/templates/manage_event.html:60
 msgid "Hidden"
 msgstr ""
 
-#: indico_chat/forms.py:40
+#: indico_chat/forms.py:45
 msgid "Hides the room on public event pages."
 msgstr ""
 
-#: indico_chat/forms.py:41
+#: indico_chat/forms.py:46
 msgid "Show password"
 msgstr ""
 
-#: indico_chat/forms.py:41
+#: indico_chat/forms.py:46
 msgid "Shows the room password on public event pages."
 msgstr ""
 
-#: indico_chat/forms.py:45
+#: indico_chat/forms.py:50
 msgid "Use custom server"
 msgstr ""
 
-#: indico_chat/forms.py:46
+#: indico_chat/forms.py:51
 msgid "Custom server"
 msgstr ""
 
-#: indico_chat/forms.py:49
+#: indico_chat/forms.py:54
 msgid "External Jabber server."
 msgstr ""
 
-#: indico_chat/forms.py:54
+#: indico_chat/forms.py:59
 msgid ""
 "Check in case you want to use an external Jabber server and not the "
 "default one ({0})."
 msgstr ""
 
-#: indico_chat/forms.py:62
+#: indico_chat/forms.py:67
 msgid "Could not convert name to a jabber ID"
 msgstr ""
 
-#: indico_chat/forms.py:64
+#: indico_chat/forms.py:69
 msgid "A room with this name already exists"
 msgstr ""
 
-#: indico_chat/forms.py:68
+#: indico_chat/forms.py:73
 msgid "A room with this name/JID already exists on the Jabber server ({0})"
 msgstr ""
 
-#: indico_chat/plugin.py:47
+#: indico_chat/plugin.py:45
 msgid "Administrators"
 msgstr ""
 
-#: indico_chat/plugin.py:47
-msgid "Users who can manage chatrooms for all events"
+#: indico_chat/plugin.py:46
+msgid "List of users/groups who can manage chatrooms for all events"
 msgstr ""
 
-#: indico_chat/plugin.py:48
+#: indico_chat/plugin.py:47
 msgid "XMPP server"
 msgstr ""
 
-#: indico_chat/plugin.py:48
+#: indico_chat/plugin.py:47
 msgid "The hostname of the XMPP server"
 msgstr ""
 
-#: indico_chat/plugin.py:49
+#: indico_chat/plugin.py:48
 msgid "XMPP MUC server"
 msgstr ""
 
-#: indico_chat/plugin.py:50
+#: indico_chat/plugin.py:49
 msgid "The hostname of the XMPP MUC server"
 msgstr ""
 
-#: indico_chat/plugin.py:51
+#: indico_chat/plugin.py:50
 msgid "Bot JID"
 msgstr ""
 
-#: indico_chat/plugin.py:52
+#: indico_chat/plugin.py:51
 msgid ""
 "Jabber ID of the XMPP bot. Can be just a username (in that case the "
 "default server is assumed) or a username@server."
 msgstr ""
 
-#: indico_chat/plugin.py:54
+#: indico_chat/plugin.py:53
 msgid "Bot Password"
 msgstr ""
 
-#: indico_chat/plugin.py:55
+#: indico_chat/plugin.py:54
 msgid "Password for the bot"
 msgstr ""
 
-#: indico_chat/plugin.py:56
-msgid "Notify admins"
-msgstr ""
-
-#: indico_chat/plugin.py:57
-msgid "Should chat administrators receive email notifications?"
-msgstr ""
-
-#: indico_chat/plugin.py:58
+#: indico_chat/plugin.py:55
 msgid "Notification emails"
 msgstr ""
 
-#: indico_chat/plugin.py:59
-msgid "Additional email addresses to sent notifications to (one per line)"
+#: indico_chat/plugin.py:56
+msgid "Email addresses to sent notifications to (one per line)"
 msgstr ""
 
-#: indico_chat/plugin.py:60
+#: indico_chat/plugin.py:57
 msgid "Log URL"
 msgstr ""
 
-#: indico_chat/plugin.py:60
+#: indico_chat/plugin.py:57
 msgid ""
 "You can set this to the URL of the <a href=\"https://github.com/indico"
 "/jabber-logs/\">jabber-logs app</a>, running on the jabber server to let "
 "event managers can retrieve chat logs for rooms on that server."
 msgstr ""
 
-#: indico_chat/plugin.py:64
+#: indico_chat/plugin.py:61
 msgid "Chatroom links"
 msgstr ""
 
-#: indico_chat/plugin.py:65
+#: indico_chat/plugin.py:62
+msgid "Title"
+msgstr ""
+
+#: indico_chat/plugin.py:63
+msgid "Link"
+msgstr ""
+
+#: indico_chat/plugin.py:64
 msgid ""
 "Links to join the chatroom. You can use the placeholders {room} for the "
 "room name and {server} for the MUC server."
 msgstr ""
 
-#: indico_chat/plugin.py:67
+#: indico_chat/plugin.py:66
 msgid "How to connect"
 msgstr ""
 
-#: indico_chat/plugin.py:68
+#: indico_chat/plugin.py:67
 msgid "Text shown below the chatrooms on an event page"
 msgstr ""
 
-#: indico_chat/plugin.py:73
+#: indico_chat/plugin.py:72
 msgid "All fields must contain a value."
 msgstr ""
 
-#: indico_chat/plugin.py:131
+#: indico_chat/plugin.py:127
 msgid "Chat Guides"
 msgstr ""
 
-#: indico_chat/plugin.py:132
+#: indico_chat/plugin.py:128
 msgid "Chat User Guide"
 msgstr ""
 
-#: indico_chat/plugin.py:135
+#: indico_chat/plugin.py:131
 msgid "Recommended Chat Clients"
 msgstr ""
 
-#: indico_chat/plugin.py:177
+#: indico_chat/plugin.py:138 indico_chat/templates/event_page.html:1
+#: indico_chat/templates/manage_event.html:4
+#: indico_chat/templates/manage_event_edit.html:5
+#: indico_chat/templates/manage_event_logs.html:4
+msgid "Chat Rooms"
+msgstr ""
+
+#: indico_chat/plugin.py:163
 msgid "Chatrooms"
 msgstr ""
 
-#: indico_chat/util.py:35
+#: indico_chat/util.py:33
 msgid "Chat plugin is not configured properly"
 msgstr ""
 
-#: indico_chat/controllers/base.py:35 indico_chat/controllers/event.py:36
-msgid "This page is not available for legacy events."
-msgstr ""
-
-#: indico_chat/controllers/logs.py:45
+#: indico_chat/controllers/logs.py:49
 msgid "There are no logs available for this room."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:78
+#: indico_chat/controllers/logs.py:82
 msgid "Could not find any logs for the given timeframe."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:80
+#: indico_chat/controllers/logs.py:84
 msgid "Could not find any logs for the chatroom."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:96
+#: indico_chat/controllers/logs.py:100
 msgid "No logs found"
 msgstr ""
 
-#: indico_chat/controllers/management.py:72
+#: indico_chat/controllers/management.py:82
 msgid "Chatroom updated"
 msgstr ""
 
-#: indico_chat/controllers/management.py:93
+#: indico_chat/controllers/management.py:105
 msgid "Unexpected result from Jabber server"
 msgstr ""
 
-#: indico_chat/controllers/management.py:120
+#: indico_chat/controllers/management.py:138
 msgid "Chatroom created"
 msgstr ""
 
-#: indico_chat/controllers/management.py:136
+#: indico_chat/controllers/management.py:155
 msgid "Chatroom added"
 msgstr ""
 
-#: indico_chat/controllers/management.py:152
+#: indico_chat/controllers/management.py:173
 msgid "Chatroom deleted"
 msgstr ""
 
-#: indico_chat/controllers/management.py:154
+#: indico_chat/controllers/management.py:175
 msgid "Chatroom removed from event"
 msgstr ""
 
@@ -273,13 +280,6 @@ msgstr ""
 
 #: indico_chat/templates/event_header.html:59
 msgid "How to connect to the chat"
-msgstr ""
-
-#: indico_chat/templates/event_page.html:1
-#: indico_chat/templates/manage_event.html:4
-#: indico_chat/templates/manage_event_edit.html:5
-#: indico_chat/templates/manage_event_logs.html:4
-msgid "Chat Rooms"
 msgstr ""
 
 #: indico_chat/templates/manage_event.html:8
@@ -331,11 +331,7 @@ msgstr ""
 msgid "Add existing chat room"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:100
-msgid "Available chatrooms"
-msgstr ""
-
-#: indico_chat/templates/manage_event.html:110
+#: indico_chat/templates/manage_event.html:101
 msgid "Attach existing room"
 msgstr ""
 
@@ -351,7 +347,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: indico_chat/templates/manage_event_edit.html:28
+#: indico_chat/templates/manage_event_edit.html:29
 msgid "Cancel"
 msgstr ""
 
