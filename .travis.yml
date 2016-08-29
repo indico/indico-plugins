@@ -18,7 +18,7 @@ install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
   - python setup.py develop
 script:
-  - py.test
+  - pytest
 notifications:
   email: false
   irc:

@@ -2,6 +2,6 @@
 
 for dir in $(find -name pytest.ini -exec dirname {} \;); do
     pushd "$dir" >/dev/null
-    py.test "$@"
+    pytest "$@"
     popd >/dev/null
 done
