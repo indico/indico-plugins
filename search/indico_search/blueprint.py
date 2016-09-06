@@ -23,8 +23,8 @@ from indico_search.controllers import RHSearch, RHSearchCategoryTitles
 
 blueprint = IndicoPluginBlueprint('search', 'indico_search')
 
-blueprint.add_url_rule('/search', 'search', RHSearch, methods=('GET', 'POST'))
-blueprint.add_url_rule('/category/<int:category_id>/search', 'search', RHSearch, methods=('GET', 'POST'))
-blueprint.add_url_rule('/event/<confId>/search', 'search', RHSearch, methods=('GET', 'POST'))
+blueprint.add_url_rule('/search', 'search', RHSearch)
+blueprint.add_url_rule('/category/<int:category_id>/search', 'search', RHSearch)
+blueprint.add_url_rule('/event/<confId>/search', 'search', RHSearch)
 
 blueprint.add_url_rule('/category/search-titles', 'category_names', RHSearchCategoryTitles)

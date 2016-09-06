@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import request
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import StringField, SelectField
 from wtforms.validators import Optional
@@ -38,3 +39,6 @@ class SearchForm(IndicoForm):
     field = SelectField(_('Search in'), choices=FIELD_CHOICES, default='')
     start_date = DateField('Start Date', [Optional()], parse_kwargs={'dayfirst': True})
     end_date = DateField('End Date', [Optional()], parse_kwargs={'dayfirst': True})
+
+    def is_submitted(self):
+        return 'search-phrase' in request.args
