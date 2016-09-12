@@ -1,7 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_row, form_footer  %}
 
-{% block title %}{% trans %}Chat Rooms{% endtrans %}{% endblock %}
 {% block content %}
     <div class="plugin-chat chat-mgmt" style="margin-bottom: 2em;">
         {% if event_chatrooms %}
@@ -27,7 +26,13 @@
                                         {% if logs_enabled and not chatroom.custom_server %}
                                             <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}" class="i-button icon-file-content" title="{% trans %}Logs{% endtrans %}"></a>
                                         {% endif %}
-                                        <a href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}" class="i-button icon-edit" title="{%- trans %}Edit{% endtrans -%}"></a>
+                                        <a href="#" class="i-button icon-edit"
+                                           title="{% trans %}Edit{% endtrans %}"
+                                           data-href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}"
+                                           data-title="{% trans %}Edit chatroom{% endtrans %}"
+                                           data-ajax-dialog
+                                           data-reload-after>
+                                        </a>
                                         {% if not chatroom.custom_server %}
                                             <a href="#" class="i-button icon-loop js-chat-refresh-room" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}" title="{% trans %}Refresh{% endtrans %}"></a>
                                         {% endif %}
@@ -88,7 +93,13 @@
                 <div class="message-text">{% trans %}No chatrooms have been added yet.{% endtrans %}</div>
             </div>
         {% endif %}
-        <a class="i-button bottom icon-plus" href="{{ url_for_plugin('.manage_rooms_create', event) }}">{% trans %}Create new room{% endtrans %}</a>
+        <a class="i-button bottom icon-plus"
+           data-href="{{ url_for_plugin('.manage_rooms_create', event) }}"
+           data-title="{% trans %}Create chatroom{% endtrans %}"
+           data-ajax-dialog
+           data-reload-after>
+            {%- trans %}Create new room{% endtrans -%}
+        </a>
     </div>
 
     {% if attach_form %}

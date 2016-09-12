@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session, flash, redirect, jsonify
-from flask_pluginengine import current_plugin
+from flask_pluginengine import current_plugin, render_plugin_template
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
@@ -27,6 +27,7 @@ from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_template
 
 from indico_chat import _
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
@@ -82,10 +83,9 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             flash(_('Chatroom updated'), 'success')
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
                            'Chatroom updated: {}'.format(self.chatroom.name), session.user)
-            return redirect(url_for_plugin('.manage_rooms', self.event))
-        return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form,
-                                               event_chatroom=self.event_chatroom, event=self.event)
-
+            return jsonify_data(flash=False)
+        return jsonify_template('manage_event_edit.html', render_plugin_template, form=form,
+                                event=self.event, event_chatroom=self.event_chatroom)
 
 class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
     """Synchronizes the local chatroom data with the XMPP server"""
@@ -136,8 +136,8 @@ class RHChatManageEventCreate(RHChatManageEventBase):
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
                            'Chatroom created: {}'.format(chatroom.name), session.user)
             flash(_('Chatroom created'), 'success')
-            return redirect(url_for_plugin('.manage_rooms', self.event))
-        return WPChatEventMgmt.render_template('manage_event_edit.html', self._conf, form=form, event=self.event)
+            return jsonify_data(flash=False)
+        return jsonify_template('manage_event_edit.html', render_plugin_template, form=form, event=self.event)
 
 
 class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
