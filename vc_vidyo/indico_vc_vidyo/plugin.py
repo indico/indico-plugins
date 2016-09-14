@@ -203,8 +203,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
             else:
                 # get room back, in order to fetch Vidyo-set parameters
-                created_room = client.find_room(extension)[0]
+                created_room = client.find_room(extension)
 
+                if not created_room:
+                    raise VCRoomNotFoundError(_("This room doesnt exist in Vidyo"))
                 vc_room.data.update({
                     'vidyo_id': unicode(created_room.roomID),
                     'url': created_room.RoomMode.roomURL,
