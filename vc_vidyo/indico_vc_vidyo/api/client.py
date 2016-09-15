@@ -77,6 +77,7 @@ class AdminClient(ClientBase):
 
     @raises_api_error
     def find_room(self, extension):
+        from indico_vc_vidyo.plugin import VidyoPlugin
         filter_ = self.client.factory.create('Filter')
         filter_.query = extension
         filter_.limit = 40
@@ -84,23 +85,20 @@ class AdminClient(ClientBase):
 
         target_room = None
         counter = 0
-        from indico_vc_vidyo.plugin import VidyoPlugin
+
         while True:
-            filter_.start = (counter*filter_.limit)
-            VidyoPlugin.logger.warning('filter is: %s', filter_.start)
+            filter_.start = counter*filter_.limit
             rooms = self.soap.getRooms(filter_).room
             for room in rooms:
-                if (int(room.extension) == int(extension)):
-                    VidyoPlugin.logger.info('Room: %s has been found.', room)
+                if int(room.extension) == int(extension):
+                    VidyoPlugin.logger.debug('Room: %s has been found.', room)
                     target_room = room
                     break
                 else:
-                    VidyoPlugin.logger.info('Dismissing room extension %s', room.extension)
-            if not target_room:
-                counter += 1
-            else:
-                break
-        return target_room
+                    VidyoPlugin.logger.debug('Dismissing room extension %s', room.extension)
+            if target_room:
+                return target_room
+            counter += 1
 
     @raises_api_error
     def get_room(self, vidyo_id):

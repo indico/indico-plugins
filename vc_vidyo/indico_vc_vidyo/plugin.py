@@ -206,7 +206,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 created_room = client.find_room(extension)
 
                 if not created_room:
-                    raise VCRoomNotFoundError(_("This room doesnt exist in Vidyo"))
+                    raise VCRoomNotFoundError(_("Could not find newly created room in Vidyo"))
                 vc_room.data.update({
                     'vidyo_id': unicode(created_room.roomID),
                     'url': created_room.RoomMode.roomURL,
