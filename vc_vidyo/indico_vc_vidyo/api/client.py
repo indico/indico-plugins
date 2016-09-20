@@ -83,7 +83,6 @@ class AdminClient(ClientBase):
         filter_.limit = 40
         filter_.dir = 'DESC'
 
-        target_room = None
         counter = 0
 
         while True:
@@ -98,7 +97,6 @@ class AdminClient(ClientBase):
                 else:
                     VidyoPlugin.logger.debug('Dismissing room extension %s', room.extension)
                 counter += 1
-
 
     @raises_api_error
     def get_room(self, vidyo_id):
