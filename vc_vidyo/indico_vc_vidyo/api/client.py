@@ -88,17 +88,17 @@ class AdminClient(ClientBase):
 
         while True:
             filter_.start = counter*filter_.limit
-            rooms = self.soap.getRooms(filter_).room
-            for room in rooms:
+            response = self.soap.getRooms(filter_)
+            if response.total == 0:
+                return None
+            for room in response.room:
                 if int(room.extension) == int(extension):
                     VidyoPlugin.logger.debug('Room: %s has been found.', room)
-                    target_room = room
-                    break
+                    return room
                 else:
                     VidyoPlugin.logger.debug('Dismissing room extension %s', room.extension)
-            if target_room:
-                return target_room
-            counter += 1
+                counter += 1
+
 
     @raises_api_error
     def get_room(self, vidyo_id):
