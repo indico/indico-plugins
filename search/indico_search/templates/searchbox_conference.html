@@ -1,9 +1,11 @@
 {% from 'forms/_form.html' import form_header, form_footer %}
 
-<div class="confSearchBox">
-    {{ form_header(form, method='get', action=url_for_plugin('search.search', event), classes='UIForm', i_form=false) }}
-        <input class="searchButton" type="submit" value="{% trans %}Search{% endtrans %}">
-        {{ form.phrase(class_='searchField', id='conference-search-phrase') }}
-        {% block extra_fields %}{% endblock %}
-    {{ form_footer(form, i_form=false) }}
-</div>
+{{ form_header(form, method='get', action=url_for_plugin('search.search', event), i_form=false) }}
+    <div class="toolbar thin f-j-end">
+        <div class="group">
+            {{ form.phrase(id='conference-search-phrase', placeholder=_("Search...")) }}
+            <button class="i-button highlight text-color color-on-hover icon-search" type="submit"></button>
+            {% block extra_fields %}{% endblock %}
+        </div>
+    </div>
+{{ form_footer(form, i_form=false) }}
