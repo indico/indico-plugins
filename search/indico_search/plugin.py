@@ -37,7 +37,7 @@ class SearchPlugin(IndicoPlugin):
     def init(self):
         super(SearchPlugin, self).init()
         self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
-        self.template_hook('conference-header', self._add_conference_search_box)
+        self.template_hook('conference-header-right-column', self._add_conference_search_box)
         self.template_hook('page-header', self._add_category_search_box)
         self.inject_js('search_js')
         self.inject_css('search_css')
