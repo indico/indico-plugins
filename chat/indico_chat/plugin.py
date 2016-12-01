@@ -136,7 +136,7 @@ class ChatPlugin(IndicoPlugin):
 
     def extend_event_menu(self, sender, **kwargs):
         return MenuEntryData(_('Chat Rooms'), 'chatrooms', 'chat.event_page', position=-1,
-                             visible=lambda event: bool(ChatroomEventAssociation.find_for_event(event).count()))
+                             visible=lambda event: ChatroomEventAssociation.find_for_event(event).has_rows())
 
     def extend_event_management_menu(self, sender, event, **kwargs):
         if event.can_manage(session.user) or is_chat_admin(session.user):
