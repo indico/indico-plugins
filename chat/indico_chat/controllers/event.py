@@ -28,7 +28,7 @@ class RHChatEventPage(RHConferenceBaseDisplay):
     """Lists the public chatrooms in a conference"""
 
     def _process(self):
-        chatrooms = ChatroomEventAssociation.find_for_event(self._conf).all()
+        chatrooms = ChatroomEventAssociation.find_for_event(self.event_new).all()
         cols = set()
         if any(c.chatroom.description for c in chatrooms):
             cols.add('description')

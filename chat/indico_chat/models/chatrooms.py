@@ -180,7 +180,7 @@ class ChatroomEventAssociation(db.Model):
         :param include_hidden: if hidden chatrooms should be included, too
         :param kwargs: extra kwargs to pass to ``find()``
         """
-        query = cls.find(event_id=int(event.id), **kwargs)
+        query = cls.find(event_id=event.id, **kwargs)
         if not include_hidden:
             query = query.filter(~cls.hidden)
         return query

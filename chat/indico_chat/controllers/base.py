@@ -25,10 +25,7 @@ from indico_chat.util import is_chat_admin
 
 
 class RHChatManageEventBase(RHConferenceModifBase):
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event_id = int(self._conf.id)
-        self.event = self._conf
+    CSRF_ENABLED = True
 
     def _checkProtection(self):
         if not is_chat_admin(session.user):
@@ -37,6 +34,7 @@ class RHChatManageEventBase(RHConferenceModifBase):
 
 class RHEventChatroomMixin:
     def _checkParams(self):
-        self.event_chatroom = ChatroomEventAssociation.find_one(event_id=self.event_id,
-                                                                chatroom_id=request.view_args['chatroom_id'])
+        self.event_chatroom = (ChatroomEventAssociation.query.with_parent(self.event_new)
+                               .filter_by(chatroom_id=request.view_args['chatroom_id'])
+                               .one())
         self.chatroom = self.event_chatroom.chatroom

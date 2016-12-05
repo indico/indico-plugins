@@ -42,16 +42,14 @@
                     msg += $t.gettext('Since it is only used in this event, it will be deleted from the Jabber server, too!');
                 }
             }
-            new ConfirmPopup($t.gettext('Delete this chatroom?'), msg, function(confirmed) {
-                if (!confirmed) {
-                    return;
-                }
-
-                $('<form>', {
+            confirmPrompt(msg, $t.gettext('Delete this chatroom?')).then(function() {
+                var form = $('<form>', {
                     action: $this.data('href'),
                     method: 'post'
-                }).appendTo('body').submit();
-            }).open();
+                });
+                var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
+                form.append(csrf).appendTo('body').submit();
+            });
         });
 
         $('.js-chat-refresh-room').on('click', function(e) {
