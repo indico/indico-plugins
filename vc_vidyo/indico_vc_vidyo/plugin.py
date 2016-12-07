@@ -33,12 +33,14 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import retrieve_principal
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
+from indico.web.http_api.hooks.base import HTTPAPIHook
 
 from indico_vc_vidyo import _
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.blueprint import blueprint
 from indico_vc_vidyo.cli import cli_manager
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
+from indico_vc_vidyo.http_api import DeleteVCRoomAPI
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
@@ -87,6 +89,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
         self.inject_js('vc_vidyo_js', WPVCManageEvent)
+        HTTPAPIHook.register(DeleteVCRoomAPI)
 
     @property
     def default_settings(self):
