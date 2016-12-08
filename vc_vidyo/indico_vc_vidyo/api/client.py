@@ -86,9 +86,9 @@ class AdminClient(ClientBase):
         counter = 0
 
         while True:
-            filter_.start = counter*filter_.limit
+            filter_.start = counter * filter_.limit
             response = self.soap.getRooms(filter_)
-            if response.total == 0:
+            if not response.total:
                 return None
             for room in response.room:
                 if int(room.extension) == int(extension):
