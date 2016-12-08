@@ -48,7 +48,7 @@ class RHSearch(RHCustomizable):
             form = current_plugin.search_form(formdata=request.args, prefix='search-', csrf_enabled=False)
             result = None
             if form.validate_on_submit():
-                result = current_plugin.perform_search(form.data, self.obj)
+                result = current_plugin.perform_search(form.data, self.obj, self.obj_type)
             if isinstance(result, Response):  # probably a redirect or a json response
                 return result
             view_class = WPSearchConference if isinstance(self.obj, Event) else WPSearchCategory
