@@ -47,9 +47,9 @@
         {{ clipboard_input(vc_room.data.url, name="vc-room-url") }}
     </dd>
     <dt>{% trans %}Created on{% endtrans %}</dt>
-    <dd>{{ vc_room.created_dt | format_datetime(timezone=event.as_event.tzinfo) }}</dd>
+    <dd>{{ vc_room.created_dt | format_datetime(timezone=event.tzinfo) }}</dd>
     {% if vc_room.modified_dt %}
         <dt>{% trans %}Modified on{% endtrans %}</dt>
-        <dd>{{ vc_room.modified_dt | format_datetime(timezone=event.as_event.tzinfo) }}</dd>
+        <dd>{{ vc_room.modified_dt | format_datetime(timezone=event.tzinfo) }}</dd>
     {% endif %}
 </dl>
