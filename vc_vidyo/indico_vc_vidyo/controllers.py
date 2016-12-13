@@ -29,7 +29,7 @@ class RHVidyoRoomOwner(RHVCSystemEventBase):
         result = {}
         self.vc_room.vidyo_extension.owned_by_user = session.user
         try:
-            self.plugin.update_room(self.vc_room, self.event)
+            self.plugin.update_room(self.vc_room, self.event_new)
         except VCRoomError as err:
             result['error'] = {'message': err.message}
             result['success'] = False
