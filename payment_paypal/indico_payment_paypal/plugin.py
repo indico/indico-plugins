@@ -64,7 +64,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         event = data['event']
         registration = data['registration']
         data['item_name'] = '{}: registration for {}'.format(remove_accents(registration.full_name),
-                                                             remove_accents(event.getTitle()))
+                                                             remove_accents(event.title))
         data['return_url'] = url_for_plugin('payment_paypal.success', registration.locator.uuid, _external=True)
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
         data['notify_url'] = url_for_plugin('payment_paypal.notify', registration.locator.uuid, _external=True)
