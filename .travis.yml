@@ -7,12 +7,13 @@ addons:
 env:
   - PLUGIN=livesync
 before_install:
+  - pip install -U pip setuptools
   # Flask-PluginEngine is not on PyPI yet, so we need to install it from git
   - pip install git+https://github.com/indico/flask-pluginengine.git
   # We can't use pip install indico from Git directly because of cds-indico-extras :(
   - git clone https://github.com/indico/indico.git /tmp/indico
   - cd /tmp/indico
-  - pip install -r requirements.txt
+  - grep -v indico-fonts requirements.txt | pip install -r /dev/stdin
   - python setup.py develop
 install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
