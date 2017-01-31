@@ -40,7 +40,7 @@ def raises_api_error(wrapped):
             return wrapped(*args, **kwargs)
         except WebFault as err:
             err_msg = err.fault.faultstring
-            if err_msg.startswith('Room not found for roomID'):
+            if err_msg.startswith('Room not found for roomID') or 'Invalid roomID' in err_msg:
                 raise RoomNotFoundAPIException()
             else:
                 raise APIException(err_msg)
