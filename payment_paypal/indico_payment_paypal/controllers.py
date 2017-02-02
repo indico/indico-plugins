@@ -82,7 +82,7 @@ class RHPaypalIPN(RH):
                              data=request.form)
 
     def _verify_business(self):
-        expected = current_plugin.event_settings.get(self.registration.registration_form.event, 'business')
+        expected = current_plugin.event_settings.get(self.registration.registration_form.event_new, 'business')
         business = request.form.get('business')
         if expected == business:
             return True
