@@ -1,0 +1,45 @@
+@startuml
+actor User
+
+box "Indico Service"
+   participant "Indico Server" as Indico
+   participant "SixPay Plugin" as Plugin
+end box
+
+== Payment Request==
+    User -> Indico: request payment
+    activate Indico
+        Indico -> Plugin
+        activate Plugin
+            Plugin -> SixPay: payment details
+            activate SixPay
+                create participant Saferpay
+                SixPay -> Saferpay
+                Plugin <-- SixPay: saferpay url
+            deactivate SixPay
+            Indico <- Plugin
+        deactivate Plugin
+        User <- Indico: payment page
+    deactivate Indico
+...
+
+== Payment Transaction ==
+User -> Saferpay: saferpay url
+activate Saferpay
+    Plugin <<- Saferpay: result
+    activate Plugin
+        Plugin -> SixPay: validate result
+        Plugin <- SixPay: confirmation
+        Plugin -> Plugin: validate details
+        Indico <- Plugin: confirm payment
+    deactivate Plugin
+    User <- Saferpay
+destroy Saferpay
+alt success
+    User -> Plugin: success
+else failure
+    User -> Plugin: failure
+else cancel
+    User -> Plugin: cancel
+end
+@enduml

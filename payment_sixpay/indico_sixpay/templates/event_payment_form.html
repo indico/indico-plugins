@@ -1,0 +1,16 @@
+Clicking on the <strong>{% trans %}Pay Now{% endtrans %}</strong> button you will get redirected to the SixPay site in order to complete your transaction.
+
+<dl class="i-data-list">
+    <dt>{% trans %}First name{% endtrans %}</dt>
+    <dd>{{ registration.first_name }}</dd>
+    <dt>{% trans %}Last name{% endtrans %}</dt>
+    <dd>{{ registration.last_name }}</dd>
+    <dt>{% trans %}Total amount{% endtrans %}</dt>
+    <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
+    <dt></dt>
+    <dd>
+        <form action="{{ payment_url }}" method="POST">
+            <button type="submit">{% trans %}Pay Now{% endtrans %}</button>
+        </form>
+    </dd>
+</dl>
