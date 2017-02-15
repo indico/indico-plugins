@@ -16,24 +16,20 @@
 
 from __future__ import unicode_literals
 
-import re
-
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, Length, Optional, ValidationError
+from wtforms.validators import DataRequired, Length, Optional, ValidationError, Regexp
 
 from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
 from indico.util.user import retrieve_principal
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import PrincipalField, IndicoPasswordField
-from indico.web.forms.validators import IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_vidyo import _
 from indico_vc_vidyo.util import iter_user_identities
 
-PIN_RE = re.compile(r'^\d+$')
-ERROR_MSG_PIN = _("The PIN must be a number")
+PIN_VALIDATORS = [Optional(), Length(min=3, max=10), Regexp(r'^\d+$', message=_("The PIN must be a number"))]
 
 
 class VidyoAdvancedFormMixin(object):
@@ -61,12 +57,11 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
 
     description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
     owner_user = PrincipalField(_('Owner'), [DataRequired()], description=_('The owner of the room'))
-    moderation_pin = IndicoPasswordField(_('Moderation PIN'),
-                                         [Optional(), Length(min=3, max=10), IndicoRegexp(PIN_RE)],
-                                         toggle=True, description=_('Used to moderate the VC Room'))
-    room_pin = IndicoPasswordField(
-        _('Room PIN'), [Optional(), Length(min=3, max=10), IndicoRegexp(PIN_RE, message=ERROR_MSG_PIN)],
-        toggle=True, description=_('Used to protect the access to the VC Room (leave blank for open access)'))
+    moderation_pin = IndicoPasswordField(_('Moderation PIN'), PIN_VALIDATORS, toggle=True,
+                                         description=_('Used to moderate the VC Room. Only digits allowed.'))
+    room_pin = IndicoPasswordField(_('Room PIN'), PIN_VALIDATORS, toggle=True,
+                                   description=_('Used to protect the access to the VC Room (leave blank for open '
+                                                 'access). Only digits allowed.'))
     auto_mute = BooleanField(_('Auto mute'),
                              widget=SwitchWidget(_('On'), _('Off')),
                              description=_('The VidyoDesktop clients will join the VC room muted by default '
