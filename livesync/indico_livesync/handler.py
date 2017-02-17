@@ -50,9 +50,11 @@ def connect_signals(plugin):
     plugin.connect(signals.event.contribution_deleted, _deleted)
     plugin.connect(signals.event.subcontribution_deleted, _deleted)
     # updated
-    plugin.connect(signals.event.data_changed, _updated)
+    plugin.connect(signals.event.updated, _updated)
     plugin.connect(signals.event.contribution_updated, _updated)
     plugin.connect(signals.event.subcontribution_updated, _updated)
+    # event times
+    plugin.connect(signals.event.times_changed, _event_times_changed, sender=Event)
     # timetable
     plugin.connect(signals.event.timetable_entry_created, _timetable_changed)
     plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
@@ -108,6 +110,10 @@ def _deleted(obj, **kwargs):
 
 
 def _updated(obj, **kwargs):
+    _register_change(obj, ChangeType.data_changed)
+
+
+def _event_times_changed(sender, obj, **kwargs):
     _register_change(obj, ChangeType.data_changed)
 
 
