@@ -102,20 +102,20 @@ class MARCXMLGenerator:
     def _event_to_marcxml(self, obj):
         xg = XMLGen(init=False)
         xg.openTag(b'record')
-        self.output_generator.confToXMLMarc21(obj, out=xg, overrideCache=True)
+        self.output_generator.confToXMLMarc21(obj, out=xg)
         xg.closeTag(b'record')
         return xg.xml
 
     def _contrib_to_marcxml(self, obj):
         xg = XMLGen(init=False)
         xg.openTag(b'record')
-        self.output_generator.contribToXMLMarc21(obj, out=xg, overrideCache=True)
+        self.output_generator.contribToXMLMarc21(obj, out=xg)
         xg.closeTag(b'record')
         return xg.xml
 
     def _subcontrib_to_marcxml(self, obj):
         xg = XMLGen(init=False)
         xg.openTag(b'record')
-        self.output_generator.subContribToXMLMarc21(obj, out=xg, overrideCache=True)
+        self.output_generator.subContribToXMLMarc21(obj, out=xg)
         xg.closeTag(b'record')
         return xg.xml
