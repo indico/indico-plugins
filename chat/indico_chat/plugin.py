@@ -115,7 +115,7 @@ class ChatPlugin(IndicoPlugin):
         self.register_js_bundle('chat_js', 'js/chat.js')
 
     def inject_event_header(self, event, **kwargs):
-        chatrooms = ChatroomEventAssociation.find_for_event(event.as_event).all()
+        chatrooms = ChatroomEventAssociation.find_for_event(event).all()
         if not chatrooms:
             return ''
         how_to_connect = self.settings.get('how_to_connect')
