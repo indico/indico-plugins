@@ -37,7 +37,6 @@ from indico_livesync.util import obj_ref, get_excluded_categories
 def connect_signals(plugin):
     # request
     plugin.connect(signals.after_process, _apply_changes)
-    plugin.connect(signals.before_retry, _clear_changes)
     # moved
     plugin.connect(signals.category.moved, _moved)
     plugin.connect(signals.event.moved, _moved)
@@ -153,12 +152,6 @@ def _apply_changes(sender, **kwargs):
         return
     for ref, changes in g.livesync_changes.iteritems():
         LiveSyncQueueEntry.create(changes, ref, excluded_categories=excluded_categories)
-
-
-def _clear_changes(sender, **kwargs):
-    if not hasattr(g, 'livesync_changes'):
-        return
-    del g.livesync_changes
 
 
 def _register_deletion(obj):
