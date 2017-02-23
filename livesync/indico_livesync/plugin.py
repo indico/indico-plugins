@@ -16,13 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request
-
 from wtforms.validators import NumberRange
 from wtforms.fields.html5 import IntegerField
 
 from indico.core.plugins import IndicoPlugin, PluginCategory, wrap_cli_manager
-from indico.core.plugins.views import WPPlugins
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 
@@ -63,14 +60,9 @@ class LiveSyncPlugin(IndicoPlugin):
         self.backend_classes = {}
         connect_signals(self)
         self.template_hook('plugin-details', self._extend_plugin_details)
-        self.inject_js('livesync_admin_js', WPPlugins, subclasses=False,
-                       condition=lambda: request.view_args.get('plugin') == self.name)
 
     def get_blueprints(self):
         return blueprint
-
-    def register_assets(self):
-        self.register_js_bundle('livesync_admin_js', 'js/livesync_admin.js')
 
     def add_cli_command(self, manager):
         manager.add_command('livesync', wrap_cli_manager(cli_manager, self))

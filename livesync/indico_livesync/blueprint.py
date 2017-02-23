@@ -23,5 +23,5 @@ from indico_livesync.controllers import RHAddAgent, RHEditAgent, RHDeleteAgent
 blueprint = IndicoPluginBlueprint('livesync', 'indico_livesync', url_prefix='/admin/plugins/livesync')
 
 blueprint.add_url_rule('/agents/create/<backend>', 'add_agent', RHAddAgent, methods=('GET', 'POST'))
-blueprint.add_url_rule('/agents/<int:agent_id>/', 'edit_agent', RHEditAgent, methods=('GET', 'POST'))
-blueprint.add_url_rule('/agents/<int:agent_id>/delete', 'delete_agent', RHDeleteAgent, methods=('POST',))
+blueprint.add_url_rule('/agents/<int:agent_id>', 'edit_agent', RHEditAgent, methods=('GET', 'POST'))
+blueprint.add_url_rule('/agents/<int:agent_id>', 'delete_agent', RHDeleteAgent, methods=('DELETE',))

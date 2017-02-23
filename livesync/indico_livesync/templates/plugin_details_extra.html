@@ -42,8 +42,13 @@
                         </td>
                         <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
                         <td>
-                            <a href="#" class="action-icon icon-remove js-delete-agent"
-                               data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"></a>
+                            <a href="#" class="action-icon icon-remove"
+                               data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"
+                               data-method="DELETE"
+                               data-title="{% trans %}Delete this agent?{% endtrans %}"
+                               data-confirm="{% trans %}Do you really want to delete this agent and all its queue entries?{% endtrans %}"
+                               data-reload-after
+                               data-ajax></a>
                             {%- if agent.backend -%}
                                 <a class="action-icon icon-edit" href="{{ url_for_plugin('livesync.edit_agent', agent) }}"></a>
                             {%- endif -%}
@@ -78,7 +83,3 @@ indico livesync initial_export {{ agent.id }}
         </code></pre>
     {% endif %}
 </div>
-
-<script>
-    liveSyncPluginPage();
-</script>

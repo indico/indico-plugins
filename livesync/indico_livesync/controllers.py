@@ -20,9 +20,10 @@ from flask import request, redirect, flash
 from flask_pluginengine import render_plugin_template, current_plugin
 
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
+from indico.web.util import jsonify_data
 
 from indico_livesync import _
 from indico_livesync.models.agents import LiveSyncAgent
@@ -38,12 +39,12 @@ class RHDeleteAgent(RHAdminBase):
     """Deletes a LiveSync agent"""
 
     def _checkParams(self):
-        self.agent = LiveSyncAgent.find_one(id=request.view_args['agent_id'])
+        self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
 
     def _process(self):
         db.session.delete(self.agent)
         flash(_('Agent deleted'), 'success')
-        return redirect(url_for('plugins.details', plugin='livesync'))
+        return jsonify_data(flash=False)
 
 
 class RHAddAgent(RHAdminBase):
@@ -71,7 +72,7 @@ class RHEditAgent(RHAdminBase):
     """Edits a LiveSync agent"""
 
     def _checkParams(self):
-        self.agent = LiveSyncAgent.find_one(id=request.view_args['agent_id'])
+        self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
         if self.agent.backend is None:
             flash(_('Cannot edit an agent that is not loaded'), 'error')
             return redirect(url_for('plugins.details', plugin='livesync'))
