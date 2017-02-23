@@ -21,7 +21,7 @@ from flask_pluginengine import current_plugin
 from flask_script import Manager
 from terminaltables import AsciiTable
 
-from indico.core.db import db, DBMgr
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.models.events import Event
 from indico.util.console import cformat
@@ -110,9 +110,8 @@ def run(agent_id, force=False):
             print cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name)
             continue
         print cformat('Running agent: %{white!}{}%{reset}').format(agent.name)
-        with DBMgr.getInstance().global_connection():
-            try:
-                agent.create_backend().run()
-                db.session.commit()
-            finally:
-                transaction.abort()
+        try:
+            agent.create_backend().run()
+            db.session.commit()
+        finally:
+            transaction.abort()
