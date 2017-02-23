@@ -16,13 +16,11 @@
 
 from __future__ import unicode_literals
 
-import transaction
 from flask_pluginengine import current_plugin
 from flask_script import Manager
 from terminaltables import AsciiTable
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.models.events import Event
 from indico.util.console import cformat
 
@@ -69,7 +67,6 @@ def agents():
 @cli_manager.option('--force', action='store_true', help="Perform export even if it has already been done once.")
 def initial_export(agent_id, force=False):
     """Performs the initial data export for an agent"""
-    update_session_options(db)
     agent = LiveSyncAgent.find_first(id=int(agent_id))
     if agent is None:
         print 'No such agent'
@@ -92,7 +89,6 @@ def initial_export(agent_id, force=False):
 @cli_manager.option('--force', action='store_true', help="Run even if initial export was not done")
 def run(agent_id, force=False):
     """Runs the livesync agent"""
-    update_session_options(db)
     if agent_id is None:
         agent_list = LiveSyncAgent.find_all()
     else:
@@ -113,5 +109,6 @@ def run(agent_id, force=False):
         try:
             agent.create_backend().run()
             db.session.commit()
-        finally:
-            transaction.abort()
+        except:
+            db.session.rollback()
+            raise

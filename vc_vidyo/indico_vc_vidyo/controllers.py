@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-import transaction
 from flask import flash, jsonify, session
 
+from indico.core.db import db
 from indico.modules.vc.controllers import RHVCSystemEventBase
 from indico.modules.vc.exceptions import VCRoomError
 from indico.util.i18n import _
@@ -33,7 +33,7 @@ class RHVidyoRoomOwner(RHVCSystemEventBase):
         except VCRoomError as err:
             result['error'] = {'message': err.message}
             result['success'] = False
-            transaction.abort()
+            db.session.rollback()
         else:
             flash(_("You are now the owner of the room '{room.name}'".format(room=self.vc_room)), 'success')
             result['success'] = True
