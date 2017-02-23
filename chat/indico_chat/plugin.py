@@ -150,7 +150,7 @@ class ChatPlugin(IndicoPlugin):
             return url_for_plugin('chat.manage_rooms', event)
 
     def event_deleted(self, event, **kwargs):
-        for event_chatroom in ChatroomEventAssociation.find_for_event(event.as_event, include_hidden=True):
+        for event_chatroom in ChatroomEventAssociation.find_for_event(event, include_hidden=True):
             chatroom_deleted = event_chatroom.delete()
             notify_deleted(event_chatroom.chatroom, event, None, chatroom_deleted)
 

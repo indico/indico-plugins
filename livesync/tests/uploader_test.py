@@ -16,11 +16,12 @@
 
 from mock import MagicMock, Mock
 
+from indico.modules.events.legacy import LegacyConference
+
 from indico_livesync import SimpleChange
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
 from indico_livesync.uploader import Uploader, MARCXMLUploader
 
-from MaKaC.conference import Conference
 
 
 class RecordingUploader(Uploader):
@@ -60,7 +61,7 @@ def test_run_initial(mocker):
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
     uploader = RecordingUploader(MagicMock())
     uploader.INITIAL_BATCH_SIZE = 3
-    records = tuple(Mock(spec=Conference, id=evt_id) for evt_id in xrange(4))
+    records = tuple(Mock(spec=LegacyConference, id=evt_id) for evt_id in xrange(4))
     uploader.run_initial(records)
     # We expect two batches, with the second one being smaller (i.e. no None padding, just the events)
     batches = set(records[:3]), set(records[3:])
