@@ -1,3 +1,20 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro add_agent_link(name, backend, standalone=false) %}
+    <a href="#"
+       class="{{ 'i-button icon-plus' if standalone }}"
+       data-href="{{ url_for_plugin('livesync.add_agent', backend=name) }}"
+       data-title="{% trans backend=backend.title %}Add {{ backend }} agent{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        {% if standalone %}
+            {% trans backend=backend.title %}Add {{ backend }} agent{% endtrans %}
+        {% else %}
+            {{ backend.title }}
+        {% endif %}
+    </a>
+{% endmacro %}
+
 <h2>{% trans %}LiveSync Agents{% endtrans %}</h2>
 
 <div class="i-form">
@@ -50,7 +67,11 @@
                                data-reload-after
                                data-ajax></a>
                             {%- if agent.backend -%}
-                                <a class="action-icon icon-edit" href="{{ url_for_plugin('livesync.edit_agent', agent) }}"></a>
+                                <a href="#" class="action-icon icon-edit"
+                                   data-href="{{ url_for_plugin('livesync.edit_agent', agent) }}"
+                                   data-title="{% trans %}Edit LiveSync agent{% endtrans %}"
+                                   data-reload-after
+                                   data-ajax-dialog></a>
                             {%- endif -%}
                         </td>
                     </tr>
@@ -58,14 +79,28 @@
             </tbody>
         </table>
     {% else %}
-        <div class="info-message-box">
-            <div class="message-text">{% trans %}No agents have been added yet.{% endtrans %}</div>
-        </div>
+        {% call message_box('info') %}
+            {% trans %}No agents have been added yet.{% endtrans %}
+        {% endcall %}
     {% endif %}
 
-    {% for name, backend in backends.items() | sort(attribute='1.title') %}
-        <a class="i-button icon-plus" href="{{ url_for_plugin('livesync.add_agent', backend=name) }}">{% trans backend=backend.title %}Add {{ backend }} agent{% endtrans %}</a>
-    {% endfor %}
+    <div class="toolbar space-before">
+        {% if backends|length == 1 %}
+            {% set name, backend = backends.viewitems()|first %}
+            {{ add_agent_link(name, backend, standalone=true) }}
+        {% else %}
+            <a class="i-button icon-plus {{ 'disabled' if not backends else 'arrow js-dropdown' }}"
+               data-toggle="dropdown"
+               title="{% if not backends %}{% trans %}No backend plugins enabled{% endtrans %}{% endif %}">
+                {% trans %}Add{% endtrans %}
+            </a>
+            <ul class="dropdown">
+                {% for name, backend in backends.viewitems() | sort(attribute='1.title') %}
+                    <li>{{ add_agent_link(name, backend) }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 
     {% set missing_initial_export = agents|rejectattr('initial_data_exported')|list %}
     {% if missing_initial_export %}
@@ -76,10 +111,11 @@
             {%- endtrans %}
         </p>
         <pre class="code"><code>
-{#- Don't "fix" the indentation of these lines! -#}
-{%- for agent in missing_initial_export -%}
-indico livesync initial_export {{ agent.id }}
-{% endfor -%}
+            {%- filter dedent %}
+                {%- for agent in missing_initial_export -%}
+                    indico livesync initial_export {{ agent.id }}
+                {% endfor -%}
+            {% endfilter -%}
         </code></pre>
     {% endif %}
 </div>

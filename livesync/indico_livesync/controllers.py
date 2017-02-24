@@ -18,16 +18,16 @@ from __future__ import unicode_literals
 
 from flask import request, redirect, flash
 from flask_pluginengine import render_plugin_template, current_plugin
+from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 
 from indico_livesync import _
 from indico_livesync.models.agents import LiveSyncAgent
-from indico_livesync.views import WPLiveSync
 
 
 def extend_plugin_details():
@@ -52,7 +52,10 @@ class RHAddAgent(RHAdminBase):
 
     def _checkParams(self):
         self.backend_name = request.view_args['backend']
-        self.backend = current_plugin.backend_classes[self.backend_name]
+        try:
+            self.backend = current_plugin.backend_classes[self.backend_name]
+        except KeyError:
+            raise NotFound
 
     def _process(self):
         form = self.backend.form(obj=FormDefaults(name=self.backend.title))
@@ -63,9 +66,9 @@ class RHAddAgent(RHAdminBase):
             db.session.add(agent)
             flash(_('Agent added'), 'success')
             flash(_("Don't forget to run the initial export!"), 'highlight')
-            return redirect(url_for('plugins.details', plugin='livesync'))
+            return jsonify_data(flash=False)
 
-        return WPLiveSync.render_template('edit_agent.html', form=form, backend=self.backend)
+        return jsonify_template('edit_agent.html', render_plugin_template, form=form, backend=self.backend, edit=False)
 
 
 class RHEditAgent(RHAdminBase):
@@ -78,12 +81,13 @@ class RHEditAgent(RHAdminBase):
             return redirect(url_for('plugins.details', plugin='livesync'))
 
     def _process(self):
-        form = self.agent.backend.form(obj=FormDefaults(self.agent, {'name'}, **self.agent.settings))
+        form = self.agent.backend.form(obj=FormDefaults(name=self.agent.name, **self.agent.settings))
         if form.validate_on_submit():
             data = form.data
             self.agent.name = data.pop('name')
             self.agent.settings = data
             flash(_('Agent updated'), 'success')
-            return redirect(url_for('plugins.details', plugin='livesync'))
+            return jsonify_data(flash=False)
 
-        return WPLiveSync.render_template('edit_agent.html', form=form, backend=self.agent.backend, agent=self.agent)
+        return jsonify_template('edit_agent.html', render_plugin_template, form=form, backend=self.agent.backend,
+                                edit=True)
