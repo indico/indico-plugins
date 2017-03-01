@@ -24,7 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.attachments import Attachment
 
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 from indico_previewer_jupyter.cpp_highlighter import CppHighlighter
 

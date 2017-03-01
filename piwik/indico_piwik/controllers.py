@@ -17,7 +17,7 @@
 from flask import jsonify
 
 from indico.core.config import Config
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico_piwik.views import WPStatistics
 from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,

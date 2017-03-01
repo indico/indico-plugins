@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
 
 
 class WPStatistics(WPJinjaMixinPlugin, WPConferenceModifBase):

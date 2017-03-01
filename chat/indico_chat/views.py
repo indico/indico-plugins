@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
 class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):

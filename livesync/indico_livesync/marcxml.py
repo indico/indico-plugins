@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask_pluginengine import current_plugin
 
 from indico.modules.users import User
-from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.output import outputGenerator
-from MaKaC.common.xmlGen import XMLGen
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common.output import outputGenerator
+from indico.legacy.common.xmlGen import XMLGen
 
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution

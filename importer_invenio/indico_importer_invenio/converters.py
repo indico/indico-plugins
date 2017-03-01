@@ -16,7 +16,7 @@
 
 from indico_importer.converter import APPEND, RecordConverter
 from indico_importer.util import convert_dt_tuple
-from MaKaC.webinterface.common.tools import strip_ml_tags
+from indico.legacy.webinterface.common.tools import strip_ml_tags
 
 
 class InvenioRecordConverterBase(RecordConverter):

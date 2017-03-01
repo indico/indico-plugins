@@ -23,8 +23,8 @@ from werkzeug.wrappers import Response
 
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceBase import RHCustomizable
+from indico.legacy.webinterface.rh.base import RH
 
 from indico_search.views import WPSearchCategory, WPSearchConference
 

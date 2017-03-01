@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.views import WPChatEventPage

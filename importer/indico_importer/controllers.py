@@ -27,7 +27,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import db
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from MaKaC.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected
 
 
 class RHGetImporters(RHProtected):

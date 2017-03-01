@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from suds.cache import Cache
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 DEFAULT_CACHE_TTL = 24 * 3600
 

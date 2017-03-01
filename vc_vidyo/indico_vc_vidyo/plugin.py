@@ -44,7 +44,7 @@ from indico_vc_vidyo.http_api import DeleteVCRoomAPI
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
-from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
+from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):

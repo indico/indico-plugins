@@ -28,7 +28,7 @@ from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
 from indico.modules.events.payment.util import register_transaction
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 from indico_payment_paypal import _
 

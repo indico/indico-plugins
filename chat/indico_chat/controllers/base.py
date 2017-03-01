@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session, request
 
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.util import is_chat_admin

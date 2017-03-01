@@ -24,8 +24,8 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time
 from indico.util.serializer import Serializer
-from MaKaC.common.cache import GenericCache
-from MaKaC.common.timezoneUtils import nowutc, utc2server
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.timezoneUtils import nowutc, utc2server
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
 from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
