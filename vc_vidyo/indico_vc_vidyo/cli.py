@@ -16,15 +16,20 @@
 
 from __future__ import unicode_literals
 
-from flask_script import Manager
+import click
 from terminaltables import AsciiTable
 
+from indico.cli.core import cli_group
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 
-cli_manager = Manager(usage="Manages the Vidyo plugin")
+
+@cli_group(name='vidyo')
+def cli():
+    """Manage the Vidyo plugin."""
 
 
-@cli_manager.option('--status', choices=(b'deleted', b'created'))
+@cli.command()
+@click.option('--status', type=click.Choice(['deleted', 'created']))
 def rooms(status=None):
     """Lists all Vidyo rooms"""
 

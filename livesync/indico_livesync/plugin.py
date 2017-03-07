@@ -19,13 +19,14 @@ from __future__ import unicode_literals
 from wtforms.validators import NumberRange
 from wtforms.fields.html5 import IntegerField
 
-from indico.core.plugins import IndicoPlugin, PluginCategory, wrap_cli_manager
+from indico.core import signals
+from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 
 from indico_livesync import _
 from indico_livesync.blueprint import blueprint
-from indico_livesync.cli import cli_manager
+from indico_livesync.cli import cli
 from indico_livesync.controllers import extend_plugin_details
 from indico_livesync.handler import connect_signals
 
@@ -59,13 +60,14 @@ class LiveSyncPlugin(IndicoPlugin):
         super(LiveSyncPlugin, self).init()
         self.backend_classes = {}
         connect_signals(self)
+        self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.template_hook('plugin-details', self._extend_plugin_details)
 
     def get_blueprints(self):
         return blueprint
 
-    def add_cli_command(self, manager):
-        manager.add_command('livesync', wrap_cli_manager(cli_manager, self))
+    def _extend_indico_cli(self, sender, **kwargs):
+        return cli
 
     def register_backend_class(self, name, backend_class):
         if name in self.backend_classes:

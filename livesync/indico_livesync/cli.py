@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
+import click
 from flask_pluginengine import current_plugin
-from flask_script import Manager
 from terminaltables import AsciiTable
 
+from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.util.console import cformat
@@ -27,10 +28,12 @@ from indico.util.console import cformat
 from indico_livesync.models.agents import LiveSyncAgent
 
 
-cli_manager = Manager(usage="Manages LiveSync")
+@cli_group(name='livesync')
+def cli():
+    """Manage the LiveSync plugin."""
 
 
-@cli_manager.command
+@cli.command()
 def available_backends():
     """Lists the currently available backend types"""
     print 'The following LiveSync agents are available:'
@@ -38,7 +41,7 @@ def available_backends():
         print cformat('  - %{white!}{}%{reset}: {} ({})').format(name, backend.title, backend.description)
 
 
-@cli_manager.command
+@cli.command()
 def agents():
     """Lists the currently active agents"""
     print 'The following LiveSync agents are active:'
@@ -63,11 +66,12 @@ def agents():
                       "%{yellow!}indico livesync initial_export %{reset}%{yellow}<agent_id>%{reset} for those agents.")
 
 
-@cli_manager.option('agent_id')
-@cli_manager.option('--force', action='store_true', help="Perform export even if it has already been done once.")
-def initial_export(agent_id, force=False):
+@cli.command()
+@click.argument('agent_id', type=int)
+@click.option('--force', is_flag=True, help="Perform export even if it has already been done once.")
+def initial_export(agent_id, force):
     """Performs the initial data export for an agent"""
-    agent = LiveSyncAgent.find_first(id=int(agent_id))
+    agent = LiveSyncAgent.find_first(id=agent_id)
     if agent is None:
         print 'No such agent'
         return
@@ -85,14 +89,15 @@ def initial_export(agent_id, force=False):
     db.session.commit()
 
 
-@cli_manager.option('agent_id')
-@cli_manager.option('--force', action='store_true', help="Run even if initial export was not done")
+@cli.command()
+@click.argument('agent_id', type=int, required=False)
+@click.option('--force', is_flag=True, help="Run even if initial export was not done")
 def run(agent_id, force=False):
     """Runs the livesync agent"""
     if agent_id is None:
         agent_list = LiveSyncAgent.find_all()
     else:
-        agent = LiveSyncAgent.find_first(id=int(agent_id))
+        agent = LiveSyncAgent.find_first(id=agent_id)
         if agent is None:
             print 'No such agent'
             return

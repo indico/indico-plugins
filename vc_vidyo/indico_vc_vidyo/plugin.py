@@ -25,7 +25,7 @@ from wtforms.validators import NumberRange, DataRequired
 
 from indico.core.auth import multipass
 from indico.core.config import Config
-from indico.core.plugins import IndicoPlugin, url_for_plugin, wrap_cli_manager
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.core import signals
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
@@ -38,7 +38,7 @@ from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico_vc_vidyo import _
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.blueprint import blueprint
-from indico_vc_vidyo.cli import cli_manager
+from indico_vc_vidyo.cli import cli
 from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.http_api import DeleteVCRoomAPI
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
@@ -86,6 +86,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.connect(signals.indico_help, self._extend_indico_help)
+        self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
         self.inject_js('vc_vidyo_js', WPVCManageEvent)
@@ -128,6 +129,9 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 )
             }
         }
+
+    def _extend_indico_cli(self, sender, **kwargs):
+        return cli
 
     def update_data_association(self, event, vc_room, event_vc_room, data):
         super(VidyoPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
@@ -308,9 +312,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def register_assets(self):
         self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
-
-    def add_cli_command(self, manager):
-        manager.add_command('vidyo', wrap_cli_manager(cli_manager, self))
 
     def get_vc_room_form_defaults(self, event):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
