@@ -13,7 +13,7 @@ before_install:
   # We can't use pip install indico from Git directly because of cds-indico-extras :(
   - git clone https://github.com/indico/indico.git /tmp/indico
   - cd /tmp/indico
-  - grep -v indico-fonts requirements.txt | pip install -r /dev/stdin
+  - pip install -r requirements.txt
   - python setup.py develop
 install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
