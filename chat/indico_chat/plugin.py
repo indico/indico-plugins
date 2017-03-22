@@ -96,7 +96,6 @@ class ChatPlugin(IndicoPlugin):
 
     def init(self):
         super(ChatPlugin, self).init()
-        self.connect(signals.indico_help, self.extend_indico_help)
         self.connect(signals.event.sidemenu, self.extend_event_menu)
         self.connect(signals.event.deleted, self.event_deleted)
         self.connect(signals.menu.items, self.extend_event_management_menu, sender='event-management-sidemenu')
@@ -121,18 +120,6 @@ class ChatPlugin(IndicoPlugin):
         how_to_connect = self.settings.get('how_to_connect')
         return render_plugin_template('event_header.html', event=event, event_chatrooms=chatrooms,
                                       how_to_connect=how_to_connect, chat_links=self.settings.get('chat_links'))
-
-    def extend_indico_help(self, sender, **kwargs):
-        return {
-            _('Chat Guides'): {
-                _('Chat User Guide'):
-                    (url_for_plugin(self.name + '.static', filename='help/html/ChatUserGuide.html'),
-                     url_for_plugin(self.name + '.static', filename='help/pdf/ChatUserGuide.pdf')),
-                _('Recommended Chat Clients'):
-                    (url_for_plugin(self.name + '.static', filename='help/html/XMPPClients.html'),
-                     url_for_plugin(self.name + '.static', filename='help/pdf/XMPPClients.pdf'))
-            }
-        }
 
     def extend_event_menu(self, sender, **kwargs):
         return MenuEntryData(_('Chat Rooms'), 'chatrooms', 'chat.event_page', position=-1,

@@ -85,7 +85,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def init(self):
         super(VidyoPlugin, self).init()
-        self.connect(signals.indico_help, self._extend_indico_help)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
@@ -119,16 +118,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     @property
     def icon_url(self):
         return url_for_plugin(self.name + '.static', filename='images/vidyo_logo_notext.png')
-
-    def _extend_indico_help(self, sender, **kwargs):
-        return {
-            _('Videoconference'): {
-                _('Vidyo'): (
-                    url_for_plugin(self.name + '.static', filename='help/html/index.html'),
-                    url_for_plugin(self.name + '.static', filename='help/pdf/index.pdf')
-                )
-            }
-        }
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
