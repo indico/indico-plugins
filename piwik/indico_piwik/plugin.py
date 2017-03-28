@@ -61,7 +61,7 @@ class PiwikPlugin(IndicoPlugin):
         self.connect(signals.attachments.attachment_accessed, self.track_download)
         self.template_hook('html-head', self.inject_tracking)
 
-    def inject_tracking(self, template, **kwargs):
+    def inject_tracking(self, **kwargs):
         server_url = self._get_tracking_url()
         site_id_general = self.settings.get('site_id_general')
         if not self.settings.get('enabled') or not server_url or not site_id_general:
