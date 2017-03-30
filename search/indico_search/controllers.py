@@ -23,13 +23,12 @@ from werkzeug.wrappers import Response
 
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.legacy.webinterface.rh.conferenceBase import RHCustomizable
 from indico.legacy.webinterface.rh.base import RH
 
 from indico_search.views import WPSearchCategory, WPSearchConference
 
 
-class RHSearch(RHCustomizable):
+class RHSearch(RH):
     """Performs a search using the search engine plugin"""
     def _checkParams(self):
         if 'confId' in request.view_args:
