@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='indico_vc_vidyo',
-    version='0.3',
+    version='0.4',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'indico>=1.9.3',
+        'indico>=1.9.10.dev2',
         'suds-jurko'
     ],
     classifiers=[

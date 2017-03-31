@@ -27,7 +27,6 @@ class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
         self._conf = conf
-        self._aw = rh.getAW()
 
     def _getBody(self, params):
         return self._getPageContent(params)

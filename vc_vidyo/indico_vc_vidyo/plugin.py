@@ -27,6 +27,7 @@ from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.core import signals
+from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
@@ -43,8 +44,6 @@ from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
 from indico_vc_vidyo.http_api import DeleteVCRoomAPI
 from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
-
-from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -86,7 +85,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.inject_js('vc_vidyo_js', WPTPLConferenceDisplay)
+        self.inject_js('vc_vidyo_js', WPSimpleEventDisplay)
         self.inject_js('vc_vidyo_js', WPVCEventPage)
         self.inject_js('vc_vidyo_js', WPVCManageEvent)
         HTTPAPIHook.register(DeleteVCRoomAPI)
