@@ -2,3 +2,5 @@ graft indico_livesync/migrations
 graft indico_livesync/static
 graft indico_livesync/templates
 graft indico_livesync/translations
+
+global-exclude *.pyc __pycache__ .keep

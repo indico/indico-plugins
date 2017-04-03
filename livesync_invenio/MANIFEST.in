@@ -1,1 +1,3 @@
 graft indico_livesync_invenio/translations
+
+global-exclude *.pyc __pycache__ .keep
