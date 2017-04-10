@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'indico>=1.9.1',
+        'indico>=1.9.10',
         'indico_livesync'
     ],
     classifiers=[

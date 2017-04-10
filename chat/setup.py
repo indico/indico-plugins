@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'indico>=1.9.10.dev2',
+        'indico>=1.9.10',
         'sleekxmpp'
     ],
     classifiers=[
