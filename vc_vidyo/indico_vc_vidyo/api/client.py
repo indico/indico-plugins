@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import re
+from requests import Session
+from requests.auth import HTTPBasicAuth
+from zeep import Client
+from zeep.exceptions import Fault
+from zeep.transports import Transport
 
-from suds import WebFault
-from suds.client import Client
-from suds.transport.https import HttpAuthenticated
-
-from indico_vc_vidyo.api.cache import SudsCache
+from indico_vc_vidyo.api.cache import ZeepCache
 
 DEFAULT_CLIENT_TIMEOUT = 30
 AUTOMUTE_API_PROFILE = "NoAudioAndVideo"
@@ -38,8 +38,8 @@ def raises_api_error(wrapped):
     def _wrapper(*args, **kwargs):
         try:
             return wrapped(*args, **kwargs)
-        except WebFault as err:
-            err_msg = err.fault.faultstring
+        except Fault as err:
+            err_msg = err.message
             if err_msg.startswith('Room not found for roomID') or 'Invalid roomID' in err_msg:
                 raise RoomNotFoundAPIException()
             else:
@@ -49,9 +49,11 @@ def raises_api_error(wrapped):
 
 class ClientBase(object):
     def __init__(self, wsdl, settings):
-        transport = HttpAuthenticated(username=settings.get('username'), password=settings.get('password'),
-                                      timeout=DEFAULT_CLIENT_TIMEOUT)
-        self.client = Client(wsdl, cache=SudsCache(), transport=transport, location=re.sub(r'\?wsdl$', '', wsdl))
+        session = Session()
+        transport = Transport(session=session, cache=ZeepCache())
+        session.auth = HTTPBasicAuth(settings.get('username'), settings.get('password'))
+        self.client = Client(wsdl, transport=transport)
+        self.factory = self.client.type_factory('ns0')
 
     @property
     def soap(self):
@@ -68,25 +70,20 @@ class AdminClient(ClientBase):
         super(AdminClient, self).__init__(settings.get('admin_api_wsdl'), settings)
 
     def create_room_object(self, **kwargs):
-        room = self.client.factory.create('Room')
-
-        for key, value in kwargs.iteritems():
-            setattr(room, key, value)
-
-        return room
+        return self.factory.Room(**kwargs)
 
     @raises_api_error
     def find_room(self, extension):
         from indico_vc_vidyo.plugin import VidyoPlugin
-        filter_ = self.client.factory.create('Filter')
-        filter_.query = extension
-        filter_.limit = 40
-        filter_.dir = 'DESC'
-
+        filter_ = {
+            'query': extension,
+            'limit': 40,
+            'dir': 'DESC'
+        }
         counter = 0
 
         while True:
-            filter_.start = counter * filter_.limit
+            filter_['start'] = counter * filter_['limit']
             response = self.soap.getRooms(filter_)
             if not response.total:
                 return None
@@ -100,23 +97,23 @@ class AdminClient(ClientBase):
 
     @raises_api_error
     def get_room(self, vidyo_id):
-        return self.soap.getRoom(vidyo_id)
+        return self.soap.getRoom(roomID=vidyo_id)
 
     @raises_api_error
     def add_room(self, room_obj):
-        self.soap.addRoom(room_obj)
+        self.soap.addRoom(room=room_obj)
 
     @raises_api_error
     def update_room(self, room_id, room_obj):
-        self.soap.updateRoom(room_id, room_obj)
+        self.soap.updateRoom(roomID=room_id, room=room_obj)
 
     @raises_api_error
     def delete_room(self, room_id):
-        self.soap.deleteRoom(room_id)
+        self.soap.deleteRoom(roomID=room_id)
 
     @raises_api_error
     def get_automute(self, room_id):
-        answer = self.soap.getRoomProfile(room_id)
+        answer = self.soap.getRoomProfile(roomID=room_id)
         if answer:
             return answer.roomProfileName == AUTOMUTE_API_PROFILE
         else:
@@ -125,6 +122,6 @@ class AdminClient(ClientBase):
     @raises_api_error
     def set_automute(self, room_id, status):
         if status:
-            self.soap.setRoomProfile(room_id, AUTOMUTE_API_PROFILE)
+            self.soap.setRoomProfile(roomID=room_id, roomProfileName=AUTOMUTE_API_PROFILE)
         else:
-            self.soap.removeRoomProfile(room_id)
+            self.soap.removeRoomProfile(roomID=room_id)

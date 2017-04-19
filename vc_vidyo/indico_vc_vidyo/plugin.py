@@ -163,17 +163,24 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         extension = next(extension_gen)
 
         while True:
+            room_mode = {
+                'isLocked': False,
+                'hasPIN': vc_room.data['room_pin'] != "",
+                'hasModeratorPIN': vc_room.data['moderation_pin'] != ""
+            }
+            if room_mode['hasPIN']:
+                room_mode['roomPIN'] = vc_room.data['room_pin']
+            if room_mode['hasModeratorPIN']:
+                room_mode['moderatorPIN'] = vc_room.data['moderation_pin']
+
             room_obj = client.create_room_object(
                 name=vc_room.name,
                 RoomType='Public',
                 ownerName=login,
                 extension=extension,
                 groupName=self.settings.get('room_group_name'),
-                description=vc_room.data['description'])
-
-            room_obj.RoomMode.isLocked = False
-            room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
-            room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderation_pin'] != ""
+                description=vc_room.data['description'],
+                RoomMode=room_mode)
 
             if room_obj.RoomMode.hasPIN:
                 room_obj.RoomMode.roomPIN = vc_room.data['room_pin']

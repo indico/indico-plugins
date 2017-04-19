@@ -14,24 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from suds.cache import Cache
+from zeep.cache import Base
 from indico.legacy.common.cache import GenericCache
 
 DEFAULT_CACHE_TTL = 24 * 3600
 
 
-class SudsCache(Cache):
+class ZeepCache(Base):
     _instance = None
 
     def __init__(self, duration=DEFAULT_CACHE_TTL):
-        self._cache = GenericCache("SudsCache")
+        self._cache = GenericCache("ZeepCache")
         self._duration = duration
 
-    def get(self, key):
-        self._cache.get(key)
+    def get(self, url):
+        self._cache.get(url)
 
-    def put(self, key, val):
-        self._cache.set(key, val, self._duration)
-
-    def purge(self, key):
-        self._cache.delete(key)
+    def add(self, url, content):
+        self._cache.set(url, content, self._duration)

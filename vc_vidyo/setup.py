@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=1.9.10',
-        'suds-jurko'
+        'zeep'
     ],
     classifiers=[
         'Environment :: Plugins',
