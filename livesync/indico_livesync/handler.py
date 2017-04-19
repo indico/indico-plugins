@@ -64,10 +64,10 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Session)
     plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Contribution)
     # ACLs
-    plugin.connect(signals.acl.entry_changed, _protection_changed, sender=Category)
-    plugin.connect(signals.acl.entry_changed, _protection_changed, sender=Event)
-    plugin.connect(signals.acl.entry_changed, _protection_changed, sender=Session)
-    plugin.connect(signals.acl.entry_changed, _protection_changed, sender=Contribution)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Category)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Event)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Session)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # notes
     plugin.connect(signals.event.notes.note_added, _note_changed)
     plugin.connect(signals.event.notes.note_deleted, _note_changed)
@@ -132,6 +132,25 @@ def _protection_changed(sender, obj, **kwargs):
     if not inspect(obj).persistent:
         return
     _register_change(obj, ChangeType.protection_changed)
+
+
+def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
+    if not inspect(obj).persistent:
+        return
+    register = False
+    # entry deleted
+    if entry is None and old_data is not None:
+        register = True
+    # entry added
+    elif entry is not None and old_data is None:
+        register = True
+    # entry updated
+    elif entry is not None and old_data is not None:
+        old_access = bool(old_data['read_access'] or old_data['full_access'] or old_data['roles'])
+        new_access = bool(entry.full_access or entry.read_access or entry.roles)
+        register = old_access != new_access
+    if register:
+        _register_change(obj, ChangeType.protection_changed)
 
 
 def _note_changed(note, **kwargs):
