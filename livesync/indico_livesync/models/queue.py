@@ -230,12 +230,8 @@ class LiveSyncQueueEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        ref_repr = '{}.{}.{}.{}.{}'.format(self.category_id if self.category_id else 'x',
-                                           self.event_id if self.event_id else 'x',
-                                           self.session_id if self.session_id else 'x',
-                                           self.contrib_id if self.contrib_id else 'x',
-                                           self.subcontrib_id if self.subcontrib_id else 'x')
-        return format_repr(self, 'agent', 'id', 'type', 'change', _text=ref_repr)
+        return format_repr(self, 'id', 'agent_id', 'change', 'type',
+                           category_id=None, event_id=None, session_id=None, contrib_id=None, subcontrib_id=None)
 
     @classmethod
     def create(cls, changes, ref, excluded_categories=set()):
