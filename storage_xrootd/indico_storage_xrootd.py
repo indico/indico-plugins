@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import ast
 import os
 import shutil
 import sys
@@ -46,10 +47,13 @@ class XRootDStoragePlugin(IndicoPlugin):
 
 class XRootDStorage(Storage):
     name = 'xrootd'
-    simple_data = True
+    simple_data = False
 
     def __init__(self, data):
-        self.xrootd_host, self.path = data.split(':', 1)
+        data = self._parse_data(data)
+        self.xrootd_host = data['host']
+        self.path = data['root']
+        self.fuse = bool(ast.literal_eval(data.get('fuse', 'False').title()))
 
     @return_ascii
     def __repr__(self):
@@ -105,4 +109,5 @@ class XRootDStorage(Storage):
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename, inline=True):
-        return send_file(filename, self.open(file_id), content_type, inline=inline)
+        file_data = self._resolve_path(file_id) if self.fuse else self.open(file_id)
+        return send_file(filename, file_data, content_type, inline=inline)
