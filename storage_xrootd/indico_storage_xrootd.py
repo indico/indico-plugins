@@ -1,0 +1,108 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+import os
+import shutil
+import sys
+
+from werkzeug.security import safe_join
+from xrootdpyfs import XRootDPyFS
+
+from indico.core import signals
+from indico.core.plugins import IndicoPlugin
+from indico.core.storage import Storage, StorageError
+from indico.util.string import return_ascii
+from indico.web.flask.util import send_file
+
+
+class XRootDStoragePlugin(IndicoPlugin):
+    """XRootD Storage
+
+    Provides XRootD/EOS storage backends.
+    """
+
+    def init(self):
+        super(XRootDStoragePlugin, self).init()
+        self.connect(signals.get_storage_backends, self._get_storage_backends)
+
+    def _get_storage_backends(self, sender, **kwargs):
+        return XRootDStorage
+
+
+class XRootDStorage(Storage):
+    name = 'xrootd'
+    simple_data = True
+
+    def __init__(self, data):
+        self.xrootd_host, self.path = data.split(':', 1)
+
+    @return_ascii
+    def __repr__(self):
+        return '<XRootDStorage: root://{}/{}>'.format(self.xrootd_host, self.path)
+
+    def _get_xrootd_fs(self):
+        return XRootDPyFS('root://{}//'.format(self.xrootd_host))
+
+    def _resolve_path(self, path):
+        full_path = safe_join(self.path, path)
+        if full_path is None:
+            raise ValueError('Invalid path: {}'.format(path))
+        return full_path
+
+    def open(self, file_id):
+        try:
+            return self._get_xrootd_fs().open(self._resolve_path(file_id), 'rb')
+        except Exception as e:
+            raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def save(self, name, content_type, filename, fileobj):
+        try:
+            fs = self._get_xrootd_fs()
+            filepath = self._resolve_path(name)
+            if fs.exists(filepath):
+                raise ValueError('A file with this name already exists')
+            fileobj = self._ensure_fileobj(fileobj)
+            basedir = os.path.dirname(filepath)
+            if not fs.exists(basedir):
+                fs.makedir(basedir, recursive=True, allow_recreate=True)
+            with fs.open(filepath, 'wb') as f:
+                shutil.copyfileobj(fileobj, f, 1024 * 1024)
+            return name
+        except Exception as e:
+            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
+
+    def delete(self, file_id):
+        try:
+            self._get_xrootd_fs().remove(self._resolve_path(file_id))
+        except Exception as e:
+            raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def getsize(self, file_id):
+        try:
+            fs = self._get_xrootd_fs()
+            path = self._resolve_path(file_id)
+            fullpath = fs._p(path)
+            status, stat = fs._client.stat(fullpath)
+            if not status.ok:
+                fs._raise_status(path, status)
+            return stat.size
+        except Exception as e:
+            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def send_file(self, file_id, content_type, filename, inline=True):
+        return send_file(filename, self.open(file_id), content_type, inline=inline)
