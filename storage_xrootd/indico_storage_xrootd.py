@@ -52,15 +52,20 @@ class XRootDStorage(Storage):
     def __init__(self, data):
         data = self._parse_data(data)
         self.xrootd_host = data['host']
+        self.xrootd_opts = data.get('opts', '')
         self.path = data['root']
         self.fuse = bool(ast.literal_eval(data.get('fuse', 'False').title()))
 
     @return_ascii
     def __repr__(self):
-        return '<XRootDStorage: root://{}/{}>'.format(self.xrootd_host, self.path)
+        qs = '?{}'.format(self.xrootd_opts) if self.xrootd_opts else ''
+        return '<XRootDStorage: root://{}/{}{}>'.format(self.xrootd_host, self.path, qs)
 
     def _get_xrootd_fs(self):
-        return XRootDPyFS('root://{}//'.format(self.xrootd_host))
+        uri = 'root://{}//'.format(self.xrootd_host)
+        if self.xrootd_opts:
+            uri += '?' + self.xrootd_opts
+        return XRootDPyFS(uri)
 
     def _resolve_path(self, path):
         full_path = safe_join(self.path, path)
