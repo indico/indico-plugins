@@ -21,6 +21,7 @@ import os
 import shutil
 import sys
 
+from flask import current_app
 from werkzeug.security import safe_join
 from xrootdpyfs import XRootDPyFS
 
@@ -42,7 +43,8 @@ class XRootDStoragePlugin(IndicoPlugin):
         self.connect(signals.get_storage_backends, self._get_storage_backends)
 
     def _get_storage_backends(self, sender, **kwargs):
-        return XRootDStorage
+        yield XRootDStorage
+        yield EOSStorage
 
 
 class XRootDStorage(Storage):
@@ -59,13 +61,16 @@ class XRootDStorage(Storage):
     @return_ascii
     def __repr__(self):
         qs = '?{}'.format(self.xrootd_opts) if self.xrootd_opts else ''
-        return '<XRootDStorage: root://{}/{}{}>'.format(self.xrootd_host, self.path, qs)
+        return '<{}: root://{}/{}{}>'.format(type(self).__name__, self.xrootd_host, self.path, qs)
 
-    def _get_xrootd_fs(self):
+    def _get_xrootd_fs_uri(self):
         uri = 'root://{}//'.format(self.xrootd_host)
         if self.xrootd_opts:
             uri += '?' + self.xrootd_opts
-        return XRootDPyFS(uri)
+        return uri
+
+    def _get_xrootd_fs(self):
+        return XRootDPyFS(self._get_xrootd_fs_uri())
 
     def _resolve_path(self, path):
         full_path = safe_join(self.path, path)
@@ -79,18 +84,21 @@ class XRootDStorage(Storage):
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
+    def _save(self, name, fileobj, fs):
+        filepath = self._resolve_path(name)
+        if fs.exists(filepath):
+            raise ValueError('A file with this name already exists')
+        fileobj = self._ensure_fileobj(fileobj)
+        basedir = os.path.dirname(filepath)
+        if not fs.exists(basedir):
+            fs.makedir(basedir, recursive=True, allow_recreate=True)
+        with fs.open(filepath, 'wb') as f:
+            shutil.copyfileobj(fileobj, f, 1024 * 1024)
+
     def save(self, name, content_type, filename, fileobj):
         try:
             fs = self._get_xrootd_fs()
-            filepath = self._resolve_path(name)
-            if fs.exists(filepath):
-                raise ValueError('A file with this name already exists')
-            fileobj = self._ensure_fileobj(fileobj)
-            basedir = os.path.dirname(filepath)
-            if not fs.exists(basedir):
-                fs.makedir(basedir, recursive=True, allow_recreate=True)
-            with fs.open(filepath, 'wb') as f:
-                shutil.copyfileobj(fileobj, f, 1024 * 1024)
+            self._save(name, fileobj, fs)
             return name
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
@@ -116,3 +124,36 @@ class XRootDStorage(Storage):
     def send_file(self, file_id, content_type, filename, inline=True):
         file_data = self._resolve_path(file_id) if self.fuse else self.open(file_id)
         return send_file(filename, file_data, content_type, inline=inline)
+
+
+class EOSStorage(XRootDStorage):
+    name = 'eos'
+
+    def _get_xrootd_fs(self, size=None):
+        query = {}
+        if size is not None:
+            query['eos.bookingsize'] = size
+        return XRootDPyFS(self._get_xrootd_fs_uri(), query=query)
+
+    def save(self, name, content_type, filename, fileobj):
+        try:
+            if isinstance(fileobj, basestring):
+                size_hint = len(fileobj)
+            elif hasattr(fileobj, 'seek') and hasattr(fileobj, 'tell'):
+                pos = fileobj.tell()
+                fileobj.seek(0, os.SEEK_END)
+                size_hint = fileobj.tell() - pos
+                fileobj.seek(pos, os.SEEK_SET)
+            else:
+                # Very unlikely to happen:
+                # - strings/bytes have a length
+                # - uploaded files are either fdopen (file-buffered) or BytesIO objects (-> seekable)
+                # - other file-like objects are usually seekable too
+                # So the only case where we can end up here is when using some custom file-like
+                # object which does not have seek/tell methods.
+                size_hint = current_app.config['MAX_CONTENT_LENGTH'] if current_app else None
+            fs = self._get_xrootd_fs(size=size_hint)
+            self._save(name, fileobj, fs)
+            return name
+        except Exception as e:
+            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
