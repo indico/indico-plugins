@@ -20,6 +20,7 @@ import ast
 import os
 import shutil
 import sys
+from datetime import date
 
 from flask import current_app
 from werkzeug.security import safe_join
@@ -57,6 +58,7 @@ class XRootDStorage(Storage):
         self.xrootd_opts = data.get('opts', '')
         self.path = data['root']
         self.fuse = bool(ast.literal_eval(data.get('fuse', 'False').title()))
+        self.datestamp = bool(ast.literal_eval(data.get('datestamp', 'False').title()))
 
     @return_ascii
     def __repr__(self):
@@ -85,6 +87,8 @@ class XRootDStorage(Storage):
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def _save(self, name, fileobj, fs):
+        if self.datestamp:
+            name = os.path.join(date.today().strftime('%Y%m'), name)
         filepath = self._resolve_path(name)
         if fs.exists(filepath):
             raise ValueError('A file with this name already exists')
@@ -94,11 +98,12 @@ class XRootDStorage(Storage):
             fs.makedir(basedir, recursive=True, allow_recreate=True)
         with fs.open(filepath, 'wb') as f:
             shutil.copyfileobj(fileobj, f, 1024 * 1024)
+        return name
 
     def save(self, name, content_type, filename, fileobj):
         try:
             fs = self._get_xrootd_fs()
-            self._save(name, fileobj, fs)
+            name = self._save(name, fileobj, fs)
             return name
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
@@ -153,7 +158,7 @@ class EOSStorage(XRootDStorage):
                 # object which does not have seek/tell methods.
                 size_hint = current_app.config['MAX_CONTENT_LENGTH'] if current_app else None
             fs = self._get_xrootd_fs(size=size_hint)
-            self._save(name, fileobj, fs)
+            name = self._save(name, fileobj, fs)
             return name
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
