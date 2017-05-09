@@ -24,7 +24,6 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
-from indico.core.config import Config
 
 
 authenticators_re = re.compile(r'\s*,\s*')
@@ -82,11 +81,7 @@ def update_room_from_obj(settings, vc_room, room_obj):
     """Updates a VCRoom DB object using a SOAP room object returned by the API"""
     vc_room.name = room_obj.name
     if room_obj.ownerName != vc_room.data['owner_identity']:
-        owner = get_user_from_identifier(settings, room_obj.ownerName)
-        # if the owner does not exist anymore (e.g. was changed on the server),
-        # use the janitor user as a placeholder
-        if not owner:
-            owner = User.get(Config.getInstance().getJanitorUserId())
+        owner = get_user_from_identifier(settings, room_obj.ownerName) or User.get_system_user()
         vc_room.vidyo_extension.owned_by_user = owner
 
     vc_room.data.update({
