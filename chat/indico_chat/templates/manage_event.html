@@ -26,7 +26,7 @@
                                         {% if logs_enabled and not chatroom.custom_server %}
                                             <a href="{{ url_for_plugin('.manage_rooms_logs', event_chatroom) }}" class="i-button icon-file-content" title="{% trans %}Logs{% endtrans %}"></a>
                                         {% endif %}
-                                        <a href="#" class="i-button icon-edit"
+                                        <a href="#" class="i-button icon-edit hide-if-locked"
                                            title="{% trans %}Edit{% endtrans %}"
                                            data-href="{{ url_for_plugin('.manage_rooms_modify', event_chatroom) }}"
                                            data-title="{% trans %}Edit chatroom{% endtrans %}"
@@ -34,12 +34,20 @@
                                            data-reload-after>
                                         </a>
                                         {% if not chatroom.custom_server %}
-                                            <a href="#" class="i-button icon-loop js-chat-refresh-room" data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}" title="{% trans %}Refresh{% endtrans %}"></a>
+                                            <a href="#" class="i-button icon-loop js-chat-refresh-room hide-if-locked"
+                                               data-href="{{ url_for_plugin('.manage_rooms_refresh', event_chatroom) }}"
+                                               title="{% trans %}Refresh{% endtrans %}"></a>
                                         {% endif %}
-                                        <a href="#" class="i-button icon-remove js-chat-remove-room" data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}" data-num-events="{{ chatroom.events | count }}" data-custom-server="{{ 1 if chatroom.custom_server else 0 }}" title="{%- trans %}Remove{% endtrans -%}"></a>
+                                        <a href="#" class="i-button icon-remove js-chat-remove-room hide-if-locked"
+                                           data-href="{{ url_for_plugin('.manage_rooms_remove', event_chatroom) }}"
+                                           data-num-events="{{ chatroom.events | count }}"
+                                           data-custom-server="{{ 1 if chatroom.custom_server else 0 }}"
+                                           title="{%- trans %}Remove{% endtrans -%}"></a>
                                     </div>
                                     <div class="group">
-                                        <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown">{% trans %}Join{% endtrans %}</a>
+                                        <a class="i-button arrow button highlight dropdown-button" data-toggle="dropdown">
+                                            {%- trans %}Join{% endtrans -%}
+                                        </a>
                                         <ul class="dropdown">
                                             {% for chat_link in chat_links %}
                                                 <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
@@ -93,7 +101,7 @@
                 <div class="message-text">{% trans %}No chatrooms have been added yet.{% endtrans %}</div>
             </div>
         {% endif %}
-        <a class="i-button bottom icon-plus"
+        <a class="i-button bottom icon-plus hide-if-locked"
            data-href="{{ url_for_plugin('.manage_rooms_create', event) }}"
            data-title="{% trans %}Create chatroom{% endtrans %}"
            data-ajax-dialog
@@ -102,7 +110,7 @@
         </a>
     </div>
 
-    {% if attach_form %}
+    {% if attach_form and not event.is_locked %}
         <div>
             <h2>{% trans %}Add existing chat room{% endtrans %}</h2>
             <div>

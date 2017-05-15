@@ -37,6 +37,8 @@ class RHStatistics(RHConferenceModifBase):
 
 
 class RHApiBase(RHConferenceModifBase):
+    ALLOW_LOCKED = True
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self._report_params = {'start_date': params.get('start_date'),
