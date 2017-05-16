@@ -44,7 +44,7 @@
     {% endif %}
     <dt>{% trans %}Auto-join URL{% endtrans %}</dt>
     <dd>
-        {{ clipboard_input(vc_room.data.url, name="vc-room-url") }}
+        {{ clipboard_input(vc_room.vidyo_extension.join_url, name="vc-room-url") }}
     </dd>
     <dt>{% trans %}Created on{% endtrans %}</dt>
     <dd>{{ vc_room.created_dt | format_datetime(timezone=event.tzinfo) }}</dd>

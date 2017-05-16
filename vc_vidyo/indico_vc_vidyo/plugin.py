@@ -66,6 +66,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                      description=_('Maximum number of rooms until a warning is sent to the managers'))
     vidyo_phone_link = URLField(_('VidyoVoice phone number'),
                                 description=_('Link to the list of VidyoVoice phone numbers'))
+    client_chooser_url = URLField(_('Client Chooser URL'),
+                                  description=_("URL for client chooser interface. The room key will be passed as a "
+                                                "'url' GET query argument"))
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=CKEditorWidget(),
                                           description=_('Footer to append to emails sent upon creation of a VC room'))
 
@@ -107,7 +110,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             'num_days_old': 365,
             'max_rooms_warning': 5000,
             'vidyo_phone_link': None,
-            'creation_email_footer': None
+            'creation_email_footer': None,
+            'client_chooser_url': None
         })
 
     @property

@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import urllib
+
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -63,6 +65,15 @@ class VidyoExtension(db.Model):
             lazy='dynamic'
         )
     )
+
+    @property
+    def join_url(self):
+        from indico_vc_vidyo.plugin import VidyoPlugin
+        url = self.vc_room.data['url']
+        custom_url_tpl = VidyoPlugin.settings.get('client_chooser_url')
+        if custom_url_tpl:
+            return custom_url_tpl + '?' + urllib.urlencode({'url': url})
+        return url
 
     @return_ascii
     def __repr__(self):
