@@ -17,16 +17,16 @@
 from flask import jsonify
 
 from indico.core.config import Config
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.events.management.controllers import RHManageEventBase
 
 from indico_piwik.views import WPStatistics
 from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
                                   ReportVisitsPerDay)
 
 
-class RHStatistics(RHConferenceModifBase):
+class RHStatistics(RHManageEventBase):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self._params = params
         self._params['loading_gif'] = '{}/images/loading.gif'.format(Config.getInstance().getBaseURL())
         self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
@@ -36,11 +36,11 @@ class RHStatistics(RHConferenceModifBase):
         return WPStatistics.render_template('statistics.html', self._conf, **self._params)
 
 
-class RHApiBase(RHConferenceModifBase):
+class RHApiBase(RHManageEventBase):
     ALLOW_LOCKED = True
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self._report_params = {'start_date': params.get('start_date'),
                                'end_date': params.get('end_date')}
 

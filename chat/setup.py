@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='indico_chat',
-    version='0.5.2',
+    version='0.5.3',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -30,7 +30,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=1.9.11.dev2',
+        'indico>=1.9.11.dev3',
         'sleekxmpp'
     ],
     classifiers=[

@@ -16,20 +16,18 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request
+from flask import request, session
 
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.events.management.controllers import RHManageEventBase
 
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.util import is_chat_admin
 
 
-class RHChatManageEventBase(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHChatManageEventBase(RHManageEventBase):
     def _checkProtection(self):
         if not is_chat_admin(session.user):
-            RHConferenceModifBase._checkProtection(self)
+            RHManageEventBase._checkProtection(self)
 
 
 class RHEventChatroomMixin:
