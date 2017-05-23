@@ -1,243 +1,228 @@
-# French (France) translations for .
-# Copyright (C) 2015 ORGANIZATION
-# This file is distributed under the same license as the  project.
-#
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
 # Translators:
-# Thomas Baron <thomas.baron@cern.ch>, 2015
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017
 msgid ""
 msgstr ""
-"Project-Id-Version:  Indico\n"
+"Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-08-29 10:46+0200\n"
-"PO-Revision-Date: 2015-03-12 09:47+0000\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2017-05-12 15:32+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
-"Language: fr_FR\n"
-"Language-Team: French (France) "
-"(http://www.transifex.com/projects/p/indico/language/fr_FR/)\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: indico_vc_vidyo/controllers.py:38
 msgid "You are now the owner of the room '{room.name}'"
-msgstr ""
+msgstr "Vous êtes maintenant responsable de la salle '{room.name}'"
 
-#: indico_vc_vidyo/forms.py:35
+#: indico_vc_vidyo/forms.py:32
 msgid "The PIN must be a number"
 msgstr "Le code confidentiel doit être un nombre entier"
 
-#: indico_vc_vidyo/forms.py:40
+#: indico_vc_vidyo/forms.py:37
 msgid "Show PIN"
 msgstr "Afficher le code confidentiel"
 
-#: indico_vc_vidyo/forms.py:42
+#: indico_vc_vidyo/forms.py:39
 msgid "Show the VC Room PIN on the event page (insecure!)"
-msgstr ""
-"Afficher le code confidentiel de la salle Vidyo sur la page de "
-"l'événement (peu sûr!)"
+msgstr "Afficher le code confidentiel de la salle Vidyo sur la page de l'événement (peu sûr!)"
 
-#: indico_vc_vidyo/forms.py:43
+#: indico_vc_vidyo/forms.py:40
 msgid "Show Auto-join URL"
 msgstr "Afficher l'URL de connexion"
 
-#: indico_vc_vidyo/forms.py:45
+#: indico_vc_vidyo/forms.py:42
 msgid "Show the auto-join URL on the event page"
 msgstr "Afficher l'URL de connexion sur la page de l'événement"
 
-#: indico_vc_vidyo/forms.py:46
+#: indico_vc_vidyo/forms.py:43
 msgid "Show Phone Access numbers"
 msgstr "Afficher les numéros d'accès téléphonique"
 
-#: indico_vc_vidyo/forms.py:48
+#: indico_vc_vidyo/forms.py:45
 msgid "Show a link to the list of phone access numbers"
 msgstr "Afficher un lien vers la liste des numéros d'accès téléphonique"
 
-#: indico_vc_vidyo/forms.py:61 indico_vc_vidyo/templates/info_box.html:7
+#: indico_vc_vidyo/forms.py:58 indico_vc_vidyo/templates/info_box.html:7
 #: indico_vc_vidyo/templates/manage_event_info_box.html:6
 msgid "Description"
 msgstr "Description"
 
-#: indico_vc_vidyo/forms.py:61
+#: indico_vc_vidyo/forms.py:58
 msgid "The description of the room"
 msgstr "La description de la salle"
 
-#: indico_vc_vidyo/forms.py:62 indico_vc_vidyo/templates/info_box.html:14
+#: indico_vc_vidyo/forms.py:59 indico_vc_vidyo/templates/info_box.html:14
 #: indico_vc_vidyo/templates/manage_event_info_box.html:10
 msgid "Owner"
 msgstr "Responsable"
 
-#: indico_vc_vidyo/forms.py:62
+#: indico_vc_vidyo/forms.py:59
 msgid "The owner of the room"
 msgstr "Le responsable de la salle"
 
-#: indico_vc_vidyo/forms.py:63
+#: indico_vc_vidyo/forms.py:60
 #: indico_vc_vidyo/templates/manage_event_info_box.html:39
 msgid "Moderation PIN"
 msgstr "Code confidentiel de modération"
 
-#: indico_vc_vidyo/forms.py:65
-msgid "Used to moderate the VC Room"
-msgstr "Donne les droits de modération de la salle Vidyo"
+#: indico_vc_vidyo/forms.py:61
+msgid "Used to moderate the VC Room. Only digits allowed."
+msgstr "Utilisé pour modérer la salle de VC. Seuls les chiffres sont autorisés."
 
-#: indico_vc_vidyo/forms.py:67 indico_vc_vidyo/templates/info_box.html:18
+#: indico_vc_vidyo/forms.py:62 indico_vc_vidyo/templates/info_box.html:18
 #: indico_vc_vidyo/templates/manage_event_info_box.html:32
 msgid "Room PIN"
 msgstr "Code confidentiel de la salle"
 
-#: indico_vc_vidyo/forms.py:68
-msgid "Used to protect the access to the VC Room (leave blank for open access)"
-msgstr ""
-"Utilisé pour protéger l'accès à la salle Vidyo (laisser vide pour un "
-"accès ouvert)"
+#: indico_vc_vidyo/forms.py:63
+msgid ""
+"Used to protect the access to the VC Room (leave blank for open access). "
+"Only digits allowed."
+msgstr "Utilisé pour protéger l'accès à la salle de VC (laisser vide pour un accès ouvert). Seuls les chiffres sont autorisés."
 
-#: indico_vc_vidyo/forms.py:69
+#: indico_vc_vidyo/forms.py:65
 msgid "Auto mute"
 msgstr "Coupure automatique des périphériques d'entrée"
 
-#: indico_vc_vidyo/forms.py:70
+#: indico_vc_vidyo/forms.py:66
 msgid "On"
 msgstr "Activé"
 
-#: indico_vc_vidyo/forms.py:70
+#: indico_vc_vidyo/forms.py:66
 msgid "Off"
 msgstr "Désactivé"
 
-#: indico_vc_vidyo/forms.py:71
+#: indico_vc_vidyo/forms.py:67
 msgid ""
-"The VidyoDesktop clients will join the VC room muted by default (audio "
-"and video)"
-msgstr ""
-"Les clients VidyoDesktop rejoindront la salle Vidyo avec le micro et la "
-"caméra coupés par défaut"
+"The VidyoDesktop clients will join the VC room muted by default (audio and "
+"video)"
+msgstr "Les clients VidyoDesktop rejoindront la salle Vidyo avec le micro et la caméra coupés par défaut"
 
-#: indico_vc_vidyo/forms.py:86
+#: indico_vc_vidyo/forms.py:82
 msgid "Unable to find this user in Indico."
 msgstr "Impossible de trouver cet utilisateur dans Indico."
 
-#: indico_vc_vidyo/forms.py:88
+#: indico_vc_vidyo/forms.py:84
 msgid "This user does not have a suitable account to use Vidyo."
 msgstr "Cet utilisateur n'a pas de compte qui lui permet d'utiliser Vidyo."
 
-#: indico_vc_vidyo/plugin.py:49
+#: indico_vc_vidyo/plugin.py:51
 msgid "Vidyo email support"
 msgstr "Adresse électronique du support Vidyo"
 
-#: indico_vc_vidyo/plugin.py:50
+#: indico_vc_vidyo/plugin.py:52
 msgid "Username"
 msgstr "Identifiant"
 
-#: indico_vc_vidyo/plugin.py:50
+#: indico_vc_vidyo/plugin.py:52
 msgid "Indico username for Vidyo"
 msgstr "Identifiant Indico pour Vidyo"
 
-#: indico_vc_vidyo/plugin.py:51
+#: indico_vc_vidyo/plugin.py:53
 msgid "Password"
 msgstr "Mot de passe"
 
-#: indico_vc_vidyo/plugin.py:52
+#: indico_vc_vidyo/plugin.py:54
 msgid "Indico password for Vidyo"
 msgstr "Mot de passe utilisateur pour Vidyo"
 
-#: indico_vc_vidyo/plugin.py:53
+#: indico_vc_vidyo/plugin.py:55
 msgid "Admin API WSDL URL"
 msgstr "URL WSDL pour l'API admin"
 
-#: indico_vc_vidyo/plugin.py:54
+#: indico_vc_vidyo/plugin.py:56
 msgid "User API WSDL URL"
 msgstr "URL WSDL pour l'API utilisateur"
 
-#: indico_vc_vidyo/plugin.py:55
+#: indico_vc_vidyo/plugin.py:57
 msgid "Indico tenant prefix"
 msgstr "Préfixe de tenant pour Indico"
 
-#: indico_vc_vidyo/plugin.py:56
+#: indico_vc_vidyo/plugin.py:58
 msgid "The tenant prefix for Indico rooms created on this server"
 msgstr "Le préfixe de tenant pour les salles Vidyo créées sur ce serveur Indico"
 
-#: indico_vc_vidyo/plugin.py:57
+#: indico_vc_vidyo/plugin.py:59
 msgid "Public rooms' group name"
 msgstr "Nom du groupe Vidyo pour les salles Vidyo"
 
-#: indico_vc_vidyo/plugin.py:58
+#: indico_vc_vidyo/plugin.py:60
 msgid "Group name for public videoconference rooms created by Indico"
-msgstr ""
+msgstr "Nom du groupe pour les salles publiques de visioconférence créées par Indico"
 
-#: indico_vc_vidyo/plugin.py:59
+#: indico_vc_vidyo/plugin.py:61
 msgid "Authenticators"
 msgstr "Services d'authentification"
 
-#: indico_vc_vidyo/plugin.py:60
+#: indico_vc_vidyo/plugin.py:62
 msgid "Identity providers to convert Indico users to Vidyo accounts"
-msgstr ""
+msgstr "Fournisseurs d'identité pour convertir des utilisateurs Indico en comptes Vidyo"
 
-#: indico_vc_vidyo/plugin.py:61
+#: indico_vc_vidyo/plugin.py:63
 msgid "VC room age threshold"
 msgstr "Limite d'âge pour les salles Vidyo"
 
-#: indico_vc_vidyo/plugin.py:62
+#: indico_vc_vidyo/plugin.py:64
 msgid ""
 "Number of days after an Indico event when a videoconference room is "
 "considered old"
-msgstr ""
+msgstr "Nombre de jours à partir de la fin d'un événement dans Indico après lesquels une salle de visioconférence est considérée comme agée"
 
-#: indico_vc_vidyo/plugin.py:64
+#: indico_vc_vidyo/plugin.py:66
 msgid "Max. num. VC rooms before warning"
 msgstr "Nombre maximum de salles Vidyo avant un message d'alerte"
 
-#: indico_vc_vidyo/plugin.py:65
+#: indico_vc_vidyo/plugin.py:67
 msgid "Maximum number of rooms until a warning is sent to the managers"
-msgstr ""
-"Nombre maximum de salles Vidyo créées sur ce serveur avant qu'un message "
-"d'alerte soit envoyé aux administrateurs"
+msgstr "Nombre maximum de salles Vidyo créées sur ce serveur avant qu'un message d'alerte soit envoyé aux administrateurs"
 
-#: indico_vc_vidyo/plugin.py:66
+#: indico_vc_vidyo/plugin.py:68
 msgid "VidyoVoice phone number"
 msgstr "Numéros de téléphone VidyoVoice"
 
-#: indico_vc_vidyo/plugin.py:67
+#: indico_vc_vidyo/plugin.py:69
 msgid "Link to the list of VidyoVoice phone numbers"
 msgstr "Lien vers la liste des numéros de téléphones VidyoVoice"
 
-#: indico_vc_vidyo/plugin.py:68
+#: indico_vc_vidyo/plugin.py:70
 msgid "Creation email footer"
 msgstr "Pied de page du courriel de création"
 
-#: indico_vc_vidyo/plugin.py:69
+#: indico_vc_vidyo/plugin.py:71
 msgid "Footer to append to emails sent upon creation of a VC room"
-msgstr ""
-"Pied de page ajouté au courriel envoyé à la création d'une nouvelle salle"
-" Vidyo"
+msgstr "Pied de page ajouté au courriel envoyé à la création d'une nouvelle salle Vidyo"
 
-#: indico_vc_vidyo/plugin.py:121
-msgid "Videoconference"
-msgstr ""
-
-#: indico_vc_vidyo/plugin.py:122
-msgid "Vidyo"
-msgstr ""
-
-#: indico_vc_vidyo/plugin.py:165 indico_vc_vidyo/plugin.py:198
-#: indico_vc_vidyo/plugin.py:234 indico_vc_vidyo/plugin.py:263
+#: indico_vc_vidyo/plugin.py:161 indico_vc_vidyo/plugin.py:194
+#: indico_vc_vidyo/plugin.py:232 indico_vc_vidyo/plugin.py:261
 msgid "No valid Vidyo account found for this user"
 msgstr "Pas de compte Vidyo valide pour cet utilisateur"
 
-#: indico_vc_vidyo/plugin.py:194 indico_vc_vidyo/plugin.py:257
+#: indico_vc_vidyo/plugin.py:190 indico_vc_vidyo/plugin.py:255
 msgid "Room name already in use"
 msgstr "Ce nom de salle est déjà utilisé"
 
-#: indico_vc_vidyo/plugin.py:226 indico_vc_vidyo/plugin.py:253
-#: indico_vc_vidyo/plugin.py:282
+#: indico_vc_vidyo/plugin.py:205
+msgid "Could not find newly created room in Vidyo"
+msgstr "Impossible de trouver la nouvelle salle dans Vidyo"
+
+#: indico_vc_vidyo/plugin.py:224 indico_vc_vidyo/plugin.py:251
+#: indico_vc_vidyo/plugin.py:280
 msgid "This room has been deleted from Vidyo"
 msgstr "Cette salle a été supprimée de Vidyo"
 
 #: indico_vc_vidyo/templates/buttons.html:7
 #, python-format
 msgid "You will be the owner of this Vidyo room, replacing %(name)s."
-msgstr ""
-"Vous deviendrez le responsable de cette salle Vidyo, à la place de "
-"%(name)s."
+msgstr "Vous deviendrez le responsable de cette salle Vidyo, à la place de %(name)s."
 
 #: indico_vc_vidyo/templates/buttons.html:9
 msgid "Make me owner"
@@ -259,7 +244,7 @@ msgstr "Extension"
 #: indico_vc_vidyo/templates/info_box.html:22
 #: indico_vc_vidyo/templates/manage_event_info_box.html:45
 msgid "Auto-join URL"
-msgstr ""
+msgstr "URL pour connexion à la salle"
 
 #: indico_vc_vidyo/templates/info_box.html:29
 msgid "Useful links"
@@ -292,31 +277,3 @@ msgstr "Créée le "
 #: indico_vc_vidyo/templates/manage_event_info_box.html:52
 msgid "Modified on"
 msgstr "Modifiée le "
-
-#~ msgid "Group name for public video conference rooms created by Indico"
-#~ msgstr ""
-#~ "Nom du groupe Vidyo dans lequel "
-#~ "sont ajoutées les salles Vidyo créées"
-#~ " par Indico"
-
-#~ msgid "Authenticators to convert Indico users to Vidyo accounts"
-#~ msgstr ""
-#~ "Services d'authentification pour convertir les"
-#~ " utilisateurs Indico en comptes Vidyo"
-
-#~ msgid ""
-#~ "Number of days after an Indico "
-#~ "event when a video conference room "
-#~ "is considered old"
-#~ msgstr ""
-#~ "Le nombre de jours après le "
-#~ "dernier événement utilisant une salle "
-#~ "Vidyo après lesquels cette salle est "
-#~ "supprimée."
-
-#~ msgid "Create new Vidyo room"
-#~ msgstr "Créer une nouvelle salle Vidyo"
-
-#~ msgid "Moderator"
-#~ msgstr "Modérateur"
-
