@@ -16,6 +16,8 @@
 
 import pytest
 
+from indico.modules.categories import Category
+
 from indico_livesync.util import get_excluded_categories, obj_ref
 from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 
@@ -39,8 +41,9 @@ def test_excluded_categories(mocker, monkeypatch, db, create_category):
     categories = {}
     with db.session.no_autoflush:
         for cat_id in xrange(6):
-            category = create_category(cat_id, title=str(cat_id), protection_mode=0,
-                                       parent=(categories[CATEGORY_PARENTS[cat_id]] if cat_id else None))
+            category = (create_category(cat_id, title=str(cat_id), protection_mode=0,
+                                        parent=categories[CATEGORY_PARENTS[cat_id]])
+                        if cat_id else Category.get_root())
             categories[cat_id] = category
             db.session.add(category)
             db.session.flush()
