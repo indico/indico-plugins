@@ -1,0 +1,85 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Jesús Martín <jesusmartin@sallep.net>, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2017-04-21 14:35+0000\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_search_invenio/forms.py:26
+msgid "Both (Events + Contributions)"
+msgstr "Ambos (Eventos + Contribuciones)"
+
+#: indico_search_invenio/forms.py:27
+msgid "Events"
+msgstr "Eventos"
+
+#: indico_search_invenio/forms.py:28
+msgid "Contributions"
+msgstr "Contribuciones"
+
+#: indico_search_invenio/forms.py:29
+msgid "Oldest first"
+msgstr "Los más antiguos primero"
+
+#: indico_search_invenio/forms.py:30
+msgid "Newest first"
+msgstr "Los más nuevos primero"
+
+#: indico_search_invenio/forms.py:34
+msgid "Search for"
+msgstr "Búsqueda de"
+
+#: indico_search_invenio/forms.py:35
+msgid "Sort order"
+msgstr "Orden de clasificación"
+
+#: indico_search_invenio/plugin.py:34
+msgid "Invenio URL"
+msgstr "URL Invenio"
+
+#: indico_search_invenio/plugin.py:35
+msgid "Display mode"
+msgstr "Modo de visualización"
+
+#: indico_search_invenio/plugin.py:35
+msgid "Embedded (public data)"
+msgstr "Embebido (datos públicos)"
+
+#: indico_search_invenio/plugin.py:36
+msgid "Embedded (private data)"
+msgstr "Embebido (datos privados)"
+
+#: indico_search_invenio/plugin.py:37
+msgid "External (Redirect)"
+msgstr "Externo (Redirigir)"
+
+#: indico_search_invenio/plugin.py:38
+msgid "Results per page"
+msgstr "Resultados por página"
+
+#: indico_search_invenio/plugin.py:39
+msgid "Number of results to show per page (only in embedded mode)"
+msgstr "Número de resultados que se mostrarán por página (solo en modo embebido)"
+
+#: indico_search_invenio/templates/results.html:26
+msgid "No results found"
+msgstr "No se encontró ningún resultado"
+
+#: indico_search_invenio/templates/results.html:39
+#: indico_search_invenio/templates/results.html:56
+msgid "Load more results"
+msgstr "Cargar más resultados"

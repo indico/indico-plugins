@@ -1,0 +1,256 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2017-03-22 17:04+0000\n"
+"Last-Translator: Pedro Ferreira <pedro.ferreira@cern.ch>\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_piwik/forms.py:29
+msgid "Track global visits"
+msgstr ""
+
+#: indico_piwik/forms.py:30
+msgid "Track events"
+msgstr ""
+
+#: indico_piwik/forms.py:31
+msgid "Track downloads"
+msgstr ""
+
+#: indico_piwik/forms.py:32
+msgid "Cache results"
+msgstr ""
+
+#: indico_piwik/forms.py:33
+msgid "Piwik server URL"
+msgstr ""
+
+#: indico_piwik/forms.py:34
+msgid "Piwik API server URL"
+msgstr ""
+
+#: indico_piwik/forms.py:35
+msgid "Should be pointing to 'index.php'"
+msgstr ""
+
+#: indico_piwik/forms.py:36
+msgid "Piwik API token"
+msgstr ""
+
+#: indico_piwik/forms.py:37
+msgid "Token to access the API. Do not share it!"
+msgstr ""
+
+#: indico_piwik/forms.py:38
+msgid "Global statistics ID"
+msgstr ""
+
+#: indico_piwik/forms.py:39
+msgid "Piwik site ID for global statistics"
+msgstr ""
+
+#: indico_piwik/forms.py:40
+msgid "Event statistics ID"
+msgstr ""
+
+#: indico_piwik/forms.py:41
+msgid "Piwik site ID for event statistics"
+msgstr ""
+
+#: indico_piwik/forms.py:42
+msgid "Result cache TTL (seconds)"
+msgstr ""
+
+#: indico_piwik/forms.py:43
+msgid "How long event reports are kept cached"
+msgstr ""
+
+#: indico_piwik/forms.py:44
+msgid "Use Piwik server URL for all requests"
+msgstr ""
+
+#: indico_piwik/forms.py:48
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr ""
+
+#: indico_piwik/plugin.py:78
+msgid "Statistics"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Selection Information"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:14
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:17
+#: indico_piwik/templates/statistics.html:19
+msgid "Modify Query"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:18
+msgid "Hide"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:28
+msgid "View statistics between these dates"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:34
+msgid "to"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Choose Event / Contribution"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:46
+msgid "Event"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:49
+msgid "Contribution"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:58
+msgid "Update Query"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:69
+msgid "Visitor Hit Rates"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:71
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:78
+msgid "Info"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:91
+msgid "Overall Statistics"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:95
+msgid "Visitor Metrics"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:99
+msgid "Visitors"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:103
+msgid "Unique Visitors"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:107
+msgid "Returning Visitors"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Avg. Duration"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:116
+msgid "Peak Statistics"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:120
+msgid "Peak Date"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:124
+msgid "Peak Users"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:134
+msgid "Visitors Geography"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:138
+msgid "Visitor Origins"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:149
+msgid "Top Referrers"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Traffic Inbound Top 10"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:157
+msgid "Referrer"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:158
+msgid "Visits"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:159
+msgid "Actions"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:160
+msgid "Visit Length"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:177
+msgid "User Systems"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:181
+msgid "Visitor Systems"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:192
+msgid "Material Downloads"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:198
+msgid "Downloads for"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:202
+msgid "Total"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:206
+msgid "No material selected"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:216
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:224
+msgid "Unable to retrieve Graph Data"
+msgstr ""
+
+#: indico_piwik/templates/statistics.html:226
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr ""

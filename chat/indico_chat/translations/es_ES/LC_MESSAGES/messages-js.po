@@ -1,0 +1,73 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Jesús Martín <jesusmartin@sallep.net>, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2017-04-21 08:35+0000\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_chat/static/js/chat.js:36
+msgid "Do you really want to remove this chatroom from the event?"
+msgstr "¿Desea borrar esta sala de chat del evento?"
+
+#: indico_chat/static/js/chat.js:40
+msgid ""
+"Since it is on an external server, it will not be deleted on that server."
+msgstr "Dado que está en un servidor externo, no será borrado en dicho servidor."
+
+#: indico_chat/static/js/chat.js:42
+msgid ""
+"Since it is only used in this event, it will be deleted from the Jabber "
+"server, too!"
+msgstr "Dado que solo se utiliza en este evento, también será borrado del servidor Jabber."
+
+#: indico_chat/static/js/chat.js:45
+msgid "Delete this chatroom?"
+msgstr "¿Eliminar esta sala de chat?"
+
+#: indico_chat/static/js/chat.js:67
+msgid "Chatroom not found"
+msgstr "Sala de chat no encontrada"
+
+#: indico_chat/static/js/chat.js:67
+msgid ""
+"The chatroom does not exist on the Jabber server anymore. We recommend you "
+"to delete it chatroom from Indico as well."
+msgstr "La sala de chat ya no existe en el servidor Jabber. Le recomendamos que también elimine esta sala de chat en Indico."
+
+#: indico_chat/static/js/chat.js:69
+msgid "Chatroom updated"
+msgstr "Sala de chat actualizada"
+
+#: indico_chat/static/js/chat.js:69
+msgid "The chatroom data has been updated."
+msgstr "Los datos de la sala de chat han sido actualizados."
+
+#: indico_chat/static/js/chat.js:98
+msgid "No logs available"
+msgstr "No hay logs disponibles"
+
+#: indico_chat/static/js/chat.js:136
+msgid "Could not create material"
+msgstr "No se pudo crear el material"
+
+#: indico_chat/static/js/chat.js:140
+msgid "Material created"
+msgstr "Material creado"
+
+#: indico_chat/static/js/chat.js:140
+msgid "The chat logs have been attached to the event."
+msgstr "Los logs del chat han sido adjuntados al evento."

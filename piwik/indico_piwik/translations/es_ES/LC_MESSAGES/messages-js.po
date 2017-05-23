@@ -1,0 +1,35 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2015-03-11 16:40+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_piwik/static/js/statistics.js:47
+msgid "Total Hits"
+msgstr ""
+
+#: indico_piwik/static/js/statistics.js:52
+msgid "Unique Hits"
+msgstr ""
+
+#: indico_piwik/static/js/statistics.js:172
+msgid "No material found"
+msgstr ""
+
+#: indico_piwik/static/js/statistics.js:219
+msgid "No graph data received"
+msgstr ""
