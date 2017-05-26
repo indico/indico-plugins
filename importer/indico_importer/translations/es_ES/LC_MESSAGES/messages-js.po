@@ -1,0 +1,224 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Jesús Martín <jesusmartin@sallep.net>, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-03-22 18:04+0100\n"
+"PO-Revision-Date: 2017-04-21 13:36+0000\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_importer/static/js/importer.js:31
+msgid "Jan"
+msgstr "Ene"
+
+#: indico_importer/static/js/importer.js:32
+msgid "Feb"
+msgstr "Feb"
+
+#: indico_importer/static/js/importer.js:33
+msgid "Mar"
+msgstr "Mar"
+
+#: indico_importer/static/js/importer.js:34
+msgid "Apr"
+msgstr "Abr"
+
+#: indico_importer/static/js/importer.js:35
+msgid "May"
+msgstr "May"
+
+#: indico_importer/static/js/importer.js:36
+msgid "Jun"
+msgstr "Jun"
+
+#: indico_importer/static/js/importer.js:37
+msgid "Jul"
+msgstr "Jul"
+
+#: indico_importer/static/js/importer.js:38
+msgid "Aug"
+msgstr "Ago"
+
+#: indico_importer/static/js/importer.js:39
+msgid "Sep"
+msgstr "Sep"
+
+#: indico_importer/static/js/importer.js:40
+msgid "Oct"
+msgstr "Oct"
+
+#: indico_importer/static/js/importer.js:41
+msgid "Nov"
+msgstr "Nov"
+
+#: indico_importer/static/js/importer.js:42
+msgid "Dec"
+msgstr "Dic"
+
+#: indico_importer/static/js/importer.js:265
+msgid "search"
+msgstr "buscar"
+
+#: indico_importer/static/js/importer.js:296
+msgid "in"
+msgstr "en"
+
+#: indico_importer/static/js/importer.js:303
+msgid "Proceed..."
+msgstr "Proceder..."
+
+#: indico_importer/static/js/importer.js:317
+msgid "Close"
+msgstr "Cerrar"
+
+#: indico_importer/static/js/importer.js:326
+msgid "Please select contributions to be added and their destination."
+msgstr "Por favor, seleccione las contribuciones a añadir así como su destino."
+
+#: indico_importer/static/js/importer.js:352
+msgid "Import Entries"
+msgstr "Importar Entradas"
+
+#: indico_importer/static/js/importer.js:392
+msgid "Please type your search phrase and press 'search'."
+msgstr "Por favor, teclee el texto deseado y presione \"buscar\"."
+
+#: indico_importer/static/js/importer.js:393
+msgid "here"
+msgstr "aquí"
+
+#: indico_importer/static/js/importer.js:397
+msgid ""
+"Your entries were inserted successfully. Please specify a new query or click"
+msgstr "Sus entradas fueron insertadas con éxito. Por favor, especifique una nueva consulta o pulse"
+
+#: indico_importer/static/js/importer.js:397
+msgid "to see the previous results."
+msgstr "para ver los resultados anteriores"
+
+#: indico_importer/static/js/importer.js:472
+msgid "Duration time of every inserted contribution:"
+msgstr "Tiempo de duración de cada contribución insertada:"
+
+#: indico_importer/static/js/importer.js:473
+msgid "Start time of the first contribution:"
+msgstr "Hora de inicio de la primera contribución:"
+
+#: indico_importer/static/js/importer.js:474
+msgid "Show me the destination:"
+msgstr "Muéstreme el destino:"
+
+#: indico_importer/static/js/importer.js:599
+msgid "Insert"
+msgstr "Insertar"
+
+#: indico_importer/static/js/importer.js:681
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: indico_importer/static/js/importer.js:703
+msgid "Adjust entries"
+msgstr "Ajustar entradas"
+
+#: indico_importer/static/js/importer.js:939
+msgid "Report number(s)"
+msgstr "Número(s) de informe"
+
+#: indico_importer/static/js/importer.js:946
+msgid "Title"
+msgstr "Título"
+
+#: indico_importer/static/js/importer.js:949
+msgid "Meeting"
+msgstr "Reunión"
+
+#: indico_importer/static/js/importer.js:953
+msgid "Primary author"
+msgstr "Autor primario"
+
+#: indico_importer/static/js/importer.js:956
+msgid "Secondary author"
+msgstr "Autor secundario"
+
+#: indico_importer/static/js/importer.js:959
+msgid "Speaker"
+msgstr "Ponente"
+
+#: indico_importer/static/js/importer.js:965
+#: indico_importer/static/js/importer.js:989
+msgid "Summary"
+msgstr "Resumen"
+
+#: indico_importer/static/js/importer.js:969
+msgid " (show all)"
+msgstr "(mostrar todo)"
+
+#: indico_importer/static/js/importer.js:979
+msgid " (hide)"
+msgstr "(ocultar)"
+
+#: indico_importer/static/js/importer.js:994
+msgid "Place"
+msgstr "Lugar"
+
+#: indico_importer/static/js/importer.js:998
+msgid "Materials"
+msgstr "Materiales"
+
+#: indico_importer/static/js/importer.js:1039
+msgid "st"
+msgstr ".º"
+
+#: indico_importer/static/js/importer.js:1042
+msgid "nd"
+msgstr ".º"
+
+#: indico_importer/static/js/importer.js:1045
+msgid "rd"
+msgstr ".º"
+
+#: indico_importer/static/js/importer.js:1048
+msgid "th"
+msgstr ".º"
+
+#: indico_importer/static/js/importer.js:1131
+msgid "One entry was found. "
+msgid_plural "{0} entries were found. "
+msgstr[0] "Se encontró una entrada."
+msgstr[1] "Fueron encontradas {0} entradas."
+
+#: indico_importer/static/js/importer.js:1196
+msgid "Please select the results you want to insert."
+msgstr "Por favor, seleccione los resultados que desea insertar."
+
+#: indico_importer/static/js/importer.js:1197
+msgid "No results were found. Please change the search phrase."
+msgstr "No se ha encontrado ningún resultado. Cambie el texto de búsqueda."
+
+#: indico_importer/static/js/importer.js:1198
+msgid "Step 1: Search results:"
+msgstr "Paso 1. Buscar resultados:"
+
+#: indico_importer/static/js/importer.js:1203
+msgid "more results"
+msgstr "más resultados"
+
+#: indico_importer/static/js/importer.js:1440
+msgid "Step 2: Choose destination:"
+msgstr "Paso 2. Seleccionar destino:"
+
+#: indico_importer/static/js/importer.js:1441
+msgid "Please select the place in which the contributions will be inserted."
+msgstr "Por favor, seleccione el lugar en el que se insertarán las contribuciones."
