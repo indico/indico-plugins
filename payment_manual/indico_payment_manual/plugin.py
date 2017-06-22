@@ -73,5 +73,5 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         event = data['event']
         event_settings = data['event_settings']
         registration = data['registration']
-        data['details'] = replace_placeholders('event-payment-form', event_settings.details,
+        data['details'] = replace_placeholders('event-payment-form', event_settings['details'],
                                                event=event, registration=registration)
