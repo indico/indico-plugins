@@ -23,6 +23,7 @@ from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plu
 from indico.modules.events.payment import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                            PaymentEventSettingsFormBase)
 from indico.web.forms.validators import UsedIf
+from indico.util.placeholders import render_placeholder_info, replace_placeholders
 
 from indico_payment_manual import _
 
@@ -34,10 +35,19 @@ DETAILS_DESC = _('The details the user needs to make their payment. This usually
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
     details = TextAreaField(_('Payment details'), [], description=DETAILS_DESC)
 
+    def __init__(self, *args, **kwargs):
+        super(PluginSettingsForm, self).__init__(*args, **kwargs)
+        self.details.description = DETAILS_DESC + '<br>' + render_placeholder_info('event-payment-form',
+                                                                                   event=None, registration=None)
+
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    details = TextAreaField(_('Payment details'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()],
-                            description=DETAILS_DESC)
+    details = TextAreaField(_('Payment details'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(EventSettingsForm, self).__init__(*args, **kwargs)
+        self.details.description = DETAILS_DESC + '<br>' + render_placeholder_info('event-payment-form',
+                                                                                   event=None, registration=None)
 
 
 class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
@@ -58,3 +68,10 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         return IndicoPluginBlueprint('payment_manual', __name__)
+
+    def adjust_payment_form_data(self, data):
+        event = data['event']
+        event_settings = data['event_settings']
+        registration = data['registration']
+        data['details'] = replace_placeholders('event-payment-form', event_settings['details'],
+                                               event=event, registration=registration)
