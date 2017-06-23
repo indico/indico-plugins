@@ -38,7 +38,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
     def __init__(self, *args, **kwargs):
         super(PluginSettingsForm, self).__init__(*args, **kwargs)
-        self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('event-payment-form',
+        self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
 
 
@@ -47,7 +47,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
 
     def __init__(self, *args, **kwargs):
         super(EventSettingsForm, self).__init__(*args, **kwargs)
-        self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('event-payment-form',
+        self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
 
 
@@ -65,7 +65,7 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def init(self):
         super(ManualPaymentPlugin, self).init()
-        self.connect(signals.get_placeholders, self._get_details_placeholders, sender='event-payment-form')
+        self.connect(signals.get_placeholders, self._get_details_placeholders, sender='manual-payment-details')
 
     def _get_details_placeholders(self, sender, regform, registration, **kwargs):
         from indico.modules.events.registration.placeholders.registrations import (FirstNamePlaceholder,
@@ -84,6 +84,6 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return IndicoPluginBlueprint('payment_manual', __name__)
 
     def adjust_payment_form_data(self, data):
-        data['details'] = replace_placeholders('event-payment-form', data['event_settings']['details'],
+        data['details'] = replace_placeholders('manual-payment-details', data['event_settings']['details'],
                                                regform=data['registration'].registration_form,
                                                registration=data['registration'])
