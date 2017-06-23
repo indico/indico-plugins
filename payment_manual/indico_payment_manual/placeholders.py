@@ -16,27 +16,19 @@
 
 from __future__ import unicode_literals
 
-from setuptools import setup, find_packages
+from indico_payment_manual import _
+from indico.util.placeholders import Placeholder
+from indico.modules.events.registration.placeholders.registrations import IDPlaceholder
 
 
-setup(
-    name='indico_payment_manual',
-    version='0.2.0',
-    url='https://github.com/indico/indico-plugins',
-    license='https://www.gnu.org/licenses/gpl-3.0.txt',
-    author='Indico Team',
-    author_email='indico-team@cern.ch',
-    packages=find_packages(),
-    zip_safe=False,
-    include_package_data=True,
-    install_requires=[
-        'indico>=1.9.10'
-    ],
-    classifiers=[
-        'Environment :: Plugins',
-        'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python :: 2.7'
-    ],
-    entry_points={'indico.plugins': {'payment_manual = indico_payment_manual.plugin:ManualPaymentPlugin'}}
-)
+class RegistrationIDPlaceholder(IDPlaceholder):
+    name = 'registration_id'
+
+
+class EventIDPlaceholder(Placeholder):
+    name = 'event_id'
+    description = _("The ID of the event")
+
+    @classmethod
+    def render(cls, regform, registration):
+        return registration.registration_form.event_new.id
