@@ -16,17 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
 from indico.util.i18n import make_bound_gettext
 
+
 _ = make_bound_gettext('payment_manual')
-
-
-@signals.get_placeholders.connect_via('event-payment-form')
-def _get_payment_form_placeholders(sender, regform, registration, **kwargs):
-    from indico.modules.events.registration.placeholders.registrations import FirstNamePlaceholder, LastNamePlaceholder
-    from indico_payment_manual.placeholders import RegistrationIDPlaceholder, EventIDPlaceholder
-    yield FirstNamePlaceholder
-    yield LastNamePlaceholder
-    yield RegistrationIDPlaceholder
-    yield EventIDPlaceholder

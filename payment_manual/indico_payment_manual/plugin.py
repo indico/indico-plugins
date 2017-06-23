@@ -19,11 +19,12 @@ from __future__ import unicode_literals
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
-from indico.modules.events.payment import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
-                                           PaymentEventSettingsFormBase)
-from indico.web.forms.validators import UsedIf
+from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
+                                           PaymentPluginSettingsFormBase)
 from indico.util.placeholders import render_placeholder_info, replace_placeholders
+from indico.web.forms.validators import UsedIf
 
 from indico_payment_manual import _
 
@@ -61,6 +62,19 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'Bank Transfer'}
+
+    def init(self):
+        super(ManualPaymentPlugin, self).init()
+        self.connect(signals.get_placeholders, self._get_details_placeholders, sender='event-payment-form')
+
+    def _get_details_placeholders(self, sender, regform, registration, **kwargs):
+        from indico.modules.events.registration.placeholders.registrations import (FirstNamePlaceholder,
+                                                                                   LastNamePlaceholder)
+        from indico_payment_manual.placeholders import RegistrationIDPlaceholder, EventIDPlaceholder
+        yield FirstNamePlaceholder
+        yield LastNamePlaceholder
+        yield RegistrationIDPlaceholder
+        yield EventIDPlaceholder
 
     @property
     def logo_url(self):
