@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='indico_payment_manual',
-    version='0.1',
+    version='0.2.0',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
