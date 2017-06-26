@@ -1,20 +1,19 @@
-# French (France) translations for .
-# Copyright (C) 2015 ORGANIZATION
-# This file is distributed under the same license as the  project.
+
+# German (Germany) translations for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-# Translators:
-# Thomas Baron <thomas.baron@cern.ch>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version:  Indico\n"
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-06-26 09:51+0200\n"
-"PO-Revision-Date: 2017-06-26 09:51+0200\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
-"Language: fr_FR\n"
-"Language-Team: French (France) "
-"(http://www.transifex.com/projects/p/indico/language/fr_FR/)\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"PO-Revision-Date: 2017-06-26 09:56+0200\n"
+"Last-Translator: Dennis Riehle <webmaster@riehle-web.com>\n"
+"Language: de_DE\n"
+"Language-Team: German (Germany) (http://www.transifex.com/projects/p/indico/language/de_DE/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,19 +21,19 @@ msgstr ""
 
 #: indico_payment_paypal/controllers.py:117
 msgid "Your payment request has been processed."
-msgstr "Votre demande de paiement a été traitée."
+msgstr "Ihr Zahlungsvorgang wurde bearbeitet."
 
 #: indico_payment_paypal/controllers.py:125
 msgid "You cancelled the payment process."
-msgstr "Vous avez annulé le processus de paiement."
+msgstr "Sie haben den Zahlungsvorgang abgebrochen."
 
 #: indico_payment_paypal/plugin.py:34
 msgid "API URL"
-msgstr "URL de l'API"
+msgstr "API URL"
 
 #: indico_payment_paypal/plugin.py:34
 msgid "URL of the PayPal HTTP API."
-msgstr "URL de l'API http de PayPal."
+msgstr "URL der PayPal HTTP API."
 
 #: indico_payment_paypal/plugin.py:35 indico_payment_paypal/plugin.py:41
 msgid "Business"
@@ -45,56 +44,53 @@ msgid ""
 "The default PayPal ID or email address associated with a PayPal account. "
 "Event managers will be able to override this."
 msgstr ""
-"L'identifiant PayPal par défaut ou l'adresse électronique associée à un "
-"compte PayPal. Les organisateurs d'événement pourront remplacer cette "
-"valeur."
+"Die PayPal-ID oder E-Mail-Adresse des PayPal-Accounts, welcher standardmäßig "
+"verknüpft werden soll. Dies kann pro Veranstaltung überschrieben werden."
 
 #: indico_payment_paypal/plugin.py:42
 msgid "The PayPal ID or email address associated with a PayPal account."
-msgstr ""
-"L'identifiant PayPal ou l'adresse électronique associée au compte Paypal "
-"créditeur."
+msgstr "Die PayPal-ID oder E-Mail-Adresse des PayPal-Accounts."
 
 #: indico_payment_paypal/util.py:34
 msgid "Invalid email address / paypal ID"
-msgstr "Adresse électronique / identifiant PayPal invalide"
+msgstr "Ungültige E-Mail-Adresse / PayPal-ID"
 
 #: indico_payment_paypal/templates/event_payment_form.html:4
 msgid "First name"
-msgstr "Prénom"
+msgstr "Vorname"
 
 #: indico_payment_paypal/templates/event_payment_form.html:6
 msgid "Last name"
-msgstr "Nom de famille"
+msgstr "Nachname"
 
 #: indico_payment_paypal/templates/event_payment_form.html:8
 msgid "Total amount"
-msgstr "Montant total"
+msgstr "Gesamtsumme"
 
 #: indico_payment_paypal/templates/transaction_details.html:6
 msgid "Transaction ID"
-msgstr "Identifiant de transaction"
+msgstr "Transaktionsnummer"
 
 #: indico_payment_paypal/templates/transaction_details.html:8
 msgid "Invoice ID"
-msgstr "Identifiant de facture"
+msgstr "Rechnungsnummer"
 
 #: indico_payment_paypal/templates/transaction_details.html:10
 msgid "Payer e-mail"
-msgstr "Adresse électronique du payeur"
+msgstr "E-Mail-Adresse Käufer"
 
 #: indico_payment_paypal/templates/transaction_details.html:19
 msgid ""
 "The paid amount does not match the required amount. Please contact the "
 "registrant to solve the issue."
 msgstr ""
-"Le montant payé ne correspond pas au montant demandé. Veuillez contacter "
-"le participant pour régler ce problème."
+"Die tatsächlich bezahlte Summe entspricht nicht der geforderten Summe. "
+"Bitte kontaktieren Sie den Veranstalter, um dieses Problem zu lösen."
 
 #: indico_payment_paypal/templates/transaction_details.html:22
 msgid "Paid: "
-msgstr "Payé: "
+msgstr "Bezahlt: "
 
 #: indico_payment_paypal/templates/transaction_details.html:26
 msgid "Required: "
-msgstr "Demandé: "
+msgstr "Gefordert: "
