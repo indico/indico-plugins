@@ -7,12 +7,6 @@ source_file = vc_vidyo/indico_vc_vidyo/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.vc-vidyo-messages-js]
-file_filter = vc_vidyo/indico_vc_vidyo/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = vc_vidyo/indico_vc_vidyo/translations/messages-js.pot
-source_lang = en
-type = PO
-
 [indico.search-messages]
 file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages.po
 source_file = search/indico_search/translations/messages.pot
@@ -67,21 +61,9 @@ source_file = payment_paypal/indico_payment_paypal/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.payment-paypal-messages-js]
-file_filter = payment_paypal/indico_payment_paypal/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = payment_paypal/indico_payment_paypal/translations/messages-js.pot
-source_lang = en
-type = PO
-
 [indico.payment-manual-messages]
 file_filter = payment_manual/indico_payment_manual/translations/<lang>/LC_MESSAGES/messages.po
 source_file = payment_manual/indico_payment_manual/translations/messages.pot
-source_lang = en
-type = PO
-
-[indico.payment-manual-messages-js]
-file_filter = payment_manual/indico_payment_manual/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = payment_manual/indico_payment_manual/translations/messages-js.pot
 source_lang = en
 type = PO
 
@@ -103,12 +85,6 @@ source_file = livesync_invenio/indico_livesync_invenio/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.livesync-invenio-messages-js]
-file_filter = livesync_invenio/indico_livesync_invenio/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = livesync_invenio/indico_livesync_invenio/translations/messages-js.pot
-source_lang = en
-type = PO
-
 [indico.importer-messages]
 file_filter = importer/indico_importer/translations/<lang>/LC_MESSAGES/messages.po
 source_file = importer/indico_importer/translations/messages.pot
@@ -124,11 +100,5 @@ type = PO
 [indico.importer-invenio-messages]
 file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_MESSAGES/messages.po
 source_file = importer_invenio/indico_importer_invenio/translations/messages.pot
-source_lang = en
-type = PO
-
-[indico.importer-invenio-messages-js]
-file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = importer_invenio/indico_importer_invenio/translations/messages-js.pot
 source_lang = en
 type = PO

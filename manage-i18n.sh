@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 USAGE="$0 [init <locale>|extract|update <locale>|compile <locale>]"
 
@@ -31,7 +31,17 @@ for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;
         TRANSLATIONS_DIR="./indico_${plugin}/translations"
         [[ ! -d "$TRANSLATIONS_DIR" ]] && mkdir "$TRANSLATIONS_DIR"
         pybabel extract -o "${TRANSLATIONS_DIR}/messages.pot" "indico_${plugin}" -F ../babel.cfg
+        num_strings=$(grep msgid "${TRANSLATIONS_DIR}/messages.pot" | wc -l)
+        if (( $num_strings == 1 )); then
+            echo "deleting empty dict ${TRANSLATIONS_DIR}/messages.pot"
+            rm "${TRANSLATIONS_DIR}/messages.pot"
+        fi
         pybabel extract -o "${TRANSLATIONS_DIR}/messages-js.pot" "indico_${plugin}" -k 'gettext' -k 'ngettext:1,2' -k '$T' -F ../babel-js.cfg
+        num_strings=$(grep msgid "${TRANSLATIONS_DIR}/messages-js.pot" | wc -l)
+        if (( $num_strings == 1 )); then
+            echo "deleting empty js dict ${TRANSLATIONS_DIR}/messages-js.pot"
+            rm "${TRANSLATIONS_DIR}/messages-js.pot"
+        fi
     elif [[ "$ACTION" == "update" ]]; then
         require_locale
         pybabel update -i "./indico_${plugin}/translations/messages.pot" -l "$LOCALE" -d "./indico_${plugin}/translations"
