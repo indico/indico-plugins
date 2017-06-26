@@ -1,21 +1,21 @@
 # Translations template for PROJECT.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-08-29 10:46+0200\n"
+"POT-Creation-Date: 2017-06-26 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.4.0\n"
 
 #: indico_chat/static/js/chat.js:36
 msgid "Do you really want to remove this chatroom from the event?"
@@ -35,37 +35,37 @@ msgstr ""
 msgid "Delete this chatroom?"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:69
+#: indico_chat/static/js/chat.js:67
 msgid "Chatroom not found"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:69
+#: indico_chat/static/js/chat.js:67
 msgid ""
 "The chatroom does not exist on the Jabber server anymore. We recommend "
 "you to delete it chatroom from Indico as well."
 msgstr ""
 
-#: indico_chat/static/js/chat.js:71
+#: indico_chat/static/js/chat.js:69
 msgid "Chatroom updated"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:71
+#: indico_chat/static/js/chat.js:69
 msgid "The chatroom data has been updated."
 msgstr ""
 
-#: indico_chat/static/js/chat.js:100
+#: indico_chat/static/js/chat.js:98
 msgid "No logs available"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:138
+#: indico_chat/static/js/chat.js:136
 msgid "Could not create material"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:142
+#: indico_chat/static/js/chat.js:140
 msgid "Material created"
 msgstr ""
 
-#: indico_chat/static/js/chat.js:142
+#: indico_chat/static/js/chat.js:140
 msgid "The chat logs have been attached to the event."
 msgstr ""
 

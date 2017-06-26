@@ -1,51 +1,51 @@
 # Translations template for PROJECT.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-08-29 10:46+0200\n"
+"POT-Creation-Date: 2017-06-26 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.4.0\n"
 
-#: indico_search/forms.py:28
+#: indico_search/forms.py:29
 msgid "Anywhere"
 msgstr ""
 
-#: indico_search/forms.py:29
+#: indico_search/forms.py:30
 msgid "Title"
 msgstr ""
 
-#: indico_search/forms.py:30
+#: indico_search/forms.py:31
 msgid "Description/Abstract"
 msgstr ""
 
-#: indico_search/forms.py:31
+#: indico_search/forms.py:32
 msgid "Author/Speaker"
 msgstr ""
 
-#: indico_search/forms.py:32
+#: indico_search/forms.py:33
 msgid "Affiliation"
 msgstr ""
 
-#: indico_search/forms.py:33
+#: indico_search/forms.py:34
 msgid "Keyword"
 msgstr ""
 
-#: indico_search/forms.py:37
+#: indico_search/forms.py:38
 msgid "Phrase"
 msgstr ""
 
-#: indico_search/forms.py:38
+#: indico_search/forms.py:39
 msgid "Search in"
 msgstr ""
 
@@ -57,7 +57,6 @@ msgstr ""
 
 #: indico_search/templates/results.html:11
 #: indico_search/templates/results.html:30
-#: indico_search/templates/searchbox_conference.html:5
 msgid "Search"
 msgstr ""
 
@@ -80,5 +79,9 @@ msgstr ""
 
 #: indico_search/templates/searchbox_category.html:13
 msgid "Advanced options"
+msgstr ""
+
+#: indico_search/templates/searchbox_conference.html:6
+msgid "Search..."
 msgstr ""
 

@@ -1,21 +1,21 @@
 # Translations template for PROJECT.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-08-29 10:46+0200\n"
+"POT-Creation-Date: 2017-06-26 10:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.4.0\n"
 
 #: indico_piwik/forms.py:29
 msgid "Track global visits"
@@ -85,12 +85,8 @@ msgstr ""
 msgid "Event statistics can't use the same Piwik site as global statistics"
 msgstr ""
 
-#: indico_piwik/plugin.py:79 indico_piwik/plugin.py:110
+#: indico_piwik/plugin.py:78
 msgid "Statistics"
-msgstr ""
-
-#: indico_piwik/plugin.py:111
-msgid "Piwik"
 msgstr ""
 
 #: indico_piwik/templates/statistics.html:13
@@ -141,12 +137,10 @@ msgstr ""
 
 #: indico_piwik/templates/statistics.html:71
 msgid ""
-"Please note, statistics have only been collected since the plugin's\n"
-"                        introduction. This means that there is no data "
-"present for the earlier\n"
-"                        period of some events, this does not necessarily "
-"mean that there was no\n"
-"                        activity in the event at that time."
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
 msgstr ""
 
 #: indico_piwik/templates/statistics.html:78
@@ -256,7 +250,7 @@ msgstr ""
 
 #: indico_piwik/templates/statistics.html:226
 msgid ""
-"The server did not respond in a timely manner.\n"
-"                It may be the case that the date-range is too large."
+"The server did not respond in a timely manner. It may be the case that "
+"the date-range is too large."
 msgstr ""
 
