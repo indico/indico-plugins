@@ -32,4 +32,4 @@ msgstr "Zahlungsinformationen"
 
 #: indico_payment_manual/placeholders/__init__.py:30
 msgid "The ID of the event"
-msgstr "Die ID der Veranstaltung"
+msgstr "Die ID des Events"
