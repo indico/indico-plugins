@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-08-29 10:46+0200\n"
-"PO-Revision-Date: 2015-03-12 13:24+0000\n"
+"POT-Creation-Date: 2017-06-26 09:51+0200\n"
+"PO-Revision-Date: 2017-06-26 09:51+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language: fr_FR\n"
 "Language-Team: French (France) "
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: indico_payment_manual/plugin.py:30
+#: indico_payment_manual/plugin.py:31
 msgid ""
 "The details the user needs to make their payment. This usually includes "
 "the bank account details the IBAN and payment reference."
@@ -29,7 +29,10 @@ msgstr ""
 " Ceci inclue en général les détails du compte bancaire créditeur, l'IBAN "
 "et la référence du paiement."
 
-#: indico_payment_manual/plugin.py:35 indico_payment_manual/plugin.py:39
+#: indico_payment_manual/plugin.py:36 indico_payment_manual/plugin.py:45
 msgid "Payment details"
 msgstr "Informations pour le paiement"
 
+#: indico_payment_manual/placeholders/__init__.py:30
+msgid "The ID of the event"
+msgstr "L'ID de l'événement"
