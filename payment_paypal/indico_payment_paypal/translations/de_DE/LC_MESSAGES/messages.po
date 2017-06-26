@@ -45,7 +45,7 @@ msgid ""
 "Event managers will be able to override this."
 msgstr ""
 "Die PayPal-ID oder E-Mail-Adresse des PayPal-Accounts, welcher standardmäßig "
-"verknüpft werden soll. Dies kann pro Veranstaltung überschrieben werden."
+"verwendet werden soll. Dies kann pro Event überschrieben werden."
 
 #: indico_payment_paypal/plugin.py:42
 msgid "The PayPal ID or email address associated with a PayPal account."
@@ -85,7 +85,7 @@ msgid ""
 "registrant to solve the issue."
 msgstr ""
 "Die tatsächlich bezahlte Summe entspricht nicht der geforderten Summe. "
-"Bitte kontaktieren Sie den Veranstalter, um dieses Problem zu lösen."
+"Bitte kontaktieren Sie den Gast, um dieses Problem zu lösen."
 
 #: indico_payment_paypal/templates/transaction_details.html:22
 msgid "Paid: "
