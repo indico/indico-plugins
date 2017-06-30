@@ -24,6 +24,7 @@ from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                            PaymentEventSettingsFormBase)
 from indico.util.string import remove_accents
+from indico.web.forms.validators import UsedIf
 
 from indico_payment_paypal import _
 from indico_payment_paypal.blueprint import blueprint
@@ -38,7 +39,8 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    business = StringField(_('Business'), [DataRequired(), validate_business],
+    business = StringField(_('Business'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
+                                           validate_business],
                            description=_('The PayPal ID or email address associated with a PayPal account.'))
 
 
@@ -51,7 +53,11 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'PayPal',
-                        'url': 'https://www.paypal.com/cgi-bin/webscr'}
+                        'url': 'https://www.paypal.com/cgi-bin/webscr',
+                        'business': ''}
+    default_event_settings = {'enabled': False,
+                              'method_name': None,
+                              'business': None}
 
     @property
     def logo_url(self):

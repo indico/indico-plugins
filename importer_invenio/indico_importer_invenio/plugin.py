@@ -29,4 +29,5 @@ class ImporterInvenioPlugin(ImporterSourcePluginBase):
     """
     configurable = True
     settings_form = SettingsForm
+    default_settings = {'server_url': ''}
     importer_engine_classes = (InvenioImporter,)

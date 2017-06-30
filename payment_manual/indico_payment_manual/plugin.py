@@ -61,7 +61,11 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     configurable = True
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
-    default_settings = {'method_name': 'Bank Transfer'}
+    default_settings = {'method_name': 'Bank Transfer',
+                        'details': ''}
+    default_event_settings = {'enabled': False,
+                              'method_name': None,
+                              'details': ''}
 
     def init(self):
         super(ManualPaymentPlugin, self).init()

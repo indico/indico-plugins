@@ -47,12 +47,13 @@ class PiwikPlugin(IndicoPlugin):
         'enabled_for_events': True,
         'enabled_for_downloads': True,
         'cache_enabled': True,
-        'cache_ttl': 3600,
-        'server_url': '//127.0.0.1/piwik/',
-        'server_api_url': '//127.0.0.1/piwik/',
-        'use_only_server_url': True,
+        'server_url': u'//127.0.0.1/piwik/',
+        'server_api_url': u'//127.0.0.1/piwik/',
+        'server_token': u'',
         'site_id_general': 1,
-        'site_id_events': 2
+        'site_id_events': 2,
+        'cache_ttl': 3600,
+        'use_only_server_url': True,
     }
 
     def init(self):

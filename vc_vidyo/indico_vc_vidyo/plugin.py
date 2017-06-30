@@ -79,7 +79,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     Videoconferencing with Vidyo
     """
     configurable = True
-    strict_settings = True
     settings_form = PluginSettingsForm
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm

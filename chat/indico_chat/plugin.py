@@ -90,9 +90,16 @@ class ChatPlugin(IndicoPlugin):
 
     @property
     def default_settings(self):
-        return {'notify_emails': [],
-                'how_to_connect': render_plugin_template('how_to_connect.html'),
-                'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}]}
+        return {
+            'server': '',
+            'muc_server': '',
+            'bot_jid': '',
+            'bot_password': '',
+            'notify_emails': [],
+            'log_url': '',
+            'chat_links': [{'title': 'Desktop Client', 'link': 'xmpp:{room}@{server}?join'}],
+            'how_to_connect': render_plugin_template('how_to_connect.html')
+        }
 
     def init(self):
         super(ChatPlugin, self).init()
