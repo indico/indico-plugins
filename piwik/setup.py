@@ -38,6 +38,5 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'piwik = indico_piwik.plugin:PiwikPlugin'},
-                  'indico.zodb_importers': {'piwik = indico_piwik.zodbimport:PiwikImporter'}}
+    entry_points={'indico.plugins': {'piwik = indico_piwik.plugin:PiwikPlugin'}}
 )

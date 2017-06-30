@@ -39,6 +39,5 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'search_invenio = indico_search_invenio.plugin:InvenioSearchPlugin'},
-                  'indico.zodb_importers': {'search_invenio = indico_search_invenio.zodbimport:InvenioSearchImporter'}}
+    entry_points={'indico.plugins': {'search_invenio = indico_search_invenio.plugin:InvenioSearchPlugin'}}
 )

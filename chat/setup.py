@@ -40,6 +40,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Communications :: Chat'
     ],
-    entry_points={'indico.plugins': {'chat = indico_chat.plugin:ChatPlugin'},
-                  'indico.zodb_importers': {'chat = indico_chat.zodbimport:ChatImporter'}}
+    entry_points={'indico.plugins': {'chat = indico_chat.plugin:ChatPlugin'}}
 )
