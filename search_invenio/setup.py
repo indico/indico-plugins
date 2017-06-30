@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 setup(
     name='indico_search_invenio',
-    version='0.2',
+    version='1.0.dev0',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -30,8 +30,8 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=1.9.10',
-        'indico_search'
+        'indico>=2.0.dev0',
+        'indico_search>=1.0.dev0'
     ],
     classifiers=[
         'Environment :: Plugins',

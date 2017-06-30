@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from setuptools import setup
 
+
 setup(
     name='indico_storage_xrootd',
-    version='0.1.0',
+    version='1.0.dev0',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
@@ -29,7 +30,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'indico>=1.9.10',
+        'indico>=2.0.dev0',
         'xrootdpyfs==0.1.4',
     ],
     classifiers=[
