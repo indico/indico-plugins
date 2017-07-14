@@ -68,7 +68,7 @@
             }
 
             // Prepare regular expression for highlighting
-            var tokens = filter(escapeHTML(text).split(' '), function(t) {
+            var tokens = _.filter(escapeHTML(text).split(' '), function(t) {
                 return t !== '';
             });
             var tokenRE = new RegExp('(' + tokens.join('|') + ')', 'gi');
