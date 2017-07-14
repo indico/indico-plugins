@@ -611,7 +611,7 @@
                             var errorCallback = function(error) {
                                 if (error) {
                                     hasError = true;
-                                    IndicoUtil.errorReport(error);
+                                    IndicoUI.Dialogs.Util.error(error);
                                 }
                             };
                             var date = self.destination.startDate.date.replace(/-/g, '/');
