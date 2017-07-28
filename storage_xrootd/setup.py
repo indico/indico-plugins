@@ -31,7 +31,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=2.0.dev0',
-        'xrootdpyfs==0.1.4',
+        'xrootdpyfs==0.1.5',
     ],
     classifiers=[
         'Environment :: Plugins',
