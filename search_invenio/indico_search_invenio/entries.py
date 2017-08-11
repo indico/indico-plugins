@@ -121,7 +121,7 @@ class SubContributionEntry(SearchResult):
         return (SubContribution.query
                 .filter(SubContribution.id == self.id,
                         ~SubContribution.is_deleted,
-                        SubContribution.contribution.has(id=self.parent, event_new=self.event, is_deleted=False))
+                        SubContribution.contribution.has(id=self.parent, event=self.event, is_deleted=False))
                 .first())
 
 

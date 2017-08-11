@@ -80,7 +80,7 @@ class MARCXMLGenerator:
             xg.closeTag(b'record')
             self.xml_generator.xml += xg.xml
         elif isinstance(obj, (Event, Contribution, SubContribution)):
-            if obj.is_deleted or obj.event_new.is_deleted:
+            if obj.is_deleted or obj.event.is_deleted:
                 pass
             elif isinstance(obj, Event):
                 self.xml_generator.xml += self._event_to_marcxml(obj)

@@ -168,7 +168,7 @@ class LiveSyncQueueEntry(db.Model):
         )
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -214,7 +214,7 @@ class LiveSyncQueueEntry(db.Model):
         if self.type == EntryType.category:
             return self.category
         elif self.type == EntryType.event:
-            return self.event_new
+            return self.event
         elif self.type == EntryType.session:
             return self.session
         elif self.type == EntryType.contribution:
@@ -251,7 +251,7 @@ class LiveSyncQueueEntry(db.Model):
             if any(c.id in excluded_categories for c in obj.chain_query):
                 return
         else:
-            event = obj if isinstance(obj, Event) else obj.event_new
+            event = obj if isinstance(obj, Event) else obj.event
             if excluded_categories & set(event.category_chain):
                 return
 

@@ -50,7 +50,7 @@ class RHEndTimeBase(RHManageTimetableBase):
     """Base class for the importer operations"""
     normalize_url_spec = {
         'locators': {
-            lambda self: self.event_new
+            lambda self: self.event
         },
         'preserved_args': {
             'importer_name'
@@ -66,7 +66,7 @@ class RHEndTimeBase(RHManageTimetableBase):
         return latest_dt
 
     def _format_date(self, date):
-        return date.astimezone(timezone(self.event_new.timezone)).strftime('%H:%M')
+        return date.astimezone(timezone(self.event.timezone)).strftime('%H:%M')
 
 
 class RHDayEndTime(RHEndTimeBase):
@@ -74,14 +74,14 @@ class RHDayEndTime(RHEndTimeBase):
 
     def _checkParams(self, params):
         RHEndTimeBase._checkParams(self, params)
-        self.date = self.event_new.tzinfo.localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d')).date()
+        self.date = self.event.tzinfo.localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d')).date()
 
     def _process(self):
-        event_start_date = db.cast(TimetableEntry.start_dt.astimezone(self.event_new.tzinfo), db.Date)
-        entries = self.event_new.timetable_entries.filter(event_start_date == self.date)
+        event_start_date = db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date)
+        entries = self.event.timetable_entries.filter(event_start_date == self.date)
         latest_end_dt = self._find_latest_end_dt(entries)
         if latest_end_dt is None:
-            event_start = self.event_new.start_dt
+            event_start = self.event.start_dt
             latest_end_dt = utc.localize(datetime.combine(self.date, event_start.time()))
         return self._format_date(latest_end_dt)
 
@@ -100,9 +100,9 @@ class RHBlockEndTime(RHEndTimeBase):
 
     def _checkParams(self, params):
         RHEndTimeBase._checkParams(self, params)
-        self.date = timezone(self.event_new.timezone).localize(datetime.strptime(request.args['selectedDay'],
+        self.date = timezone(self.event.timezone).localize(datetime.strptime(request.args['selectedDay'],
                                                                                  '%Y/%m/%d'))
-        self.timetable_entry = self.event_new.timetable_entries.filter_by(
+        self.timetable_entry = self.event.timetable_entries.filter_by(
             type=TimetableEntryType.SESSION_BLOCK, id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):

@@ -40,7 +40,7 @@ def find_old_vidyo_rooms(max_room_event_age):
                      .filter(VCRoom.type == 'vidyo',
                              Event.end_dt > (now_utc() - timedelta(days=max_room_event_age)))
                      .join(VCRoom.events)
-                     .join(VCRoomEventAssociation.event_new)
+                     .join(VCRoomEventAssociation.event)
                      .group_by(VCRoom.id))
 
     # non-deleted rooms with no recent associations

@@ -47,11 +47,11 @@ class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
     def _process(self):
         if not retrieve_logs(self.chatroom):
             flash(_('There are no logs available for this room.'), 'warning')
-            return redirect(url_for_plugin('.manage_rooms', self.event_new))
+            return redirect(url_for_plugin('.manage_rooms', self.event))
         return WPChatEventMgmt.render_template('manage_event_logs.html', self._conf,
                                                event_chatroom=self.event_chatroom,
-                                               start_date=self.event_new.start_dt_local,
-                                               end_date=self.event_new.end_dt_local)
+                                               start_date=self.event.start_dt_local,
+                                               end_date=self.event.end_dt_local)
 
 
 class RHChatManageEventRetrieveLogsBase(RHEventChatroomMixin, RHChatManageEventBase):
@@ -103,10 +103,10 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
         return jsonify(success=True)
 
     def _create_material(self, logs):
-        folder = AttachmentFolder.find_first(object=self.event_new, is_default=False, title='Chat Logs',
+        folder = AttachmentFolder.find_first(object=self.event, is_default=False, title='Chat Logs',
                                              is_deleted=False)
         if folder is None:
-            folder = AttachmentFolder(protection_mode=ProtectionMode.protected, linked_object=self.event_new,
+            folder = AttachmentFolder(protection_mode=ProtectionMode.protected, linked_object=self.event,
                                       title='Chat Logs', description='Chat logs for this event')
             db.session.add(folder)
 
@@ -121,5 +121,5 @@ class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
             ('Range', 'Everything' if not self.date_filter else
                       '{} - {}'.format(format_date(self.start_date), format_date(self.end_date))),
         ]
-        self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
-                           'Created material: {}'.format(filename), session.user, data=log_data)
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                       'Created material: {}'.format(filename), session.user, data=log_data)

@@ -93,7 +93,7 @@ def _created(obj, **kwargs):
     if isinstance(obj, Event):
         parent = None
     elif isinstance(obj, Contribution):
-        parent = obj.event_new
+        parent = obj.event
     elif isinstance(obj, SubContribution):
         parent = obj.contribution
     else:
@@ -117,7 +117,7 @@ def _event_times_changed(sender, obj, **kwargs):
 
 
 def _timetable_changed(entry, **kwargs):
-    _register_change(entry.event_new, ChangeType.data_changed)
+    _register_change(entry.event, ChangeType.data_changed)
 
 
 def _category_protection_changed(sender, obj, mode, old_mode, **kwargs):
@@ -154,14 +154,14 @@ def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
 
 
 def _note_changed(note, **kwargs):
-    obj = note.event_new if isinstance(note.object, Session) else note.object
+    obj = note.event if isinstance(note.object, Session) else note.object
     _register_change(obj, ChangeType.data_changed)
 
 
 def _attachment_changed(attachment_or_folder, **kwargs):
     folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
     if not isinstance(folder.object, Category) and not isinstance(folder.object, Session):
-        _register_change(folder.object.event_new, ChangeType.data_changed)
+        _register_change(folder.object.event, ChangeType.data_changed)
 
 
 def _apply_changes(sender, **kwargs):
@@ -181,7 +181,7 @@ def _register_deletion(obj):
 @unify_event_args
 def _register_change(obj, action):
     if not isinstance(obj, Category):
-        event = obj.event_new
+        event = obj.event
         if event is None or event.is_deleted or event.as_legacy is None:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
             # Also, ACL changes during user merges might involve deleted objects which we also don't care about

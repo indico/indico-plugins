@@ -32,7 +32,7 @@ class RHChatManageEventBase(RHManageEventBase):
 
 class RHEventChatroomMixin:
     def _checkParams(self):
-        self.event_chatroom = (ChatroomEventAssociation.query.with_parent(self.event_new)
+        self.event_chatroom = (ChatroomEventAssociation.query.with_parent(self.event)
                                .filter_by(chatroom_id=request.view_args['chatroom_id'])
                                .one())
         self.chatroom = self.event_chatroom.chatroom

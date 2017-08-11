@@ -60,12 +60,12 @@ def test_run(mocker):
     assert mock_uploader.run.called
 
 
-def test_fetch_records(db, dummy_event_new, dummy_agent):
+def test_fetch_records(db, dummy_event, dummy_agent):
     """Test if the correct records are fetched"""
     backend = DummyBackend(dummy_agent)
     queue = [
-        LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_new=dummy_event_new, processed=True),
-        LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_new=dummy_event_new)
+        LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event, processed=True),
+        LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event)
     ]
     dummy_agent.queue = queue
     db.session.flush()

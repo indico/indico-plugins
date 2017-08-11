@@ -154,7 +154,7 @@ class ChatroomEventAssociation(db.Model):
         backref=db.backref('events', cascade='all, delete-orphan')
     )
     #: The associated event
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

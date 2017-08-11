@@ -43,7 +43,7 @@ class AttachChatroomMixin:
         form = AttachChatroomForm()
         form.chatroom.query = (Chatroom.query
                                .filter(Chatroom.created_by_user == session.user,
-                                       ~Chatroom.events.any(ChatroomEventAssociation.event_id == self.event_new.id)))
+                                       ~Chatroom.events.any(ChatroomEventAssociation.event_id == self.event.id)))
         return form
 
 
@@ -51,14 +51,14 @@ class RHChatManageEvent(AttachChatroomMixin, RHChatManageEventBase):
     """Lists the chatrooms of an event"""
 
     def _process(self):
-        chatrooms = ChatroomEventAssociation.find_for_event(self.event_new, include_hidden=True,
+        chatrooms = ChatroomEventAssociation.find_for_event(self.event, include_hidden=True,
                                                             _eager='chatroom.events').all()
         logs_enabled = current_plugin.settings.get('log_url')
         attach_form = self._get_attach_form()
         if not attach_form.chatroom._get_object_list():
             attach_form = None
         return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
-                                               event=self.event_new,
+                                               event=self.event,
                                                chat_links=current_plugin.settings.get('chat_links'),
                                                logs_enabled=logs_enabled, attach_form=attach_form)
 
@@ -81,13 +81,13 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
             self.chatroom.modified_dt = now_utc()
             if attrs_changed(self.chatroom, 'name', 'description', 'password'):
                 update_room(self.chatroom)
-            notify_modified(self.chatroom, self.event_new, session.user)
+            notify_modified(self.chatroom, self.event, session.user)
             flash(_('Chatroom updated'), 'success')
-            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Chat',
-                               'Chatroom updated: {}'.format(self.chatroom.name), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                           'Chatroom updated: {}'.format(self.chatroom.name), session.user)
             return jsonify_data(flash=False)
         return jsonify_template('manage_event_edit.html', render_plugin_template, form=form,
-                                event=self.event_new, event_chatroom=self.event_chatroom)
+                                event=self.event, event_chatroom=self.event_chatroom)
 
 
 class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
@@ -114,8 +114,8 @@ class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
                 setattr(self.chatroom, key, value)
 
         if changed:
-            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Chat',
-                               'Chatroom updated during refresh: {}'.format(self.chatroom.name), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                           'Chatroom updated during refresh: {}'.format(self.chatroom.name), session.user)
 
         return jsonify(result='changed' if changed else '')
 
@@ -124,23 +124,23 @@ class RHChatManageEventCreate(RHChatManageEventBase):
     """Creates a new chatroom for an event"""
 
     def _process(self):
-        form = AddChatroomForm(obj=FormDefaults(name=self.event_new.title),
-                               date=self.event_new.start_dt_local)
+        form = AddChatroomForm(obj=FormDefaults(name=self.event.title),
+                               date=self.event.start_dt_local)
         if form.validate_on_submit():
             chatroom = Chatroom(created_by_user=session.user)
-            event_chatroom = ChatroomEventAssociation(event_new=self.event_new, chatroom=chatroom)
+            event_chatroom = ChatroomEventAssociation(event=self.event, chatroom=chatroom)
             form.populate_obj(event_chatroom, fields=form.event_specific_fields)
             form.populate_obj(chatroom, skip=form.event_specific_fields)
             chatroom.jid_node = form.jid_node.data
             db.session.add_all((chatroom, event_chatroom))
             db.session.flush()
             create_room(chatroom)
-            notify_created(chatroom, self.event_new, session.user)
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
-                               'Chatroom created: {}'.format(chatroom.name), session.user)
+            notify_created(chatroom, self.event, session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                           'Chatroom created: {}'.format(chatroom.name), session.user)
             flash(_('Chatroom created'), 'success')
             return jsonify_data(flash=False)
-        return jsonify_template('manage_event_edit.html', render_plugin_template, form=form, event=self.event_new)
+        return jsonify_template('manage_event_edit.html', render_plugin_template, form=form, event=self.event)
 
 
 class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
@@ -152,12 +152,12 @@ class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
     def _process(self):
         form = self._get_attach_form()
         if form.validate_on_submit():
-            event_chatroom = ChatroomEventAssociation(event_new=self.event_new, chatroom=form.chatroom.data)
-            notify_attached(form.chatroom.data, self.event_new, session.user)
+            event_chatroom = ChatroomEventAssociation(event=self.event, chatroom=form.chatroom.data)
+            notify_attached(form.chatroom.data, self.event, session.user)
             flash(_('Chatroom added'), 'success')
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
-                               'Chatroom attached: {}'.format(event_chatroom.chatroom.name), session.user)
-        return redirect(url_for_plugin('.manage_rooms', self.event_new))
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Chat',
+                           'Chatroom attached: {}'.format(event_chatroom.chatroom.name), session.user)
+        return redirect(url_for_plugin('.manage_rooms', self.event))
 
 
 class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
@@ -170,12 +170,12 @@ class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
     def _process(self):
         reason = '{} has requested to delete this room.'.format(to_unicode(session.user.full_name))
         chatroom_deleted = self.event_chatroom.delete(reason)
-        notify_deleted(self.chatroom, self.event_new, session.user, chatroom_deleted)
+        notify_deleted(self.chatroom, self.event, session.user, chatroom_deleted)
         if chatroom_deleted:
             flash(_('Chatroom deleted'), 'success')
         else:
             flash(_('Chatroom removed from event'), 'success')
-        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Chat',
-                           'Chatroom removed: {}'.format(self.chatroom.name), session.user,
-                           data={'Deleted from server': 'Yes' if chatroom_deleted else 'No'})
-        return redirect(url_for_plugin('.manage_rooms', self.event_new))
+        self.event.log(EventLogRealm.management, EventLogKind.change, 'Chat',
+                       'Chatroom removed: {}'.format(self.chatroom.name), session.user,
+                       data={'Deleted from server': 'Yes' if chatroom_deleted else 'No'})
+        return redirect(url_for_plugin('.manage_rooms', self.event))

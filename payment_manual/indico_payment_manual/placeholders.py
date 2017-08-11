@@ -31,4 +31,4 @@ class EventIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, regform, registration):
-        return registration.registration_form.event_new.id
+        return registration.registration_form.event.id

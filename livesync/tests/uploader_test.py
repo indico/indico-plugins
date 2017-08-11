@@ -124,13 +124,13 @@ def test_run_failing(mocker, db, create_event, dummy_agent):
     assert db_mock.session.commit.call_count == 1
 
 
-def test_marcxml_run(mocker, db, dummy_event_new, dummy_agent):
+def test_marcxml_run(mocker, db, dummy_event, dummy_agent):
     """Text if the MARCXML uploader uses the correct function"""
     mocker.patch('indico_livesync.uploader.db')
     mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
     mxg = mocker.patch('indico_livesync.uploader.MARCXMLGenerator')
 
-    entry = LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_new=dummy_event_new,
+    entry = LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event,
                                agent=dummy_agent)
     db.session.add(entry)
     db.session.flush()
