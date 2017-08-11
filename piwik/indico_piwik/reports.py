@@ -19,21 +19,20 @@ from datetime import timedelta
 
 from sqlalchemy.orm import joinedload
 
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.timezoneUtils import nowutc, utc2server
 from indico.modules.attachments.util import get_nested_attached_items
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time
 from indico.util.serializer import Serializer
-from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.timezoneUtils import nowutc, utc2server
+from indico.util.string import to_unicode
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
 from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
                                           PiwikQueryReportEventMetricPeakDateAndVisitors,
-                                          PiwikQueryReportEventMetricReferrers,
-                                          PiwikQueryReportEventMetricUniqueVisits,
-                                          PiwikQueryReportEventMetricVisits,
-                                          PiwikQueryReportEventMetricVisitDuration)
+                                          PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
+                                          PiwikQueryReportEventMetricVisitDuration, PiwikQueryReportEventMetricVisits)
 
 
 class ReportBase(Serializer):
@@ -142,7 +141,8 @@ class ReportGeneral(ReportBase):
             cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                    else contribution.id)
             key = '{}t{}'.format(contribution.event_id, cid)
-            self.contributions[key] = u'{} ({})'.format(contribution.title, format_time(contribution.start_dt))
+            self.contributions[key] = u'{} ({})'.format(contribution.title,
+                                                        to_unicode(format_time(contribution.start_dt)))
 
 
 class ReportMaterial(ReportBase):
