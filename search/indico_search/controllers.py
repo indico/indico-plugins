@@ -16,27 +16,28 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify
+from flask import jsonify, request
 from flask_pluginengine import current_plugin
 from sqlalchemy.orm import undefer
 from werkzeug.wrappers import Response
 
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.legacy.webinterface.rh.base import RH
 
 from indico_search.views import WPSearchCategory, WPSearchConference
 
 
 class RHSearch(RH):
     """Performs a search using the search engine plugin"""
+
     def _checkParams(self):
         if 'confId' in request.view_args:
-            self.obj = Event.get_one(request.view_args['confId'])
+            self.obj = Event.get_one(request.view_args['confId'], is_deleted=False)
             self._conf = self.obj.as_legacy
             self.obj_type = 'event'
         elif 'category_id' in request.view_args:
-            self.obj = Category.get_one(request.view_args['category_id'])
+            self.obj = Category.get_one(request.view_args['category_id'], is_deleted=False)
             self.obj_type = 'category' if not self.obj.is_root else None
         else:
             self.obj = Category.get_root()
