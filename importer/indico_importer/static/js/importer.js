@@ -390,7 +390,7 @@
 
             draw: function() {
                 this.firstSearch = Html.span({style:{display:"inline"}}, $t.gettext("Please type your search phrase and press 'search'."));
-                var hereLink = Html.span({className: 'fakeLink'}, $t.gettext("here"));
+                var hereLink = Html.span({className: 'fake-link'}, $t.gettext("here"));
                 hereLink.observeClick(this.afterSearchAction);
                 this.afterSearch = Html.span(
                     {style: {display: 'none'}},
@@ -966,7 +966,7 @@
                     } else {
                         var summaryBeg = Html.span({}, summary.substr(0, 200));
                         var summaryEnd = Html.span({style:{display:'none'}}, summary.substr(200));
-                        var showLink = Html.span({className:'fakeLink'}, $t.gettext(" (show all)"));
+                        var showLink = Html.span({className:'fake-link'}, $t.gettext(" (show all)"));
                         showLink.observeClick(function(evt) {
                             summaryEnd.dom.style.display = "inline";
                             showLink.dom.style.display = "none";
@@ -976,7 +976,7 @@
                             //Recalculating position of the selection number
                             self.observeSelection(self.selectedList);
                         });
-                        var hideLink = Html.span({className:'fakeLink', style:{display:'none'}}, $t.gettext(" (hide)"));
+                        var hideLink = Html.span({className:'fake-link', style:{display:'none'}}, $t.gettext(" (hide)"));
                         hideLink.observeClick(function(evt) {
                             summaryEnd.dom.style.display = "none";
                             showLink.dom.style.display = "inline";
@@ -1200,7 +1200,7 @@
 
             _drawImporterDiv: function() {
                 var self = this;
-                this.moreEntriesDiv = Html.div({className:'fakeLink', style:{paddingBottom:pixels(15), textAlign:'center', clear: 'both', marginTop: pixels(15)}}, $t.gettext("more results"));
+                this.moreEntriesDiv = Html.div({className:'fake-link', style:{paddingBottom:pixels(15), textAlign:'center', clear: 'both', marginTop: pixels(15)}}, $t.gettext("more results"));
                 this.moreEntriesDiv.observeClick(function() {
                     self.append(20);
                 });

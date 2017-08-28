@@ -50,7 +50,7 @@
                                         </a>
                                         <ul class="dropdown">
                                             {% for chat_link in chat_links %}
-                                                <li><a class="fakeLink" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
+                                                <li><a class="fake-link" href="{{ chat_link.link.format(room=chatroom.jid_node, server=server) }}" target="_blank">{{ chat_link.title }}</a></li>
                                             {% endfor %}
                                         </ul>
                                     </div>
