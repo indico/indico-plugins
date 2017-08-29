@@ -97,14 +97,13 @@ class XRootDStorage(Storage):
         if not fs.exists(basedir):
             fs.makedir(basedir, recursive=True, allow_recreate=True)
         with fs.open(filepath, 'wb') as f:
-            shutil.copyfileobj(fileobj, f, 1024 * 1024)
-        return name
+            checksum = self._copy_file(fileobj, f)
+        return name, checksum
 
     def save(self, name, content_type, filename, fileobj):
         try:
             fs = self._get_xrootd_fs()
-            name = self._save(name, fileobj, fs)
-            return name
+            return self._save(name, fileobj, fs)
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
@@ -158,7 +157,6 @@ class EOSStorage(XRootDStorage):
                 # object which does not have seek/tell methods.
                 size_hint = current_app.config['MAX_CONTENT_LENGTH'] if current_app else None
             fs = self._get_xrootd_fs(size=size_hint)
-            name = self._save(name, fileobj, fs)
-            return name
+            return self._save(name, fileobj, fs)
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
