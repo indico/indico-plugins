@@ -29,8 +29,9 @@ from indico.web.forms.validators import UsedIf
 from indico_payment_manual import _
 
 
-DETAILS_DESC = _('The details the user needs to make their payment. This usually includes the bank account details '
-                 'the IBAN and payment reference.')
+DETAILS_DESC = _('The details the user needs to make their payment. This usually includes the bank account details, '
+                 'the IBAN and payment reference.  You can also link to a custom payment site. In this case make sure '
+                 'to use the URL-escaped versions of the placeholders where available.')
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -68,13 +69,15 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         self.connect(signals.get_placeholders, self._get_details_placeholders, sender='manual-payment-details')
 
     def _get_details_placeholders(self, sender, regform, registration, **kwargs):
-        from indico.modules.events.registration.placeholders.registrations import (FirstNamePlaceholder,
-                                                                                   LastNamePlaceholder)
-        from indico_payment_manual.placeholders import RegistrationIDPlaceholder, EventIDPlaceholder
+        from indico_payment_manual.placeholders import (FirstNamePlaceholder, LastNamePlaceholder,
+                                                        RegistrationIDPlaceholder, EventIDPlaceholder, PricePlaceholder,
+                                                        CurrencyPlaceholder)
         yield FirstNamePlaceholder
         yield LastNamePlaceholder
         yield RegistrationIDPlaceholder
         yield EventIDPlaceholder
+        yield PricePlaceholder
+        yield CurrencyPlaceholder
 
     @property
     def logo_url(self):
