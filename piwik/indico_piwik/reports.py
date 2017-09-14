@@ -20,11 +20,10 @@ from datetime import timedelta
 from sqlalchemy.orm import joinedload
 
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.timezoneUtils import nowutc, utc2server
 from indico.modules.attachments.util import get_nested_attached_items
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
-from indico.util.date_time import format_time
+from indico.util.date_time import format_time, now_utc, utc_to_server
 from indico.util.serializer import Serializer
 from indico.util.string import to_unicode
 
@@ -50,7 +49,7 @@ class ReportBase(Serializer):
                        'event_id': self.event_id,
                        'contrib_id': self.contrib_id}
         self._build_report(**report_params)
-        self.timestamp = utc2server(nowutc(), naive=False)
+        self.timestamp = utc_to_server(now_utc())
 
     @property
     def event(self):
@@ -83,7 +82,7 @@ class ReportBase(Serializer):
         self.end_date = end_date
         self.start_date = start_date
         if self.end_date is None:
-            today = nowutc().date()
+            today = now_utc().date()
             end_date = self.event.end_dt.date()
             self.end_date = end_date if end_date < today else today
         if self.start_date is None:
