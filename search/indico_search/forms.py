@@ -17,11 +17,11 @@
 from __future__ import unicode_literals
 
 from flask import request
-from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import StringField, SelectField
 from wtforms.validators import Optional
 
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoDateField
 
 from indico_search import _
 
@@ -37,8 +37,8 @@ FIELD_CHOICES = [('', _('Anywhere')),
 class SearchForm(IndicoForm):
     phrase = StringField(_('Phrase'))
     field = SelectField(_('Search in'), choices=FIELD_CHOICES, default='')
-    start_date = DateField('Start Date', [Optional()], parse_kwargs={'dayfirst': True})
-    end_date = DateField('End Date', [Optional()], parse_kwargs={'dayfirst': True})
+    start_date = IndicoDateField('Start Date', [Optional()])
+    end_date = IndicoDateField('End Date', [Optional()])
 
     def is_submitted(self):
         return 'search-phrase' in request.args
