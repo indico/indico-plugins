@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.util.struct.iterables import grouper
+
 from indico_livesync import MARCXMLGenerator, process_records
 
 

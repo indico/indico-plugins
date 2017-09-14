@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from indico.util.i18n import make_bound_gettext
 
+
 _ = make_bound_gettext('search')
 __all__ = ('SearchPluginBase', 'SearchEngine', 'SearchForm')
 
-from .base import SearchPluginBase, SearchEngine
-from .forms import SearchForm
+from .base import SearchPluginBase, SearchEngine  # isort:skip
+from .forms import SearchForm  # isort:skip

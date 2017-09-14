@@ -19,9 +19,8 @@ from mock import MagicMock, Mock
 from indico.modules.events.legacy import LegacyConference
 
 from indico_livesync import SimpleChange
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
-from indico_livesync.uploader import Uploader, MARCXMLUploader
-
+from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
+from indico_livesync.uploader import MARCXMLUploader, Uploader
 
 
 class RecordingUploader(Uploader):

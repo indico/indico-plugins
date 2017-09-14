@@ -18,15 +18,14 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from indico.modules.users import User
 from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
-
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
+from indico.modules.users import User
 
 from indico_livesync import SimpleChange
 from indico_livesync.util import compound_id, obj_ref

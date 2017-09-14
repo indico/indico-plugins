@@ -13,12 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from indico.testing.util import bool_matrix
 
 import pytest
 
-from indico_livesync import process_records, SimpleChange
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
+from indico.testing.util import bool_matrix
+
+from indico_livesync import SimpleChange, process_records
+from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 
 
 class Dummy(object):

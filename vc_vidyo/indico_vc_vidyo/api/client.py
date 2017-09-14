@@ -22,6 +22,7 @@ from zeep.transports import Transport
 
 from indico_vc_vidyo.api.cache import ZeepCache
 
+
 DEFAULT_CLIENT_TIMEOUT = 30
 AUTOMUTE_API_PROFILE = "NoAudioAndVideo"
 

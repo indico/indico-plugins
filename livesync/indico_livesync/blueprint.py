@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_livesync.controllers import RHAddAgent, RHEditAgent, RHDeleteAgent
+from indico_livesync.controllers import RHAddAgent, RHDeleteAgent, RHEditAgent
+
 
 blueprint = IndicoPluginBlueprint('livesync', 'indico_livesync', url_prefix='/admin/plugins/livesync')
 

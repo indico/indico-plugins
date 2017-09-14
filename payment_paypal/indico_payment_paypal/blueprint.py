@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
-from indico_payment_paypal.controllers import RHPaypalIPN, RHPaypalCancel, RHPaypalSuccess
+
+from indico_payment_paypal.controllers import RHPaypalCancel, RHPaypalIPN, RHPaypalSuccess
 
 
 blueprint = IndicoPluginBlueprint('payment_paypal', __name__,

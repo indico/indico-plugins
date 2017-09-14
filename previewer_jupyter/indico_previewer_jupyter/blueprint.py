@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.plugins import IndicoPluginBlueprint
+
 from indico_previewer_jupyter.controllers import RHEventPreviewIPyNB
 
 

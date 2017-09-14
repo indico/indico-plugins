@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
 from indico.core.errors import IndicoError
 
 from indico_chat import _

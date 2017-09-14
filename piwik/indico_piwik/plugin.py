@@ -20,14 +20,14 @@ from flask import request, session
 from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin, plugin_url_rule_to_js
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, url_for_plugin
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.events.contributions import Contribution
 from indico.web.menu import SideMenuItem
 
 from indico_piwik import _
-from indico_piwik.controllers import (RHStatistics, RHApiMaterial, RHApiDownloads, RHApiEventVisitsPerDay,
-                                      RHApiEventGraphCountries, RHApiEventGraphDevices)
+from indico_piwik.controllers import (RHApiDownloads, RHApiEventGraphCountries, RHApiEventGraphDevices,
+                                      RHApiEventVisitsPerDay, RHApiMaterial, RHStatistics)
 from indico_piwik.forms import SettingsForm
 from indico_piwik.queries.tracking import track_download_request
 

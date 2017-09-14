@@ -18,8 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from flask import request, flash, redirect, jsonify, session
-
+from flask import flash, jsonify, redirect, request, session
 
 from indico.core import signals
 from indico.core.db import db
@@ -27,12 +26,12 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.plugins import url_for_plugin
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import format_date
 from indico.util.fs import secure_filename
 
 from indico_chat import _
-from indico_chat.controllers.base import RHEventChatroomMixin, RHChatManageEventBase
+from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
 from indico_chat.views import WPChatEventMgmt
 from indico_chat.xmpp import retrieve_logs
 

@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request
-from wtforms.fields.core import StringField, SelectField
+from wtforms.fields.core import SelectField, StringField
 from wtforms.validators import Optional
 
 from indico.web.forms.base import IndicoForm

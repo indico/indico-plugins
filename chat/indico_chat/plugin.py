@@ -29,7 +29,7 @@ from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout.util import MenuEntryData
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField, MultipleItemsField, EmailListField, IndicoPasswordField
+from indico.web.forms.fields import EmailListField, IndicoPasswordField, MultipleItemsField, PrincipalListField
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.menu import SideMenuItem
 

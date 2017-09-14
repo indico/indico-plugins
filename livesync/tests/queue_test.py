@@ -18,8 +18,8 @@ import pytest
 
 from indico.modules.categories import Category
 
+from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
 from indico_livesync.util import get_excluded_categories, obj_ref
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
 
 
 CATEGORY_PARENTS = {

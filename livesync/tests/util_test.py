@@ -18,7 +18,7 @@ from datetime import timedelta
 
 from indico.util.date_time import now_utc
 
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
+from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 from indico_livesync.util import clean_old_entries
 

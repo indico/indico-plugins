@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from indico_livesync import LiveSyncPluginBase
-
 from indico_livesync_debug.backend import LiveSyncDebugBackend
 
 

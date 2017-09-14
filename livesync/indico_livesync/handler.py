@@ -30,8 +30,8 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.sessions import Session
 from indico.util.event import unify_event_args
 
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType
-from indico_livesync.util import obj_ref, get_excluded_categories
+from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
+from indico_livesync.util import get_excluded_categories, obj_ref
 
 
 def connect_signals(plugin):

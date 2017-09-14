@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from wtforms.validators import NumberRange
 from wtforms.fields.html5 import IntegerField
+from wtforms.validators import NumberRange
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, PluginCategory

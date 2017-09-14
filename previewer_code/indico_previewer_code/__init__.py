@@ -18,4 +18,5 @@
 
 from .plugin import CodePreviewerPlugin
 
+
 __all__ = ('CodePreviewerPlugin',)

@@ -19,17 +19,17 @@ from __future__ import unicode_literals
 from flask import session
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
-from wtforms.fields.html5 import URLField, EmailField
+from wtforms.fields.html5 import EmailField, URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import NumberRange, DataRequired
+from wtforms.validators import DataRequired, NumberRange
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.core import signals
 from indico.modules.events.views import WPSimpleEventDisplay
+from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
-from indico.modules.vc import VCPluginSettingsFormBase, VCPluginMixin
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import retrieve_principal
 from indico.web.forms.fields import IndicoPasswordField
@@ -40,10 +40,10 @@ from indico_vc_vidyo import _
 from indico_vc_vidyo.api import AdminClient, APIException, RoomNotFoundAPIException
 from indico_vc_vidyo.blueprint import blueprint
 from indico_vc_vidyo.cli import cli
-from indico_vc_vidyo.forms import VCRoomForm, VCRoomAttachForm
+from indico_vc_vidyo.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_vidyo.http_api import DeleteVCRoomAPI
-from indico_vc_vidyo.util import iter_user_identities, iter_extensions, update_room_from_obj
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
+from indico_vc_vidyo.util import iter_extensions, iter_user_identities, update_room_from_obj
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):

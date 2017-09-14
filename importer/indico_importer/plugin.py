@@ -17,12 +17,12 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, PluginCategory
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, PluginCategory, plugin_url_rule_to_js
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.web.flask.util import url_rule_to_js
 
 from indico_importer import _
-from indico_importer.controllers import RHGetImporters, RHImportData, RHDayEndTime, RHBlockEndTime
+from indico_importer.controllers import RHBlockEndTime, RHDayEndTime, RHGetImporters, RHImportData
 
 
 class ImporterPlugin(IndicoPlugin):

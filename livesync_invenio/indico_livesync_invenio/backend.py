@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import URL, DataRequired
 
-from indico_livesync import LiveSyncBackendBase, MARCXMLUploader, AgentForm
+from indico_livesync import AgentForm, LiveSyncBackendBase, MARCXMLUploader
 from indico_livesync_invenio import _
 from indico_livesync_invenio.connector import InvenioConnector
 

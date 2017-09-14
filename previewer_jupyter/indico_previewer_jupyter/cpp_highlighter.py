@@ -26,6 +26,7 @@ Code courtesy of the ROOT project (https://root.cern.ch).
 """
 
 import re
+
 from nbconvert.preprocessors.base import Preprocessor
 
 

@@ -7,9 +7,9 @@ Create Date: 2017-06-30 15:51:54.477207
 
 import sqlalchemy as sa
 from alembic import op
-from indico.core.db.sqlalchemy import UTCDateTime
-
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
+
+from indico.core.db.sqlalchemy import UTCDateTime
 
 
 # revision identifiers, used by Alembic.

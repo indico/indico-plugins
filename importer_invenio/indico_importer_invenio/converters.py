@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.legacy.webinterface.common.tools import strip_ml_tags
+
 from indico_importer.converter import APPEND, RecordConverter
 from indico_importer.util import convert_dt_tuple
-from indico.legacy.webinterface.common.tools import strip_ml_tags
 
 
 class InvenioRecordConverterBase(RecordConverter):

@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash
-from flask_pluginengine import render_plugin_template, current_plugin
+from flask import flash, redirect, request
+from flask_pluginengine import current_plugin, render_plugin_template
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db

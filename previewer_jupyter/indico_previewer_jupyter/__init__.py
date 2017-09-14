@@ -18,4 +18,5 @@
 
 from .plugin import JupyterPreviewerPlugin
 
+
 __all__ = ('JupyterPreviewerPlugin',)

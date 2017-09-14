@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
-from .client import UserClient, AdminClient, APIException, RoomNotFoundAPIException
+from .client import AdminClient, APIException, RoomNotFoundAPIException, UserClient
+
 
 __all__ = ['UserClient', 'AdminClient', 'APIException', 'RoomNotFoundAPIException']

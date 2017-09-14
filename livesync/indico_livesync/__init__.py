@@ -24,11 +24,11 @@ _ = make_bound_gettext('livesync')
 __all__ = ('LiveSyncPluginBase', 'LiveSyncBackendBase', 'AgentForm', 'SimpleChange', 'process_records',
            'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
 
-from .base import LiveSyncPluginBase, LiveSyncBackendBase
-from .forms import AgentForm
-from .simplify import SimpleChange, process_records
-from .marcxml import MARCXMLGenerator
-from .uploader import Uploader, MARCXMLUploader
+from .base import LiveSyncPluginBase, LiveSyncBackendBase  # isort:skip
+from .forms import AgentForm  # isort:skip
+from .simplify import SimpleChange, process_records  # isort:skip
+from .marcxml import MARCXMLGenerator  # isort:skip
+from .uploader import Uploader, MARCXMLUploader  # isort:skip
 
 
 @signals.import_tasks.connect

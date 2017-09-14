@@ -45,18 +45,18 @@ FIXME:
 
 from __future__ import print_function
 
+import os
+import re
+import sys
+import tempfile
+import time
 import urllib
 import urllib2
-import requests
 import xml.sax
-import re
-import tempfile
-import os
-import time
-import sys
 
-from requests.exceptions import (ConnectionError, InvalidSchema, InvalidURL,
-                                 MissingSchema, RequestException)
+import requests
+from requests.exceptions import ConnectionError, InvalidSchema, InvalidURL, MissingSchema, RequestException
+
 
 MECHANIZE_CLIENTFORM_VERSION_CHANGE = (0, 2, 0)
 try:

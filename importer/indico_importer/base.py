@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask_pluginengine import depends
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
+
 from indico_importer.plugin import ImporterPlugin
 
 

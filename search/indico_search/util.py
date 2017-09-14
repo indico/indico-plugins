@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask_pluginengine import render_plugin_template, current_plugin
+from flask_pluginengine import current_plugin, render_plugin_template
 
 
 def render_engine_or_search_template(template_name, **context):

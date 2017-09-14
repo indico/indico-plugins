@@ -19,10 +19,11 @@ from __future__ import unicode_literals
 from indico.core.plugins import IndicoPluginBlueprint
 
 from indico_chat.controllers.event import RHChatEventPage
-from indico_chat.controllers.logs import RHChatManageEventLogs, RHChatManageEventShowLogs, RHChatManageEventAttachLogs
-from indico_chat.controllers.management import (RHChatManageEvent, RHChatManageEventModify, RHChatManageEventRefresh,
-                                                RHChatManageEventRemove, RHChatManageEventCreate,
-                                                RHChatManageEventAttach)
+from indico_chat.controllers.logs import RHChatManageEventAttachLogs, RHChatManageEventLogs, RHChatManageEventShowLogs
+from indico_chat.controllers.management import (RHChatManageEvent, RHChatManageEventAttach, RHChatManageEventCreate,
+                                                RHChatManageEventModify, RHChatManageEventRefresh,
+                                                RHChatManageEventRemove)
+
 
 blueprint = IndicoPluginBlueprint('chat', 'indico_chat', url_prefix='/event/<confId>')
 

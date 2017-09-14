@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.util.console import cformat
 from indico.util.struct.iterables import grouper
 
-from indico_livesync import LiveSyncBackendBase, SimpleChange, MARCXMLGenerator, process_records, Uploader
+from indico_livesync import LiveSyncBackendBase, MARCXMLGenerator, SimpleChange, Uploader, process_records
 
 
 def _change_str(change):

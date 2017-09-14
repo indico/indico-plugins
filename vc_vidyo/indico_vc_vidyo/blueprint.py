@@ -20,6 +20,7 @@ from indico.core.plugins import IndicoPluginBlueprint
 
 from indico_vc_vidyo.controllers import RHVidyoRoomOwner
 
+
 blueprint = IndicoPluginBlueprint('vc_vidyo', 'indico_vc_vidyo')
 
 # Room management

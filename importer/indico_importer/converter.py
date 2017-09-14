@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+
 APPEND = object()
 
 

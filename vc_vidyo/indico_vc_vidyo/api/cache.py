@@ -15,7 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from zeep.cache import Base
+
 from indico.legacy.common.cache import GenericCache
+
 
 DEFAULT_CACHE_TTL = 24 * 3600
 

@@ -23,11 +23,11 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.categories.models.categories import Category
-from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-
+from indico.modules.events.models.events import Event
 from indico.util.struct.enum import IndicoEnum
+
 from indico_livesync.models.queue import ChangeType, EntryType
 
 

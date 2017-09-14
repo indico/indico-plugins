@@ -26,13 +26,14 @@ from flask_pluginengine import current_plugin
 from requests.exceptions import RequestException
 
 from indico.util.string import unicode_to_ascii
+
 from indico_chat.util import check_config
 
 
 # XXX: SleekXMPP sets the default encoding to UTF8. We don't want that!
 sys.setdefaultencoding = lambda x: None
-from sleekxmpp import ClientXMPP
-from sleekxmpp.exceptions import IqError
+from sleekxmpp import ClientXMPP  # isort:skip
+from sleekxmpp.exceptions import IqError  # isort:skip
 del sys.setdefaultencoding
 
 

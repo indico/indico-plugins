@@ -7,7 +7,6 @@ Create Date: 2017-06-30 16:11:31.486845
 
 import sqlalchemy as sa
 from alembic import op
-
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 

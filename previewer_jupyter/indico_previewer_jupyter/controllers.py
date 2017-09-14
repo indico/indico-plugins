@@ -17,14 +17,13 @@
 from uuid import uuid4
 
 import nbformat
-from flask import session, render_template, request, current_app
+from flask import current_app, render_template, request, session
 from nbconvert.exporters import HTMLExporter
 from traitlets.config import Config
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.attachments import Attachment
-
 from indico.legacy.webinterface.rh.base import RH
+from indico.modules.attachments import Attachment
 
 from indico_previewer_jupyter.cpp_highlighter import CppHighlighter
 

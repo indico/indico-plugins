@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from wtforms.fields.core import SelectField
 
 from indico_search import SearchForm
-
 from indico_search_invenio import _
 
 

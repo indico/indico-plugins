@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core.db.sqlalchemy import UTCDateTime, db
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 

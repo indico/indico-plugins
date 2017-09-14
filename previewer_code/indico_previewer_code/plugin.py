@@ -20,8 +20,8 @@ import mimetypes
 
 from flask import render_template
 from pygments import highlight
-from pygments.lexers import get_lexer_for_mimetype, CppLexer, PhpLexer, JavaLexer, RubyLexer
 from pygments.formatters import HtmlFormatter
+from pygments.lexers import CppLexer, JavaLexer, PhpLexer, RubyLexer, get_lexer_for_mimetype
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin

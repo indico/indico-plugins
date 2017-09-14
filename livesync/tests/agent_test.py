@@ -17,7 +17,7 @@
 from mock import MagicMock
 
 from indico_livesync.base import LiveSyncBackendBase
-from indico_livesync.models.queue import LiveSyncQueueEntry, ChangeType, EntryType
+from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 
 
 class DummyBackend(LiveSyncBackendBase):

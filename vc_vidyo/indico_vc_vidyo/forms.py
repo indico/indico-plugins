@@ -18,16 +18,17 @@ from __future__ import unicode_literals
 
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, Length, Optional, ValidationError, Regexp
+from wtforms.validators import DataRequired, Length, Optional, Regexp, ValidationError
 
-from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
+from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.util.user import retrieve_principal
 from indico.web.forms.base import generated_data
-from indico.web.forms.fields import PrincipalField, IndicoPasswordField
+from indico.web.forms.fields import IndicoPasswordField, PrincipalField
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_vidyo import _
 from indico_vc_vidyo.util import iter_user_identities
+
 
 PIN_VALIDATORS = [Optional(), Length(min=3, max=10), Regexp(r'^\d+$', message=_("The PIN must be a number"))]
 

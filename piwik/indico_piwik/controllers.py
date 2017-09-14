@@ -19,9 +19,9 @@ from flask import jsonify
 from indico.core.config import Config
 from indico.modules.events.management.controllers import RHManageEventBase
 
-from indico_piwik.views import WPStatistics
 from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
                                   ReportVisitsPerDay)
+from indico_piwik.views import WPStatistics
 
 
 class RHStatistics(RHManageEventBase):

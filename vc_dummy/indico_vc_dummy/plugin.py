@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields.core import BooleanField
 
-from indico.core.plugins import IndicoPlugin, url_for_plugin, IndicoPluginBlueprint
+from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, url_for_plugin
 from indico.modules.vc import VCPluginMixin
-from indico.modules.vc.forms import VCRoomFormBase, VCRoomAttachFormBase
+from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.web.forms.widgets import SwitchWidget
 
 

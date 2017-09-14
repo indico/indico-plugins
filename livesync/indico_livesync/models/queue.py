@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from werkzeug.datastructures import ImmutableDict
 
-from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent

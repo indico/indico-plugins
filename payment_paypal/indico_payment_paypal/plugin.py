@@ -21,8 +21,8 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.modules.events.payment import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
-                                           PaymentEventSettingsFormBase)
+from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
+                                           PaymentPluginSettingsFormBase)
 from indico.util.string import remove_accents
 from indico.web.forms.validators import UsedIf
 

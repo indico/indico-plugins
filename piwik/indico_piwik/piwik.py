@@ -17,8 +17,8 @@
 import socket
 from urllib2 import urlparse
 
-from flask_pluginengine import current_plugin
 import requests
+from flask_pluginengine import current_plugin
 
 
 class PiwikRequest(object):

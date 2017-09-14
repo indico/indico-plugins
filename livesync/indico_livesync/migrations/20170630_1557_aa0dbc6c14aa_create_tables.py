@@ -11,6 +11,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+
 from indico_livesync.models.queue import ChangeType, EntryType
 
 

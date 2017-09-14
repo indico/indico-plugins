@@ -18,20 +18,20 @@ from __future__ import unicode_literals
 
 import os
 import re
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from xml.dom import minidom
 
 import requests
-from flask import redirect, request, jsonify
+from flask import jsonify, redirect, request
 from flask_pluginengine import current_plugin
 from lxml import etree
 from werkzeug.urls import url_encode
-from xml.dom import minidom
 
 from indico.core.db import db
 from indico.core.plugins import get_plugin_template_module
-from indico_search import SearchEngine
 
-from indico_search_invenio.entries import Author, SubContributionEntry, ContributionEntry, EventEntry
+from indico_search import SearchEngine
+from indico_search_invenio.entries import Author, ContributionEntry, EventEntry, SubContributionEntry
 
 
 class InvenioRemoteSearch(object):

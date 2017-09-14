@@ -16,14 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import session, flash, redirect, jsonify
+from flask import flash, jsonify, redirect, session
 from flask_pluginengine import current_plugin, render_plugin_template
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.forms.base import FormDefaults
@@ -31,11 +31,11 @@ from indico.web.util import jsonify_data, jsonify_template
 
 from indico_chat import _
 from indico_chat.controllers.base import RHChatManageEventBase, RHEventChatroomMixin
-from indico_chat.forms import AddChatroomForm, EditChatroomForm, AttachChatroomForm
-from indico_chat.models.chatrooms import ChatroomEventAssociation, Chatroom
-from indico_chat.notifications import notify_created, notify_attached, notify_modified, notify_deleted
+from indico_chat.forms import AddChatroomForm, AttachChatroomForm, EditChatroomForm
+from indico_chat.models.chatrooms import Chatroom, ChatroomEventAssociation
+from indico_chat.notifications import notify_attached, notify_created, notify_deleted, notify_modified
 from indico_chat.views import WPChatEventMgmt
-from indico_chat.xmpp import create_room, update_room, get_room_config, room_exists
+from indico_chat.xmpp import create_room, get_room_config, room_exists, update_room
 
 
 class AttachChatroomMixin:
