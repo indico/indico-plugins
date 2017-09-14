@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.categories.models.categories import Category
@@ -54,9 +53,8 @@ class MARCXMLGenerator:
         self.xml_generator.initXml()
         self.xml_generator.openTag(b'collection', [[b'xmlns', b'http://www.loc.gov/MARC21/slim']])
         # This is horrible. but refactoring all the code in the indico core would be just as bad.
-        aw = AccessWrapper()
-        aw.setUser(User.find_first(is_admin=True).as_avatar)
-        self.output_generator = outputGenerator(aw, self.xml_generator)
+        admin = User.find_first(is_admin=True)
+        self.output_generator = outputGenerator(admin, self.xml_generator)
 
     def safe_add_object(self, obj, deleted=False):
         try:

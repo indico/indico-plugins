@@ -29,15 +29,15 @@ class DeleteVCRoomAPI(HTTPAPIHook):
     COMMIT = True
     HTTP_POST = True
 
-    def _hasAccess(self, aw):
+    def _has_access(self, user):
         from indico_vc_vidyo.plugin import VidyoPlugin
-        return aw.getUser().user in VidyoPlugin.settings.acls.get('managers')
+        return user in VidyoPlugin.settings.acls.get('managers')
 
     def _getParams(self):
         super(DeleteVCRoomAPI, self)._getParams()
         self._room_ids = map(int, request.form.getlist('rid'))
 
-    def api_deletevcroom(self, aw):
+    def api_deletevcroom(self, user):
         from indico_vc_vidyo.plugin import VidyoPlugin
         from indico_vc_vidyo.api import APIException
 
