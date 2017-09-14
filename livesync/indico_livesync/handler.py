@@ -144,8 +144,8 @@ def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
         register = True
     # entry updated
     elif entry is not None and old_data is not None:
-        old_access = bool(old_data['read_access'] or old_data['full_access'] or old_data['roles'])
-        new_access = bool(entry.full_access or entry.read_access or entry.roles)
+        old_access = bool(old_data['read_access'] or old_data['full_access'] or old_data['permissions'])
+        new_access = bool(entry.full_access or entry.read_access or entry.permissions)
         register = old_access != new_access
     if register:
         _register_change(obj, ChangeType.protection_changed)
