@@ -16,7 +16,7 @@
 
 from flask import jsonify
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.events.management.controllers import RHManageEventBase
 
 from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
@@ -28,7 +28,7 @@ class RHStatistics(RHManageEventBase):
     def _checkParams(self, params):
         RHManageEventBase._checkParams(self, params)
         self._params = params
-        self._params['loading_gif'] = '{}/images/loading.gif'.format(Config.getInstance().getBaseURL())
+        self._params['loading_gif'] = '{}/images/loading.gif'.format(config.BASE_URL)
         self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
                                                    start_date=params.get('start_date'), end_date=params.get('end_date'))
 

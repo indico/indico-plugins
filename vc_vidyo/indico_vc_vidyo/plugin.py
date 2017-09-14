@@ -25,7 +25,7 @@ from wtforms.validators import DataRequired, NumberRange
 
 from indico.core import signals
 from indico.core.auth import multipass
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -95,7 +95,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     @property
     def default_settings(self):
         return dict(VCPluginMixin.default_settings, **{
-            'support_email': Config.getInstance().getSupportEmail(),
+            'support_email': config.SUPPORT_EMAIL,
             'username': 'indico',
             'password': None,
             'admin_api_wsdl': 'https://yourvidyoportal/services/v1_1/VidyoPortalAdminService?wsdl',
