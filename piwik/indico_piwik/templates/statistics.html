@@ -134,7 +134,7 @@
                 {% trans %}Visitors Geography{% endtrans %}
             </div>
             <div class="statsWidgetContent">
-                <img id="graph_countries" src="{{ loading_gif }}"
+                <img id="graph_countries" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
                      alt="{% trans %}Visitor Origins{% endtrans %}">
             </div>
         </div>
@@ -177,7 +177,7 @@
                 {% trans %}User Systems{% endtrans %}
             </div>
             <div class="statsWidgetContent" style="text-align:center;">
-                <img id="graph_devices" src="{{ loading_gif }}"
+                <img id="graph_devices" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
                      alt="{% trans %}Visitor Systems{% endtrans %}">
             </div>
         </div>

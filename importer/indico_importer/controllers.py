@@ -18,11 +18,9 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from dateutil.relativedelta import relativedelta
 from flask import jsonify, request
 from flask_pluginengine import current_plugin
 from pytz import timezone, utc
-from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHProtected
@@ -72,8 +70,8 @@ class RHEndTimeBase(RHManageTimetableBase):
 class RHDayEndTime(RHEndTimeBase):
     """Get the end_dt of the latest timetable entry or the event start_dt if no entry exist on that date"""
 
-    def _process_args(self, params):
-        RHEndTimeBase._process_args(self, params)
+    def _process_args(self):
+        RHEndTimeBase._process_args(self)
         self.date = self.event.tzinfo.localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d')).date()
 
     def _process(self):
@@ -98,12 +96,13 @@ class RHBlockEndTime(RHEndTimeBase):
         }
     }
 
-    def _process_args(self, params):
-        RHEndTimeBase._process_args(self, params)
-        self.date = timezone(self.event.timezone).localize(datetime.strptime(request.args['selectedDay'],
-                                                                                 '%Y/%m/%d'))
-        self.timetable_entry = self.event.timetable_entries.filter_by(
-            type=TimetableEntryType.SESSION_BLOCK, id=request.view_args['entry_id']).first_or_404()
+    def _process_args(self):
+        RHEndTimeBase._process_args(self)
+        self.date = timezone(self.event.timezone).localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d'))
+        self.timetable_entry = (self.event.timetable_entries
+                                .filter_by(type=TimetableEntryType.SESSION_BLOCK,
+                                           id=request.view_args['entry_id'])
+                                .first_or_404())
 
     def _process(self):
         entries = self.timetable_entry.children

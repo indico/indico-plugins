@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import jsonify
+from flask import jsonify, request
 
-from indico.core.config import config
 from indico.modules.events.management.controllers import RHManageEventBase
 
 from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
@@ -25,37 +24,34 @@ from indico_piwik.views import WPStatistics
 
 
 class RHStatistics(RHManageEventBase):
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
-        self._params = params
-        self._params['loading_gif'] = '{}/images/loading.gif'.format(config.BASE_URL)
-        self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
-                                                   start_date=params.get('start_date'), end_date=params.get('end_date'))
-
     def _process(self):
-        return WPStatistics.render_template('statistics.html', self._conf, **self._params)
+        report = ReportGeneral.get(event_id=self.event.id,
+                                   contrib_id=request.args.get('contrib_id'),
+                                   start_date=request.args.get('start_date'),
+                                   end_date=request.args.get('end_date'))
+        return WPStatistics.render_template('statistics.html', self._conf, report=report)
 
 
 class RHApiBase(RHManageEventBase):
     ALLOW_LOCKED = True
 
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
-        self._report_params = {'start_date': params.get('start_date'),
-                               'end_date': params.get('end_date')}
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self._report_params = {'start_date': request.args.get('start_date'),
+                               'end_date': request.args.get('end_date')}
 
 
 class RHApiEventBase(RHApiBase):
-    def _process_args(self, params):
-        RHApiBase._process_args(self, params)
-        self._report_params['event_id'] = params['confId']
-        self._report_params['contrib_id'] = params.get('contrib_id')
+    def _process_args(self):
+        RHApiBase._process_args(self)
+        self._report_params['event_id'] = self.event.id
+        self._report_params['contrib_id'] = request.args.get('contrib_id')
 
 
 class RHApiDownloads(RHApiEventBase):
-    def _process_args(self, params):
-        RHApiEventBase._process_args(self, params)
-        self._report_params['download_url'] = params['download_url']
+    def _process_args(self):
+        RHApiEventBase._process_args(self)
+        self._report_params['download_url'] = request.args['download_url']
 
     def _process(self):
         return jsonify(ReportDownloads.get(**self._report_params))

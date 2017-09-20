@@ -30,12 +30,10 @@ from indico_previewer_jupyter.cpp_highlighter import CppHighlighter
 
 class RHEventPreviewIPyNB(RH):
     def _check_access(self):
-        RH._check_access(self)
         if not self.attachment.can_access(session.user):
             raise Forbidden
 
-    def _process_args(self, params):
-        RH._process_args(self, params)
+    def _process_args(self):
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
 
     def _process(self):
