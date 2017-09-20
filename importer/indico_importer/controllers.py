@@ -72,8 +72,8 @@ class RHEndTimeBase(RHManageTimetableBase):
 class RHDayEndTime(RHEndTimeBase):
     """Get the end_dt of the latest timetable entry or the event start_dt if no entry exist on that date"""
 
-    def _checkParams(self, params):
-        RHEndTimeBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHEndTimeBase._process_args(self, params)
         self.date = self.event.tzinfo.localize(datetime.strptime(request.args['selectedDay'], '%Y/%m/%d')).date()
 
     def _process(self):
@@ -98,8 +98,8 @@ class RHBlockEndTime(RHEndTimeBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHEndTimeBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHEndTimeBase._process_args(self, params)
         self.date = timezone(self.event.timezone).localize(datetime.strptime(request.args['selectedDay'],
                                                                                  '%Y/%m/%d'))
         self.timetable_entry = self.event.timetable_entries.filter_by(

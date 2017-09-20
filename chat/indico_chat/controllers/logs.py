@@ -39,9 +39,9 @@ from indico_chat.xmpp import retrieve_logs
 class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
     """UI to retrieve logs for a chatroom"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
+        RHEventChatroomMixin._process_args(self)
 
     def _process(self):
         if not retrieve_logs(self.chatroom):
@@ -56,9 +56,9 @@ class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
 class RHChatManageEventRetrieveLogsBase(RHEventChatroomMixin, RHChatManageEventBase):
     """Retrieves logs for a chatroom"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
+        RHEventChatroomMixin._process_args(self)
 
         if 'get_all_logs' not in request.values:
             self.start_date = datetime.strptime(request.values['start_date'], '%d/%m/%Y').date()
@@ -89,8 +89,8 @@ class RHChatManageEventShowLogs(RHChatManageEventRetrieveLogsBase):
 class RHChatManageEventAttachLogs(RHChatManageEventRetrieveLogsBase):
     """Attachs the logs for a chatroom to the event"""
 
-    def _checkParams(self, params):
-        RHChatManageEventRetrieveLogsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHChatManageEventRetrieveLogsBase._process_args(self, params)
         self.material_name = request.form['material_name'].strip()
         self.file_repo_id = None
 

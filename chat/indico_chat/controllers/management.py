@@ -66,9 +66,9 @@ class RHChatManageEvent(AttachChatroomMixin, RHChatManageEventBase):
 class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
     """Modifies an existing chatroom"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
+        RHEventChatroomMixin._process_args(self)
 
     def _process(self):
         defaults = FormDefaults(self.chatroom)
@@ -93,9 +93,9 @@ class RHChatManageEventModify(RHEventChatroomMixin, RHChatManageEventBase):
 class RHChatManageEventRefresh(RHEventChatroomMixin, RHChatManageEventBase):
     """Synchronizes the local chatroom data with the XMPP server"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
+        RHEventChatroomMixin._process_args(self)
 
     def _process(self):
         if self.chatroom.custom_server:
@@ -146,8 +146,8 @@ class RHChatManageEventCreate(RHChatManageEventBase):
 class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
     """Attaches an existing chatroom to an event"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
 
     def _process(self):
         form = self._get_attach_form()
@@ -163,9 +163,9 @@ class RHChatManageEventAttach(AttachChatroomMixin, RHChatManageEventBase):
 class RHChatManageEventRemove(RHEventChatroomMixin, RHChatManageEventBase):
     """Removes a chatroom from an event (and if necessary from the server)"""
 
-    def _checkParams(self, params):
-        RHChatManageEventBase._checkParams(self, params)
-        RHEventChatroomMixin._checkParams(self)
+    def _process_args(self, params):
+        RHChatManageEventBase._process_args(self, params)
+        RHEventChatroomMixin._process_args(self)
 
     def _process(self):
         reason = '{} has requested to delete this room.'.format(to_unicode(session.user.full_name))

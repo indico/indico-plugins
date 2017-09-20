@@ -44,7 +44,7 @@ paypal_transaction_action_mapping = {'Completed': TransactionAction.complete,
 class RHPaypalIPN(RH):
     """Process the notification sent by the PayPal"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.token = request.args['token']
         self.registration = Registration.find_first(uuid=self.token)
         if not self.registration:

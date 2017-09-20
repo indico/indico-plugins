@@ -34,8 +34,8 @@ class RHEventPreviewIPyNB(RH):
         if not self.attachment.can_access(session.user):
             raise Forbidden
 
-    def _checkParams(self, params):
-        RH._checkParams(self, params)
+    def _process_args(self, params):
+        RH._process_args(self, params)
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
 
     def _process(self):

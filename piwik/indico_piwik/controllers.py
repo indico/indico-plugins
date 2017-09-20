@@ -25,8 +25,8 @@ from indico_piwik.views import WPStatistics
 
 
 class RHStatistics(RHManageEventBase):
-    def _checkParams(self, params):
-        RHManageEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageEventBase._process_args(self, params)
         self._params = params
         self._params['loading_gif'] = '{}/images/loading.gif'.format(config.BASE_URL)
         self._params['report'] = ReportGeneral.get(event_id=params.get('confId'), contrib_id=params.get('contrib_id'),
@@ -39,22 +39,22 @@ class RHStatistics(RHManageEventBase):
 class RHApiBase(RHManageEventBase):
     ALLOW_LOCKED = True
 
-    def _checkParams(self, params):
-        RHManageEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageEventBase._process_args(self, params)
         self._report_params = {'start_date': params.get('start_date'),
                                'end_date': params.get('end_date')}
 
 
 class RHApiEventBase(RHApiBase):
-    def _checkParams(self, params):
-        RHApiBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHApiBase._process_args(self, params)
         self._report_params['event_id'] = params['confId']
         self._report_params['contrib_id'] = params.get('contrib_id')
 
 
 class RHApiDownloads(RHApiEventBase):
-    def _checkParams(self, params):
-        RHApiEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHApiEventBase._process_args(self, params)
         self._report_params['download_url'] = params['download_url']
 
     def _process(self):

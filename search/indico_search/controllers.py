@@ -31,7 +31,7 @@ from indico_search.views import WPSearchCategory, WPSearchConference
 class RHSearch(RH):
     """Performs a search using the search engine plugin"""
 
-    def _checkParams(self):
+    def _process_args(self):
         if 'confId' in request.view_args:
             self.obj = Event.get_one(request.view_args['confId'], is_deleted=False)
             self._conf = self.obj.as_legacy

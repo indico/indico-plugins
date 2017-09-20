@@ -38,7 +38,7 @@ def extend_plugin_details():
 class RHDeleteAgent(RHAdminBase):
     """Deletes a LiveSync agent"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
 
     def _process(self):
@@ -50,7 +50,7 @@ class RHDeleteAgent(RHAdminBase):
 class RHAddAgent(RHAdminBase):
     """Adds a LiveSync agent"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.backend_name = request.view_args['backend']
         try:
             self.backend = current_plugin.backend_classes[self.backend_name]
@@ -74,7 +74,7 @@ class RHAddAgent(RHAdminBase):
 class RHEditAgent(RHAdminBase):
     """Edits a LiveSync agent"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
         if self.agent.backend is None:
             flash(_('Cannot edit an agent that is not loaded'), 'error')
