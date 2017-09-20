@@ -31,7 +31,6 @@ from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
-from indico.util.user import retrieve_principal
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.http_api.hooks.base import HTTPAPIHook
@@ -43,7 +42,7 @@ from indico_vc_vidyo.cli import cli
 from indico_vc_vidyo.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_vidyo.http_api import DeleteVCRoomAPI
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
-from indico_vc_vidyo.util import iter_extensions, iter_user_identities, update_room_from_obj
+from indico_vc_vidyo.util import iter_extensions, iter_user_identities, retrieve_principal, update_room_from_obj
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -156,7 +155,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         :param event: Event -- The event to the Vidyo room will be attached
         """
         client = AdminClient(self.settings)
-        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
+        owner = retrieve_principal(vc_room.data['owner'])
         login_gen = iter_user_identities(owner)
         login = next(login_gen, None)
         if login is None:
@@ -232,7 +231,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         except RoomNotFoundAPIException:
             raise VCRoomNotFoundError(_("This room has been deleted from Vidyo"))
 
-        owner = retrieve_principal(vc_room.data['owner'], allow_groups=False, legacy=False)
+        owner = retrieve_principal(vc_room.data['owner'])
         changed_owner = room_obj.ownerName not in iter_user_identities(owner)
         if changed_owner:
             login_gen = iter_user_identities(owner)

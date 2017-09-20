@@ -93,3 +93,12 @@ def update_room_from_obj(settings, vc_room, room_obj):
         'moderation_pin': room_obj.RoomMode.moderatorPIN if room_obj.RoomMode.hasModeratorPIN else "",
     })
     vc_room.vidyo_extension.extension = int(room_obj.extension)
+
+
+def retrieve_principal(principal):
+    from indico.modules.users import User
+    type_, id_ = principal
+    if type_ in {'Avatar', 'User'}:
+        return User.get(int(id_))
+    else:
+        raise ValueError('Unexpected type: {}'.format(type_))

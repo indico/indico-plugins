@@ -21,13 +21,12 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, Regexp, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
-from indico.util.user import retrieve_principal
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import IndicoPasswordField, PrincipalField
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_vidyo import _
-from indico_vc_vidyo.util import iter_user_identities
+from indico_vc_vidyo.util import iter_user_identities, retrieve_principal
 
 
 PIN_VALIDATORS = [Optional(), Length(min=3, max=10), Regexp(r'^\d+$', message=_("The PIN must be a number"))]
@@ -71,7 +70,7 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
         if defaults.owner_user is None and defaults.owner is not None:
-            defaults.owner_user = retrieve_principal(defaults.owner, allow_groups=False, legacy=False)
+            defaults.owner_user = retrieve_principal(defaults.owner)
         super(VCRoomForm, self).__init__(*args, **kwargs)
 
     @generated_data
