@@ -25,9 +25,9 @@ from indico_chat.util import is_chat_admin
 
 
 class RHChatManageEventBase(RHManageEventBase):
-    def _checkProtection(self):
+    def _check_access(self):
         if not is_chat_admin(session.user):
-            RHManageEventBase._checkProtection(self)
+            RHManageEventBase._check_access(self)
 
 
 class RHEventChatroomMixin:

@@ -29,8 +29,8 @@ from indico_previewer_jupyter.cpp_highlighter import CppHighlighter
 
 
 class RHEventPreviewIPyNB(RH):
-    def _checkProtection(self):
-        RH._checkProtection(self)
+    def _check_access(self):
+        RH._check_access(self)
         if not self.attachment.can_access(session.user):
             raise Forbidden
 
