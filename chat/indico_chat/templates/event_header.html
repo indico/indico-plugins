@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="event-service-details">
-                    {{ how_to_connect | safe }}
+                    {{ how_to_connect | sanitize_html }}
                 </div>
                 <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
             </div>

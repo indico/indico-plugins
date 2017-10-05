@@ -11,6 +11,6 @@
 {% block custom_footer %}
     {% if plugin.settings.get('creation_email_footer') %}
         <hr>
-        {{ plugin.settings.get('creation_email_footer') |safe }}
+        {{ plugin.settings.get('creation_email_footer') | sanitize_html }}
     {% endif %}
 {% endblock %}
