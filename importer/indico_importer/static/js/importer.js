@@ -105,9 +105,14 @@
                         onSuccess(data, textStatus);
                     }
                 },
-                error: function(jqxhr, textStatus, errorThrown) {
+                error: function(xhr) {
                     if ($.isFunction(onError)) {
-                        onError(textStatus + ': ' + errorThrown);
+                        onError({
+                            title: $t.gettext('Something went wrong'),
+                            message: '{0} ({1})'.format(xhr.statusText.toLowerCase(), xhr.status),
+                            suggest_login: false,
+                            report_url: null
+                        });
                     }
                 }
             });
@@ -611,7 +616,7 @@
                             var errorCallback = function(error) {
                                 if (error) {
                                     hasError = true;
-                                    IndicoUI.Dialogs.Util.error(error);
+                                    showErrorDialog(error);
                                 }
                             };
                             var date = self.destination.startDate.date.replace(/-/g, '/');
