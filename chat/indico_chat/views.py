@@ -17,26 +17,27 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 
 
-class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDefaultDisplayBase):
+class WPChatEventPage(WPJinjaMixinPlugin, WPConferenceDisplayLegacyBase):
     menu_entry_plugin = 'chat'
     menu_entry_name = 'chatrooms'
 
     def __init__(self, rh, conf, **kwargs):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
+        WPConferenceDisplayLegacyBase.__init__(self, rh, conf, **kwargs)
         self._conf = conf
 
     def _getBody(self, params):
         return self._getPageContent(params)
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+        return WPConferenceDisplayLegacyBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+        return WPConferenceDisplayLegacyBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
 
-class WPChatEventMgmt(WPJinjaMixinPlugin, WPConferenceModifBase):
+class WPChatEventMgmt(WPJinjaMixinPlugin, WPEventManagementLegacy):
     sidemenu_option = 'chat'
