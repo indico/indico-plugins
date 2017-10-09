@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import g, request
 from flask_pluginengine import plugins_loaded
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
@@ -64,7 +64,7 @@ class SearchPlugin(IndicoPlugin):
         return blueprint
 
     def _add_conference_search_box(self, event, **kwargs):
-        if layout_settings.get(event, 'is_searchable'):
+        if layout_settings.get(event, 'is_searchable') and not g.get('static_site'):
             form = self.engine_plugin.search_form(prefix='search-', csrf_enabled=False)
             return render_engine_or_search_template('searchbox_conference.html', event=event, form=form)
 
