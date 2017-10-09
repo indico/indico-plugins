@@ -47,7 +47,7 @@ class RHChatManageEventLogs(RHEventChatroomMixin, RHChatManageEventBase):
         if not retrieve_logs(self.chatroom):
             flash(_('There are no logs available for this room.'), 'warning')
             return redirect(url_for_plugin('.manage_rooms', self.event))
-        return WPChatEventMgmt.render_template('manage_event_logs.html', self._conf,
+        return WPChatEventMgmt.render_template('manage_event_logs.html', self.event,
                                                event_chatroom=self.event_chatroom,
                                                start_date=self.event.start_dt_local,
                                                end_date=self.event.end_dt_local)

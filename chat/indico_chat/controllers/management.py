@@ -57,8 +57,7 @@ class RHChatManageEvent(AttachChatroomMixin, RHChatManageEventBase):
         attach_form = self._get_attach_form()
         if not attach_form.chatroom._get_object_list():
             attach_form = None
-        return WPChatEventMgmt.render_template('manage_event.html', self._conf, event_chatrooms=chatrooms,
-                                               event=self.event,
+        return WPChatEventMgmt.render_template('manage_event.html', self.event, event_chatrooms=chatrooms,
                                                chat_links=current_plugin.settings.get('chat_links'),
                                                logs_enabled=logs_enabled, attach_form=attach_form)
 

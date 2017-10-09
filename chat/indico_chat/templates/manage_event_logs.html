@@ -1,7 +1,8 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/management/base.html' %}
+
 {% set chatroom = event_chatroom.chatroom %}
 
-{% block title %}{% trans %}Chat Rooms{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Chat{% endtrans %}{% endblock %}
 
 {% block subtitle %}{% trans room=chatroom.name %}Logs for {{ room }}{% endtrans %}{% endblock %}
 

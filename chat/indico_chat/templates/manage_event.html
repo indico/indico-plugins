@@ -1,5 +1,10 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/management/base.html' %}
+
 {% from 'forms/_form.html' import form_header, form_row, form_footer  %}
+
+{% block title %}
+    {% trans %}Chat{% endtrans %}
+{% endblock %}
 
 {% block content %}
     <div class="plugin-chat chat-mgmt" style="margin-bottom: 2em;">

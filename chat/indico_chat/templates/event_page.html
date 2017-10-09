@@ -1,5 +1,10 @@
-<h2 class="page-title">{% trans %}Chat Rooms{% endtrans %}</h2>
-<div>
+{% extends 'events/display/conference/base.html' %}
+
+{% block title %}
+    {% trans %}Chat Rooms{% endtrans %}
+{% endblock %}
+
+{% block content %}
     {% for event_chatroom in event_chatrooms %}
         {% set chatroom = event_chatroom.chatroom %}
         {% set server = chatroom.server %}
@@ -49,7 +54,8 @@
             <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
         </div>
     {% endfor %}
-</div>
-<script>
-    $('.event-service-toolbar').dropdown();
-</script>
+
+    <script>
+        $('.event-service-toolbar').dropdown();
+    </script>
+{% endblock %}
