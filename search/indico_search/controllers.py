@@ -52,8 +52,7 @@ class RHSearch(RH):
             if isinstance(result, Response):  # probably a redirect or a json response
                 return result
             view_class = WPSearchConference if isinstance(self.obj, Event) else WPSearchCategory
-            obj = self.obj.as_legacy if isinstance(self.obj, Event) else self.obj
-            return view_class.render_template('results.html', obj, only_public=current_plugin.only_public,
+            return view_class.render_template('results.html', self.obj, only_public=current_plugin.only_public,
                                               form=form, obj_type=self.obj_type, result=result)
 
 

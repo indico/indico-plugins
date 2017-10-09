@@ -18,14 +18,12 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import WPJinjaMixinPlugin
 from indico.modules.categories.views import WPCategory
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 
 
 class WPSearchCategory(WPJinjaMixinPlugin, WPCategory):
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    pass
 
 
-class WPSearchConference(WPJinjaMixinPlugin, WPConferenceDisplayLegacyBase):
-    def _getBody(self, params):
-        return self._getPageContent(params)
+class WPSearchConference(WPJinjaMixinPlugin, WPConferenceDisplayBase):
+    pass
