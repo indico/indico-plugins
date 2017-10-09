@@ -29,7 +29,7 @@ class RHStatistics(RHManageEventBase):
                                    contrib_id=request.args.get('contrib_id'),
                                    start_date=request.args.get('start_date'),
                                    end_date=request.args.get('end_date'))
-        return WPStatistics.render_template('statistics.html', self._conf, report=report)
+        return WPStatistics.render_template('statistics.html', self.event, report=report)
 
 
 class RHApiBase(RHManageEventBase):

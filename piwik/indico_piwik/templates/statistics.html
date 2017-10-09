@@ -1,240 +1,244 @@
-{{ include_js_assets('jqplot_js') }}
-{{ include_css_assets('jqplot_css') }}
-{{ include_plugin_js_assets('jqtree_js') }}
-{{ include_plugin_css_assets('jqtree_css') }}
-{{ include_plugin_js_assets('statistics_js') }}
-{{ include_plugin_css_assets('statistics_css') }}
+{% extends 'events/management/base.html' %}
+
+{% block content %}
+    {{ include_js_assets('jqplot_js') }}
+    {{ include_css_assets('jqplot_css') }}
+    {{ include_plugin_js_assets('jqtree_js') }}
+    {{ include_plugin_css_assets('jqtree_css') }}
+    {{ include_plugin_js_assets('statistics_js') }}
+    {{ include_plugin_css_assets('statistics_css') }}
 
 
-<div id="statsWidgetsWrapper">
-    <!-- Header -->
-    <div class="statsWidget full edge">
-        <div class="statsWidgetTitle">
-            {% trans %}Selection Information{% endtrans %}
-            {% trans start=report.start_date, end=report.end_date %}({{ start }} to {{ end }}){% endtrans %}
-            <span style="float:right;padding-right:5px;">
-                <a href="#" id="statsModify"
-                   data-msg-show="{% trans %}Modify Query{% endtrans %}"
-                   data-msg-hide="{% trans %}Hide{% endtrans %}">
-                    {%- trans -%}Modify Query{%- endtrans -%}
-                </a>
-            </span>
-            <div style="clear:both;"></div>
-        </div>
-        <div class="statsWidgetContent">
-            <span style="display:block;width:100%;">
-                <div id="statsFilter">
-                    <div class="statsFilterOption">
-                        {% trans %}View statistics between these dates{% endtrans %}:
-                        <input type="text"
-                               class="statsDates"
-                               id="statsFilterStartDate"
-                               data-default="{{ report.start_date }}"
-                               value="{{ report.start_date }}">
-                        {% trans %}to{% endtrans %}
-                        <input type="text" class="statsDates"
-                               id="statsFilterEndDate"
-                               data-default="{{ report.end_date }}"
-                               value="{{ report.end_date }}">
-                        <input type="hidden" id="confId" value="{{ report.event_id }}">
-                        <input type="hidden" id="contribId" value="{{ report.contrib_id }}">
-                    </div>
-                    <div class="statsFilterOption">
-                    {% if report.contributions %}
-                        {% trans %}Choose Event / Contribution{% endtrans %}
-                        <select id="updateContribution">
-                            <option value="None">{% trans %}Event{% endtrans %}</option>
-                            {% for id, title in report.contributions.iteritems() %}
-                                <option value="{{ id }}" {{ 'selected' if report.contrib_id == id }}>
-                                    {% trans %}Contribution{% endtrans %}: {{ title }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    {% else %}
-                        <input type="hidden" id="updateContribution" value="None">
-                    {% endif %}
-                    </div>
-                    <div class="statsFilterOption statsTopBordered">
-                        <input type="button" id="updateQuery" class="i-button" value="{% trans %}Update Query{% endtrans %}">
-                    </div>
-                </div>
-            </span>
-        </div>
-    </div>
-
-    <div class="statsRow">
-        <!-- Visitor hit rates -->
+    <div id="statsWidgetsWrapper">
+        <!-- Header -->
         <div class="statsWidget full edge">
             <div class="statsWidgetTitle">
-            {% trans %}Visitor Hit Rates{% endtrans %}
-                <span id="visitsInfoHelp" class="fake-link" title="
-                    {%- trans -%}
-                        Please note, statistics have only been collected since the plugin's
-                        introduction. This means that there is no data present for the earlier
-                        period of some events, this does not necessarily mean that there was no
-                        activity in the event at that time.
-                    {%- endtrans -%}
-                ">
-                    {% trans %}Info{% endtrans %}
+                {% trans %}Selection Information{% endtrans %}
+                {% trans start=report.start_date, end=report.end_date %}({{ start }} to {{ end }}){% endtrans %}
+                <span style="float:right;padding-right:5px;">
+                    <a href="#" id="statsModify"
+                       data-msg-show="{% trans %}Modify Query{% endtrans %}"
+                       data-msg-hide="{% trans %}Hide{% endtrans %}">
+                        {%- trans -%}Modify Query{%- endtrans -%}
+                    </a>
+                </span>
+                <div style="clear:both;"></div>
+            </div>
+            <div class="statsWidgetContent">
+                <span style="display:block;width:100%;">
+                    <div id="statsFilter">
+                        <div class="statsFilterOption">
+                            {% trans %}View statistics between these dates{% endtrans %}:
+                            <input type="text"
+                                   class="statsDates"
+                                   id="statsFilterStartDate"
+                                   data-default="{{ report.start_date }}"
+                                   value="{{ report.start_date }}">
+                            {% trans %}to{% endtrans %}
+                            <input type="text" class="statsDates"
+                                   id="statsFilterEndDate"
+                                   data-default="{{ report.end_date }}"
+                                   value="{{ report.end_date }}">
+                            <input type="hidden" id="confId" value="{{ report.event_id }}">
+                            <input type="hidden" id="contribId" value="{{ report.contrib_id }}">
+                        </div>
+                        <div class="statsFilterOption">
+                        {% if report.contributions %}
+                            {% trans %}Choose Event / Contribution{% endtrans %}
+                            <select id="updateContribution">
+                                <option value="None">{% trans %}Event{% endtrans %}</option>
+                                {% for id, title in report.contributions.iteritems() %}
+                                    <option value="{{ id }}" {{ 'selected' if report.contrib_id == id }}>
+                                        {% trans %}Contribution{% endtrans %}: {{ title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <input type="hidden" id="updateContribution" value="None">
+                        {% endif %}
+                        </div>
+                        <div class="statsFilterOption statsTopBordered">
+                            <input type="button" id="updateQuery" class="i-button" value="{% trans %}Update Query{% endtrans %}">
+                        </div>
+                    </div>
                 </span>
             </div>
-            <div class="statsWidgetContent">
-                <div id="visitorChart"></div>
-            </div>
         </div>
-    </div>
 
-    <div class="statsRow">
-         <!-- Overall Statistics -->
-        <div class="statsWidget small">
-            <div class="statsWidgetTitle">
-                {% trans %}Overall Statistics{% endtrans %}
-            </div>
-            <div class="statsWidgetContent">
-                <div class="statsTableDivider">
-                    {% trans %}Visitor Metrics{% endtrans %}:
+        <div class="statsRow">
+            <!-- Visitor hit rates -->
+            <div class="statsWidget full edge">
+                <div class="statsWidgetTitle">
+                {% trans %}Visitor Hit Rates{% endtrans %}
+                    <span id="visitsInfoHelp" class="fake-link" title="
+                        {%- trans -%}
+                            Please note, statistics have only been collected since the plugin's
+                            introduction. This means that there is no data present for the earlier
+                            period of some events, this does not necessarily mean that there was no
+                            activity in the event at that time.
+                        {%- endtrans -%}
+                    ">
+                        {% trans %}Info{% endtrans %}
+                    </span>
                 </div>
-                <table style="padding-top:10px;">
-                    <tr>
-                        <td>{% trans %}Visitors{% endtrans %}:</td>
-                        <td>{{ report.metrics.visits }}</td>
-                    </tr>
-                    <tr>
-                        <td>{% trans %}Unique Visitors{% endtrans %}</td>
-                        <td>{{ report.metrics.unique_visits }}</td>
-                    </tr>
-                    <tr>
-                        <td>{% trans %}Returning Visitors{% endtrans %}</td>
-                        <td>{{ report.metrics.visits - report.metrics.unique_visits }}</td>
-                    </tr>
-                    <tr>
-                        <td>{% trans %}Avg. Duration{% endtrans %}</td>
-                        <td>{{ report.metrics.visit_duration }}</td>
-                    </tr>
-                </table>
-                <div class="statsTableDivider">
-                    {% trans %}Peak Statistics{% endtrans %}
+                <div class="statsWidgetContent">
+                    <div id="visitorChart"></div>
                 </div>
-                <table>
-                    <tr>
-                        <td>{% trans %}Peak Date{% endtrans %}:</td>
-                        <td>{{ report.metrics.peak.date }}</td>
-                    </tr>
-                    <tr>
-                        <td>{% trans %}Peak Users{% endtrans %}:</td>
-                        <td>{{ report.metrics.peak.users }}</td>
-                    </tr>
-                </table>
             </div>
         </div>
 
-        <!-- World map hits -->
-        <div class="statsWidget large edge">
-            <div class="statsWidgetTitle">
-                {% trans %}Visitors Geography{% endtrans %}
-            </div>
-            <div class="statsWidgetContent">
-                <img id="graph_countries" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
-                     alt="{% trans %}Visitor Origins{% endtrans %}">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="statsRow">
-
-        <!-- Top Referrers -->
-        <div class="statsWidget medium">
-            <div class="statsWidgetTitle">
-                {% trans %}Top Referrers{% endtrans %}
-            </div>
-            <div class="statsWidgetContent">
-                <div class="statsTableDivider">
-                    {% trans %}Traffic Inbound Top 10{% endtrans %}:
+        <div class="statsRow">
+             <!-- Overall Statistics -->
+            <div class="statsWidget small">
+                <div class="statsWidgetTitle">
+                    {% trans %}Overall Statistics{% endtrans %}
                 </div>
-                <table>
-                    <tr>
-                        <td width="150">{% trans %}Referrer{% endtrans %}</td>
-                        <td>{% trans %}Visits{% endtrans %}</td>
-                        <td>{% trans %}Actions{% endtrans %}</td>
-                        <td>{% trans %}Visit Length{% endtrans %}</td>
-                    </tr>
-                    {% for referrer in report.metrics.referrers %}
-                        <tr>
-                            <td>{{ referrer.label }}</td>
-                            <td>{{ referrer.nb_visits }}</td>
-                            <td>{{ referrer.nb_actions }}</td>
-                            <td>{{ referrer.sum_visit_length }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-
-        <!-- User Devices -->
-        <div class="statsWidget medium edge">
-            <div class="statsWidgetTitle">
-                {% trans %}User Systems{% endtrans %}
-            </div>
-            <div class="statsWidgetContent" style="text-align:center;">
-                <img id="graph_devices" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
-                     alt="{% trans %}Visitor Systems{% endtrans %}">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="statsRow">
-
-        <!-- File Downloads -->
-        <div class="statsWidget full edge">
-            <div class="statsWidgetTitle">
-                {% trans %}Material Downloads{% endtrans %}
-            </div>
-            <div class="statsWidgetContent">
-                <div id="materialTree"></div>
-                <div id="materialContainer">
-                    <div id="materialHeader" class="statsTableDivider">
-                        {% trans %}Downloads for{% endtrans %}:
-                        <span id="materialTitle">
-                            &mdash;
-                        </span>
-                        ({% trans %}Total{% endtrans %}: <span id="materialTotalDownloads">0</span>)
+                <div class="statsWidgetContent">
+                    <div class="statsTableDivider">
+                        {% trans %}Visitor Metrics{% endtrans %}:
                     </div>
-                    <div id="materialInfo">
-                        <div id="materialDownloadChart">
-                            {% trans %}No material selected{% endtrans %}
+                    <table style="padding-top:10px;">
+                        <tr>
+                            <td>{% trans %}Visitors{% endtrans %}:</td>
+                            <td>{{ report.metrics.visits }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans %}Unique Visitors{% endtrans %}</td>
+                            <td>{{ report.metrics.unique_visits }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans %}Returning Visitors{% endtrans %}</td>
+                            <td>{{ report.metrics.visits - report.metrics.unique_visits }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans %}Avg. Duration{% endtrans %}</td>
+                            <td>{{ report.metrics.visit_duration }}</td>
+                        </tr>
+                    </table>
+                    <div class="statsTableDivider">
+                        {% trans %}Peak Statistics{% endtrans %}
+                    </div>
+                    <table>
+                        <tr>
+                            <td>{% trans %}Peak Date{% endtrans %}:</td>
+                            <td>{{ report.metrics.peak.date }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans %}Peak Users{% endtrans %}:</td>
+                            <td>{{ report.metrics.peak.users }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- World map hits -->
+            <div class="statsWidget large edge">
+                <div class="statsWidgetTitle">
+                    {% trans %}Visitors Geography{% endtrans %}
+                </div>
+                <div class="statsWidgetContent">
+                    <img id="graph_countries" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
+                         alt="{% trans %}Visitor Origins{% endtrans %}">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="statsRow">
+
+            <!-- Top Referrers -->
+            <div class="statsWidget medium">
+                <div class="statsWidgetTitle">
+                    {% trans %}Top Referrers{% endtrans %}
+                </div>
+                <div class="statsWidgetContent">
+                    <div class="statsTableDivider">
+                        {% trans %}Traffic Inbound Top 10{% endtrans %}:
+                    </div>
+                    <table>
+                        <tr>
+                            <td width="150">{% trans %}Referrer{% endtrans %}</td>
+                            <td>{% trans %}Visits{% endtrans %}</td>
+                            <td>{% trans %}Actions{% endtrans %}</td>
+                            <td>{% trans %}Visit Length{% endtrans %}</td>
+                        </tr>
+                        {% for referrer in report.metrics.referrers %}
+                            <tr>
+                                <td>{{ referrer.label }}</td>
+                                <td>{{ referrer.nb_visits }}</td>
+                                <td>{{ referrer.nb_actions }}</td>
+                                <td>{{ referrer.sum_visit_length }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Devices -->
+            <div class="statsWidget medium edge">
+                <div class="statsWidgetTitle">
+                    {% trans %}User Systems{% endtrans %}
+                </div>
+                <div class="statsWidgetContent" style="text-align:center;">
+                    <img id="graph_devices" src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif"
+                         alt="{% trans %}Visitor Systems{% endtrans %}">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="statsRow">
+
+            <!-- File Downloads -->
+            <div class="statsWidget full edge">
+                <div class="statsWidgetTitle">
+                    {% trans %}Material Downloads{% endtrans %}
+                </div>
+                <div class="statsWidgetContent">
+                    <div id="materialTree"></div>
+                    <div id="materialContainer">
+                        <div id="materialHeader" class="statsTableDivider">
+                            {% trans %}Downloads for{% endtrans %}:
+                            <span id="materialTitle">
+                                &mdash;
+                            </span>
+                            ({% trans %}Total{% endtrans %}: <span id="materialTotalDownloads">0</span>)
+                        </div>
+                        <div id="materialInfo">
+                            <div id="materialDownloadChart">
+                                {% trans %}No material selected{% endtrans %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
-    </div>
-
-    <div id="statsGenerated">
-        {% trans dt=report.timestamp | format_datetime('long') -%}
-            This report was generated at: {{ dt }}
-        {%- endtrans %}
-    </div>
-</div>
-
-<!--  Container for popup content -->
-<div style="display:none; visibility: false;">
-    <div id="dialogNoGraphData" title="{% trans %}Unable to retrieve Graph Data{% endtrans %}">
-        <p>
-            {% trans -%}
-                The server did not respond in a timely manner.
-                It may be the case that the date-range is too large.
+        <div id="statsGenerated">
+            {% trans dt=report.timestamp | format_datetime('long') -%}
+                This report was generated at: {{ dt }}
             {%- endtrans %}
-        </p>
+        </div>
     </div>
-</div>
 
-<script>
-    // Data for jqPlot
-    window.piwikReportDates = {
-        start: {{ report.start_date | tojson }},
-        end: {{ report.end_date | tojson }}
-    };
-</script>
+    <!--  Container for popup content -->
+    <div style="display:none; visibility: false;">
+        <div id="dialogNoGraphData" title="{% trans %}Unable to retrieve Graph Data{% endtrans %}">
+            <p>
+                {% trans -%}
+                    The server did not respond in a timely manner.
+                    It may be the case that the date-range is too large.
+                {%- endtrans %}
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Data for jqPlot
+        window.piwikReportDates = {
+            start: {{ report.start_date | tojson }},
+            end: {{ report.end_date | tojson }}
+        };
+    </script>
+{% endblock %}

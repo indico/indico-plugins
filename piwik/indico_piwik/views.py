@@ -15,8 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.plugins import WPJinjaMixinPlugin
-from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPStatistics(WPJinjaMixinPlugin, WPEventManagementLegacy):
+class WPStatistics(WPJinjaMixinPlugin, WPEventManagement):
     sidemenu_option = 'statistics'
