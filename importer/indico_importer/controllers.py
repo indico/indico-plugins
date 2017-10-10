@@ -23,9 +23,9 @@ from flask_pluginengine import current_plugin
 from pytz import timezone, utc
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.events.timetable.controllers import RHManageTimetableBase
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.web.rh import RHProtected
 
 
 class RHGetImporters(RHProtected):

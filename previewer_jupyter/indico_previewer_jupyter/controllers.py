@@ -22,8 +22,8 @@ from nbconvert.exporters import HTMLExporter
 from traitlets.config import Config
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.attachments import Attachment
+from indico.web.rh import RH
 
 from indico_previewer_jupyter.cpp_highlighter import CppHighlighter
 

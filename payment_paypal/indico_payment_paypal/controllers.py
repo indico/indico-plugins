@@ -23,12 +23,12 @@ from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
+from indico.web.rh import RH
 
 from indico_payment_paypal import _
 

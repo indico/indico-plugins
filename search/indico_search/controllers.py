@@ -21,9 +21,9 @@ from flask_pluginengine import current_plugin
 from sqlalchemy.orm import undefer
 from werkzeug.wrappers import Response
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.categories import Category
 from indico.modules.events import Event
+from indico.web.rh import RH
 
 from indico_search.views import WPSearchCategory, WPSearchConference
 
