@@ -18,13 +18,13 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 
 from indico_chat.models.chatrooms import ChatroomEventAssociation
 from indico_chat.views import WPChatEventPage
 
 
-class RHChatEventPage(RHConferenceBaseDisplay):
+class RHChatEventPage(RHDisplayEventBase):
     """Lists the public chatrooms in a conference"""
 
     def _process(self):
