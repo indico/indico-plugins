@@ -19,7 +19,7 @@ from datetime import datetime
 import pytest
 from pytz import utc
 
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
 from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
