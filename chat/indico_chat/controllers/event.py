@@ -34,5 +34,5 @@ class RHChatEventPage(RHDisplayEventBase):
             cols.add('description')
         if any(c.chatroom.password for c in chatrooms):
             cols.add('password')
-        return WPChatEventPage.render_template('event_page.html', self._conf, event_chatrooms=chatrooms, cols=cols,
+        return WPChatEventPage.render_template('event_page.html', self.event, event_chatrooms=chatrooms, cols=cols,
                                                chat_links=current_plugin.settings.get('chat_links'))

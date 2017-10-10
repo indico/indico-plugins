@@ -34,7 +34,6 @@ class RHSearch(RH):
     def _process_args(self):
         if 'confId' in request.view_args:
             self.obj = Event.get_one(request.view_args['confId'], is_deleted=False)
-            self._conf = self.obj.as_legacy
             self.obj_type = 'event'
         elif 'category_id' in request.view_args:
             self.obj = Category.get_one(request.view_args['category_id'], is_deleted=False)
