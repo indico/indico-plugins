@@ -28,7 +28,6 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
-from indico.util.event import unify_event_args
 
 from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
 from indico_livesync.util import get_excluded_categories, obj_ref
@@ -103,7 +102,6 @@ def _created(obj, **kwargs):
     _register_change(obj, ChangeType.created)
 
 
-@unify_event_args
 def _deleted(obj, **kwargs):
     _register_deletion(obj)
 
@@ -178,11 +176,10 @@ def _register_deletion(obj):
     g.livesync_changes[obj_ref(obj)].add(ChangeType.deleted)
 
 
-@unify_event_args
 def _register_change(obj, action):
     if not isinstance(obj, Category):
         event = obj.event
-        if event is None or event.is_deleted or event.as_legacy is None:
+        if event is None or event.is_deleted:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
             # Also, ACL changes during user merges might involve deleted objects which we also don't care about
             return
