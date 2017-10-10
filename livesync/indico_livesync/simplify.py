@@ -155,7 +155,6 @@ def _process_cascaded_event_contents(records, additional_events=None):
 
     # Same for subcontributions
     if subcontribution_records:
-        changed_subcontributions.update(SubContribution
-                                        .find(SubContribution.contribution_id.in_(subcontribution_records)))
+        changed_subcontributions.update(SubContribution.find(SubContribution.id.in_(subcontribution_records)))
     for subcontrib in changed_subcontributions:
         yield subcontrib
