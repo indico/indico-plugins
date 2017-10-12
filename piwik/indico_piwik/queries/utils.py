@@ -25,6 +25,10 @@ def get_json_from_remote_server(func, **kwargs):
     from Piwik data.
     """
     rawjson = func(**kwargs)
+    if rawjson is None:
+        # If the request failed we already logged in in PiwikRequest;
+        # no need to get into the exception handler below.
+        return {}
     try:
         data = json.loads(rawjson)
         if isinstance(data, dict) and data.get('result') == 'error':
