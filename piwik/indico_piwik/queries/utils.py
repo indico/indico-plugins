@@ -19,7 +19,7 @@ import json
 from flask_pluginengine import current_plugin
 
 
-def get_json_from_remote_server(func, default={}, **kwargs):
+def get_json_from_remote_server(func, **kwargs):
     """
     Safely manage calls to the remote server by encapsulating JSON creation
     from Piwik data.
@@ -33,7 +33,7 @@ def get_json_from_remote_server(func, default={}, **kwargs):
         return data
     except Exception:
         current_plugin.logger.exception('Unable to load JSON from source %s', rawjson)
-        return default
+        return {}
 
 
 def reduce_json(data):
