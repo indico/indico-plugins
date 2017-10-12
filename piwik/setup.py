@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico_piwik',
-    version='1.0.dev0',
+    version='1.0.dev1',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
