@@ -31,7 +31,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'indico>=2.0.dev0',
-        'indico_search>=1.0.dev0'
+        'indico-plugin-search>=1.0.dev0'
     ],
     classifiers=[
         'Environment :: Plugins',
