@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import jsonify, request
+from werkzeug.exceptions import NotFound
 
 from indico.modules.events.management.controllers import RHManageEventBase
 
@@ -23,7 +24,15 @@ from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownload
 from indico_piwik.views import WPStatistics
 
 
-class RHStatistics(RHManageEventBase):
+class RHPiwikBase(RHManageEventBase):
+    def _process_args(self):
+        from indico_piwik.plugin import PiwikPlugin
+        RHManageEventBase._process_args(self)
+        if not PiwikPlugin.settings.get('site_id_events'):
+            raise NotFound
+
+
+class RHStatistics(RHPiwikBase):
     def _process(self):
         report = ReportGeneral.get(event_id=self.event.id,
                                    contrib_id=request.args.get('contrib_id'),
@@ -32,11 +41,11 @@ class RHStatistics(RHManageEventBase):
         return WPStatistics.render_template('statistics.html', self.event, report=report)
 
 
-class RHApiBase(RHManageEventBase):
+class RHApiBase(RHPiwikBase):
     ALLOW_LOCKED = True
 
     def _process_args(self):
-        RHManageEventBase._process_args(self)
+        RHPiwikBase._process_args(self)
         self._report_params = {'start_date': request.args.get('start_date'),
                                'end_date': request.args.get('end_date')}
 
