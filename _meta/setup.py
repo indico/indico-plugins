@@ -47,6 +47,7 @@ extras_require = {
 setup(
     name='indico-plugins',
     version='1.0.dev0',
+    description='A meta-package containing all official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
