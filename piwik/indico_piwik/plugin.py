@@ -74,7 +74,7 @@ class PiwikPlugin(IndicoPlugin):
                                       **event_tracking_params)
 
     def add_sidemenu_item(self, sender, event, **kwargs):
-        if not event.can_manage(session.user):
+        if not event.can_manage(session.user) or not PiwikPlugin.settings.get('site_id_events'):
             return
         return SideMenuItem(u'statistics', _(u"Statistics"), url_for_plugin(u'piwik.view', event), section=u'reports')
 
