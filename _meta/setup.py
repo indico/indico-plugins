@@ -22,24 +22,24 @@ from setuptools import setup
 # Do not modify this block manually - use `update-meta.py` instead!
 # BEGIN GENERATED REQUIREMENTS
 plugins_require = [
-    'indico_chat==1.0.dev0',
-    'indico_importer==1.0.dev0',
-    'indico_importer_invenio==1.0.dev0',
-    'indico_livesync==1.0.dev0',
-    'indico_livesync_debug==1.0.dev0',
-    'indico_livesync_invenio==1.0.dev0',
-    'indico_payment_manual==1.0.dev0',
-    'indico_payment_paypal==1.0.dev0',
-    'indico_piwik==1.0.dev1',
-    'indico_previewer_code==1.0.dev0',
-    'indico_previewer_jupyter==1.0.dev0',
-    'indico_search==1.0.dev0',
-    'indico_search_invenio==1.0.dev0',
-    'indico_vc_dummy==1.0.dev0',
-    'indico_vc_vidyo==1.0.dev0',
+    'indico-plugin-chat==1.0.dev0',
+    'indico-plugin-importer==1.0.dev0',
+    'indico-plugin-importer-invenio==1.0.dev0',
+    'indico-plugin-livesync==1.0.dev0',
+    'indico-plugin-livesync-debug==1.0.dev0',
+    'indico-plugin-livesync-invenio==1.0.dev0',
+    'indico-plugin-payment-manual==1.0.dev0',
+    'indico-plugin-payment-paypal==1.0.dev0',
+    'indico-plugin-piwik==1.0.dev1',
+    'indico-plugin-previewer-code==1.0.dev0',
+    'indico-plugin-previewer-jupyter==1.0.dev0',
+    'indico-plugin-search==1.0.dev0',
+    'indico-plugin-search-invenio==1.0.dev0',
+    'indico-plugin-vc-dummy==1.0.dev0',
+    'indico-plugin-vc-vidyo==1.0.dev0',
 ]
 extras_require = {
-    'xrootd': ['indico_storage_xrootd==1.0.dev0'],
+    'xrootd': ['indico-plugin-storage-xrootd==1.0.dev0'],
 }
 # END GENERATED REQUIREMENTS
 

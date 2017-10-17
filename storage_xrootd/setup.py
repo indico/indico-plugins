@@ -20,7 +20,7 @@ from setuptools import setup
 
 
 setup(
-    name='indico_storage_xrootd',
+    name='indico-plugin-storage-xrootd',
     version='1.0.dev0',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',

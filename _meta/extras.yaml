@@ -1,2 +1,2 @@
 # depends on pyxrootd which needs to be installed manually
-indico_storage_xrootd: xrootd
+indico-plugin-storage-xrootd: xrootd

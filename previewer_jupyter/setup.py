@@ -20,7 +20,7 @@ from setuptools import find_packages, setup
 
 
 setup(
-    name='indico_previewer_jupyter',
+    name='indico-plugin-previewer-jupyter',
     version='1.0.dev0',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
