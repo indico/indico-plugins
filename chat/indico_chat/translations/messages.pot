@@ -8,20 +8,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-06-26 10:51+0200\n"
+"POT-Creation-Date: 2017-10-18 11:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.5.1\n"
 
 #: indico_chat/forms.py:34
 msgid "Available chatrooms"
 msgstr ""
 
-#: indico_chat/forms.py:41 indico_chat/templates/manage_event.html:12
+#: indico_chat/forms.py:41 indico_chat/templates/manage_event.html:17
 msgid "Name"
 msgstr ""
 
@@ -30,8 +30,8 @@ msgid "The name of the room"
 msgstr ""
 
 #: indico_chat/forms.py:42 indico_chat/templates/event_header.html:35
-#: indico_chat/templates/event_page.html:34
-#: indico_chat/templates/manage_event.html:70
+#: indico_chat/templates/event_page.html:39
+#: indico_chat/templates/manage_event.html:75
 msgid "Description"
 msgstr ""
 
@@ -40,9 +40,9 @@ msgid "The description of the room"
 msgstr ""
 
 #: indico_chat/forms.py:43 indico_chat/templates/event_header.html:39
-#: indico_chat/templates/event_page.html:38
-#: indico_chat/templates/manage_event.html:76
-#: indico_chat/templates/manage_event.html:78
+#: indico_chat/templates/event_page.html:43
+#: indico_chat/templates/manage_event.html:81
+#: indico_chat/templates/manage_event.html:83
 msgid "Password"
 msgstr ""
 
@@ -51,8 +51,8 @@ msgid "An optional password required to join the room"
 msgstr ""
 
 #: indico_chat/forms.py:45 indico_chat/templates/event_header.html:44
-#: indico_chat/templates/event_page.html:43
-#: indico_chat/templates/manage_event.html:73
+#: indico_chat/templates/event_page.html:48
+#: indico_chat/templates/manage_event.html:78
 msgid "Hidden"
 msgstr ""
 
@@ -189,56 +189,55 @@ msgstr ""
 msgid "All fields must contain a value."
 msgstr ""
 
-#: indico_chat/plugin.py:125 indico_chat/templates/event_page.html:1
-#: indico_chat/templates/manage_event_logs.html:4
+#: indico_chat/plugin.py:132 indico_chat/templates/event_page.html:4
 msgid "Chat Rooms"
 msgstr ""
 
-#: indico_chat/plugin.py:150
+#: indico_chat/plugin.py:157
 msgid "Chatrooms"
 msgstr ""
 
-#: indico_chat/util.py:33
+#: indico_chat/util.py:34
 msgid "Chat plugin is not configured properly"
 msgstr ""
 
-#: indico_chat/controllers/logs.py:49
+#: indico_chat/controllers/logs.py:48
 msgid "There are no logs available for this room."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:83
+#: indico_chat/controllers/logs.py:82
 msgid "Could not find any logs for the given timeframe."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:85
+#: indico_chat/controllers/logs.py:84
 msgid "Could not find any logs for the chatroom."
 msgstr ""
 
-#: indico_chat/controllers/logs.py:101
+#: indico_chat/controllers/logs.py:100
 msgid "No logs found"
 msgstr ""
 
-#: indico_chat/controllers/management.py:85
+#: indico_chat/controllers/management.py:84
 msgid "Chatroom updated"
 msgstr ""
 
-#: indico_chat/controllers/management.py:108
+#: indico_chat/controllers/management.py:107
 msgid "Unexpected result from Jabber server"
 msgstr ""
 
-#: indico_chat/controllers/management.py:141
+#: indico_chat/controllers/management.py:140
 msgid "Chatroom created"
 msgstr ""
 
-#: indico_chat/controllers/management.py:157
+#: indico_chat/controllers/management.py:156
 msgid "Chatroom added"
 msgstr ""
 
-#: indico_chat/controllers/management.py:175
+#: indico_chat/controllers/management.py:174
 msgid "Chatroom deleted"
 msgstr ""
 
-#: indico_chat/controllers/management.py:177
+#: indico_chat/controllers/management.py:176
 msgid "Chatroom removed from event"
 msgstr ""
 
@@ -247,20 +246,20 @@ msgid "Chat rooms"
 msgstr ""
 
 #: indico_chat/templates/event_header.html:16
-#: indico_chat/templates/event_page.html:15
-#: indico_chat/templates/manage_event.html:49
+#: indico_chat/templates/event_page.html:20
+#: indico_chat/templates/manage_event.html:54
 msgid "Join"
 msgstr ""
 
 #: indico_chat/templates/event_header.html:32
-#: indico_chat/templates/event_page.html:31
-#: indico_chat/templates/manage_event.html:67
+#: indico_chat/templates/event_page.html:36
+#: indico_chat/templates/manage_event.html:72
 msgid "Server"
 msgstr ""
 
 #: indico_chat/templates/event_header.html:50
 #: indico_chat/templates/event_header.html:64
-#: indico_chat/templates/event_page.html:49
+#: indico_chat/templates/event_page.html:54
 msgid "More info"
 msgstr ""
 
@@ -268,64 +267,69 @@ msgstr ""
 msgid "How to connect to the chat"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:7
+#: indico_chat/templates/manage_event.html:6
+#: indico_chat/templates/manage_event_logs.html:5
+msgid "Chat"
+msgstr ""
+
+#: indico_chat/templates/manage_event.html:12
 msgid "Current chat rooms"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:13
+#: indico_chat/templates/manage_event.html:18
 msgid "Actions"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:27
-#: indico_chat/templates/manage_event_logs.html:48
+#: indico_chat/templates/manage_event.html:32
+#: indico_chat/templates/manage_event_logs.html:49
 msgid "Logs"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:30
+#: indico_chat/templates/manage_event.html:35
 msgid "Edit"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:32
+#: indico_chat/templates/manage_event.html:37
 msgid "Edit chatroom"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:39
+#: indico_chat/templates/manage_event.html:44
 msgid "Refresh"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:45
+#: indico_chat/templates/manage_event.html:50
 msgid "Remove"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:81
+#: indico_chat/templates/manage_event.html:86
 msgid "Created by"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:83
+#: indico_chat/templates/manage_event.html:88
 msgid "Created on"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:85
+#: indico_chat/templates/manage_event.html:90
 msgid "Modified on"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:101
+#: indico_chat/templates/manage_event.html:106
 msgid "No chatrooms have been added yet."
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:106
+#: indico_chat/templates/manage_event.html:111
 msgid "Create chatroom"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:109
+#: indico_chat/templates/manage_event.html:114
 msgid "Create new room"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:115
+#: indico_chat/templates/manage_event.html:120
 msgid "Add existing chat room"
 msgstr ""
 
-#: indico_chat/templates/manage_event.html:120
+#: indico_chat/templates/manage_event.html:125
 msgid "Attach existing room"
 msgstr ""
 
@@ -337,42 +341,42 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:6
+#: indico_chat/templates/manage_event_logs.html:7
 #, python-format
 msgid "Logs for %(room)s"
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:11
+#: indico_chat/templates/manage_event_logs.html:12
 msgid ""
 "Here you can retrieve logs for the chat room. You can either retrieve "
 "logs from during the event, from a custom period or all logs available "
 "for the room."
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:21
+#: indico_chat/templates/manage_event_logs.html:22
 msgid "Retrieve logs for the selected range"
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:22
+#: indico_chat/templates/manage_event_logs.html:23
 msgid "Retrieve all logs"
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:27
+#: indico_chat/templates/manage_event_logs.html:28
 msgid "You can add the currently displayed chat logs to the event material."
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:31
+#: indico_chat/templates/manage_event_logs.html:32
 msgid ""
 "Have in mind that due to security policy logs will be private by default."
 " If you want to change the protection level you will have to do it "
 "manually."
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:37
+#: indico_chat/templates/manage_event_logs.html:38
 msgid "Material name"
 msgstr ""
 
-#: indico_chat/templates/manage_event_logs.html:40
+#: indico_chat/templates/manage_event_logs.html:41
 msgid "Create material"
 msgstr ""
 

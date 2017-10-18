@@ -8,40 +8,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-06-26 10:51+0200\n"
+"POT-Creation-Date: 2017-10-18 11:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.5.1\n"
 
-#: indico_search_invenio/forms.py:26
+#: indico_search_invenio/forms.py:25
 msgid "Both (Events + Contributions)"
 msgstr ""
 
-#: indico_search_invenio/forms.py:27
+#: indico_search_invenio/forms.py:26
 msgid "Events"
 msgstr ""
 
-#: indico_search_invenio/forms.py:28
+#: indico_search_invenio/forms.py:27
 msgid "Contributions"
 msgstr ""
 
-#: indico_search_invenio/forms.py:29
+#: indico_search_invenio/forms.py:28
 msgid "Oldest first"
 msgstr ""
 
-#: indico_search_invenio/forms.py:30
+#: indico_search_invenio/forms.py:29
 msgid "Newest first"
 msgstr ""
 
-#: indico_search_invenio/forms.py:34
+#: indico_search_invenio/forms.py:33
 msgid "Search for"
 msgstr ""
 
-#: indico_search_invenio/forms.py:35
+#: indico_search_invenio/forms.py:34
 msgid "Sort order"
 msgstr ""
 
