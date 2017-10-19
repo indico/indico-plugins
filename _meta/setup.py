@@ -26,7 +26,6 @@ plugins_require = [
     'indico-plugin-importer==1.0.dev0',
     'indico-plugin-importer-invenio==1.0.dev0',
     'indico-plugin-livesync==1.0.dev0',
-    'indico-plugin-livesync-debug==1.0.dev0',
     'indico-plugin-livesync-invenio==1.0.dev0',
     'indico-plugin-payment-manual==1.0.dev0',
     'indico-plugin-payment-paypal==1.0.dev0',
@@ -34,8 +33,6 @@ plugins_require = [
     'indico-plugin-previewer-code==1.0.dev0',
     'indico-plugin-previewer-jupyter==1.0.dev0',
     'indico-plugin-search==1.0.dev0',
-    'indico-plugin-search-invenio==1.0.dev0',
-    'indico-plugin-vc-dummy==1.0.dev0',
     'indico-plugin-vc-vidyo==1.0.dev0',
 ]
 extras_require = {

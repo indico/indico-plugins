@@ -47,16 +47,17 @@ def _find_plugins():
         yield name.group(2), version.group(2)
 
 
-def _get_extras():
+def _get_config():
+    rv = {'extras': {}, 'skip': []}
     try:
-        f = open('_meta/extras.yaml')
+        f = open('_meta/meta.yaml')
     except IOError as exc:
         if exc.errno != errno.ENOENT:
             raise
-        return {}
     else:
         with f:
-            return yaml.safe_load(f)
+            rv.update(yaml.safe_load(f))
+    return rv
 
 
 def _update_meta(data):
@@ -78,13 +79,15 @@ def cli():
         click.secho('Could not find meta package (_meta subdir)', fg='red', bold=True)
         sys.exit(1)
 
-    extras = _get_extras()
+    config = _get_config()
     plugins_require = []
     extras_require = defaultdict(list)
     for name, version in sorted(_find_plugins()):
+        if name in config['skip']:
+            continue
         pkgspec = '{}=={}'.format(name, version)
-        if name in extras:
-            extras_require[extras[name]].append(pkgspec)
+        if name in config['extras']:
+            extras_require[config['extras'][name]].append(pkgspec)
         else:
             plugins_require.append(pkgspec)
 

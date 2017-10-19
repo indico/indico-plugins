@@ -1,0 +1,8 @@
+extras:
+  # depends on pyxrootd which needs to be installed manually
+  indico-plugin-storage-xrootd: xrootd
+
+skip:
+  - indico-plugin-livesync-debug
+  - indico-plugin-search-invenio
+  - indico-plugin-vc-dummy

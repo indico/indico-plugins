@@ -1,2 +1,0 @@
-# depends on pyxrootd which needs to be installed manually
-indico-plugin-storage-xrootd: xrootd
