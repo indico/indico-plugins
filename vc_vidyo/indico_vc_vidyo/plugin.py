@@ -167,8 +167,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         while True:
             room_mode = {
                 'isLocked': False,
-                'hasPIN': vc_room.data['room_pin'] != "",
-                'hasModeratorPIN': vc_room.data['moderation_pin'] != ""
+                'hasPIN': bool(vc_room.data['room_pin']),
+                'hasModeratorPIN': bool(vc_room.data['moderation_pin'])
             }
             if room_mode['hasPIN']:
                 room_mode['roomPIN'] = vc_room.data['room_pin']
@@ -243,8 +243,8 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         room_obj.name = vc_room.name
         room_obj.description = vc_room.data['description']
 
-        room_obj.RoomMode.hasPIN = vc_room.data['room_pin'] != ""
-        room_obj.RoomMode.hasModeratorPIN = vc_room.data['moderation_pin'] != ""
+        room_obj.RoomMode.hasPIN = bool(vc_room.data['room_pin'])
+        room_obj.RoomMode.hasModeratorPIN = bool(vc_room.data['moderation_pin'])
 
         if room_obj.RoomMode.hasPIN:
             room_obj.RoomMode.roomPIN = vc_room.data['room_pin']
