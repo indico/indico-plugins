@@ -6,6 +6,7 @@ addons:
   postgresql: 9.6
 env:
   - PLUGIN=livesync
+  - PLUGIN=payment_paypal
 before_install:
   - pip install -U pip setuptools
   - pip install https://github.com/indico/indico/archive/master.zip
