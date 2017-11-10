@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-vc-dummy',
-    version='1.0a1',
+    version='1.0rc1',
     description='Dummy/example video-conferencing plugin for Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',

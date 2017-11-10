@@ -22,28 +22,28 @@ from setuptools import setup
 # Do not modify this block manually - use `update-meta.py` instead!
 # BEGIN GENERATED REQUIREMENTS
 plugins_require = [
-    'indico-plugin-chat==1.0a1',
-    'indico-plugin-importer==1.0a1',
-    'indico-plugin-importer-invenio==1.0a1',
-    'indico-plugin-livesync==1.0a1',
-    'indico-plugin-livesync-invenio==1.0a1',
-    'indico-plugin-payment-manual==1.0a1',
-    'indico-plugin-payment-paypal==1.0a1',
-    'indico-plugin-piwik==1.0a1',
-    'indico-plugin-previewer-code==1.0a1',
-    'indico-plugin-previewer-jupyter==1.0a1',
-    'indico-plugin-search==1.0a1',
-    'indico-plugin-vc-vidyo==1.0a1',
+    'indico-plugin-chat==1.0rc1',
+    'indico-plugin-importer==1.0rc1',
+    'indico-plugin-importer-invenio==1.0rc1',
+    'indico-plugin-livesync==1.0rc1',
+    'indico-plugin-livesync-invenio==1.0rc1',
+    'indico-plugin-payment-manual==1.0rc1',
+    'indico-plugin-payment-paypal==1.0rc1',
+    'indico-plugin-piwik==1.0rc1',
+    'indico-plugin-previewer-code==1.0rc1',
+    'indico-plugin-previewer-jupyter==1.0rc1',
+    'indico-plugin-search==1.0rc1',
+    'indico-plugin-vc-vidyo==1.0rc1',
 ]
 extras_require = {
-    'xrootd': ['indico-plugin-storage-xrootd==1.0a1'],
+    'xrootd': ['indico-plugin-storage-xrootd==1.0rc1'],
 }
 # END GENERATED REQUIREMENTS
 
 
 setup(
     name='indico-plugins',
-    version='1.0a1',
+    version='1.0rc1',
     description='A meta-package containing the official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
