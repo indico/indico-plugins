@@ -25,16 +25,19 @@ from indico_payment_paypal.plugin import PaypalPaymentPlugin
 
 
 @pytest.mark.usefixtures('db', 'request_context')
-@pytest.mark.parametrize(('business', 'expected'), (
-    ('test', True),
-    ('foo',  False)
+@pytest.mark.parametrize(('formdata', 'expected'), (
+    ({'business': 'test'},       True),
+    ({'receiver_id': 'test'},    True),
+    ({'receiver_email': 'test'}, True),
+    ({'business': 'foo'},        False),
+    ({},                         False)
 ))
-def test_ipn_verify_business(business, expected, dummy_event):
+def test_ipn_verify_business(formdata, expected, dummy_event):
     rh = RHPaypalIPN()
     rh.registration = MagicMock()
     rh.registration.registration_form.event = dummy_event
     PaypalPaymentPlugin.event_settings.set(dummy_event, 'business', 'test')
-    request.form = {'business': business}
+    request.form = formdata
     with PaypalPaymentPlugin.instance.plugin_context():
         assert rh._verify_business() == expected
 
