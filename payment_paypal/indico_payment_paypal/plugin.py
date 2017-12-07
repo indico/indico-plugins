@@ -23,7 +23,7 @@ from wtforms.validators import DataRequired, Optional
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
                                            PaymentPluginSettingsFormBase)
-from indico.util.string import remove_accents
+from indico.util.string import remove_accents, unicode_to_ascii
 from indico.web.forms.validators import UsedIf
 
 from indico_payment_paypal import _
@@ -69,8 +69,10 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     def adjust_payment_form_data(self, data):
         event = data['event']
         registration = data['registration']
-        data['item_name'] = '{}: registration for {}'.format(remove_accents(registration.full_name, reencode=False),
-                                                             remove_accents(event.title, reencode=False))
+        data['item_name'] = '{}: registration for {}'.format(
+            unicode_to_ascii(remove_accents(registration.full_name, reencode=False)),
+            unicode_to_ascii(remove_accents(event.title, reencode=False))
+        )
         data['return_url'] = url_for_plugin('payment_paypal.success', registration.locator.uuid, _external=True)
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
         data['notify_url'] = url_for_plugin('payment_paypal.notify', registration.locator.uuid, _external=True)
