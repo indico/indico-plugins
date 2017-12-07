@@ -111,9 +111,11 @@ class PiwikPlugin(IndicoPlugin):
             return {}
         params = {'site_id_events': site_id_events}
         if request.blueprint in ('event', 'events', 'contributions') and 'confId' in request.view_args:
+            if not unicode(request.view_args['confId']).isdigit():
+                return {}
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contrib_id')
-            if contrib_id is not None:
+            if contrib_id is not None and unicode(contrib_id).isdigit():
                 contribution = Contribution.find_first(event_id=params['event_id'], id=contrib_id)
                 if contribution:
                     cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
