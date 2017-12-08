@@ -28,8 +28,8 @@ plugins_require = [
     'indico-plugin-livesync==1.0rc1',
     'indico-plugin-livesync-invenio==1.0rc1',
     'indico-plugin-payment-manual==1.0rc1',
-    'indico-plugin-payment-paypal==1.0rc1',
-    'indico-plugin-piwik==1.0rc1',
+    'indico-plugin-payment-paypal==1.0rc2',
+    'indico-plugin-piwik==1.0rc2',
     'indico-plugin-previewer-code==1.0rc1',
     'indico-plugin-previewer-jupyter==1.0rc1',
     'indico-plugin-search==1.0rc1',
@@ -43,7 +43,7 @@ extras_require = {
 
 setup(
     name='indico-plugins',
-    version='1.0rc1',
+    version='1.0rc2',
     description='A meta-package containing the official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',

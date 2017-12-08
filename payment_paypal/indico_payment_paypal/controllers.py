@@ -85,11 +85,13 @@ class RHPaypalIPN(RH):
 
     def _verify_business(self):
         expected = current_plugin.event_settings.get(self.registration.registration_form.event, 'business')
-        business = request.form.get('business')
-        if expected == business:
+        candidates = {request.form.get('business'),
+                      request.form.get('receiver_id'),
+                      request.form.get('receiver_email')}
+        if expected in candidates:
             return True
-        current_plugin.logger.warning("Unexpected business: %s != %s", business, expected)
-        current_plugin.logger.warning("Request data was: %s", request.form)
+        current_plugin.logger.warning("Unexpected business: %s not in %r (request data: %r)", expected, candidates,
+                                      request.form)
         return False
 
     def _verify_amount(self):
