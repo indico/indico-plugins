@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='indico-plugin-storage-xrootd',
-    version='1.0rc1',
+    version='1.0',
     description='XRootD/EOS storage backend for Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
@@ -31,7 +31,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'indico>=2.0a1',
+        'indico>=2.0',
         'xrootdpyfs==0.1.5',
     ],
     classifiers=[

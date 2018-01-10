@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-payment-paypal',
-    version='1.0rc2',
+    version='1.0',
     description='PayPal payments for Indico event registration fees',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
@@ -31,7 +31,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0a1'
+        'indico>=2.0'
     ],
     classifiers=[
         'Environment :: Plugins',

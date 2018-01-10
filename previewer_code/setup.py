@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-previewer-code',
-    version='1.0rc1',
+    version='1.0',
     description='Syntax highlighter for code attachments in Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
@@ -31,7 +31,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0a1',
+        'indico>=2.0',
         'pygments'
     ],
     entry_points={'indico.plugins': {'previewer_code = indico_previewer_code:CodePreviewerPlugin'}}
