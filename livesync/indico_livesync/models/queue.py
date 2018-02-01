@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import g
 from werkzeug.datastructures import ImmutableDict
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
@@ -252,11 +253,18 @@ class LiveSyncQueueEntry(db.Model):
                 return
         else:
             event = obj if isinstance(obj, Event) else obj.event
-            if excluded_categories & set(event.category_chain):
+            if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
+                g.livesync_excluded_categories_checked[event.category] = excluded_categories & set(event.category_chain)
+            if g.livesync_excluded_categories_checked[event.category]:
                 return
 
+        try:
+            agents = g.livesync_agents
+        except AttributeError:
+            agents = g.livesync_agents = LiveSyncAgent.query.all()
+
         for change in changes:
-            for agent in LiveSyncAgent.find():
+            for agent in agents:
                 entry = cls(agent=agent, change=change, **ref)
                 db.session.add(entry)
 

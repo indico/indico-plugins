@@ -80,12 +80,14 @@ def connect_signals(plugin):
 
 def _moved(obj, old_parent, **kwargs):
     _register_change(obj, ChangeType.moved)
-    category_protection = old_parent.effective_protection_mode
-    new_category_protection = obj.protection_parent.effective_protection_mode
 
-    # Event is inheriting and protection of new parent is different
-    if category_protection != new_category_protection and obj.is_inheriting:
-        _register_change(obj, ChangeType.protection_changed)
+    if obj.is_inheriting:
+        # If protection is inherited, check whether it changed
+        category_protection = old_parent.effective_protection_mode
+        new_category_protection = obj.protection_parent.effective_protection_mode
+        # Protection of new parent is different
+        if category_protection != new_category_protection:
+            _register_change(obj, ChangeType.protection_changed)
 
 
 def _created(obj, **kwargs):
