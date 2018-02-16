@@ -86,9 +86,9 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.inject_js('vc_vidyo_js', WPSimpleEventDisplay)
-        self.inject_js('vc_vidyo_js', WPVCEventPage)
-        self.inject_js('vc_vidyo_js', WPVCManageEvent)
+        self.inject_bundle('main.js', WPSimpleEventDisplay)
+        self.inject_bundle('main.js', WPVCEventPage)
+        self.inject_bundle('main.js', WPVCManageEvent)
         HTTPAPIHook.register(DeleteVCRoomAPI)
 
     @property
@@ -306,9 +306,6 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
-
-    def register_assets(self):
-        self.register_js_bundle('vc_vidyo_js', 'js/vc_vidyo.js')
 
     def get_vc_room_form_defaults(self, event):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
