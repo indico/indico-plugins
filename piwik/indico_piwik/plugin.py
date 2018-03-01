@@ -88,12 +88,6 @@ class PiwikPlugin(IndicoPlugin):
                          'graph_countries': plugin_url_rule_to_js('piwik.graph_countries'),
                          'graph_devices': plugin_url_rule_to_js('piwik.graph_devices')}}
 
-    def register_assets(self):
-        self.register_js_bundle('statistics_js', 'js/statistics.js')
-        self.register_css_bundle('statistics_css', 'css/statistics.css')
-        self.register_js_bundle('jqtree_js', 'js/lib/jqTree/tree.jquery.js')
-        self.register_css_bundle('jqtree_css', 'js/lib/jqTree/jqtree.css')
-
     def track_download(self, attachment, from_preview, **kwargs):
         if from_preview or not self.settings.get('enabled_for_downloads'):
             return

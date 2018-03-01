@@ -1,3 +1,8 @@
+import 'jqtree';
+import 'jquery';
+import './main.css';
+import 'indico/jquery/compat/jqplot';
+
 $(function() {
     var $t = $T.domain('piwik');
     var treeDOMTarget = '#materialTree';
@@ -115,12 +120,12 @@ $(function() {
      * each element will be a key-pair value of date-hits.
      */
     var get_jqplot_array_values = function(data, key, with_date) {
-        output = [];
+        const output = [];
         with_date = typeof with_date !== 'undefined' ? with_date : true;
 
         for (var date in data) {
-            hits = data[date];
-            value = (with_date) ? [date, hits[key]] : hits[key];
+            const hits = data[date];
+            const value = (with_date) ? [date, hits[key]] : hits[key];
             output.push(value);
         }
 
