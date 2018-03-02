@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import './main.css';
+
 (function() {
     var $t = $T.domain('importer');
 

@@ -39,12 +39,8 @@ class SearchPlugin(IndicoPlugin):
         self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
         self.template_hook('conference-header-right-column', self._add_conference_search_box)
         self.template_hook('page-header', self._add_category_search_box)
-        self.inject_js('search_js')
-        self.inject_css('search_css')
-
-    def register_assets(self):
-        self.register_js_bundle('search_js', 'js/search.js')
-        self.register_css_bundle('search_css', 'css/search.scss')
+        self.inject_bundle('main.js')
+        self.inject_bundle('main.css')
 
     def _plugins_loaded(self, sender, **kwargs):
         if not self.engine_plugin:

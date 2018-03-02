@@ -57,12 +57,8 @@ class InvenioSearchPlugin(SearchPluginBase):
     def init(self):
         super(InvenioSearchPlugin, self).init()
         for wp in (WPSearchCategory, WPSearchConference):
-            self.inject_css('search_invenio_css', wp)
-            self.inject_js('search_invenio_js', wp)
-
-    def register_assets(self):
-        self.register_css_bundle('search_invenio_css', 'css/search_invenio.scss')
-        self.register_js_bundle('search_invenio_js', 'js/search_invenio.js')
+            self.inject_bundle('main.js', wp)
+            self.inject_bundle('main.css', wp)
 
     def get_blueprints(self):
         return IndicoPluginBlueprint('search_invenio', 'indico_search_invenio')

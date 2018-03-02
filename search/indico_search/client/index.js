@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import './main.scss';
+
 (function(global) {
     var $t = $T.domain('search');
 

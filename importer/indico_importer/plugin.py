@@ -35,8 +35,8 @@ class ImporterPlugin(IndicoPlugin):
 
     def init(self):
         super(ImporterPlugin, self).init()
-        self.inject_js('importer_js', WPManageTimetable)
-        self.inject_css('importer_css', WPManageTimetable)
+        self.inject_bundle('main.js', WPManageTimetable)
+        self.inject_bundle('main.css', WPManageTimetable)
         self.connect(signals.event.timetable_buttons, self.get_timetable_buttons)
         self.importer_engines = {}
 
@@ -58,10 +58,6 @@ class ImporterPlugin(IndicoPlugin):
                          'create_subcontrib_reference_rest': url_rule_to_js('contributions'
                                                                             '.create_subcontrib_reference_rest'),
                          'add_link': url_rule_to_js('attachments.add_link')}}
-
-    def register_assets(self):
-        self.register_js_bundle('importer_js', 'js/importer.js')
-        self.register_css_bundle('importer_css', 'css/importer.css')
 
     def register_importer_engine(self, importer_engine, plugin):
         self.importer_engines[importer_engine._id] = (importer_engine, plugin)
