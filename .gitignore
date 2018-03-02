@@ -13,3 +13,5 @@ wheelhouse/
 **/static/help/
 .cache/
 *.mo
+webpack-build-config.json
+node_modules/
