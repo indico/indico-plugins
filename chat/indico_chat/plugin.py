@@ -110,15 +110,11 @@ class ChatPlugin(IndicoPlugin):
         self.connect(signals.event_management.management_url, self.get_event_management_url)
         self.connect(signals.users.merged, self._merge_users)
         self.template_hook('event-header', self.inject_event_header)
-        self.inject_css('chat_css', WPChatEventMgmt)
-        self.inject_js('chat_js', WPChatEventMgmt)
+        self.inject_bundle('main.css', WPChatEventMgmt)
+        self.inject_bundle('main.js', WPChatEventMgmt)
 
     def get_blueprints(self):
         return blueprint
-
-    def register_assets(self):
-        self.register_css_bundle('chat_css', 'css/chat.scss')
-        self.register_js_bundle('chat_js', 'js/chat.js')
 
     def inject_event_header(self, event, **kwargs):
         chatrooms = ChatroomEventAssociation.find_for_event(event).all()
