@@ -12,6 +12,7 @@ build/
 wheelhouse/
 **/static/help/
 .cache/
+.pytest_cache/
 *.mo
 webpack-build-config.json
 node_modules/
