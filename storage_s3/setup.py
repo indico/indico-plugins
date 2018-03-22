@@ -32,6 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=2.0',
+        'boto3>=1.6.5'
     ],
     classifiers=[
         'Environment :: Plugins',
@@ -39,5 +40,5 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'storage_s3 = indico_storage_cloud:S3StoragePlugin'}}
+    entry_points={'indico.plugins': {'storage_s3 = indico_storage_s3.plugin:S3StoragePlugin'}}
 )

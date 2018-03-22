@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-import ast
-
+import boto3
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage
 from indico.core import signals
@@ -43,13 +42,21 @@ class S3Storage(Storage):
 
     def __init__(self, data):
         data = self._parse_data(data)
-        self.could_host = data['host']
-        self.datestamp = bool(ast.literal_eval(data.get('datestamp', 'False').title()))
+        self.host = data['host']
+        self.bucket = data['bucket']
+        self.secret_key = data['secret_key']
+        self.access_key = data['access_key']
+        self.client = boto3.client(
+            's3',
+            endpoint_url=self.host,
+            aws_access_key_id=self.access_key,
+            aws_secret_access_key=self.secret_key,
+        )
 
     def open(self, file_id):
         pass
 
-    def save(self, file_id):
+    def save(self, name, content_type, filename, fileobj):
         pass
 
     def delete(self, file_id):
@@ -58,5 +65,5 @@ class S3Storage(Storage):
     def getsize(self, file_id):
         pass
 
-    def send_file(self, file_id):
+    def send_file(self, file_id, content_type, filename, inline=True):
         pass
