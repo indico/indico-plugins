@@ -20,6 +20,7 @@ import boto3
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage
 from indico.core import signals
+from indico.web.flask.util import send_file
 
 
 class S3StoragePlugin(IndicoPlugin):
@@ -54,16 +55,19 @@ class S3Storage(Storage):
         )
 
     def open(self, file_id):
-        pass
+        return self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
 
     def save(self, name, content_type, filename, fileobj):
-        pass
+        self.client.upload_fileobj(fileobj, self.bucket, name)
+        return name, ''
 
     def delete(self, file_id):
-        pass
+        self.client.delete_object(self.bucket, file_id)
 
     def getsize(self, file_id):
-        pass
+        response = self.client.head_object(Bucket=self.bucket, Key=file_id)
+        return response['ContentLength']
 
     def send_file(self, file_id, content_type, filename, inline=True):
-        pass
+        fileobj = self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+        return send_file(filename, fileobj, content_type, inline=inline)
