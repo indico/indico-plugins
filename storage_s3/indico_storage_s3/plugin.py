@@ -16,10 +16,15 @@
 
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
+from tempfile import NamedTemporaryFile
+
 import boto3
+
+from indico.core import signals
+from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage
-from indico.core import signals
 from indico.web.flask.util import send_file
 
 
@@ -56,6 +61,13 @@ class S3Storage(Storage):
 
     def open(self, file_id):
         return self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+
+    @contextmanager
+    def get_local_path(self, file_id):
+        with NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR) as tmpfile:
+            self._copy_file(self.open(file_id), tmpfile)
+            tmpfile.flush()
+            yield tmpfile.name
 
     def save(self, name, content_type, filename, fileobj):
         self.client.upload_fileobj(fileobj, self.bucket, name)
