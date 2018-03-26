@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='indico-plugin-storage-s3',
-    version='1.0',
+    version='1.0-dev',
     description='S3 storage backend for Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=2.0',
-        'boto3>=1.6.5'
+        'boto3>=1.6.16,<2.0'
     ],
     classifiers=[
         'Environment :: Plugins',

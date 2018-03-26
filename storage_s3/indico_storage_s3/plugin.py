@@ -75,8 +75,10 @@ class S3Storage(Storage):
 
     def save(self, name, content_type, filename, fileobj):
         try:
-            self.client.upload_fileobj(fileobj, self.bucket, name)
-            return name, ''
+            fileobject = self._ensure_fileobj(fileobj)
+            self.client.upload_fileobj(fileobject, self.bucket, name)
+            checksum = self.client.head_object(Bucket=self.bucket, Key=name)['ETag'][1:-1]
+            return name, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
