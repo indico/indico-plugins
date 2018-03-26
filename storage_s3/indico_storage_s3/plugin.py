@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import sys
 from contextlib import contextmanager
 from tempfile import NamedTemporaryFile
 
@@ -24,7 +25,7 @@ import boto3
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
-from indico.core.storage import Storage
+from indico.core.storage import Storage, StorageError
 from indico.web.flask.util import send_file
 
 
@@ -60,7 +61,10 @@ class S3Storage(Storage):
         )
 
     def open(self, file_id):
-        return self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+        try:
+            return self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+        except Exception as e:
+            raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     @contextmanager
     def get_local_path(self, file_id):
@@ -70,16 +74,27 @@ class S3Storage(Storage):
             yield tmpfile.name
 
     def save(self, name, content_type, filename, fileobj):
-        self.client.upload_fileobj(fileobj, self.bucket, name)
-        return name, ''
+        try:
+            self.client.upload_fileobj(fileobj, self.bucket, name)
+            return name, ''
+        except Exception as e:
+            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
     def delete(self, file_id):
-        self.client.delete_object(self.bucket, file_id)
+        try:
+            self.client.delete_object(self.bucket, file_id)
+        except Exception as e:
+            raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def getsize(self, file_id):
-        response = self.client.head_object(Bucket=self.bucket, Key=file_id)
-        return response['ContentLength']
+        try:
+            return self.client.head_object(Bucket=self.bucket, Key=file_id)['ContentLength']
+        except Exception as e:
+            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename, inline=True):
-        fileobj = self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
-        return send_file(filename, fileobj, content_type, inline=inline)
+        try:
+            fileobj = self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+            return send_file(filename, fileobj, content_type, inline=inline)
+        except Exception as e:
+            raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
