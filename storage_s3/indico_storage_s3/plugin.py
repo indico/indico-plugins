@@ -96,9 +96,15 @@ class S3Storage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
+
+            content_disp = ('inline; filename="%s"' % filename if inline
+                            else 'attachment; filename="%s"' % filename)
             url = self.client.generate_presigned_url('get_object',
-                                                     Params={'Bucket': self.bucket, 'Key': file_id},
-                                                     ExpiresIn=100)
+                                                     Params={'Bucket': self.bucket,
+                                                             'Key': file_id,
+                                                             'ResponseContentDisposition': content_disp,
+                                                             'ResponseContentType': content_type},
+                                                     ExpiresIn=120)
             return redirect(url)
         except Exception as e:
             raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
