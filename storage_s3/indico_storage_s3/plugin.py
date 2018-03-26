@@ -21,12 +21,12 @@ from contextlib import contextmanager
 from tempfile import NamedTemporaryFile
 
 import boto3
+from werkzeug.utils import redirect
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage, StorageError
-from indico.web.flask.util import send_file
 
 
 class S3StoragePlugin(IndicoPlugin):
@@ -96,7 +96,9 @@ class S3Storage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
-            fileobj = self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
-            return send_file(filename, fileobj, content_type, inline=inline)
+            url = self.client.generate_presigned_url('get_object',
+                                                     Params={'Bucket': self.bucket, 'Key': file_id},
+                                                     ExpiresIn=100)
+            return redirect(url)
         except Exception as e:
             raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
