@@ -100,7 +100,6 @@ class S3Storage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
-
             content_disp = ('inline; filename="%s"' % filename if inline
                             else 'attachment; filename="%s"' % filename)
             url = self.client.generate_presigned_url('get_object',
@@ -120,8 +119,14 @@ class S3Storage(Storage):
             return self.bucket
 
     def create_bucket(self, name):
-        acl = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
-        self.client.create_bucket(name, ACL=acl)
+        try:
+            response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
+            acl_keys = ['Owner', 'Grants']
+            acl = {key: response[key] for key in response if key in acl_keys}
+            self.client.create_bucket(Bucket=name)
+            self.client.put_bucket_acl(AccessControlPolicy=acl, Bucket=name)
+        except Exception as e:
+            raise StorageError('Could not create bucket "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
     def get_week_of_the_month(self, date):
         first_day = date.replace(day=1)
