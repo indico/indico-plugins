@@ -16,11 +16,9 @@
 
 from __future__ import unicode_literals
 
-import datetime
-import re
 import sys
 from contextlib import contextmanager
-from math import ceil
+from datetime import datetime
 from tempfile import NamedTemporaryFile
 
 import boto3
@@ -57,7 +55,8 @@ class S3Storage(Storage):
         self.bucket = self.get_bucket_name(data['bucket'])
         self.secret_key = data['secret_key']
         self.access_key = data['access_key']
-        self.acl_template_bucket = data['acl_template_bucket']
+        if any(x in data['bucket'] for x in ['<year>', '<month>', '<week>']):
+            self.acl_template_bucket = data['acl_template_bucket']
         self.client = boto3.client(
             's3',
             endpoint_url=self.host,
@@ -116,28 +115,19 @@ class S3Storage(Storage):
 
     def get_bucket_name(self, name, replace_placeholders=True):
         if replace_placeholders:
-            return self.replace_bucket_placeholders(name, datetime.datetime.now())
+            return self.replace_bucket_placeholders(name, datetime.now())
         else:
             return self.bucket
 
     def create_bucket(self, name):
-        try:
             response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
-            acl_keys = ['Owner', 'Grants']
+            acl_keys = {'Owner', 'Grants'}
             acl = {key: response[key] for key in response if key in acl_keys}
             self.client.create_bucket(Bucket=name)
             self.client.put_bucket_acl(AccessControlPolicy=acl, Bucket=name)
-        except Exception as e:
-            raise StorageError('Could not create bucket "{}": {}'.format(name, e)), None, sys.exc_info()[2]
-
-    def get_week_of_the_month(self, date):
-        first_day = date.replace(day=1)
-        current_day = date.day
-        return int(ceil((current_day + first_day.weekday())/7))
 
     def replace_bucket_placeholders(self, name, date):
-        dates = {'year': str(date.year),
-                 'month': str(date.month),
-                 'week': str(self.get_week_of_the_month(date))}
-        pattern = re.compile("|".join(dates.keys()))
-        return pattern.sub(lambda m: dates[re.escape(m.group(0))], name)
+        name = name.replace('<year>', date.strftime('%Y'))
+        name = name.replace('<month>', date.strftime('%m'))
+        name = name.replace('<week>', date.strftime('%W'))
+        return name
