@@ -24,6 +24,7 @@ from math import ceil
 from tempfile import NamedTemporaryFile
 
 import boto3
+from werkzeug.datastructures import Headers
 from werkzeug.utils import redirect
 
 from indico.core import signals
@@ -100,12 +101,13 @@ class S3Storage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
-            content_disp = ('inline; filename="%s"' % filename if inline
-                            else 'attachment; filename="%s"' % filename)
+            content_disp = ('inline' if inline else 'attachment')
+            h = Headers()
+            h.add('Content-Disposition', content_disp, filename=filename)
             url = self.client.generate_presigned_url('get_object',
                                                      Params={'Bucket': self.bucket,
                                                              'Key': file_id,
-                                                             'ResponseContentDisposition': content_disp,
+                                                             'ResponseContentDisposition': h.get('Content-Disposition'),
                                                              'ResponseContentType': content_type},
                                                      ExpiresIn=120)
             return redirect(url)
