@@ -30,10 +30,11 @@ def create_bucket():
     storage = get_storage('s3')
     bucket_name = storage.get_bucket_name(replace_placeholders=False)
     now = datetime.now()
-    if all(x in bucket_name for x in ['<year>', '<week>']) and now.weekday() == 1:
+    if all(x in bucket_name for x in ['<year>', '<week>']) and now.weekday() == 0:
         date = now + relativedelta(weeks=1)
         storage.create_bucket(storage.replace_bucket_placeholders(bucket_name, date))
-    elif (all(x in bucket_name for x in ['<year>', '<month>']) and now.day == 1
-          or bucket_name.find('<year>') and now.day == 1 and now.month == 12):
+    elif ((all(x in bucket_name for x in ['<year>', '<month>']) and now.day == 1)
+          or ('<year>' in bucket_name and not any(x in bucket_name for x in ['<month>', '<week>'])
+              and now.day == 1 and now.month == 12)):
         date = now + relativedelta(months=1)
         storage.create_bucket(storage.replace_bucket_placeholders(bucket_name, date))

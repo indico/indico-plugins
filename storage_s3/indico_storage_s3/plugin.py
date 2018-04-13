@@ -117,7 +117,7 @@ class S3Storage(Storage):
         if replace_placeholders:
             return self.replace_bucket_placeholders(name, datetime.now())
         else:
-            return self.bucket
+            return name
 
     def create_bucket(self, name):
             response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
