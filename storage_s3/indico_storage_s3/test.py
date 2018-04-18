@@ -37,35 +37,47 @@ from indico_storage_s3.task import create_bucket
 def test_resolve_bucket_name(date, name_template, expected_name):
     with freeze_time(date):
         storage = plugin.S3Storage()
-        assert storage.get_bucket_name(name_template) == expected_name
+        storage.bucket = name_template
+        assert storage._get_current_bucket() == expected_name
 
 
 @mock.create_autospec
-def fake_bucket_created(name, replace_placeholders=True):
+def mock_bucket_created(self, name):
     pass
 
 
+class MockConfig:
+
+    def __init__(self):
+        self.STORAGE_BACKENDS = {'s3': None}
+
+
 @pytest.mark.usefixtures('app_context')
-@pytest.mark.parametrize(('date', 'name_template', 'bucket_created', 'expected_name'), (
-    ('2018-04-11', 'name', False, None),
-    ('2018-12-01', 'name', False, None),
-    ('2018-04-11', 'name-<year>', False, None),
-    ('2018-01-01', 'name-<year>', False, None),
-    ('2018-12-01', 'name-<year>-<week>', False, None),
-    ('2018-12-02', 'name-<year>-<week>', False, None),
-    ('2018-02-10', 'name-<year>-<month>', False, None),
-    ('2018-12-01', 'name-<year>', True, 'name-2019'),
-    ('2018-12-01', 'name-<year>-<month>', True, 'name-2019-01'),
-    ('2018-01-01', 'name-<year>-<month>', True, 'name-2018-02'),
-    ('2018-12-03', 'name-<year>-<week>', True, 'name-2018-50'),
+@pytest.mark.parametrize(('date', 'name_template', 'bucket_created', 'expected_name', 'expected_error'), (
+    ('2018-04-11', 'name', False, None, None),
+    ('2018-12-01', 'name', False, None, None),
+    ('2018-04-11', 'name-<year>', False, None, None),
+    ('2018-01-01', 'name-<year>', False, None, None),
+    ('2018-12-01', 'name-<month>', False, None, RuntimeError),
+    ('2018-12-01', 'name-<week>', False, None, RuntimeError),
+    ('2018-12-01', 'name-<month>-<week>', False, None, RuntimeError),
+    ('2018-12-01', 'name-<year>', True, 'name-2019', None),
+    ('2018-12-01', 'name-<year>-<month>', True, 'name-2019-01', None),
+    ('2018-01-01', 'name-<year>-<month>', True, 'name-2018-02', None),
+    ('2018-12-03', 'name-<year>-<week>', True, 'name-2018-50', None),
 ))
-def test_dynamic_bucket_creation_task(date, name_template, bucket_created, expected_name):
+def test_dynamic_bucket_creation_task(date, name_template, bucket_created, expected_name, expected_error):
     with freeze_time(date), \
-         mock.patch.object(plugin.S3Storage, '__init__', lambda self: None),\
-         mock.patch.object(plugin.S3Storage, 'get_bucket_name', return_value=name_template),\
-         mock.patch('indico_storage_s3.task.get_storage', return_value=plugin.S3Storage()),\
-         mock.patch.object(plugin.S3Storage, 'create_bucket', fake_bucket_created) as create_bucket_call:
-        create_bucket()
+         mock.patch.object(plugin.S3Storage, '__init__', lambda self: None), \
+         mock.patch.object(plugin.S3Storage, '_get_bucket_name', return_value=name_template), \
+         mock.patch('indico_storage_s3.task.config', MockConfig()), \
+         mock.patch('indico_storage_s3.task.get_storage', return_value=plugin.S3Storage()), \
+         mock.patch.object(plugin.S3Storage, '_create_bucket', mock_bucket_created) as create_bucket_call:
+        if expected_error:
+            with pytest.raises(expected_error):
+                create_bucket()
+        else:
+            create_bucket()
     if bucket_created:
         create_bucket_call.assert_called_with(mock.ANY, expected_name)
     else:

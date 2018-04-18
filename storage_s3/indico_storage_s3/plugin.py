@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 import sys
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import date
 from tempfile import NamedTemporaryFile
 
 import boto3
+import botocore
 from werkzeug.datastructures import Headers
 from werkzeug.utils import redirect
 
@@ -52,11 +53,10 @@ class S3Storage(Storage):
     def __init__(self, data):
         data = self._parse_data(data)
         self.host = data['host']
-        self.bucket = self.get_bucket_name(data['bucket'])
+        self.bucket = data['bucket']
         self.secret_key = data['secret_key']
         self.access_key = data['access_key']
-        if any(x in data['bucket'] for x in ['<year>', '<month>', '<week>']):
-            self.acl_template_bucket = data['acl_template_bucket']
+        self.acl_template_bucket = data.get('acl_template_bucket')
         self.client = boto3.client(
             's3',
             endpoint_url=self.host,
@@ -66,7 +66,7 @@ class S3Storage(Storage):
 
     def open(self, file_id):
         try:
-            return self.client.get_object(Bucket=self.bucket, Key=file_id)['Body']
+            return self.client.get_object(Bucket=self._get_current_bucket(), Key=file_id)['Body']
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
@@ -80,21 +80,22 @@ class S3Storage(Storage):
     def save(self, name, content_type, filename, fileobj):
         try:
             fileobject = self._ensure_fileobj(fileobj)
-            self.client.upload_fileobj(fileobject, self.bucket, name)
-            checksum = self.client.head_object(Bucket=self.bucket, Key=name)['ETag'][1:-1]
+            bucket = self._get_current_bucket()
+            self.client.upload_fileobj(fileobject, bucket, name)
+            checksum = self.client.head_object(Bucket=bucket, Key=name)['ETag'][1:-1]
             return name, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
     def delete(self, file_id):
         try:
-            self.client.delete_object(self.bucket, file_id)
+            self.client.delete_object(self._get_current_bucket(), file_id)
         except Exception as e:
             raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def getsize(self, file_id):
         try:
-            return self.client.head_object(Bucket=self.bucket, Key=file_id)['ContentLength']
+            return self.client.head_object(Bucket=self._get_current_bucket(), Key=file_id)['ContentLength']
         except Exception as e:
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
@@ -104,7 +105,7 @@ class S3Storage(Storage):
             h = Headers()
             h.add('Content-Disposition', content_disp, filename=filename)
             url = self.client.generate_presigned_url('get_object',
-                                                     Params={'Bucket': self.bucket,
+                                                     Params={'Bucket': self._get_current_bucket(),
                                                              'Key': file_id,
                                                              'ResponseContentDisposition': h.get('Content-Disposition'),
                                                              'ResponseContentType': content_type},
@@ -113,21 +114,33 @@ class S3Storage(Storage):
         except Exception as e:
             raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
-    def get_bucket_name(self, name, replace_placeholders=True):
-        if replace_placeholders:
-            return self.replace_bucket_placeholders(name, datetime.now())
-        else:
-            return name
+    def _get_current_bucket(self):
+        return self._replace_bucket_placeholders(self.bucket, date.today())
 
-    def create_bucket(self, name):
-            response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
-            acl_keys = {'Owner', 'Grants'}
-            acl = {key: response[key] for key in response if key in acl_keys}
-            self.client.create_bucket(Bucket=name)
-            self.client.put_bucket_acl(AccessControlPolicy=acl, Bucket=name)
+    def _get_bucket_name(self, current=False):
+            return self._get_current_bucket() if current else self.bucket
 
-    def replace_bucket_placeholders(self, name, date):
+    def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))
         name = name.replace('<month>', date.strftime('%m'))
         name = name.replace('<week>', date.strftime('%W'))
         return name
+
+    def _create_bucket(self, name):
+        if self._bucket_exists(name):
+            S3StoragePlugin.logger.info('Bucket %s already exists', name)
+            return
+        self.client.create_bucket(Bucket=name)
+        S3StoragePlugin.logger.info('New bucket created: %s', name)
+        if self.acl_template_bucket:
+            response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
+            acl_keys = {'Owner', 'Grants'}
+            acl = {key: response[key] for key in response if key in acl_keys}
+            self.client.put_bucket_acl(AccessControlPolicy=acl, Bucket=name)
+
+    def _bucket_exists(self, name):
+        try:
+            self.client.head_bucket(Bucket=name)
+            return True
+        except botocore.exceptions.ClientError:
+            return False

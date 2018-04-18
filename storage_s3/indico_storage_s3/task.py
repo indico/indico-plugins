@@ -16,25 +16,34 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+import re
+from datetime import date
 
 from celery.schedules import crontab
 from dateutil.relativedelta import relativedelta
 
 from indico.core.celery import celery
+from indico.core.config import config
 from indico.core.storage.backend import get_storage
+
+from plugin import S3Storage
 
 
 @celery.periodic_task(run_every=crontab(minute=0, hour=1))
 def create_bucket():
-    storage = get_storage('s3')
-    bucket_name = storage.get_bucket_name(replace_placeholders=False)
-    now = datetime.now()
-    if all(x in bucket_name for x in ['<year>', '<week>']) and now.weekday() == 0:
-        date = now + relativedelta(weeks=1)
-        storage.create_bucket(storage.replace_bucket_placeholders(bucket_name, date))
-    elif ((all(x in bucket_name for x in ['<year>', '<month>']) and now.day == 1)
-          or ('<year>' in bucket_name and not any(x in bucket_name for x in ['<month>', '<week>'])
-              and now.day == 1 and now.month == 12)):
-        date = now + relativedelta(months=1)
-        storage.create_bucket(storage.replace_bucket_placeholders(bucket_name, date))
+    for key in config.STORAGE_BACKENDS:
+        storage = get_storage(key)
+        if isinstance(storage, S3Storage):
+            today = date.today()
+            bucket_name = storage._get_bucket_name()
+            placeholders = set(re.findall('<.*?>', bucket_name))
+            if placeholders == {'<year>', '<week>'}:
+                bucket_date = today + relativedelta(weeks=1)
+                bucket = storage._replace_bucket_placeholders(bucket_name, bucket_date)
+                storage._create_bucket(bucket)
+            elif placeholders == {'<year>', '<month>'} or (placeholders == {'<year>'} and today.month == 12):
+                bucket_date = today + relativedelta(months=1)
+                bucket = storage._replace_bucket_placeholders(bucket_name, bucket_date)
+                storage._create_bucket(bucket)
+            elif placeholders == {'<month>'} or placeholders == {'<week>'} or placeholders == {'<month>', '<week>'}:
+                raise RuntimeError('Placeholders combination in bucket name is not correct: %s', bucket_name)
