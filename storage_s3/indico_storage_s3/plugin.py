@@ -30,6 +30,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage, StorageError
+from indico.util.fs import get_file_checksum
 
 
 class S3StoragePlugin(IndicoPlugin):
@@ -81,8 +82,10 @@ class S3Storage(Storage):
         try:
             fileobject = self._ensure_fileobj(fileobj)
             bucket = self._get_current_bucket()
-            self.client.upload_fileobj(fileobject, bucket, name)
-            checksum = self.client.head_object(Bucket=bucket, Key=name)['ETag'][1:-1]
+            checksum = get_file_checksum(fileobj)
+            fileobject.seek(0)
+            contentmd5 = checksum.decode('hex').encode('base64').strip()
+            self.client.put_object(Body=fileobject, Bucket=bucket, ContentMD5=contentmd5, Key=name)
             return name, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
