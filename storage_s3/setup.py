@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 setup(
@@ -27,7 +27,7 @@ setup(
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
     author='Indico Team',
     author_email='indico-team@cern.ch',
-    py_modules=('indico_storage_s3',),
+    packages=find_packages(),
     zip_safe=False,
     platforms='any',
     install_requires=[
