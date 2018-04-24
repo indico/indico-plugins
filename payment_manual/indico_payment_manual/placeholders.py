@@ -56,6 +56,12 @@ class LastNamePlaceholder(EscapablePlaceholder):
     field = 'last_name'
 
 
+class EmailPlaceholder(EscapablePlaceholder):
+    name = 'email'
+    basic_description = _("Email address of the registrant")
+    field = 'email'
+
+
 class RegistrationIDPlaceholder(IDPlaceholder):
     name = 'registration_id'
 
