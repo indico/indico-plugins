@@ -31,7 +31,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'indico>=2.0',
+        'indico>=2.1rc3',
         'boto3>=1.7.8,<2.0',
     ],
     classifiers=[
