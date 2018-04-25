@@ -165,10 +165,9 @@ def _attachment_changed(attachment_or_folder, **kwargs):
 
 
 def _apply_changes(sender, **kwargs):
-    excluded_categories = get_excluded_categories()
-
     if not hasattr(g, 'livesync_changes'):
         return
+    excluded_categories = get_excluded_categories()
     for ref, changes in g.livesync_changes.iteritems():
         LiveSyncQueueEntry.create(changes, ref, excluded_categories=excluded_categories)
 
