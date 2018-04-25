@@ -24,13 +24,16 @@ from tempfile import NamedTemporaryFile
 
 import boto3
 import botocore
+import click
 from werkzeug.datastructures import Headers
 from werkzeug.utils import redirect
 
+from indico.cli.core import cli_command
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage, StorageError
+from indico.core.storage.backend import get_storage
 from indico.util.fs import get_file_checksum
 
 
@@ -43,9 +46,35 @@ class S3StoragePlugin(IndicoPlugin):
     def init(self):
         super(S3StoragePlugin, self).init()
         self.connect(signals.get_storage_backends, self._get_storage_backends)
+        self.connect(signals.plugin.cli, self._extend_indico_cli)
 
     def _get_storage_backends(self, sender, **kwargs):
         return S3Storage
+
+    def _extend_indico_cli(self, sender, **kwargs):
+        @cli_command()
+        @click.option('--storage', default=None, help='Storage to create bucket for')
+        def create_s3_bucket(storage):
+            """Create s3 bucket"""
+            storages = [storage] if storage else config.STORAGE_BACKENDS
+            for key in storages:
+                try:
+                    storage_instance = get_storage(key)
+                except RuntimeError:
+                    if storage:
+                        click.echo('Storage {} does not exist'.format(key))
+                        sys.exit(1)
+                if isinstance(storage_instance, S3Storage):
+                    bucket_name = storage_instance._get_current_bucket()
+                    if storage_instance._bucket_exists(bucket_name):
+                        click.echo('Storage {}: bucket {} already exists'.format(key, bucket_name))
+                        continue
+                    storage_instance._create_bucket(bucket_name)
+                    click.echo('Storage {}: bucket {} created'.format(key, bucket_name))
+                elif storage:
+                    click.echo('Storage {} is not a s3 storage'.format(key))
+                    sys.exit(1)
+        return create_s3_bucket
 
 
 class S3Storage(Storage):
@@ -123,7 +152,7 @@ class S3Storage(Storage):
         return self._replace_bucket_placeholders(self.bucket, date.today())
 
     def _get_bucket_name(self, current=False):
-            return self._get_current_bucket() if current else self.bucket
+        return self._get_current_bucket() if current else self.bucket
 
     def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))
