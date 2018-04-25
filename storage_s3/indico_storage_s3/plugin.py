@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import sys
 from contextlib import contextmanager
 from datetime import date
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 import boto3
@@ -67,7 +68,8 @@ class S3Storage(Storage):
 
     def open(self, file_id):
         try:
-            return self.client.get_object(Bucket=self._get_current_bucket(), Key=file_id)['Body']
+            s3_object = self.client.get_object(Bucket=self._get_current_bucket(), Key=file_id)['Body']
+            return BytesIO(s3_object.read())
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
@@ -80,12 +82,12 @@ class S3Storage(Storage):
 
     def save(self, name, content_type, filename, fileobj):
         try:
-            fileobject = self._ensure_fileobj(fileobj)
+            fileobj = self._ensure_fileobj(fileobj)
             bucket = self._get_current_bucket()
             checksum = get_file_checksum(fileobj)
-            fileobject.seek(0)
+            fileobj.seek(0)
             contentmd5 = checksum.decode('hex').encode('base64').strip()
-            self.client.put_object(Body=fileobject, Bucket=bucket, ContentMD5=contentmd5, Key=name)
+            self.client.put_object(Body=fileobj, Bucket=bucket, ContentMD5=contentmd5, Key=name)
             return name, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]

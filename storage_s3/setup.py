@@ -32,7 +32,7 @@ setup(
     platforms='any',
     install_requires=[
         'indico>=2.0',
-        'boto3>=1.6.16,<2.0'
+        'boto3>=1.7.8,<2.0',
     ],
     classifiers=[
         'Environment :: Plugins',
