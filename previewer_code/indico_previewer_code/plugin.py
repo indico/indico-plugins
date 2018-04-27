@@ -38,8 +38,7 @@ register_custom_mimetypes()
 class PygmentsPreviewer(Previewer):
     # All supported MIME types
     MIMETYPES = ('text/css', 'text/x-python', 'text/x-ruby-script', 'text/x-java-source', 'text/x-c',
-                 'application/javascript', 'text/x-c', 'text/x-fortran', 'text/x-csharp', 'text/php',
-                 'text/x-php')
+                 'application/javascript', 'text/x-fortran', 'text/x-csharp', 'text/php', 'text/x-php')
 
     # Python's mimetypes lib and Pygments do not quite agree on some MIME types
     CUSTOM_LEXERS = {
