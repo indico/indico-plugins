@@ -104,7 +104,7 @@ class S3Storage(Storage):
 
     @contextmanager
     def get_local_path(self, file_id):
-        with NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR) as tmpfile:
+        with NamedTemporaryFile(suffix='indico.s3', dir=config.TEMP_DIR) as tmpfile:
             self._copy_file(self.open(file_id), tmpfile)
             tmpfile.flush()
             yield tmpfile.name
@@ -135,7 +135,7 @@ class S3Storage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
-            content_disp = ('inline' if inline else 'attachment')
+            content_disp = 'inline' if inline else 'attachment'
             h = Headers()
             h.add('Content-Disposition', content_disp, filename=filename)
             url = self.client.generate_presigned_url('get_object',

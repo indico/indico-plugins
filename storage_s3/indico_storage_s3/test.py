@@ -46,8 +46,7 @@ def mock_bucket_created(self, name):
     pass
 
 
-class MockConfig:
-
+class MockConfig(object):
     def __init__(self):
         self.STORAGE_BACKENDS = {'s3': None}
 
