@@ -16,3 +16,5 @@ wheelhouse/
 *.mo
 webpack-build-config.json
 node_modules/
+package-lock.json
+*.lock
