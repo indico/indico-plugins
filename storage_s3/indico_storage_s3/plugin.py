@@ -117,30 +117,34 @@ class S3Storage(Storage):
             fileobj.seek(0)
             contentmd5 = checksum.decode('hex').encode('base64').strip()
             self.client.put_object(Body=fileobj, Bucket=bucket, ContentMD5=contentmd5, Key=name)
-            return name, checksum
+            file_id = '{}//{}'.format(bucket, name)
+            return file_id, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 
     def delete(self, file_id):
+        bucket, id_ = file_id.split('//', 1)
         try:
-            self.client.delete_object(self._get_current_bucket(), file_id)
+            self.client.delete_object(bucket, id_)
         except Exception as e:
             raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def getsize(self, file_id):
+        bucket, id_ = file_id.split('//', 1)
         try:
-            return self.client.head_object(Bucket=self._get_current_bucket(), Key=file_id)['ContentLength']
+            return self.client.head_object(Bucket=bucket, Key=id_)['ContentLength']
         except Exception as e:
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
+            bucket, id_ = file_id.split('//', 1)
             content_disp = 'inline' if inline else 'attachment'
             h = Headers()
             h.add('Content-Disposition', content_disp, filename=filename)
             url = self.client.generate_presigned_url('get_object',
-                                                     Params={'Bucket': self._get_current_bucket(),
-                                                             'Key': file_id,
+                                                     Params={'Bucket': bucket,
+                                                             'Key': id_,
                                                              'ResponseContentDisposition': h.get('Content-Disposition'),
                                                              'ResponseContentType': content_type},
                                                      ExpiresIn=120)
@@ -151,8 +155,8 @@ class S3Storage(Storage):
     def _get_current_bucket(self):
         return self._replace_bucket_placeholders(self.bucket, date.today())
 
-    def _get_bucket_name(self, current=False):
-        return self._get_current_bucket() if current else self.bucket
+    def _get_original_bucket_name(self):
+        return self.bucket
 
     def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))

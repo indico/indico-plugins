@@ -68,7 +68,7 @@ class MockConfig(object):
 def test_dynamic_bucket_creation_task(date, name_template, bucket_created, expected_name, expected_error):
     with freeze_time(date), \
          mock.patch.object(plugin.S3Storage, '__init__', lambda self: None), \
-         mock.patch.object(plugin.S3Storage, '_get_bucket_name', return_value=name_template), \
+         mock.patch.object(plugin.S3Storage, '_get_original_bucket_name', return_value=name_template), \
          mock.patch('indico_storage_s3.task.config', MockConfig()), \
          mock.patch('indico_storage_s3.task.get_storage', return_value=plugin.S3Storage()), \
          mock.patch.object(plugin.S3Storage, '_create_bucket', mock_bucket_created) as create_bucket_call:

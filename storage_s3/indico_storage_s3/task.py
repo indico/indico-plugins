@@ -35,7 +35,7 @@ def create_bucket():
         storage = get_storage(key)
         if isinstance(storage, S3Storage):
             today = date.today()
-            bucket_name = storage._get_bucket_name()
+            bucket_name = storage._get_original_bucket_name()
             placeholders = set(re.findall('<.*?>', bucket_name))
             if placeholders == {'<year>', '<week>'}:
                 bucket_date = today + relativedelta(weeks=1)
