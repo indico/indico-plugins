@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-chat',
-    version='2.0.dev0',
+    version='2.0',
     description='XMPP chat integration for Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
