@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from wtforms.fields.simple import TextAreaField
+from wtforms.fields.core import BooleanField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
@@ -26,30 +27,37 @@ from indico.modules.events.payment import (PaymentEventSettingsFormBase, Payment
 from indico.util.placeholders import render_placeholder_info, replace_placeholders
 from indico.web.forms.validators import UsedIf
 
+from indico_payment_manual.blueprint import blueprint
 from indico_payment_manual import _
 
 
 DETAILS_DESC = _('The details the user needs to make their payment. This usually includes the bank account details, '
                  'the IBAN and payment reference.  You can also link to a custom payment site. In this case make sure '
                  'to use the URL-escaped versions of the placeholders where available.')
+TRIGGER_DESC = _('If enabled, registrations are put into pending payment state if users check out using this payment '
+                 'method.')
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
     details = TextAreaField(_('Payment details'), [])
+    trigger_pending = BooleanField(_('Trigger pending state'), [])
 
     def __init__(self, *args, **kwargs):
         super(PluginSettingsForm, self).__init__(*args, **kwargs)
         self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
+        self.trigger_pending.description = TRIGGER_DESC
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
     details = TextAreaField(_('Payment details'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()])
+    trigger_pending = BooleanField(_('Trigger pending state'), [UsedIf(lambda form, _: form.enabled.data)])
 
     def __init__(self, *args, **kwargs):
         super(EventSettingsForm, self).__init__(*args, **kwargs)
         self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
+        self.trigger_pending.description = TRIGGER_DESC
 
 
 class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
@@ -63,8 +71,10 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     settings_form = PluginSettingsForm
     event_settings_form = EventSettingsForm
     default_settings = {'method_name': 'Bank Transfer',
+                        'trigger_pending': False,
                         'details': ''}
     default_event_settings = {'enabled': False,
+                              'trigger_pending': False,
                               'method_name': None,
                               'details': ''}
 
@@ -88,9 +98,11 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
     def get_blueprints(self):
-        return IndicoPluginBlueprint('payment_manual', __name__)
+        return blueprint
 
     def adjust_payment_form_data(self, data):
+        registration = data['registration']
         data['details'] = replace_placeholders('manual-payment-details', data['event_settings']['details'],
-                                               regform=data['registration'].registration_form,
-                                               registration=data['registration'])
+                                               regform=registration.registration_form, registration=registration)
+        data['trigger_pending'] = data['event_settings']['trigger_pending']
+        data['confirm_url'] = url_for_plugin('payment_manual.confirm', registration.locator.uuid, _external=True)

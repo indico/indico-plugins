@@ -1,0 +1,39 @@
+{% extends 'events/payment/transaction_details.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block details %}
+    {% if transaction.status.name == 'pending' %}
+        <dt>{% trans %}Status{% endtrans %}</dt>
+        <dd>{% trans %}Awaiting bank transfer{% endtrans %}</dd>
+        <dt>&nbsp;</dt>
+        <dd>
+            <a class="i-button"
+               href="{{ url_for('plugin_payment_manual.received', transaction.registration.locator.uuid) }}">
+                {% trans %}Mark as received{% endtrans %}
+            </a>
+        </dd>
+    {% else %}
+        <dt>{% trans %}Status{% endtrans %}</dt>
+        <dd>{% trans %}Bank transfer received{% endtrans %}</dd>
+        <dt>{% trans %}Marked as paid by{% endtrans %}</dt>
+        <dd>{{ transaction.data.changed_by_name }}</dd>
+    {% endif %}
+{% endblock %}
+
+{% block warning_box %}
+    {% if transaction.amount != transaction.registration.price %}
+        {% call message_box('warning') %}
+            <p>
+                {%- trans %}The paid amount does not match the required amount. Please contact the registrant to solve the issue.{% endtrans -%}
+            </p>
+            <p>
+                {%- trans %}Paid: {% endtrans -%}
+                {{- format_currency(transaction.amount, transaction.currency, locale=session.lang) -}}
+            </p>
+            <p>
+                {%- trans %}Required: {% endtrans -%}
+                {{- transaction.registration.render_price() -}}
+            </p>
+        {% endcall %}
+    {% endif %}
+{% endblock %}

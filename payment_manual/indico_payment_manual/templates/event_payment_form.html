@@ -1,1 +1,23 @@
 {{ details | markdown }}
+
+{% if trigger_pending %}
+    <div class="checkbox-with-text">
+        <input type="checkbox" id="payment-manual-agree">
+        <div>
+            {% trans %}I understand that the registration will be completed only after the bank transfer is received. A bank trasfer usually takes two to three business days. Until then the status of your registration will remain „awaiting payment“. You will receive an email confirming your payment once the bank transfer is completed.{% endtrans %}
+        </div>
+    </div>
+    <p class="text-right">
+        <button type="button" id="payment-manual-confirm" class="action-button" data-url="{{ confirm_url }}">{% trans %}Confirm{% endtrans %}</button>
+    </p>
+    <script type="text/javascript">
+        $("#payment-manual-confirm").on("click", function(e) {
+            if ($("#payment-manual-agree").is(":checked")) {
+                location.href = $(this).data("url");
+            }
+            else {
+                $("#payment-manual-agree").parent().effect('highlight', 800);
+            }
+        });
+    </script>
+{% endif %}
