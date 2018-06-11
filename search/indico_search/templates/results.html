@@ -35,7 +35,7 @@
                         {% block banner %}{% endblock %}
                     </div>
 
-                    {{ form_header(form, method='get', i_form=false) }}
+                    {{ form_header(form, method='get', i_form=false, disable_if_locked=false) }}
                         <div>
                             {{ form.phrase() }}
                             <input type="submit" value="{% trans %}Search{% endtrans %}">

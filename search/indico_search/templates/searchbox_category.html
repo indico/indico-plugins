@@ -1,6 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer %}
 
-{{ form_header(form, method='get', action=url_for_plugin('search.search'), id='category-search-form', i_form=false) }}
+{{ form_header(form, method='get', action=url_for_plugin('search.search'), id='category-search-form', i_form=false,
+               disable_if_locked=false) }}
     <div class="search-box" id="category-search-box">
         <div class="search-controls">
             <div class="search-button icon-search"></div>
