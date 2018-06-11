@@ -112,7 +112,6 @@ import './main.css';
                         onError({
                             title: $t.gettext('Something went wrong'),
                             message: '{0} ({1})'.format(xhr.statusText.toLowerCase(), xhr.status),
-                            suggest_login: false,
                             report_url: null
                         });
                     }
