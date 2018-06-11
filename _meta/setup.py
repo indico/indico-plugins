@@ -32,7 +32,7 @@ plugins_require = [
     'indico-plugin-piwik==1.0',
     'indico-plugin-previewer-code==1.0',
     'indico-plugin-previewer-jupyter==1.0',
-    'indico-plugin-search==1.0',
+    'indico-plugin-search==1.0.1',
     'indico-plugin-vc-vidyo==1.0',
 ]
 extras_require = {
@@ -43,7 +43,7 @@ extras_require = {
 
 setup(
     name='indico-plugins',
-    version='2.0',
+    version='2.0.1',
     description='A meta-package containing the official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
