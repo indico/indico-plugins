@@ -21,6 +21,7 @@ from flask_pluginengine import plugins_loaded
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico.modules.events.layout import layout_settings
+from indico.web.views import WPBase
 
 from indico_search.blueprint import blueprint
 from indico_search.util import render_engine_or_search_template
@@ -39,8 +40,8 @@ class SearchPlugin(IndicoPlugin):
         self.connect(plugins_loaded, self._plugins_loaded, sender=self.app)
         self.template_hook('conference-header-right-column', self._add_conference_search_box)
         self.template_hook('page-header', self._add_category_search_box)
-        self.inject_bundle('main.js')
-        self.inject_bundle('main.css')
+        self.inject_bundle('main.js', WPBase)
+        self.inject_bundle('main.css', WPBase)
 
     def _plugins_loaded(self, sender, **kwargs):
         if not self.engine_plugin:
