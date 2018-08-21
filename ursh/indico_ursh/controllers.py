@@ -48,4 +48,4 @@ class RHShortenURL(RH):
         full_url = self._resolve_full_url(original_url)
         self._check_host(full_url)
         short_url = request_short_url(full_url)
-        return jsonify(success=True, msg=short_url)
+        return jsonify(url=short_url)

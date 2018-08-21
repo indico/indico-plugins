@@ -32,24 +32,7 @@ async function _makeUrshRequest(originalURL, triggerElement) {
     }
 
     const data = response.data;
-    if (data.success) {
-        $(triggerElement).copyURLTooltip(data.msg).show();
-    } else {
-        $(triggerElement).qtip({
-            content: {
-                text: $T.gettext(`URL shortening service is unavailable: ${data.msg}`),
-            },
-            hide: {
-                event: 'mouseleave',
-                fixed: true,
-                delay: 700,
-            },
-            show: {
-                event: false,
-                ready: true,
-            }
-        }).show();
-    }
+    $(triggerElement).copyURLTooltip(data.url).show();
 }
 
 
