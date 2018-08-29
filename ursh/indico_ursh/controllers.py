@@ -26,14 +26,15 @@ from indico.core.config import config
 from indico.web.rh import RH
 
 from indico_ursh.util import request_short_url
+from indico_ursh.views import WPShortenURLPage
 
 
-class RHShortenURL(RH):
+class RHGetShortURL(RH):
     """Make a request to the URL shortening service"""
 
     @staticmethod
     def _resolve_full_url(original_url):
-        if url_parse(original_url).host is not None:
+        if url_parse(original_url).host:
             return original_url
         original_url = original_url.lstrip('/')
         return posixpath.join(config.BASE_URL, original_url)
@@ -49,3 +50,10 @@ class RHShortenURL(RH):
         self._check_host(full_url)
         short_url = request_short_url(full_url)
         return jsonify(url=short_url)
+
+
+class RHDisplayShortenURLPage(RH):
+    """Provide a simple page, where users can submit a URL to be shortened"""
+
+    def _process(self):
+        return WPShortenURLPage.render_template('url_shortener.html')

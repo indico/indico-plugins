@@ -35,9 +35,66 @@ async function _makeUrshRequest(originalURL, triggerElement) {
     $(triggerElement).copyURLTooltip(data.url).show();
 }
 
+function _patchURL(url) {
+    if (url.startsWith(window.location.hostname)) {
+        return `${window.location.protocol}//${url}`;
+    } else {
+        return url;
+    }
+}
 
-$(document).on('click', '.ursh-get', (event) => {
-    event.preventDefault();
-    const originalURL = $(event.target).attr('data-original-url');
-    _makeUrshRequest(originalURL, event.target);
-});
+function _validateURL(url) {
+    const re = RegExp(`^(${window.location.protocol}//)?${window.location.hostname}/`);
+    return re.test(url);
+}
+
+function _getUrshInput() {
+    const $t = $T.domain('ursh');
+    const input = $('#ursh-shorten-input');
+    const originalURL = input.val().trim();
+
+    const tip = ((msg) => {
+        input.qtip({
+            content: {
+                text: msg
+            },
+            hide: {
+                event: 'mouseleave',
+                fixed: true,
+                delay: 700
+            },
+            show: {
+                event: false,
+                ready: true
+            }
+        });
+    });
+
+    if (!originalURL) {
+        tip($t.gettext('Please fill in a URL to shorten'));
+        input.focus();
+        return null;
+    } else if (!_validateURL(originalURL)) {
+        tip($t.gettext('This does not look like a valid URL'));
+        input.focus();
+        return null;
+    } else {
+        const patchedURL = _patchURL(originalURL);
+        input.val(patchedURL);
+        return patchedURL;
+    }
+}
+
+$(document)
+    .on('click', '#ursh-shorten-button', (evt) => {
+        evt.preventDefault();
+        const originalURL = _getUrshInput();
+        if (originalURL) {
+            _makeUrshRequest(originalURL, evt.target);
+        }
+    })
+    .on('click', '.ursh-get', (evt) => {
+        evt.preventDefault();
+        const originalURL = $(evt.target).attr('data-original-url');
+        _makeUrshRequest(originalURL, evt.target);
+    });

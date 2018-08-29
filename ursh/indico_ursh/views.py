@@ -16,22 +16,10 @@
 
 from __future__ import unicode_literals
 
-from werkzeug.exceptions import ServiceUnavailable
+from indico.core.plugins import WPJinjaMixinPlugin
+from indico.web.views import WPDecorated
 
-import requests
 
-
-def request_short_url(original_url):
-    from indico_ursh.plugin import UrshPlugin
-    api_key = UrshPlugin.settings.get('api_key')
-    api_host = UrshPlugin.settings.get('api_host')
-
-    if not api_key or not api_host:
-        raise ServiceUnavailable('Not configured')
-
-    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
-    response = requests.post(api_host, data=dict(url=original_url, allow_reuse=True), headers=headers)
-    response.raise_for_status()
-
-    data = response.json()
-    return data['short_url']
+class WPShortenURLPage(WPJinjaMixinPlugin, WPDecorated):
+    def _getBody(self, params):
+        return self._getPageContent(params)
