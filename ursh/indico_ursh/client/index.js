@@ -18,7 +18,7 @@
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
-async function _makeUrshRequest(originalURL, triggerElement) {
+async function _makeUrshRequest(originalURL, callback) {
     const urshEndpoint = '/ursh';
 
     let response;
@@ -32,7 +32,7 @@ async function _makeUrshRequest(originalURL, triggerElement) {
     }
 
     const data = response.data;
-    $(triggerElement).copyURLTooltip(data.url).show();
+    callback(data.url);
 }
 
 function _patchURL(url) {
@@ -90,11 +90,18 @@ $(document)
         evt.preventDefault();
         const originalURL = _getUrshInput();
         if (originalURL) {
-            _makeUrshRequest(originalURL, evt.target);
+            _makeUrshRequest(originalURL, (result) => {
+                const outputElement = $('#ursh-shorten-output');
+                $('#ursh-shorten-response-form').slideDown();
+                outputElement.val(result);
+                outputElement.select();
+            });
         }
     })
     .on('click', '.ursh-get', (evt) => {
         evt.preventDefault();
         const originalURL = $(evt.target).attr('data-original-url');
-        _makeUrshRequest(originalURL, evt.target);
+        _makeUrshRequest(originalURL, (result) => {
+            $(evt.target).copyURLTooltip(result).show();
+        });
     });
