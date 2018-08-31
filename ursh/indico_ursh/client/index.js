@@ -18,7 +18,7 @@
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
-async function _makeUrshRequest(originalURL, callback) {
+async function _makeUrshRequest(originalURL) {
     const urshEndpoint = '/ursh';
 
     let response;
@@ -31,8 +31,7 @@ async function _makeUrshRequest(originalURL, callback) {
         return;
     }
 
-    const data = response.data;
-    callback(data.url);
+    return response.data.url;
 }
 
 function _patchURL(url) {
@@ -86,22 +85,20 @@ function _getUrshInput() {
 }
 
 $(document)
-    .on('click', '#ursh-shorten-button', (evt) => {
+    .on('click', '#ursh-shorten-button', async (evt) => {
         evt.preventDefault();
         const originalURL = _getUrshInput();
         if (originalURL) {
-            _makeUrshRequest(originalURL, (result) => {
-                const outputElement = $('#ursh-shorten-output');
-                $('#ursh-shorten-response-form').slideDown();
-                outputElement.val(result);
-                outputElement.select();
-            });
+            const result = await _makeUrshRequest(originalURL);
+            const outputElement = $('#ursh-shorten-output');
+            $('#ursh-shorten-response-form').slideDown();
+            outputElement.val(result);
+            outputElement.select();
         }
     })
-    .on('click', '.ursh-get', (evt) => {
+    .on('click', '.ursh-get', async (evt) => {
         evt.preventDefault();
         const originalURL = $(evt.target).attr('data-original-url');
-        _makeUrshRequest(originalURL, (result) => {
-            $(evt.target).copyURLTooltip(result).show();
-        });
+        const result = await _makeUrshRequest(originalURL);
+        $(evt.target).copyURLTooltip(result).show();
     });
