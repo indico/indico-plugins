@@ -23,7 +23,9 @@
         <div id="ursh-shorten-response-form" class="i-has-action" style="margin-top:1em;display:none">
             <input id="ursh-shorten-output" name="ursh-shorten-short-url" type="url" style="font-family:monospace;"
                    spellcheck="false" autocomplete="off" autocapitalize="off" readonly>
-            <button type="button" class="i-button icon-clipboard" title="{% trans %}Copy to clipboard{% endtrans %}"></button>
+            <button type="button" class="i-button icon-clipboard js-copy-to-clipboard"
+                    title="{% trans %}Copy to clipboard{% endtrans %}"
+                    data-clipboard-target="#ursh-shorten-output"></button>
         </div>
         <p>
             {% trans -%}
