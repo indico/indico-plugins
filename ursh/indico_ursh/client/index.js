@@ -34,23 +34,34 @@ async function _makeUrshRequest(originalURL) {
     return response.data.url;
 }
 
-function _patchURL(url) {
-    if (url.startsWith(window.location.hostname)) {
-        return `${window.location.protocol}//${url}`;
-    } else {
-        return url;
+function _validateAndFormatURL(url) {
+    const $t = $T.domain('ursh');
+    if (!url) {
+        throw $t.gettext('Please fill in a URL to shorten');
     }
-}
 
-function _validateURL(url) {
-    const re = RegExp(`^(${window.location.protocol}//)?${window.location.hostname}/`);
-    return re.test(url);
+    // if protocol is missing, prepend it
+    if (url.startsWith(window.location.hostname)) {
+        url = `${window.location.protocol}//${url}`;
+    }
+
+    let parsedURL;
+    try {
+        parsedURL = new URL(url);
+    } catch (err) {
+        throw $t.gettext('This does not look like a valid URL');
+    }
+
+    parsedURL.protocol = window.location.protocol;  // patch protocol to match server
+    if (parsedURL.host !== window.location.host) {
+        throw $t.gettext('Invalid host: only Indico URLs are allowed');
+    }
+    return parsedURL.href;
 }
 
 function _getUrshInput() {
-    const $t = $T.domain('ursh');
     const input = $('#ursh-shorten-input');
-    const originalURL = input.val().trim();
+    const inputURL = input.val().trim();
 
     const tip = ((msg) => {
         input.qtip({
@@ -69,36 +80,43 @@ function _getUrshInput() {
         });
     });
 
-    if (!originalURL) {
-        tip($t.gettext('Please fill in a URL to shorten'));
-        input.focus();
+    try {
+        const formattedURL = _validateAndFormatURL(inputURL);
+        input.val(formattedURL);
+        return formattedURL;
+    } catch (err) {
+        tip(err);
+        input.focus().select();
         return null;
-    } else if (!_validateURL(originalURL)) {
-        tip($t.gettext('This does not look like a valid URL'));
-        input.focus();
-        return null;
-    } else {
-        const patchedURL = _patchURL(originalURL);
-        input.val(patchedURL);
-        return patchedURL;
     }
 }
 
-$(document)
-    .on('click', '#ursh-shorten-button', async (evt) => {
-        evt.preventDefault();
-        const originalURL = _getUrshInput();
-        if (originalURL) {
-            const result = await _makeUrshRequest(originalURL);
+async function _handleUrshPageInput(evt) {
+    evt.preventDefault();
+    const originalURL = _getUrshInput();
+    if (originalURL) {
+        const result = await _makeUrshRequest(originalURL);
+        if (result) {
             const outputElement = $('#ursh-shorten-output');
             $('#ursh-shorten-response-form').slideDown();
             outputElement.val(result);
             outputElement.select();
         }
+    }
+}
+
+async function _handleUrshClick(evt) {
+    evt.preventDefault();
+    const originalURL = $(evt.target).attr('data-original-url');
+    const result = await _makeUrshRequest(originalURL);
+    $(evt.target).copyURLTooltip(result);
+}
+
+$(document)
+    .on('click', '#ursh-shorten-button', _handleUrshPageInput)
+    .on('keydown', '#ursh-shorten-input', (evt) => {
+        if (evt.key === 'Enter') {
+            _handleUrshPageInput(evt);
+        }
     })
-    .on('click', '.ursh-get', async (evt) => {
-        evt.preventDefault();
-        const originalURL = $(evt.target).attr('data-original-url');
-        const result = await _makeUrshRequest(originalURL);
-        $(evt.target).copyURLTooltip(result).show();
-    });
+    .on('click', '.ursh-get', _handleUrshClick);
