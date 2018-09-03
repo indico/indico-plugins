@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'url-polyfill';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
@@ -41,8 +42,8 @@ function _validateAndFormatURL(url) {
     }
 
     // if protocol is missing, prepend it
-    if (url.startsWith(window.location.hostname)) {
-        url = `${window.location.protocol}//${url}`;
+    if (url.startsWith(location.hostname)) {
+        url = `${location.protocol}//${url}`;
     }
 
     let parsedURL;

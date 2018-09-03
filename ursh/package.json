@@ -1,0 +1,19 @@
+{
+  "name": "indico-plugin-ursh",
+  "version": "1.0.0",
+  "description": "URL shortening service provider for Indico",
+  "main": "indico_ursh/client/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indico/indico-plugins.git"
+  },
+  "author": "Indico Team <indico.team@cern.ch>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/indico/indico-plugins/issues"
+  },
+  "homepage": "https://github.com/indico/indico-plugins#readme",
+  "dependencies": {
+    "url-polyfill": "^1.1.0"
+  }
+}
