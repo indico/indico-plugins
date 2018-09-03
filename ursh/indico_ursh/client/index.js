@@ -53,8 +53,8 @@ function _validateAndFormatURL(url) {
         throw $t.gettext('This does not look like a valid URL');
     }
 
-    parsedURL.protocol = window.location.protocol;  // patch protocol to match server
-    if (parsedURL.host !== window.location.host) {
+    parsedURL.protocol = location.protocol;  // patch protocol to match server
+    if (parsedURL.hostname !== location.hostname) {
         throw $t.gettext('Invalid host: only Indico URLs are allowed');
     }
     return parsedURL.href;
