@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'url-polyfill';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
@@ -38,7 +37,7 @@ async function _makeUrshRequest(originalURL) {
 function _validateAndFormatURL(url) {
     const $t = $T.domain('ursh');
     if (!url) {
-        throw $t.gettext('Please fill in a URL to shorten');
+        throw Error($t.gettext('Please fill in a URL to shorten'));
     }
 
     // if protocol is missing, prepend it
@@ -46,18 +45,24 @@ function _validateAndFormatURL(url) {
         url = `${location.protocol}//${url}`;
     }
 
-    let parsedURL;
-    try {
-        parsedURL = new URL(url);
-    } catch (err) {
-        throw $t.gettext('This does not look like a valid URL');
+    // regular expression, because I.E. does not like the URL class
+    const re = RegExp(`^(.+:)//([^/]+)(/.*)?$`);
+    const urlTokens = url.match(re);
+    if (!urlTokens) {
+        throw Error($t.gettext('This does not look like a valid URL'));
     }
 
-    parsedURL.protocol = location.protocol;  // patch protocol to match server
-    if (parsedURL.hostname !== location.hostname) {
-        throw $t.gettext('Invalid host: only Indico URLs are allowed');
+    // extract tokens
+    let protocol = urlTokens[1];
+    const hostname = urlTokens[2];
+    const path = urlTokens[3] ? urlTokens[3] : '/';
+
+    protocol = location.protocol;  // patch protocol to match server
+    if (hostname !== location.hostname) {
+        throw Error($t.gettext('Invalid host: only Indico URLs are allowed'));
     }
-    return parsedURL.href;
+
+    return `${protocol}//${hostname}${path}`;
 }
 
 function _getUrshInput() {
@@ -86,7 +91,7 @@ function _getUrshInput() {
         input.val(formattedURL);
         return formattedURL;
     } catch (err) {
-        tip(err);
+        tip(err.message);
         input.focus().select();
         return null;
     }
