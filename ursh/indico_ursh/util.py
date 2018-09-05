@@ -30,8 +30,10 @@ def request_short_url(original_url):
         raise ServiceUnavailable('Not configured')
 
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
+
     response = requests.post(api_host, data=dict(url=original_url, allow_reuse=True), headers=headers)
-    response.raise_for_status()
+    if response.status_code not in (200, 201, 400):
+        response.raise_for_status()
 
     data = response.json()
-    return data['short_url']
+    return data.get('short_url')
