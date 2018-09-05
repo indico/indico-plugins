@@ -18,6 +18,23 @@
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
+function _showTip(element, msg) {
+    element.qtip({
+        content: {
+            text: msg
+        },
+        hide: {
+            event: 'mouseleave',
+            fixed: true,
+            delay: 700
+        },
+        show: {
+            event: false,
+            ready: true
+        }
+    });
+}
+
 async function _makeUrshRequest(originalURL) {
     const urshEndpoint = '/ursh';
 
@@ -46,7 +63,8 @@ function _validateAndFormatURL(url) {
     }
 
     // regular expression, because I.E. does not like the URL class
-    const re = RegExp(`^(.+:)//([^/]+)(/.*)?$`);
+    // provides minimal validation, leaving the serious job to the server
+    const re = RegExp(`^([\\d\\w]+:)//([^/ .]+(?:\\.[^/ .]+)*)(/.*)?$`);
     const urlTokens = url.match(re);
     if (!urlTokens) {
         throw Error($t.gettext('This does not look like a valid URL'));
@@ -65,33 +83,16 @@ function _validateAndFormatURL(url) {
     return `${protocol}//${hostname}${path}`;
 }
 
-function _getUrshInput() {
-    const input = $('#ursh-shorten-input');
+function _getUrshInput(input) {
     const inputURL = input.val().trim();
-
-    const tip = ((msg) => {
-        input.qtip({
-            content: {
-                text: msg
-            },
-            hide: {
-                event: 'mouseleave',
-                fixed: true,
-                delay: 700
-            },
-            show: {
-                event: false,
-                ready: true
-            }
-        });
-    });
+    input.val(inputURL);
 
     try {
         const formattedURL = _validateAndFormatURL(inputURL);
         input.val(formattedURL);
         return formattedURL;
     } catch (err) {
-        tip(err.message);
+        _showTip(input, err.message);
         input.focus().select();
         return null;
     }
@@ -99,7 +100,10 @@ function _getUrshInput() {
 
 async function _handleUrshPageInput(evt) {
     evt.preventDefault();
-    const originalURL = _getUrshInput();
+    const $t = $T.domain('ursh');
+
+    const input = $('#ursh-shorten-input');
+    const originalURL = _getUrshInput(input);
     if (originalURL) {
         const result = await _makeUrshRequest(originalURL);
         if (result) {
@@ -107,6 +111,9 @@ async function _handleUrshPageInput(evt) {
             $('#ursh-shorten-response-form').slideDown();
             outputElement.val(result);
             outputElement.select();
+        } else {
+            _showTip(input, $t.gettext('This does not look like a valid URL'));
+            input.focus().select();
         }
     }
 }
