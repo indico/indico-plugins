@@ -120,7 +120,7 @@ async function _handleUrshPageInput(evt) {
 
 async function _handleUrshClick(evt) {
     evt.preventDefault();
-    const originalURL = $(evt.target).attr('data-original-url');
+    const originalURL = evt.target.dataset.originalUrl;
     const result = await _makeUrshRequest(originalURL);
     $(evt.target).copyURLTooltip(result);
 }
