@@ -18,13 +18,15 @@
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 
-function _showTip(element, msg) {
+const $t = $T.domain('ursh');
+
+function _showTip(element, msg, hideEvent = 'unfocus') {
     element.qtip({
         content: {
             text: msg
         },
         hide: {
-            event: 'mouseleave',
+            event: hideEvent,
             fixed: true,
             delay: 700
         },
@@ -52,7 +54,6 @@ async function _makeUrshRequest(originalURL) {
 }
 
 function _validateAndFormatURL(url) {
-    const $t = $T.domain('ursh');
     if (!url) {
         throw Error($t.gettext('Please fill in a URL to shorten'));
     }
@@ -100,7 +101,6 @@ function _getUrshInput(input) {
 
 async function _handleUrshPageInput(evt) {
     evt.preventDefault();
-    const $t = $T.domain('ursh');
 
     const input = $('#ursh-shorten-input');
     const originalURL = _getUrshInput(input);
@@ -122,7 +122,11 @@ async function _handleUrshClick(evt) {
     evt.preventDefault();
     const originalURL = evt.target.dataset.originalUrl;
     const result = await _makeUrshRequest(originalURL);
-    $(evt.target).copyURLTooltip(result);
+    $(evt.target).copyURLTooltip(result, 'unfocus');
+}
+
+function _validateUrshCustomShortcut(shortcut) {
+    return shortcut.length >= 5;
 }
 
 $(document)
@@ -132,4 +136,18 @@ $(document)
             _handleUrshPageInput(evt);
         }
     })
-    .on('click', '.ursh-get', _handleUrshClick);
+    .on('click', '.ursh-get', _handleUrshClick)
+    .on('input', '#ursh-custom-shortcut-input', (evt) => {
+        const value = $(evt.target).val();
+        $('#ursh-custom-shortcut-submit-button').prop('disabled', !_validateUrshCustomShortcut(value))
+    })
+    .on('mouseenter', '#ursh-custom-shortcut-submit-button', (evt) => {
+        if (evt.target.disabled) {
+            _showTip($(evt.target), $t.gettext('Please check that the shortcut is correct'), 'mouseleave');
+        }
+    });
+
+$(document).ready(() => {
+    // keep dropdown menu open when clicking on an entry
+    $('.ursh-dropdown').next('ul').find('li a').on('menu_select', () => true);
+});

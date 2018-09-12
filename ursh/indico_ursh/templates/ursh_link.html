@@ -1,0 +1,32 @@
+{% set event_manager = event and event.can_manage(session.user) %}
+{% set target = event.url if event else target %}
+{% if dropdown or event_manager %}
+    <a href="#" class="arrow js-dropdown ursh-dropdown {{ element_class }}" data-toggle="dropdown"
+       title="{% trans %}Short URL options{% endtrans %}"></a>
+    <ul class="dropdown">
+        <li>
+            <a class="ursh-get" data-original-url="{{ target }}">
+                {{ trans }}Obtain short URL{{ end_trans }}
+            </a>
+        </li>
+        {%- if event_manager %}
+            <li>
+                <a href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                   class="ursh-create" data-original-url="{{ target }}"
+                   data-title="{{ _('Create short URL') }}"
+                   data-href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                   data-params='{"original_url": "{{ target }}"}'
+                   data-ajax-dialog
+                   data-hide-page-header>
+                    {{ trans }}Create short URL{{ end_trans }}
+                </a>
+            </li>
+        {% endif -%}
+    </ul>
+{% else %}
+    <a class="ursh-get {{ element_class }}"
+       title="{% trans %}Obtain short URL{% endtrans %}"
+       data-original-url="{{ target }}">
+        {{- text -}}
+    </a>
+{% endif %}
