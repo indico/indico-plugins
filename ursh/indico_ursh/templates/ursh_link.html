@@ -1,7 +1,7 @@
 {% set event_manager = event and event.can_manage(session.user) %}
 {% set target = event.url if event else target %}
 {% if dropdown or event_manager %}
-    <a href="#" class="arrow js-dropdown ursh-dropdown {{ element_class }}" data-toggle="dropdown"
+    <a href="#" class="arrow js-dropdown ursh-dropdown {{ classes }}" data-toggle="dropdown"
        title="{% trans %}Short URL options{% endtrans %}"></a>
     <ul class="dropdown">
         <li>
@@ -24,7 +24,7 @@
         {% endif -%}
     </ul>
 {% else %}
-    <a class="ursh-get {{ element_class }}"
+    <a class="ursh-get {{ classes }}"
        title="{% trans %}Obtain short URL{% endtrans %}"
        data-original-url="{{ target }}">
         {{- text -}}
