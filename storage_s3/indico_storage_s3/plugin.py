@@ -53,9 +53,9 @@ class S3StoragePlugin(IndicoPlugin):
 
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_command()
-        @click.option('--storage', default=None, help='Storage to create bucket for')
+        @click.option('--storage', default=None, metavar='NAME', help='Storage backend to create bucket for')
         def create_s3_bucket(storage):
-            """Create s3 bucket"""
+            """Create s3 storage bucket."""
             storages = [storage] if storage else config.STORAGE_BACKENDS
             for key in storages:
                 try:
