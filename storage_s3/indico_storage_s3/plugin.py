@@ -83,17 +83,20 @@ class S3Storage(Storage):
 
     def __init__(self, data):
         data = self._parse_data(data)
-        self.host = data['host']
+        endpoint_url = data.get('host')
+        if endpoint_url and '://' not in endpoint_url:
+            endpoint_url = 'https://' + endpoint_url
+        session_kwargs = {}
+        if 'profile' in data:
+            session_kwargs['profile_name'] = data['profile']
+        if 'access_key' in data:
+            session_kwargs['aws_access_key_id'] = data['access_key']
+        if 'secret_key' in data:
+            session_kwargs['aws_secret_access_key'] = data['secret_key']
         self.bucket = data['bucket']
-        self.secret_key = data['secret_key']
-        self.access_key = data['access_key']
         self.acl_template_bucket = data.get('acl_template_bucket')
-        self.client = boto3.client(
-            's3',
-            endpoint_url=self.host,
-            aws_access_key_id=self.access_key,
-            aws_secret_access_key=self.secret_key,
-        )
+        session = boto3.session.Session(**session_kwargs)
+        self.client = session.client('s3', endpoint_url=endpoint_url)
 
     def open(self, file_id):
         try:
