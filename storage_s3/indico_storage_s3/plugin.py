@@ -182,5 +182,7 @@ class S3Storage(Storage):
         try:
             self.client.head_bucket(Bucket=name)
             return True
-        except botocore.exceptions.ClientError:
-            return False
+        except botocore.exceptions.ClientError as exc:
+            if int(exc.response['Error']['Code']) == 404:
+                return False
+            raise
