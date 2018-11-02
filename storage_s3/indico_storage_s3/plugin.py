@@ -94,7 +94,7 @@ class S3Storage(Storage):
         if 'secret_key' in data:
             session_kwargs['aws_secret_access_key'] = data['secret_key']
         self.bucket = data['bucket']
-        self.acl_template_bucket = data.get('acl_template_bucket')
+        self.bucket_policy_file = data.get('bucket_policy_file')
         session = boto3.session.Session(**session_kwargs)
         self.client = session.client('s3', endpoint_url=endpoint_url)
 
@@ -173,11 +173,10 @@ class S3Storage(Storage):
             return
         self.client.create_bucket(Bucket=name)
         S3StoragePlugin.logger.info('New bucket created: %s', name)
-        if self.acl_template_bucket:
-            response = self.client.get_bucket_acl(Bucket=self.acl_template_bucket)
-            acl_keys = {'Owner', 'Grants'}
-            acl = {key: response[key] for key in response if key in acl_keys}
-            self.client.put_bucket_acl(AccessControlPolicy=acl, Bucket=name)
+        if self.bucket_policy_file:
+            with open(self.bucket_policy_file) as f:
+                policy = f.read()
+            self.client.put_bucket_policy(Bucket=name, Policy=policy)
 
     def _bucket_exists(self, name):
         try:
