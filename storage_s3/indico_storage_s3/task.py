@@ -38,7 +38,9 @@ def create_bucket():
         today = date.today()
         bucket_name = storage.original_bucket_name
         placeholders = set(re.findall('<.*?>', bucket_name))
-        if placeholders == {'<year>', '<week>'}:
+        if not placeholders:
+            continue
+        elif placeholders == {'<year>', '<week>'}:
             bucket_date = today + relativedelta(weeks=1)
             bucket = storage._get_bucket_name(bucket_date)
             storage._create_bucket(bucket)
@@ -46,5 +48,5 @@ def create_bucket():
             bucket_date = today + relativedelta(months=1)
             bucket = storage._get_bucket_name(bucket_date)
             storage._create_bucket(bucket)
-        elif placeholders == {'<month>'} or placeholders == {'<week>'} or placeholders == {'<month>', '<week>'}:
+        else:
             raise RuntimeError('Placeholders combination in bucket name is not correct: %s', bucket_name)
