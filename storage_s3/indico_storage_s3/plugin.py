@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import hashlib
+import hmac
 import sys
 from contextlib import contextmanager
 from datetime import date
@@ -65,7 +67,7 @@ class S3StoragePlugin(IndicoPlugin):
                         click.echo('Storage {} does not exist'.format(key))
                         sys.exit(1)
                 if isinstance(storage_instance, S3Storage):
-                    bucket_name = storage_instance._get_current_bucket()
+                    bucket_name = storage_instance._get_current_bucket_name()
                     if storage_instance._bucket_exists(bucket_name):
                         click.echo('Storage {}: bucket {} already exists'.format(key, bucket_name))
                         continue
@@ -93,15 +95,19 @@ class S3Storage(Storage):
             session_kwargs['aws_access_key_id'] = data['access_key']
         if 'secret_key' in data:
             session_kwargs['aws_secret_access_key'] = data['secret_key']
-        self.bucket = data['bucket']
+        self.original_bucket_name = data['bucket']
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
         session = boto3.session.Session(**session_kwargs)
         self.client = session.client('s3', endpoint_url=endpoint_url)
+        self.bucket_secret = (data.get('bucket_secret', '') or
+                              session._session.get_scoped_config().get('indico_bucket_secret', '')).encode('utf-8')
+        if not self.bucket_secret and self._has_dynamic_bucket_name:
+            raise StorageError('A bucket secret is required when using dynamic bucket names')
 
     def open(self, file_id):
         try:
-            s3_object = self.client.get_object(Bucket=self._get_current_bucket(), Key=file_id)['Body']
+            s3_object = self.client.get_object(Bucket=self._get_current_bucket_name(), Key=file_id)['Body']
             return BytesIO(s3_object.read())
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
@@ -116,7 +122,7 @@ class S3Storage(Storage):
     def save(self, name, content_type, filename, fileobj):
         try:
             fileobj = self._ensure_fileobj(fileobj)
-            bucket = self._get_current_bucket()
+            bucket = self._get_current_bucket_name()
             checksum = get_file_checksum(fileobj)
             fileobj.seek(0)
             content_md5 = checksum.decode('hex').encode('base64').strip()
@@ -157,11 +163,19 @@ class S3Storage(Storage):
         except Exception as e:
             raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
-    def _get_current_bucket(self):
-        return self._replace_bucket_placeholders(self.bucket, date.today())
+    def _get_current_bucket_name(self):
+        return self._get_bucket_name(date.today())
 
-    def _get_original_bucket_name(self):
-        return self.bucket
+    def _get_bucket_name(self, date):
+        name = self._replace_bucket_placeholders(self.original_bucket_name, date)
+        if name == self.original_bucket_name or not self.bucket_secret:
+            return name
+        token = hmac.new(self.bucket_secret, name, hashlib.md5).hexdigest()
+        return '{}-{}'.format(name, token)
+
+    @property
+    def _has_dynamic_bucket_name(self):
+        return self._get_current_bucket_name() != self.original_bucket_name
 
     def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))
