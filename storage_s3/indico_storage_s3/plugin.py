@@ -95,6 +95,7 @@ class S3Storage(Storage):
             session_kwargs['aws_secret_access_key'] = data['secret_key']
         self.bucket = data['bucket']
         self.bucket_policy_file = data.get('bucket_policy_file')
+        self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
         session = boto3.session.Session(**session_kwargs)
         self.client = session.client('s3', endpoint_url=endpoint_url)
 
@@ -174,6 +175,8 @@ class S3Storage(Storage):
             return
         self.client.create_bucket(Bucket=name)
         S3StoragePlugin.logger.info('New bucket created: %s', name)
+        if self.bucket_versioning:
+            self.client.put_bucket_versioning(Bucket=name, VersioningConfiguration={'Status': 'Enabled'})
         if self.bucket_policy_file:
             with open(self.bucket_policy_file) as f:
                 policy = f.read()
