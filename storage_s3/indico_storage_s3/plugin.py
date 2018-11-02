@@ -118,8 +118,9 @@ class S3Storage(Storage):
             bucket = self._get_current_bucket()
             checksum = get_file_checksum(fileobj)
             fileobj.seek(0)
-            contentmd5 = checksum.decode('hex').encode('base64').strip()
-            self.client.put_object(Body=fileobj, Bucket=bucket, ContentMD5=contentmd5, Key=name)
+            content_md5 = checksum.decode('hex').encode('base64').strip()
+            self.client.put_object(Body=fileobj, Bucket=bucket, Key=name,
+                                   ContentType=content_type, ContentMD5=content_md5)
             file_id = '{}//{}'.format(bucket, name)
             return file_id, checksum
         except Exception as e:
