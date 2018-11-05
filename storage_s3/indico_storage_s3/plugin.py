@@ -106,8 +106,9 @@ class S3Storage(Storage):
             raise StorageError('A bucket secret is required when using dynamic bucket names')
 
     def open(self, file_id):
+        bucket, id_ = file_id.split('//', 1)
         try:
-            s3_object = self.client.get_object(Bucket=self._get_current_bucket_name(), Key=file_id)['Body']
+            s3_object = self.client.get_object(Bucket=bucket, Key=id_)['Body']
             return BytesIO(s3_object.read())
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
