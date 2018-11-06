@@ -158,7 +158,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                         itemized_data.append(choice)
 
         data['itemized_data'] = itemized_data
-# ##################################################
+# ################################################## 
 
         data['return_url'] = url_for_plugin('payment_paypal.success', registration.locator.uuid, _external=True)
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
