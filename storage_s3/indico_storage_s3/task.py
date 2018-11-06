@@ -24,29 +24,30 @@ from dateutil.relativedelta import relativedelta
 
 from indico.core.celery import celery
 from indico.core.config import config
-from indico.core.storage.backend import get_storage
+from indico.core.storage.backend import ReadOnlyStorageMixin, get_storage
 
-from indico_storage_s3.plugin import ReadOnlyS3Storage, S3Storage
+from indico_storage_s3.plugin import DynamicS3Storage
 
 
 @celery.periodic_task(run_every=crontab(minute=0, hour=1))
 def create_bucket():
     for key in config.STORAGE_BACKENDS:
         storage = get_storage(key)
-        if not isinstance(storage, S3Storage) or isinstance(storage, ReadOnlyS3Storage):
+        if not isinstance(storage, DynamicS3Storage) or isinstance(storage, ReadOnlyStorageMixin):
             continue
         today = date.today()
-        bucket_name = storage.original_bucket_name
-        placeholders = set(re.findall('<.*?>', bucket_name))
+        placeholders = set(re.findall('<.*?>', storage.bucket_name_template))
         if not placeholders:
             continue
         elif placeholders == {'<year>', '<week>'}:
             bucket_date = today + relativedelta(weeks=1)
             bucket = storage._get_bucket_name(bucket_date)
             storage._create_bucket(bucket)
-        elif placeholders == {'<year>', '<month>'} or (placeholders == {'<year>'} and today.month == 12):
-            bucket_date = today + relativedelta(months=1)
-            bucket = storage._get_bucket_name(bucket_date)
-            storage._create_bucket(bucket)
+        elif placeholders == {'<year>', '<month>'} or placeholders == {'<year>'}:
+            if '<month>' in placeholders or today.month == 12:
+                bucket_date = today + relativedelta(months=1)
+                bucket = storage._get_bucket_name(bucket_date)
+                storage._create_bucket(bucket)
         else:
-            raise RuntimeError('Placeholders combination in bucket name is not correct: %s', bucket_name)
+            raise RuntimeError('Invalid placeholder combination in bucket name template: {}'
+                               .format(storage.bucket_name_template))

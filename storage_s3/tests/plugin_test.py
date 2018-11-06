@@ -31,7 +31,7 @@ def mock_boto3(mocker):
 
 
 def test_resolve_bucket_name_static():
-    storage = plugin.S3Storage('bucket=test,bucket_secret=secret')
+    storage = plugin.S3Storage('bucket=test ')
     assert storage._get_current_bucket_name() == 'test'
 
 
@@ -45,7 +45,7 @@ def test_resolve_bucket_name_static():
 ))
 def test_resolve_bucket_name_dynamic(freeze_time, date, name_template, expected_name):
     freeze_time(date)
-    storage = plugin.S3Storage('bucket={},bucket_secret=secret'.format(name_template))
+    storage = plugin.DynamicS3Storage('bucket_template={},bucket_secret=secret'.format(name_template))
     name, token = storage._get_current_bucket_name().rsplit('-', 1)
     assert name == expected_name
     assert token == hmac.new(b'secret', expected_name, hashlib.md5).hexdigest()
@@ -73,10 +73,13 @@ class MockConfig(object):
 def test_dynamic_bucket_creation_task(freeze_time, mocker, date, name_template, bucket_created, expected_name,
                                       expected_error):
     freeze_time(date)
-    storage = plugin.S3Storage('bucket={},bucket_secret=secret'.format(name_template))
+    if '<' in name_template:
+        storage = plugin.DynamicS3Storage('bucket_template={},bucket_secret=secret'.format(name_template))
+    else:
+        storage = plugin.S3Storage('bucket={}'.format(name_template))
     mocker.patch('indico_storage_s3.task.config', MockConfig())
     mocker.patch('indico_storage_s3.task.get_storage', return_value=storage)
-    create_bucket_call = mocker.patch.object(plugin.S3Storage, '_create_bucket')
+    create_bucket_call = mocker.patch.object(plugin.DynamicS3Storage, '_create_bucket')
     if expected_error:
         with pytest.raises(expected_error):
             create_bucket()
