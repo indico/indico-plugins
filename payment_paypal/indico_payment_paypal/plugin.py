@@ -88,7 +88,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         itemized_data = []
         if registration.base_price:
             choice = {
-                      'title': 'Registration Fee'.
+                      'title': 'Registration Fee',
                       'price': format_currency(registration.base_price, '', u'#0.00', locale='en_US'),
                       'quantity': 1,
                       'price_info': registration.base_price_info
