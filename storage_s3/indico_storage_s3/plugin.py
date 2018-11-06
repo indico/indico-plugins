@@ -96,9 +96,9 @@ class S3Storage(Storage):
 
     def __init__(self, data):
         data = self._parse_data(data)
-        endpoint_url = data.get('host')
-        if endpoint_url and '://' not in endpoint_url:
-            endpoint_url = 'https://' + endpoint_url
+        self.endpoint_url = data.get('host')
+        if self.endpoint_url and '://' not in self.endpoint_url:
+            self.endpoint_url = 'https://' + self.endpoint_url
         session_kwargs = {}
         if 'profile' in data:
             session_kwargs['profile_name'] = data['profile']
@@ -109,10 +109,10 @@ class S3Storage(Storage):
         self.original_bucket_name = data['bucket']
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
-        session = boto3.session.Session(**session_kwargs)
-        self.client = session.client('s3', endpoint_url=endpoint_url)
+        self.session = boto3.session.Session(**session_kwargs)
+        self.client = self.session.client('s3', endpoint_url=self.endpoint_url)
         self.bucket_secret = (data.get('bucket_secret', '') or
-                              session._session.get_scoped_config().get('indico_bucket_secret', '')).encode('utf-8')
+                              self.session._session.get_scoped_config().get('indico_bucket_secret', '')).encode('utf-8')
         if not self.bucket_secret and self._has_dynamic_bucket_name:
             raise StorageError('A bucket secret is required when using dynamic bucket names')
 
