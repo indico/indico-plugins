@@ -26,14 +26,14 @@ from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.storage.backend import get_storage
 
-from plugin import S3Storage
+from indico_storage_s3.plugin import ReadOnlyS3Storage, S3Storage
 
 
 @celery.periodic_task(run_every=crontab(minute=0, hour=1))
 def create_bucket():
     for key in config.STORAGE_BACKENDS:
         storage = get_storage(key)
-        if not isinstance(storage, S3Storage):
+        if not isinstance(storage, S3Storage) or isinstance(storage, ReadOnlyS3Storage):
             continue
         today = date.today()
         bucket_name = storage.original_bucket_name

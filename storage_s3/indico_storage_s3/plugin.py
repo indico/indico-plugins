@@ -35,8 +35,9 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin
 from indico.core.storage import Storage, StorageError
-from indico.core.storage.backend import get_storage
+from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyError, get_storage
 from indico.util.fs import get_file_checksum
+from indico.util.string import return_ascii
 
 
 class S3StoragePlugin(IndicoPlugin):
@@ -51,7 +52,8 @@ class S3StoragePlugin(IndicoPlugin):
         self.connect(signals.plugin.cli, self._extend_indico_cli)
 
     def _get_storage_backends(self, sender, **kwargs):
-        return S3Storage
+        yield S3Storage
+        yield ReadOnlyS3Storage
 
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_command()
@@ -66,6 +68,14 @@ class S3StoragePlugin(IndicoPlugin):
                     if storage:
                         click.echo('Storage {} does not exist'.format(key))
                         sys.exit(1)
+                    continue
+
+                if isinstance(storage_instance, ReadOnlyS3Storage):
+                    if storage:
+                        click.echo('Storage {} is read-only'.format(key))
+                        sys.exit(1)
+                    continue
+
                 if isinstance(storage_instance, S3Storage):
                     bucket_name = storage_instance._get_current_bucket_name()
                     if storage_instance._bucket_exists(bucket_name):
@@ -76,6 +86,7 @@ class S3StoragePlugin(IndicoPlugin):
                 elif storage:
                     click.echo('Storage {} is not a s3 storage'.format(key))
                     sys.exit(1)
+
         return create_s3_bucket
 
 
@@ -205,3 +216,18 @@ class S3Storage(Storage):
             if int(exc.response['Error']['Code']) == 404:
                 return False
             raise
+
+    @return_ascii
+    def __repr__(self):
+        return '<S3Storage: {}>'.format(self.original_bucket_name)
+
+
+class ReadOnlyS3Storage(ReadOnlyStorageMixin, S3Storage):
+    name = 's3-readonly'
+
+    def _create_bucket(self, name):
+        raise StorageReadOnlyError('Cannot write to read-only storage')
+
+    @return_ascii
+    def __repr__(self):
+        return '<ReadOnlyS3Storage: {}>'.format(self.original_bucket_name)
