@@ -8,15 +8,49 @@ Clicking on the <strong>Pay now</strong> button you will get redirected to the P
     <dt>{% trans %}Total amount{% endtrans %}</dt>
     <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
     <dt></dt>
+
+    {% if event_settings.itemize %}
+        <table class="registration-info payment-info">
+            <tr>
+                <th class="regform-done-table-title text-left">Item </th>
+                <th class="regform-done-table-title">Quantity</th>
+                <th class="regform-done-table-title">Value</th>
+                <th class="regform-done-table-title">Total</th>
+            </tr>
+            {% for item in itemized_data %}
+                <tr class="regform-done-table-item">
+                    <td class="text-left"> {{ loop.index }} .  {{ item.title }} </td>
+                    <td class="text-left"> {{ item.quantity }} </td>
+                    <td class="text-right"> {{ item.price }} </td>
+                    <td class="text-right"> {{ (item.price | float)* item.quantity }} </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <dt></dt>
     <dd>
         <form action="{{ settings.url }}" method="POST">
-            <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="{{ event_settings.business }}">
-            <input type="hidden" name="item_name" value="{{ item_name }}">
-            <input type="hidden" name="amount" value="{{ amount }}">
             <input type="hidden" name="currency_code" value="{{ currency }}">
             <input type="hidden" name="charset" value="utf-8">
             <input type="hidden" name="invoice" value="{{ registration.event_id }}_{{ registration.id }}">
+
+            {% if event_settings.itemize %}
+                <input type="hidden" name="cmd" value="_cart">
+                <input type="hidden" name="upload" value="1">
+                {% for item in itemized_data %}
+                      <input type="hidden" name="item_name_{{ loop.index }}" value="{{ item.title|truncate(127, True) }}">
+                      <input type="hidden" name="item_number_{{ loop.index }}" value="{{ item.price_info|truncate(127, True) }}">
+                      <input type="hidden" name="amount_{{  loop.index }}" value="{{ item.price }}">
+                      <input type="hidden" name="quantity_{{  loop.index }}" value="{{ item.quantity }}">
+                {% endfor %}
+            {% else %}
+                <input type="hidden" name="cmd" value="_xclick">
+                <input type="hidden" name="item_name" value="{{ item_name }}">
+                <input type="hidden" name="amount" value="{{ amount }}">
+            {% endif %}
+
             <input type="hidden" name="return" value="{{ return_url }}">
             <input type="hidden" name="cancel_return" value="{{ cancel_url }}">
             <input type="hidden" name="notify_url" value="{{ notify_url }}">
@@ -24,5 +58,4 @@ Clicking on the <strong>Pay now</strong> button you will get redirected to the P
         </form>
     </dd>
 </dl>
-
 
