@@ -19,15 +19,40 @@ from __future__ import unicode_literals
 import sys
 
 import click
+from markupsafe import Markup
+from wtforms.fields import BooleanField, StringField
+from wtforms.validators import DataRequired
 
 from indico.cli.core import cli_command
 from indico.core import signals
 from indico.core.config import config
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.core.storage.backend import ReadOnlyStorageMixin, get_storage
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoPasswordField
+from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.widgets import SwitchWidget
 
+from indico_storage_s3 import _
+from indico_storage_s3.blueprint import blueprint
 from indico_storage_s3.storage import (DynamicS3Storage, ReadOnlyDynamicS3Storage, ReadOnlyS3Storage, S3Storage,
                                        S3StorageBase)
+
+
+class SettingsForm(IndicoForm):
+    bucket_info_enabled = BooleanField(_("Bucket info API"), widget=SwitchWidget())
+    username = StringField(_("Username"), [HiddenUnless('bucket_info_enabled', preserve_data=True), DataRequired()],
+                           description=_("The username to access the S3 bucket info endpoint"))
+    password = IndicoPasswordField(_('Password'),
+                                   [HiddenUnless('bucket_info_enabled', preserve_data=True), DataRequired()],
+                                   toggle=True,
+                                   description=_("The password to access the S3 bucket info endpoint"))
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+        url = Markup('<strong><code>{}</code></strong>').format(url_for_plugin('storage_s3.buckets'))
+        self.bucket_info_enabled.description = _("Enables an API on {url} that returns information on all S3 buckets "
+                                                 "currently in use, including dynamically-named ones.").format(url=url)
 
 
 class S3StoragePlugin(IndicoPlugin):
@@ -35,6 +60,14 @@ class S3StoragePlugin(IndicoPlugin):
 
     Provides S3 storage backends.
     """
+
+    configurable = True
+    settings_form = SettingsForm
+    default_settings = {
+        'bucket_info_enabled': False,
+        'username': '',
+        'password': ''
+    }
 
     def init(self):
         super(S3StoragePlugin, self).init()
@@ -46,6 +79,9 @@ class S3StoragePlugin(IndicoPlugin):
         yield DynamicS3Storage
         yield ReadOnlyS3Storage
         yield ReadOnlyDynamicS3Storage
+
+    def get_blueprints(self):
+        return blueprint
 
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_command()

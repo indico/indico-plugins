@@ -16,13 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.util.i18n import make_bound_gettext
+from indico.core.plugins import IndicoPluginBlueprint
+
+from indico_storage_s3.controllers import RHBuckets
 
 
-_ = make_bound_gettext('search_cern')
-
-
-@signals.import_tasks.connect
-def _import_tasks(sender, **kwargs):
-    import indico_storage_s3.task
+blueprint = IndicoPluginBlueprint('storage_s3', __name__, url_prefix='/api/plugin/s3')
+blueprint.add_url_rule('/buckets', 'buckets', RHBuckets)
