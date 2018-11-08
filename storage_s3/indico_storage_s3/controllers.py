@@ -69,7 +69,7 @@ class RHBuckets(RH):
             if not isinstance(storage, S3StorageBase):
                 continue
             readonly = isinstance(storage, ReadOnlyStorageMixin)
-            data[key] = {'readonly': readonly}
+            data[key] = {'readonly': readonly, 'meta': storage.meta}
             if isinstance(storage, S3Storage):
                 data[key].update(self._get_static_info(storage))
             elif isinstance(storage, DynamicS3Storage):

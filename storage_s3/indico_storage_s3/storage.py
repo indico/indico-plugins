@@ -53,6 +53,7 @@ class S3StorageBase(Storage):
             session_kwargs['aws_secret_access_key'] = data['secret_key']
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
+        self.meta = data.get('meta')
         self.session = boto3.session.Session(**session_kwargs)
         self.client = self.session.client('s3', endpoint_url=self.endpoint_url)
 
