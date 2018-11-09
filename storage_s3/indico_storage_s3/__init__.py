@@ -20,7 +20,7 @@ from indico.core import signals
 from indico.util.i18n import make_bound_gettext
 
 
-_ = make_bound_gettext('search_cern')
+_ = make_bound_gettext('storage_s3')
 
 
 @signals.import_tasks.connect
