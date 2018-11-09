@@ -32,6 +32,7 @@ from indico_payment_paypal.blueprint import blueprint
 from indico_payment_paypal.util import validate_business
 
 from babel.numbers import format_currency
+from flask import session
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
     url = URLField(_('API URL'), [DataRequired()], description=_('URL of the PayPal HTTP API.'))
@@ -66,6 +67,14 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                               'method_name': None,
                               'business': None,
                               'itemize': False}
+    
+    def create_choice_data(self, data_list, title1, title2, price, quantity, price_info):
+        choice = {'title': '{} {dash} {}'.format(title1, title2, dash="-" if title2 else ""),
+                  'price': format_currency(price, '', u'#0.00', locale=session.lang or 'en_GB'),
+                  'quantity': quantity,
+                  'price_info': price_info}
+        data_list.append(choice)
+        
     @property
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
@@ -87,13 +96,12 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 # PayPal Itemized cart get all billable items
         itemized_data = []
         if registration.base_price:
-            choice = {
-                      'title': 'Registration Fee',
-                      'price': format_currency(registration.base_price, '', u'#0.00', locale='en_US'),
-                      'quantity': 1,
-                      'price_info': registration.base_price_info
-                     }
-            itemized_data.append(choice)
+            self.create_choice_data(itemized_data, 
+                               'Registration Fee', 
+                               '', 
+                               registration.base_price, 
+                               1, 
+                               registration.base_price_info)
 
         for section, fields in registration.summary_data.iteritems():            
             for field, regdata in fields.iteritems():
@@ -105,45 +113,37 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data['choice'] and x['is_billable']]
                     if billable_choices:
                         if not friendly_data['is_no_accommodation']:
-                            choice = {
-                                      'title': '{} - {}'.format(section.title, friendly_data['choice']),
-                                      'price': format_currency(billable_choices[0]['price'], '', u'#0.00', locale='en_US'),
-                                      'quantity': friendly_data['nights'],
-                                      'price_info': billable_choices[0]['price_info'] 
-                                     }
-                            itemized_data.append(choice)
-
+                            self.create_choice_data(itemized_data, 
+                                               section.title, 
+                                               friendly_data['choice'], 
+                                               billable_choices[0]['price'], 
+                                               friendly_data['nights'], 
+                                               billable_choices[0]['price_info'])
                 elif regdata.field_data.field.input_type == 'single_choice':
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data and x['is_billable']]
                     if billable_choices:
-                        choice = {
-                                  'title': '{} - {}'.format(field.title, unversioned_data['captions'][billable_choices[0]['id']]), 
-                                  'price': format_currency(billable_choices[0]['price'], '', u'#0.00', locale='en_US'), 
-                                  'quantity': regdata.data[billable_choices[0]['id']],
-                                  'price_info': billable_choices[0]['price_info']
-                                 }
-                        itemized_data.append(choice)
-                 
+                        self.create_choice_data(itemized_data, 
+                                           field.title, 
+                                           unversioned_data['captions'][billable_choices[0]['id']], 
+                                           billable_choices[0]['price'], 
+                                           regdata.data[billable_choices[0]['id']], 
+                                           billable_choices[0]['price_info'])
                 elif regdata.field_data.field.input_type == 'multi_choice':
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data and x['is_billable']]
                     if billable_choices:
-                        for bc in billable_choices:  
-                            choice = {
-                                      'title': '{} - {}'.format(field.title, unversioned_data['captions'][bc['id']]),
-                                      'price': format_currency(bc['price'], '', u'#0.00', locale='en_US'),
-                                      'quantity': regdata.data[bc['id']],
-                                      'price_info': bc['price_info']
-                                     }
-                            itemized_data.append(choice)
-
+                        for bc in billable_choices:
+                            self.create_choice_data(itemized_data, 
+                                               field.title, 
+                                               unversioned_data['captions'][bc['id']], 
+                                               bc['price'], 
+                                               regdata.data[bc['id']], 
+                                               bc['price_info'])
                 else: 
-                    if regdata.price: 
-                        choice = {
-                                  'title': '{} - {}'.format(section.title, field.title),
-                                  'price': format_currency(versioned_data['price'], '', u'#0.00', locale='en_US'),
-                                  'quantity': regdata.data if regdata.field_data.field.input_type == 'number' else 1,
-                                  'price_info': versioned_data['price_info']
-                                 }
-                        itemized_data.append(choice)
-
+                    if regdata.price:
+                        self.create_choice_data(itemized_data, 
+                                           section.title, 
+                                           field.title, 
+                                           versioned_data['price'], 
+                                           regdata.data if regdata.field_data.field.input_type == 'number' else 1, 
+                                           versioned_data['price_info'])
         data['itemized_data'] = itemized_data
