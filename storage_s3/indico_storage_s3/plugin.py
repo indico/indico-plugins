@@ -112,7 +112,7 @@ class S3StoragePlugin(IndicoPlugin):
                     storage_instance._create_bucket(bucket_name)
                     click.echo('Storage {}: bucket {} created'.format(key, bucket_name))
                 elif storage:
-                    click.echo('Storage {} is not a s3 storage'.format(key))
+                    click.echo('Storage {} is not an s3 storage'.format(key))
                     sys.exit(1)
 
         return create_s3_bucket
