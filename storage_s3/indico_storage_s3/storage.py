@@ -34,6 +34,7 @@ from indico.core.storage import Storage, StorageError
 from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyError
 from indico.util.fs import get_file_checksum
 from indico.util.string import return_ascii
+from indico.web.flask.util import send_file
 
 
 class S3StorageBase(Storage):
@@ -53,6 +54,7 @@ class S3StorageBase(Storage):
             session_kwargs['aws_secret_access_key'] = data['secret_key']
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
+        self.proxy_downloads = data.get('proxy') in ('1', 'true', 'yes')
         self.meta = data.get('meta')
         self.session = boto3.session.Session(**session_kwargs)
         self.client = self.session.client('s3', endpoint_url=self.endpoint_url)
@@ -102,6 +104,9 @@ class S3StorageBase(Storage):
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename, inline=True):
+        if self.proxy_downloads:
+            return send_file(filename, self.open(file_id), content_type, inline=inline)
+
         try:
             bucket, id_ = self._parse_file_id(file_id)
             content_disp = 'inline' if inline else 'attachment'
