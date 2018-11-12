@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import StringField, BooleanField
+from wtforms.fields.core import BooleanField, StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Optional
 
@@ -69,7 +69,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                               'itemize': False}
     
     def create_choice_data(self, data_list, title1, title2, price, quantity, price_info):
-        choice = {'title': '{} {dash} {}'.format(title1, title2, dash="-" if title2 else ""),
+        choice = {'title': '{} {dash} {}'.format(title1, title2, dash='-' if title2 else ''),
                   'price': format_currency(price, '', u'#0.00', locale=session.lang or 'en_GB'),
                   'quantity': quantity,
                   'price_info': price_info}
@@ -96,12 +96,8 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 # PayPal Itemized cart get all billable items
         itemized_data = []
         if registration.base_price:
-            self.create_choice_data(itemized_data, 
-                               'Registration Fee', 
-                               '', 
-                               registration.base_price, 
-                               1, 
-                               registration.base_price_info)
+            self.create_choice_data(itemized_data, 'Registration Fee', '', registration.base_price, 1, 
+                                    registration.base_price_info)
 
         for section, fields in registration.summary_data.iteritems():            
             for field, regdata in fields.iteritems():
@@ -113,37 +109,24 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data['choice'] and x['is_billable']]
                     if billable_choices:
                         if not friendly_data['is_no_accommodation']:
-                            self.create_choice_data(itemized_data, 
-                                               section.title, 
-                                               friendly_data['choice'], 
-                                               billable_choices[0]['price'], 
-                                               friendly_data['nights'], 
-                                               billable_choices[0]['price_info'])
+                            self.create_choice_data(itemized_data, section.title, friendly_data['choice'], 
+                                                    billable_choices[0]['price'], friendly_data['nights'], 
+                                                    billable_choices[0]['price_info'])
                 elif regdata.field_data.field.input_type == 'single_choice':
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data and x['is_billable']]
                     if billable_choices:
-                        self.create_choice_data(itemized_data, 
-                                           field.title, 
-                                           unversioned_data['captions'][billable_choices[0]['id']], 
-                                           billable_choices[0]['price'], 
-                                           regdata.data[billable_choices[0]['id']], 
-                                           billable_choices[0]['price_info'])
+                        self.create_choice_data(itemized_data, field.title, unversioned_data['captions'][billable_choices[0]['id']], 
+                                                billable_choices[0]['price'], regdata.data[billable_choices[0]['id']], 
+                                                billable_choices[0]['price_info'])
                 elif regdata.field_data.field.input_type == 'multi_choice':
                     billable_choices = [x for x in versioned_data['choices'] if x['id'] in regdata.data and x['is_billable']]
                     if billable_choices:
                         for bc in billable_choices:
-                            self.create_choice_data(itemized_data, 
-                                               field.title, 
-                                               unversioned_data['captions'][bc['id']], 
-                                               bc['price'], 
-                                               regdata.data[bc['id']], 
-                                               bc['price_info'])
+                            self.create_choice_data(itemized_data, field.title, unversioned_data['captions'][bc['id']], 
+                                                    bc['price'], regdata.data[bc['id']], bc['price_info'])
                 else: 
                     if regdata.price:
-                        self.create_choice_data(itemized_data, 
-                                           section.title, 
-                                           field.title, 
-                                           versioned_data['price'], 
-                                           regdata.data if regdata.field_data.field.input_type == 'number' else 1, 
-                                           versioned_data['price_info'])
+                        self.create_choice_data(itemized_data, section.title, field.title, versioned_data['price'], 
+                                                regdata.data if regdata.field_data.field.input_type == 'number' else 1, 
+                                                versioned_data['price_info'])
         data['itemized_data'] = itemized_data
