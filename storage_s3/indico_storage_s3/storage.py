@@ -25,7 +25,8 @@ from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 import boto3
-import botocore
+from botocore.config import Config
+from botocore.exceptions import ClientError
 from werkzeug.datastructures import Headers
 from werkzeug.utils import redirect
 
@@ -46,18 +47,21 @@ class S3StorageBase(Storage):
         if self.endpoint_url and '://' not in self.endpoint_url:
             self.endpoint_url = 'https://' + self.endpoint_url
         session_kwargs = {}
+        client_kwargs = {}
         if 'profile' in data:
             session_kwargs['profile_name'] = data['profile']
         if 'access_key' in data:
             session_kwargs['aws_access_key_id'] = data['access_key']
         if 'secret_key' in data:
             session_kwargs['aws_secret_access_key'] = data['secret_key']
+        if 'addressing_style' in data:
+            client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
         self.proxy_downloads = data.get('proxy') in ('1', 'true', 'yes')
         self.meta = data.get('meta')
         self.session = boto3.session.Session(**session_kwargs)
-        self.client = self.session.client('s3', endpoint_url=self.endpoint_url)
+        self.client = self.session.client('s3', endpoint_url=self.endpoint_url, **client_kwargs)
 
     def _get_current_bucket_name(self):
         raise NotImplementedError
@@ -141,7 +145,7 @@ class S3StorageBase(Storage):
         try:
             self.client.head_bucket(Bucket=name)
             return True
-        except botocore.exceptions.ClientError as exc:
+        except ClientError as exc:
             if int(exc.response['Error']['Code']) == 404:
                 return False
             raise
