@@ -198,8 +198,6 @@ class DynamicS3Storage(S3StorageBase):
 
     def _get_bucket_name(self, date):
         name = self._replace_bucket_placeholders(self.bucket_name_template, date)
-        if name == self.bucket_name_template or not self.bucket_secret:
-            return name
         token = hmac.new(self.bucket_secret.encode('utf-8'), name, hashlib.md5).hexdigest()
         return '{}-{}'.format(name, token)
 
