@@ -21,17 +21,20 @@ import hmac
 
 import pytest
 
+from indico.core.storage import StorageError
+
 from indico_storage_s3 import plugin
+from indico_storage_s3.storage import DynamicS3Storage, S3Storage
 from indico_storage_s3.task import create_bucket
 
 
 @pytest.fixture(autouse=True)
 def mock_boto3(mocker):
-    mocker.patch('indico_storage_s3.plugin.boto3')
+    mocker.patch('indico_storage_s3.storage.boto3')
 
 
 def test_resolve_bucket_name_static():
-    storage = plugin.S3Storage('bucket=test ')
+    storage = plugin.S3Storage('bucket=test')
     assert storage._get_current_bucket_name() == 'test'
 
 
@@ -90,3 +93,18 @@ def test_dynamic_bucket_creation_task(freeze_time, mocker, date, name_template, 
         create_bucket_call.assert_called_with('{}-{}'.format(expected_name, token))
     else:
         assert not create_bucket_call.called
+
+
+def test_static_bucket_name_too_long():
+    S3Storage('bucket=test' + 'x'*59)
+    with pytest.raises(StorageError):
+        S3Storage('bucket=test' + 'x'*60)
+
+
+def test_dynamic_bucket_name_too_long():
+    DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>' + 'x'*37)
+    DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>-<month>' + 'x'*34)
+    with pytest.raises(StorageError):
+        DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>' + 'x' * 38)
+    with pytest.raises(StorageError):
+        DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>-<month>' + 'x' * 35)

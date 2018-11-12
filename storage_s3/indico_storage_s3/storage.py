@@ -153,6 +153,8 @@ class S3Storage(S3StorageBase):
     def __init__(self, data):
         super(S3Storage, self).__init__(data)
         self.bucket_name = self.parsed_data['bucket']
+        if len(self.bucket_name) > 63:
+            raise StorageError('Bucket name cannot be longer than 63 chars')
 
     @return_ascii
     def __repr__(self):
@@ -185,6 +187,8 @@ class DynamicS3Storage(S3StorageBase):
             raise StorageError('At least one date placeholder is required when using dynamic bucket names')
         if not self.bucket_secret:
             raise StorageError('A bucket secret is required when using dynamic bucket names')
+        if len(self._replace_bucket_placeholders(self.bucket_name_template, date.today())) > 46:
+            raise StorageError('Bucket name cannot be longer than 46 chars (to keep at least 16 hash chars)')
 
     @return_ascii
     def __repr__(self):
