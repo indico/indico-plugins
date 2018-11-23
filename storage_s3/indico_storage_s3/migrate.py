@@ -41,6 +41,7 @@ from indico.cli.core import cli_group
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
+from indico.core.storage.backend import FileSystemStorage, get_storage
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.layout.models.images import ImageFile
@@ -475,8 +476,13 @@ def copy(source_backend_names, bucket_names, static_bucket_name, s3_endpoint, s3
     d = {}
     exec '\n'.join(code) in d
     if not source_backend_names:
-        source_backend_names = [k for k, v in config.STORAGE_BACKENDS.viewitems()
-                                if not isinstance(v, S3StorageBase)]
+        source_backend_names = [x for x in config.STORAGE_BACKENDS if not isinstance(get_storage(x), S3StorageBase)]
+    if rclone:
+        invalid = [x for x in source_backend_names if not isinstance(get_storage(x), FileSystemStorage)]
+        if invalid:
+            click.secho('Found unsupported storage backends: {}'.format(', '.join(sorted(invalid))), fg='yellow')
+            click.secho('The backends might not work together with `--rclone`', fg='yellow')
+            click.confirm('Continue anyway?', abort=True)
     s3_bucket_policy = s3_bucket_policy_file.read() if s3_bucket_policy_file else None
     imp = S3Importer(d['get_bucket_name'], static_bucket_name,
                      output, source_backend_names, rclone,
