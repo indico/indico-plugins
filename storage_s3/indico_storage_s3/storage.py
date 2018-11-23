@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import hashlib
 import hmac
 import sys
+import threading
 from contextlib import contextmanager
 from datetime import date
 from io import BytesIO
@@ -28,7 +29,7 @@ import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from werkzeug.datastructures import Headers
-from werkzeug.utils import redirect
+from werkzeug.utils import cached_property, redirect
 
 from indico.core.config import config
 from indico.core.storage import Storage, StorageError
@@ -36,6 +37,9 @@ from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyErr
 from indico.util.fs import get_file_checksum
 from indico.util.string import return_ascii
 from indico.web.flask.util import send_file
+
+
+s3_session_cache = threading.local()
 
 
 class S3StorageBase(Storage):
@@ -46,22 +50,34 @@ class S3StorageBase(Storage):
         self.endpoint_url = data.get('host')
         if self.endpoint_url and '://' not in self.endpoint_url:
             self.endpoint_url = 'https://' + self.endpoint_url
-        session_kwargs = {}
-        client_kwargs = {}
+        self.session_kwargs = {}
+        self.client_kwargs = {}
         if 'profile' in data:
-            session_kwargs['profile_name'] = data['profile']
+            self.session_kwargs['profile_name'] = data['profile']
         if 'access_key' in data:
-            session_kwargs['aws_access_key_id'] = data['access_key']
+            self.session_kwargs['aws_access_key_id'] = data['access_key']
         if 'secret_key' in data:
-            session_kwargs['aws_secret_access_key'] = data['secret_key']
+            self.session_kwargs['aws_secret_access_key'] = data['secret_key']
         if 'addressing_style' in data:
-            client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
+            self.client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
         self.proxy_downloads = data.get('proxy') in ('1', 'true', 'yes')
         self.meta = data.get('meta')
-        self.session = boto3.session.Session(**session_kwargs)
-        self.client = self.session.client('s3', endpoint_url=self.endpoint_url, **client_kwargs)
+
+    @cached_property
+    def session(self):
+        key = '__'.join('{}_{}'.format(k, v) for k, v in sorted(self.session_kwargs.viewitems()))
+        try:
+            return getattr(s3_session_cache, key)
+        except AttributeError:
+            session = boto3.session.Session(**self.session_kwargs)
+            setattr(s3_session_cache, key, session)
+            return session
+
+    @cached_property
+    def client(self):
+        return self.session.client('s3', endpoint_url=self.endpoint_url, **self.client_kwargs)
 
     def _get_current_bucket_name(self):
         raise NotImplementedError
