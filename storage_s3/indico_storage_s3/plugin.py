@@ -23,7 +23,7 @@ from markupsafe import Markup
 from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
-from indico.cli.core import cli_command
+from indico.cli.core import cli_group
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
@@ -84,9 +84,13 @@ class S3StoragePlugin(IndicoPlugin):
         return blueprint
 
     def _extend_indico_cli(self, sender, **kwargs):
-        @cli_command()
+        @cli_group()
+        def s3():
+            """Manage S3 storage"""
+
+        @s3.command()
         @click.option('--storage', default=None, metavar='NAME', help='Storage backend to create bucket for')
-        def create_s3_bucket(storage):
+        def create_bucket(storage):
             """Create s3 storage bucket."""
             storages = [storage] if storage else config.STORAGE_BACKENDS
             for key in storages:
@@ -115,4 +119,4 @@ class S3StoragePlugin(IndicoPlugin):
                     click.echo('Storage {} is not an s3 storage'.format(key))
                     sys.exit(1)
 
-        return create_s3_bucket
+        return s3
