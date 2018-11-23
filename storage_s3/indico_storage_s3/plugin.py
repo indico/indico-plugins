@@ -35,6 +35,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 from indico_storage_s3 import _
 from indico_storage_s3.blueprint import blueprint
+from indico_storage_s3.migrate import cli as migrate_cli
 from indico_storage_s3.storage import (DynamicS3Storage, ReadOnlyDynamicS3Storage, ReadOnlyS3Storage, S3Storage,
                                        S3StorageBase)
 
@@ -86,7 +87,7 @@ class S3StoragePlugin(IndicoPlugin):
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_group()
         def s3():
-            """Manage S3 storage"""
+            """Manage S3 storage."""
 
         @s3.command()
         @click.option('--storage', default=None, metavar='NAME', help='Storage backend to create bucket for')
@@ -119,4 +120,5 @@ class S3StoragePlugin(IndicoPlugin):
                     click.echo('Storage {} is not an s3 storage'.format(key))
                     sys.exit(1)
 
+        s3.add_command(migrate_cli, name='migrate')
         return s3
