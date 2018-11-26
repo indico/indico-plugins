@@ -102,8 +102,10 @@ def test_static_bucket_name_too_long():
 
 
 def test_dynamic_bucket_name_too_long():
-    DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>' + 'x'*37)
-    DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>-<month>' + 'x'*34)
+    s = DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>' + 'x'*37)
+    assert len(s._get_current_bucket_name()) == 63
+    s = DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>-<month>' + 'x'*34)
+    assert len(s._get_current_bucket_name()) == 63
     with pytest.raises(StorageError):
         DynamicS3Storage('bucket_secret=secret,bucket_template=test-<year>' + 'x' * 38)
     with pytest.raises(StorageError):
