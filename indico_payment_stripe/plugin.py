@@ -13,6 +13,10 @@ from indico.modules.events.payment import (
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
+    token = StringField(_('token'), [DataRequired()], description_('Publishable API key for the account'))
+    data-name = StringField(_('data-name'), [Optional()], description_('Name of the organization'))
+    data-description = StringField(_('data-description'), [Optional()], description_(' A description of the product or service being purchased'))
+
 
     pass
 
