@@ -1,12 +1,32 @@
-<form action="{{ settings.url }}" method="POST">
-  <script
-    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-    data-key="pk_test_4sXEkB3rAqaHZaSfmAVz2pOB"
-    data-amount="99"
-    data-name="Demo Site"
-    data-description="Example charge"
-    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-    data-locale="auto"
-    data-currency="nok">
-  </script>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Payment Form</title>
+</head>
+<body>
+<dl class="i-data-list">
+  <dt>{% trans %}First name{% endtrans %}</dt>
+  <dd>{{ registration.first_name }}</dd>
+  <dt>{% trans %}Last name{% endtrans %}</dt>
+  <dd>{{ registration.last_name }}</dd>
+  <dt>{% trans %}Total amount{% endtrans %}</dt>
+  <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
+  <dt></dt>
+  
+  <form action="{{ settings.url }}" method="POST">
+    <script
+      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="pk_test_4sXEkB3rAqaHZaSfmAVz2pOB"
+      data-amount="{{amount}}"
+      data-name="Demo Site"
+      data-description="Example charge"
+      data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+      data-locale="auto"
+      data-currency="{{currency}}">
+    </script>
+  </form>
+  </dd>
+</dl>
+</body>
+</html>
+
