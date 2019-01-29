@@ -16,7 +16,7 @@
   <form action="{{ settings.url }}" method="POST">
     <script
       src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-      data-key="pk_test_4sXEkB3rAqaHZaSfmAVz2pOB"
+      data-key="pk_test_YnzcdVQGsfMw7YJJWCzWlwdL"
       data-amount="{{amount}}"
       data-name="Demo Site"
       data-description="Example charge"
