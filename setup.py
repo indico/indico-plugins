@@ -1,43 +1,50 @@
-# This file is part of Indico.
-# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
-#
-# Indico is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3 of the
-# License, or (at your option) any later version.
-#
-# Indico is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
 
 from setuptools import find_packages, setup
 
+from indico_payment_stripe import (
+    __author__, __contact__, __homepage__, __version__
+)
+
+
+with open("README.rst") as src:
+    readme = src.read()
+with open("CHANGELOG.rst") as src:
+    changelog = src.read().replace(".. :changelog:", "")
+
+with open("requirements.txt") as src:
+    requirements = [line.strip() for line in src]
+with open("requirements-dev.txt") as src:
+    test_requirements = [line.strip() for line in src]
 
 setup(
     name='indico-plugin-payment-stripe',
-    version='0.0.1',
-    description='Payment plugin for Indico that uses Stripe accounts to charge credit cards',
-    url='https://github.com/indico/indico-plugins',
-    license='https://www.gnu.org/licenses/gpl-3.0.txt',
-    author='NeIC team',
-    author_email='dummy@neic.no',
+    version=__version__,
+    description=(
+        'Payment plugin for Indico that uses Stripe accounts to'
+        ' charge credit cards'
+    ),
+    url=__homepage__,
+    license='MIT',
+    author=__author__,
+    author_email=__contact__,
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    install_requires=[
-        'indico>=2.0'
-    ],
+    install_requires=requirements,
+    extras_require={"dev": test_requirements},
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7'
     ],
-    entry_points={'indico.plugins': {'payment_stripe = indico_payment_stripe.plugin:StripePaymentPlugin'}}
+    entry_points={
+        'indico.plugins': {
+            'payment_stripe = indico_payment_stripe.plugin:StripePaymentPlugin'
+        }
+    }
 )
