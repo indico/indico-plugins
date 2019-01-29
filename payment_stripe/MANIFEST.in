@@ -1,0 +1,4 @@
+graft indico_payment_stripe/static
+graft indico_payment_stripe/templates
+
+global-exclude *.pyc __pycache__ .keep
