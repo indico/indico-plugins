@@ -16,6 +16,7 @@ from indico.modules.events.payment import (
 )
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin, PaymentPluginSettingsFormBase)
 from indico.util.i18n import make_bound_gettext
+from indico.web.forms.validators import UsedIf
 
 _ = make_bound_gettext('payment_stripe')
 
@@ -28,8 +29,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    pass
-
+    data_description = StringField(_('data description'), [Optional()], description=_(' A description of the product or service being purchased'))
 
 class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """Stripe
@@ -49,7 +49,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     default_event_settings = {
         'enabled': False,
         'method_name': None,
-        'business': None,
+        'data_description': None,
     }
 
     def adjust_payment_form_data(self, data):
