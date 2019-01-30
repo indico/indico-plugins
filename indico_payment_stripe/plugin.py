@@ -5,18 +5,25 @@
 
 """
 
+from wtforms.fields.core import StringField
+from wtforms.fields.html5 import URLField
+from wtforms.validators import DataRequired, Optional
+
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.payment import (
     PaymentEventSettingsFormBase, PaymentPluginMixin,
     PaymentPluginSettingsFormBase
 )
+from indico_payment_paypal import _
+from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin, PaymentPluginSettingsFormBase)
+
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    pub_key = StringField(_('publishable key'), [DataRequired()], description_('Publishable API key for the stripe.com account'))
-    sec_key = StringField(_('secret key'), [DataRequired()], description_('Secret API key for the stripe.com account'))
-    data_name = StringField(_('data name'), [Optional()], description_('Name of the organization'))
-    data_description = StringField(_('data description'), [Optional()], description_(' A description of the product or service being purchased'))
+    pub_key = StringField(_('publishable key'), [DataRequired()], description=_('Publishable API key for the stripe.com account'))
+    sec_key = StringField(_('secret key'), [DataRequired()], description=_('Secret API key for the stripe.com account'))
+    data_name = StringField(_('data name'), [Optional()], description=_('Name of the organization'))
+    data_description = StringField(_('data description'), [Optional()], description=_(' A description of the product or service being purchased'))
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):

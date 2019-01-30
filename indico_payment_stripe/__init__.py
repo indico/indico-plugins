@@ -19,3 +19,8 @@ __version__ += '-dev' if not RELEASE else ''
 __author__ = 'NeIC'
 __contact__ = 'dummy@neic.no'
 __homepage__ = 'https://github.com/bow/pytest-pipeline'
+
+
+from indico.util.i18n import make_bound_gettext
+
+_ = make_bound_gettext('payment_stripe')
