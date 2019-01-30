@@ -14,9 +14,10 @@ from indico.modules.events.payment import (
     PaymentEventSettingsFormBase, PaymentPluginMixin,
     PaymentPluginSettingsFormBase
 )
-from indico_payment_paypal import _
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin, PaymentPluginSettingsFormBase)
+from indico.util.i18n import make_bound_gettext
 
+_ = make_bound_gettext('payment_stripe')
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
