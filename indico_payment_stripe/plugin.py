@@ -13,16 +13,13 @@ from indico.modules.events.payment import (
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    token = StringField(_('token'), [DataRequired()], description_('Publishable API key for the account'))
-    data-name = StringField(_('data-name'), [Optional()], description_('Name of the organization'))
-    data-description = StringField(_('data-description'), [Optional()], description_(' A description of the product or service being purchased'))
-
-
-    pass
+    pub_key = StringField(_('publishable key'), [DataRequired()], description_('Publishable API key for the stripe.com account'))
+    sec_key = StringField(_('secret key'), [DataRequired()], description_('Secret API key for the stripe.com account'))
+    data_name = StringField(_('data name'), [Optional()], description_('Name of the organization'))
+    data_description = StringField(_('data description'), [Optional()], description_(' A description of the product or service being purchased'))
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-
     pass
 
 
