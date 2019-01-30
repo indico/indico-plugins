@@ -51,3 +51,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': None,
         'business': None,
     }
+
+    def adjust_payment_form_data(self, data):
+        data['handler_url'] = url_for_plugin('payment_stripe.handler')
