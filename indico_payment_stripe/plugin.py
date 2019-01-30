@@ -7,7 +7,7 @@
 
 """
 
-from wtforms.fields.core import StringField
+from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
@@ -33,8 +33,8 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         [DataRequired()],
         description=_('Secret API key for the stripe.com account')
        )
-    name = StringField(
-        _('name'),
+    org_name = StringField(
+        _('organization name'),
         [Optional()],
         description=_('Name of the organization')
     )
@@ -60,12 +60,24 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     name = StringField(
         _('name'),
         [Optional()],
-        description=_('Name of the organization')
+        default='Conference',
+        description=_('Name of the event')
     )
     description = StringField(
         _('description'),
         [Optional()],
+        default='Payment for conference',
         description=_('A description of the product or service being purchased')
+    )
+    require_postal_code = BooleanField(
+        _('require registrants to input postal code'),
+        [Optional()],
+        default=False,
+        description=_(
+            'Whether registrants are required to input their postal code'
+            ' when filling the payment form. Setting this to true will decrease'
+            ' the chance of the payment being detected as fraudulent.'
+        )
     )
 
 
@@ -81,7 +93,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': 'Stripe',
         'pub_key': '',
         'sec_key': '',
-        'name': '',
+        'org_name': '',
         'description': '',
     }
     default_event_settings = {
@@ -91,6 +103,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'sec_key': None,
         'name': None,
         'description': None,
+        'require_postal_code': False,
     }
 
     def get_blueprints(self):

@@ -50,9 +50,16 @@ class RHStripe(RH):
             raise BadRequest
 
     def _process(self):
-        api_key = current_plugin.event_settings.get(
+
+        event_settings = current_plugin.event_settings
+
+        api_key = event_settings.get(
             self.registration.registration_form.event,
             'sec_key'
+        )
+        description = event_settings.get(
+            self.registration.registration_form.event,
+            'description'
         )
 
         charge = stripe.Charge.create(
@@ -61,7 +68,7 @@ class RHStripe(RH):
             amount=int(self.registration.price * 100),
             currency=self.registration.currency,
             # TODO: Use proper conference name.
-            description='Registration fee for conference',
+            description=description,
             source=self.stripe_token,
         )
         # TODO: Handle response from Stripe in full and handle exceptions.

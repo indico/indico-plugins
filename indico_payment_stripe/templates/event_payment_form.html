@@ -19,10 +19,10 @@
           data-key="{{ event_settings.pub_key }}"
           data-amount="{{ amount * 100 }}"
           data-currency="{{ currency }}"
-          data-name="{{ event_settings.name|default('Conference') }}"
-          data-description="{{ event_settings.description|default('Payment for Conference')}}"
+          data-name="{{ event_settings.name }}"
+          data-description="{{ event_settings.description }}"
           data-locale="auto"
-          data-zip-code="true"
+          data-zip-code="{{ event_settings.require_postal_code|string|lower }}"
           data-email="{{ user_email }}"
           data-allow-remember-me="false"
           data-image="https://stripe.com/img/documentation/checkout/marketplace.png">
