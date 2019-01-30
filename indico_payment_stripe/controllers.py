@@ -13,6 +13,7 @@ from decimal import Decimal
 import stripe
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
+from stripe import error as err
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.payment.models.transactions import TransactionAction
@@ -62,16 +63,102 @@ class RHStripe(RH):
             'description'
         )
 
-        charge = stripe.Charge.create(
-            api_key=api_key,
-            # Because Stripe wants the amount in øre / cents, we need to adjust.
-            amount=int(self.registration.price * 100),
-            currency=self.registration.currency,
-            # TODO: Use proper conference name.
-            description=description,
-            source=self.stripe_token,
+        # Several redirect possibilities:
+        # To registration form:
+        #   1. Successful payment.
+        #   2. Possibly successful payment, manual review required.
+        reg_url = url_for(
+            'event_registration.display_regform',
+            self.registration.locator.registrant
         )
-        # TODO: Handle response from Stripe in full and handle exceptions.
+        # To checkout page:
+        #   1. Fail.
+        chk_url = url_for(
+            'payment.event_payment',
+            self.registration.locator.registrant,
+        )
+
+        try:
+            charge = stripe.Charge.create(
+                api_key=api_key,
+                # Because Stripe wants the amount in øre / cents,
+                # we need to adjust.
+                amount=int(self.registration.price * 100),
+                currency=self.registration.currency,
+                # TODO: Use proper conference name.
+                description=description,
+                source=self.stripe_token,
+            )
+
+        except err.APIConnectionError as e:
+            current_plugin.logger.exception(e)
+            flash(
+                _(
+                    'There was a problem connecting to Stripe.'
+                    ' Please try again.'
+                ),
+                'error'
+            )
+            return redirect(chk_url)
+
+        except err.CardError as e:
+            current_plugin.logger.exception(e)
+            flash(
+                _('Your payment was declined. Please try again.'),
+                'error'
+            )
+            return redirect(chk_url)
+
+        except Exception as e:
+            current_plugin.logger.exception(e)
+            flash(
+                _('Your payment can not be made. Please try again.'),
+                'error'
+            )
+            return redirect(chk_url)
+
+        outcome = charge['outcome']
+        outc_type = outcome['type']
+        seller_message = outcome.get('seller_message')
+        flash_msg = None
+        flash_type = None
+
+        # See: https://stripe.com/docs/declines
+        if outc_type == 'issuer_declined':
+            flash_msg = _('Your payment failed because your card was declined.')
+            flash_type = 'error'
+            current_plugin.logger.error(seller_message)
+            return redirect(reg_url)
+
+        elif outc_type == 'blocked':
+            flash_msg = _(
+                'Your payment failed because it was classified as high risk.'
+            )
+            flash_type = 'error'
+            current_plugin.logger.error(seller_message)
+            return redirect(reg_url)
+
+        elif outc_type == 'manual_review':
+            flash_msg = _(
+                'Your payment request has been processed and will be reviewed'
+                ' soon.'
+            )
+            flash_type = 'info'
+
+        elif outc_type == 'authorized':
+            flash_msg = _('Your payment request has been processed.')
+            flash_type = 'success'
+
+        else:
+            # This is actually the 'invalid' outcome type, which indicates
+            # our API call is wrong.
+            flash_msg = _(
+                'Payment failed because something went wrong on our end.'
+                ' Please notify the event contact person.'
+            )
+            flash_type = 'error'
+            return redirect(reg_url)
+
         amount = Decimal(str(charge['amount'])) / 100
         register_transaction(
             registration=self.registration,
@@ -82,13 +169,5 @@ class RHStripe(RH):
             data=request.form,
         )
 
-        flash(
-            _('Your payment request has been processed.'),
-            'success'
-        )
-        return redirect(
-            url_for(
-                'event_registration.display_regform',
-                self.registration.locator.registrant
-            )
-        )
+        flash(flash_msg, flash_type)
+        return redirect(reg_url)

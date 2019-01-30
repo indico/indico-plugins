@@ -24,6 +24,9 @@ def test_handler_process(mocker, db, request_context):
         'status': 'succeeded',
         'amount': 10.01,
         'currency': 'EUR',
+        'outcome': {
+            'type': 'authorized'
+        }
     }
 
     rh = RHStripe()
