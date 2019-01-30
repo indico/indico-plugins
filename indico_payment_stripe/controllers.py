@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 
 import stripe
-from flask import flash, redirect, request
+from flask import flash, redirect, request, Markup
 from flask_pluginengine import current_plugin
 from stripe import error as err
 from werkzeug.exceptions import BadRequest
@@ -122,6 +122,7 @@ class RHStripe(RH):
         seller_message = outcome.get('seller_message')
         flash_msg = None
         flash_type = None
+        receipt_url = None
 
         # See: https://stripe.com/docs/declines
         if outc_type == 'issuer_declined':
@@ -139,14 +140,19 @@ class RHStripe(RH):
             return redirect(reg_url)
 
         elif outc_type == 'manual_review':
-            flash_msg = _(
+            receipt_url = charge['receipt_url']
+            flash_msg = Markup(_(
                 'Your payment request has been processed and will be reviewed'
-                ' soon.'
-            )
+                ' soon. See the receipt <a href="' + receipt_url + '">here</a>.'
+            ))
             flash_type = 'info'
 
         elif outc_type == 'authorized':
-            flash_msg = _('Your payment request has been processed.')
+            receipt_url = charge['receipt_url']
+            flash_msg = Markup(_(
+                'Your payment request has been processed.'
+                ' See the receipt <a href="' + receipt_url + '">here</a>.'
+            ))
             flash_type = 'success'
 
         else:

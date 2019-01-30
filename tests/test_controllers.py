@@ -26,7 +26,8 @@ def test_handler_process(mocker, db, request_context):
         'currency': 'EUR',
         'outcome': {
             'type': 'authorized'
-        }
+        },
+        'receipt_url': 'https://foo.com'
     }
 
     rh = RHStripe()
