@@ -10,10 +10,6 @@ from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.payment import (
-    PaymentEventSettingsFormBase, PaymentPluginMixin,
-    PaymentPluginSettingsFormBase
-)
-from indico.modules.events.payment import (
     PaymentEventSettingsFormBase,
     PaymentPluginMixin,
     PaymentPluginSettingsFormBase,
@@ -26,14 +22,37 @@ _ = make_bound_gettext('payment_stripe')
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    pub_key = StringField(_('publishable key'), [DataRequired()], description=_('Publishable API key for the stripe.com account'))
-    sec_key = StringField(_('secret key'), [DataRequired()], description=_('Secret API key for the stripe.com account'))
-    data_name = StringField(_('data name'), [Optional()], description=_('Name of the organization'))
-    data_description = StringField(_('data description'), [Optional()], description=_(' A description of the product or service being purchased'))
+
+    pub_key = StringField(
+        _('publishable key'),
+        [DataRequired()],
+        description=_('Publishable API key for the stripe.com account')
+    )
+    sec_key = StringField(
+        _('secret key'),
+        [DataRequired()],
+        description=_('Secret API key for the stripe.com account')
+       )
+    data_name = StringField(
+        _('data name'),
+        [Optional()],
+        description=_('Name of the organization')
+    )
+    data_description = StringField(
+        _('data description'),
+        [Optional()],
+        description=_('A description of the product or service being purchased')
+    )
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    data_description = StringField(_('data description'), [Optional()], description=_(' A description of the product or service being purchased'))
+
+    data_description = StringField(
+        _('data description'),
+        [Optional()],
+        description=_('A description of the product or service being purchased')
+    )
+
 
 class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """Stripe
