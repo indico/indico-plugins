@@ -1,10 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+    indico_payment_stripe.blueprint
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The plugin blueprint.
+
+"""
 from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_payment_stripe.handler import StripeHandler
+from indico_payment_stripe.controllers import RHStripe
 
 
 blueprint = IndicoPluginBlueprint('payment_stripe', __name__)
 
-blueprint.add_url_rule('/handler', 'handler', StripeHandler, methods=('POST'))
+blueprint.add_url_rule('/handler', 'handler', RHStripe, methods=['POST'])

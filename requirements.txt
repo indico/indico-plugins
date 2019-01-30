@@ -1,1 +1,2 @@
 indico>=2.0
+stripe==2.19.0

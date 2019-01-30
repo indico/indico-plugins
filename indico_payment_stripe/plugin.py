@@ -6,7 +6,6 @@
 """
 
 from wtforms.fields.core import StringField
-from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
@@ -14,11 +13,14 @@ from indico.modules.events.payment import (
     PaymentEventSettingsFormBase, PaymentPluginMixin,
     PaymentPluginSettingsFormBase
 )
-from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin, PaymentPluginSettingsFormBase)
+from indico.modules.events.payment import (
+    PaymentEventSettingsFormBase,
+    PaymentPluginMixin,
+    PaymentPluginSettingsFormBase,
+)
 from indico.util.i18n import make_bound_gettext
-from indico.web.forms.validators import UsedIf
 
-from indico_payment_stripe.blueprint import blueprint
+from .blueprint import blueprint
 
 _ = make_bound_gettext('payment_stripe')
 
@@ -56,6 +58,3 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
-
-    def adjust_payment_form_data(self, data):
-        data['handler_url'] = url_for_plugin('payment_stripe.handler')
