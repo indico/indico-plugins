@@ -41,8 +41,10 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     event_settings_form = EventSettingsForm
     default_settings = {
         'method_name': 'Stripe',
-        'url': 'https://stripe.com',
-        'business': '',
+        'pub_key': '',
+        'sec_key': '',
+        'data_name': '',
+        'data_description': '',
     }
     default_event_settings = {
         'enabled': False,
