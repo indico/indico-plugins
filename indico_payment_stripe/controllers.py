@@ -24,9 +24,9 @@ class RHStripe(RH):
     def _process_args(self):
         # TODO: Validation?
         # Stripe-specific form data.
-        self.stripe_token = request.args['stripeToken']
-        self.stripe_token_type = request.args['stripeTokenType']
-        self.stripe_email = request.args['stripeEmail']
+        self.stripe_token = request.form['stripeToken']
+        self.stripe_token_type = request.form['stripeTokenType']
+        self.stripe_email = request.form['stripeEmail']
         # Indico-specific form data.
         self.token = request.args['token']
         self.registration = Registration.find_first(uuid=self.token)

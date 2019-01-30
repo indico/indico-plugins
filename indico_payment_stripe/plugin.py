@@ -8,7 +8,7 @@
 from wtforms.fields.core import StringField
 from wtforms.validators import DataRequired, Optional
 
-from indico.core.plugins import IndicoPlugin
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (
     PaymentEventSettingsFormBase,
     PaymentPluginMixin,
@@ -33,13 +33,13 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         [DataRequired()],
         description=_('Secret API key for the stripe.com account')
        )
-    data_name = StringField(
-        _('data name'),
+    name = StringField(
+        _('name'),
         [Optional()],
         description=_('Name of the organization')
     )
-    data_description = StringField(
-        _('data description'),
+    description = StringField(
+        _('description'),
         [Optional()],
         description=_('A description of the product or service being purchased')
     )
@@ -47,8 +47,23 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
 
-    data_description = StringField(
-        _('data description'),
+    pub_key = StringField(
+        _('publishable key'),
+        [DataRequired()],
+        description=_('Publishable API key for the stripe.com account')
+    )
+    sec_key = StringField(
+        _('secret key'),
+        [DataRequired()],
+        description=_('Secret API key for the stripe.com account')
+       )
+    name = StringField(
+        _('name'),
+        [Optional()],
+        description=_('Name of the organization')
+    )
+    description = StringField(
+        _('description'),
         [Optional()],
         description=_('A description of the product or service being purchased')
     )
@@ -66,14 +81,25 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': 'Stripe',
         'pub_key': '',
         'sec_key': '',
-        'data_name': '',
-        'data_description': '',
+        'name': '',
+        'description': '',
     }
     default_event_settings = {
         'enabled': False,
         'method_name': None,
-        'data_description': None,
+        'pub_key': None,
+        'sec_key': None,
+        'name': None,
+        'description': None,
     }
 
     def get_blueprints(self):
         return blueprint
+
+    def adjust_payment_form_data(self, data):
+        registration = data['registration']
+        data['handler_url'] = url_for_plugin(
+            'payment_stripe.handler',
+            registration.locator.uuid,
+            _external=True,
+        )
