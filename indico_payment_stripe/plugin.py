@@ -18,6 +18,8 @@ from indico.modules.events.payment import (PaymentEventSettingsFormBase, Payment
 from indico.util.i18n import make_bound_gettext
 from indico.web.forms.validators import UsedIf
 
+from indico_payment_stripe.blueprint import blueprint
+
 _ = make_bound_gettext('payment_stripe')
 
 
@@ -51,6 +53,9 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': None,
         'data_description': None,
     }
+
+    def get_blueprints(self):
+        return blueprint
 
     def adjust_payment_form_data(self, data):
         data['handler_url'] = url_for_plugin('payment_stripe.handler')
