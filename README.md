@@ -1,3 +1,0 @@
-# indico-plugin-stripe
-
-TODO
