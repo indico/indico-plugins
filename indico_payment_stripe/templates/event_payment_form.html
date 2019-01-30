@@ -13,7 +13,7 @@
   <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
   <dt></dt>
   
-  <form action="{{ settings.url }}" method="POST">
+  <form action="{{ handler_url }}" method="POST">
     <script
       src="https://checkout.stripe.com/checkout.js" class="stripe-button"
       data-key="pk_test_YnzcdVQGsfMw7YJJWCzWlwdL"
