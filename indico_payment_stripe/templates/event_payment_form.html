@@ -13,15 +13,19 @@
       <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
       <dt></dt>
       <form action="{{ handler_url }}" method="POST">
+        <!-- Because Stripe wants the amount in øre / cents, we need to adjust data-amount. -->
         <script
           src="https://checkout.stripe.com/checkout.js" class="stripe-button"
           data-key="{{ event_settings.pub_key }}"
-          data-amount="{{ amount }}"
-          data-name="Demo Site"
-          data-description="Example charge"
-          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-amount="{{ amount * 100 }}"
+          data-currency="{{ currency }}"
+          data-name="{{ event_settings.name|default('Conference') }}"
+          data-description="{{ event_settings.description|default('Payment for Conference')}}"
           data-locale="auto"
-          data-currency="{{ currency }}">
+          data-zip-code="true"
+          data-email="{{ user_email }}"
+          data-allow-remember-me="false"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png">
         </script>
       </form>
       </dd>

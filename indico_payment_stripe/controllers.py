@@ -8,11 +8,25 @@
 """
 from __future__ import unicode_literals
 
-from flask import request
+from decimal import Decimal
+
+import stripe
+from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
-from indico.web.rh import RH
-from indico.modules.events.registration.models.registrations import Registration
 from werkzeug.exceptions import BadRequest
+
+from indico.modules.events.payment.models.transactions import TransactionAction
+from indico.modules.events.payment.util import register_transaction
+from indico.modules.events.registration.models.registrations import Registration
+from indico.web.flask.util import url_for
+from indico.web.rh import RH
+
+
+stripe_transaction_action_mapping = {
+    'succeeded': TransactionAction.complete,
+    'failed': TransactionAction.reject,
+    'pending': TransactionAction.pending
+}
 
 
 class RHStripe(RH):
@@ -34,20 +48,35 @@ class RHStripe(RH):
             raise BadRequest
 
     def _process(self):
-        import stripe
-
-        stripe.api_key = current_plugin.event_settings.get(
+        api_key = current_plugin.event_settings.get(
             self.registration.registration_form.event,
             'sec_key'
         )
 
         charge = stripe.Charge.create(
-            amount=self.registration.price,
+            api_key=api_key,
+            # Because Stripe wants the amount in øre / cents, we need to adjust.
+            amount=int(self.registration.price * 100),
             currency=self.registration.currency,
             # TODO: Use proper conference name.
             description='Registration fee for conference',
             source=self.stripe_token,
         )
-        # TODO: Handle response from Stripe.
-        # TODO: Register transaction.
-        print charge
+        # TODO: Handle response from Stripe in full and handle exceptions.
+        amount = Decimal(str(charge['amount'])) / 100
+        register_transaction(
+            registration=self.registration,
+            amount=float(amount),
+            currency=charge['currency'],
+            action=stripe_transaction_action_mapping[charge['status']],
+            provider='stripe',
+            data=request.form,
+        )
+
+        flash('Your payment request has been processed.', 'success')
+        return redirect(
+            url_for(
+                'event_registration.display_regform',
+                self.registration.locator.registrant
+            )
+        )

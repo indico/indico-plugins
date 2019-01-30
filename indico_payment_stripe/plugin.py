@@ -98,6 +98,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def adjust_payment_form_data(self, data):
         registration = data['registration']
+        data['user_email'] = registration.email
         data['handler_url'] = url_for_plugin(
             'payment_stripe.handler',
             registration.locator.uuid,
