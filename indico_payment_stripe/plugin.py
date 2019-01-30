@@ -3,6 +3,8 @@
     indico_payment_stripe.plugin
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    The actual plugin definitions.
+
 """
 
 from wtforms.fields.core import StringField
@@ -14,11 +16,9 @@ from indico.modules.events.payment import (
     PaymentPluginMixin,
     PaymentPluginSettingsFormBase,
 )
-from indico.util.i18n import make_bound_gettext
 
 from .blueprint import blueprint
-
-_ = make_bound_gettext('payment_stripe')
+from .utils import _
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):

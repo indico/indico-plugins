@@ -21,6 +21,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
+from .utils import _
+
 
 stripe_transaction_action_mapping = {
     'succeeded': TransactionAction.complete,
@@ -73,7 +75,10 @@ class RHStripe(RH):
             data=request.form,
         )
 
-        flash('Your payment request has been processed.', 'success')
+        flash(
+            _('Your payment request has been processed.'),
+            'success'
+        )
         return redirect(
             url_for(
                 'event_registration.display_regform',
