@@ -8,8 +8,6 @@
 """
 from __future__ import unicode_literals
 
-from decimal import Decimal
-
 import stripe
 from flask import flash, redirect, request, Markup
 from flask_pluginengine import current_plugin
@@ -22,7 +20,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
-from .utils import _
+from .utils import _, conv_to_stripe_amount, conv_from_stripe_amount
 
 
 __all__ = ['RHStripe']
@@ -84,9 +82,10 @@ class RHStripe(RH):
         try:
             charge = stripe.Charge.create(
                 api_key=api_key,
-                # Because Stripe wants the amount in øre / cents,
-                # we need to adjust.
-                amount=int(self.registration.price * 100),
+                amount=conv_to_stripe_amount(
+                    self.registration.price,
+                    self.registration.currency
+                ),
                 currency=self.registration.currency,
                 # TODO: Use proper conference name.
                 description=description,
@@ -168,10 +167,12 @@ class RHStripe(RH):
             flash_type = 'error'
             return redirect(reg_url)
 
-        amount = Decimal(str(charge['amount'])) / 100
         register_transaction(
             registration=self.registration,
-            amount=float(amount),
+            amount=conv_from_stripe_amount(
+                charge['amount'],
+                charge['currency']
+            ),
             currency=charge['currency'],
             action=STRIPE_TRX_ACTION_MAP[charge['status']],
             provider='stripe',

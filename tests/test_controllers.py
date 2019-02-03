@@ -5,25 +5,44 @@
 
 """
 
+import pytest
+from flask import request
 from mock import MagicMock
 
-from flask import request
-
+from indico.modules.events.payment.models.transactions import TransactionAction
 from indico_payment_stripe.controllers import RHStripe
 from indico_payment_stripe.plugin import StripePaymentPlugin
 
 
-def test_handler_process(mocker, db, request_context):
-    rt = mocker.patch('indico_payment_stripe.controllers.register_transaction')
+@pytest.mark.parametrize('curr, indico_amount, stripe_amount', [
+    ('EUR', 10.01, 1001),
+    ('JPY', 3690, 3690),
+])
+def test_handler_process(
+    curr, indico_amount, stripe_amount,
+    mocker, db, dummy_event, request_context,
+):
 
+    StripePaymentPlugin.event_settings.set(
+        dummy_event,
+        'sec_key',
+        'mock_sec_key'
+    )
+    StripePaymentPlugin.event_settings.set(
+        dummy_event,
+        'description',
+        'mock_description'
+    )
+
+    rt = mocker.patch('indico_payment_stripe.controllers.register_transaction')
     stripe = mocker.patch('indico_payment_stripe.controllers.stripe')
     stripe_charge = stripe.Charge.create
     # This is a pared down return value of the API call, where we only define
     # the attributes actually used afterwards.
     stripe.Charge.create.return_value = {
         'status': 'succeeded',
-        'amount': 10.01,
-        'currency': 'EUR',
+        'amount': stripe_amount,
+        'currency': curr,
         'outcome': {
             'type': 'authorized'
         },
@@ -33,7 +52,11 @@ def test_handler_process(mocker, db, request_context):
     rh = RHStripe()
     rh.event = MagicMock(id=1)
     rh.registration = MagicMock(registration_form_id=3)
-    rh.registration.getTotal.return_value = 10.01
+    rh.registration.registration_form.event = dummy_event
+    rh.registration.price = indico_amount
+    rh.registration.currency = curr
+    rh.registration.registration_form.event.sec_key = 'foo'
+    rh.registration.registration_form.event.description = 'bar'
     rh.registration.locator.registrant = {
         'confId': rh.event.id,
         'reg_form_id': rh.registration.registration_form_id,
@@ -55,5 +78,18 @@ def test_handler_process(mocker, db, request_context):
     with StripePaymentPlugin.instance.plugin_context():
         rh._process()
 
-    assert stripe_charge.called
-    assert rt.called
+    stripe_charge.assert_called_once_with(
+        api_key='mock_sec_key',
+        amount=stripe_amount,
+        currency=curr,
+        description='mock_description',
+        source='xxx',
+    )
+    rt.assert_called_once_with(
+        registration=rh.registration,
+        amount=indico_amount,
+        currency=curr,
+        action=TransactionAction.complete,
+        provider='stripe',
+        data=request.form,
+    )

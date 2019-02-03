@@ -17,7 +17,7 @@
         <script
           src="https://checkout.stripe.com/checkout.js" class="stripe-button"
           data-key="{{ event_settings.pub_key }}"
-          data-amount="{{ amount * 100 }}"
+          data-amount="{{ stripe_amount }}"
           data-currency="{{ currency }}"
           data-name="{{ event_settings.name }}"
           data-description="{{ event_settings.description }}"

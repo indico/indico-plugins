@@ -18,7 +18,7 @@ from indico.modules.events.payment import (
 )
 
 from .blueprint import blueprint
-from .utils import _
+from .utils import _, conv_to_stripe_amount
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -111,6 +111,10 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def adjust_payment_form_data(self, data):
         registration = data['registration']
+        data['stripe_amount'] = conv_to_stripe_amount(
+            registration.price,
+            registration.currency,
+        )
         data['user_email'] = registration.email
         data['handler_url'] = url_for_plugin(
             'payment_stripe.handler',
