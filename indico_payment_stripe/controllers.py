@@ -25,7 +25,10 @@ from indico.web.rh import RH
 from .utils import _
 
 
-stripe_transaction_action_mapping = {
+__all__ = ['RHStripe']
+
+
+STRIPE_TRX_ACTION_MAP = {
     'succeeded': TransactionAction.complete,
     'failed': TransactionAction.reject,
     'pending': TransactionAction.pending
@@ -170,7 +173,7 @@ class RHStripe(RH):
             registration=self.registration,
             amount=float(amount),
             currency=charge['currency'],
-            action=stripe_transaction_action_mapping[charge['status']],
+            action=STRIPE_TRX_ACTION_MAP[charge['status']],
             provider='stripe',
             data=request.form,
         )
