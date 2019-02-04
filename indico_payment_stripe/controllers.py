@@ -131,6 +131,7 @@ class RHStripe(RH):
             flash_msg = _('Your payment failed because your card was declined.')
             flash_type = 'error'
             current_plugin.logger.error(seller_message)
+            flash(flash_msg, flash_type)
             return redirect(reg_url)
 
         elif outc_type == 'blocked':
@@ -139,6 +140,7 @@ class RHStripe(RH):
             )
             flash_type = 'error'
             current_plugin.logger.error(seller_message)
+            flash(flash_msg, flash_type)
             return redirect(reg_url)
 
         elif outc_type == 'manual_review':
@@ -165,6 +167,7 @@ class RHStripe(RH):
                 ' Please notify the event contact person.'
             )
             flash_type = 'error'
+            flash(flash_msg, flash_type)
             return redirect(reg_url)
 
         register_transaction(
