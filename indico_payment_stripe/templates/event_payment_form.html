@@ -15,7 +15,7 @@
       <form action="{{ handler_url }}" method="POST">
         <script
           src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-          data-key="{{ event_settings.pub_key }}"
+          data-key="{{ pub_key }}"
           data-amount="{{ stripe_amount }}"
           data-currency="{{ currency }}"
           data-name="{{ event_settings.org_name }}"

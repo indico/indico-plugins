@@ -60,8 +60,13 @@ class RHStripe(RH):
 
     def _process(self):
 
-        sec_key = self._get_event_settings('sec_key')
         description = self._get_event_settings('description')
+        use_event_api_keys = self._get_event_settings('use_event_api_keys')
+        sec_key = (
+            self._get_event_settings('sec_key')
+            if use_event_api_keys else
+            current_plugin.settings.get('sec_key')
+        )
 
         # Several redirect possibilities:
         # To registration form:

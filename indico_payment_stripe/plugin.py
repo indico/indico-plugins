@@ -16,6 +16,7 @@ from indico.modules.events.payment import (
     PaymentPluginMixin,
     PaymentPluginSettingsFormBase,
 )
+from indico.web.forms.validators import HiddenUnless, UsedIf
 
 from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
@@ -26,12 +27,18 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
     pub_key = StringField(
         _('publishable key'),
         [DataRequired()],
-        description=_('Publishable API key for the stripe.com account')
+        description=_(
+            'Publishable API key for the stripe.com account. Event managers can'
+            ' override this.'
+        )
     )
     sec_key = StringField(
         _('secret key'),
         [DataRequired()],
-        description=_('Secret API key for the stripe.com account')
+        description=_(
+            'Secret API key for the stripe.com account. Event managers can'
+            ' override this.'
+        )
        )
     org_name = StringField(
         _('organization name'),
@@ -47,14 +54,30 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
 
+    use_event_api_keys = BooleanField(
+        _('use custom API keys'),
+        [Optional()],
+        default=False,
+        description=_(
+            'Check this box to override the organization Stripe API keys.'
+        )
+    )
     pub_key = StringField(
         _('publishable key'),
-        [DataRequired()],
+        [
+            HiddenUnless('use_event_api_keys'),
+            UsedIf(lambda form, _: form.use_event_api_keys.data),
+            DataRequired(),
+        ],
         description=_('Publishable API key for the stripe.com account')
     )
     sec_key = StringField(
         _('secret key'),
-        [DataRequired()],
+        [
+            HiddenUnless('use_event_api_keys'),
+            UsedIf(lambda form, _: form.use_event_api_keys.data),
+            DataRequired(),
+        ],
         description=_('Secret API key for the stripe.com account')
        )
     org_name = StringField(
@@ -98,9 +121,12 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     }
     default_event_settings = {
         'enabled': False,
+        'use_event_api_keys': False,
         'method_name': None,
-        'pub_key': None,
-        'sec_key': None,
+        # NOTE: apparently setting a value to `None` here means using the
+        #       plugin default and showing it in the event settings form?
+        'pub_key': '',
+        'sec_key': '',
         'org_name': None,
         'description': None,
         'require_postal_code': False,
@@ -120,4 +146,10 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             'payment_stripe.handler',
             registration.locator.uuid,
             _external=True,
+        )
+
+        data['pub_key'] = (
+            data['event_settings']['pub_key']
+            if data['event_settings']['use_event_api_keys'] else
+            data['settings']['pub_key']
         )

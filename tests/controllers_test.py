@@ -25,6 +25,11 @@ def test_handler_process(
 
     StripePaymentPlugin.event_settings.set(
         dummy_event,
+        'use_event_api_keys',
+        True,
+    )
+    StripePaymentPlugin.event_settings.set(
+        dummy_event,
         'sec_key',
         'mock_sec_key'
     )
