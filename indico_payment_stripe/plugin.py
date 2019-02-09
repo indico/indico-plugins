@@ -25,7 +25,7 @@ from .utils import _, conv_to_stripe_amount
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
     pub_key = StringField(
-        _('publishable key'),
+        _('Publishable key'),
         [DataRequired()],
         description=_(
             'Publishable API key for the stripe.com account. Event managers can'
@@ -33,7 +33,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         )
     )
     sec_key = StringField(
-        _('secret key'),
+        _('Secret key'),
         [DataRequired()],
         description=_(
             'Secret API key for the stripe.com account. Event managers can'
@@ -41,12 +41,12 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         )
        )
     org_name = StringField(
-        _('organization name'),
+        _('Organization name'),
         [Optional()],
         description=_('Name of the organization')
     )
     description = StringField(
-        _('description'),
+        _('Description'),
         [Optional()],
         description=_('A description of the product or service being purchased')
     )
@@ -55,7 +55,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 class EventSettingsForm(PaymentEventSettingsFormBase):
 
     use_event_api_keys = BooleanField(
-        _('use custom API keys'),
+        _('Use event API keys'),
         [Optional()],
         default=False,
         description=_(
@@ -63,7 +63,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         )
     )
     pub_key = StringField(
-        _('publishable key'),
+        _('Publishable key'),
         [
             HiddenUnless('use_event_api_keys'),
             UsedIf(lambda form, _: form.use_event_api_keys.data),
@@ -72,7 +72,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         description=_('Publishable API key for the stripe.com account')
     )
     sec_key = StringField(
-        _('secret key'),
+        _('Secret key'),
         [
             HiddenUnless('use_event_api_keys'),
             UsedIf(lambda form, _: form.use_event_api_keys.data),
@@ -81,19 +81,19 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         description=_('Secret API key for the stripe.com account')
        )
     org_name = StringField(
-        _('organizer name'),
+        _('Organizer name'),
         [Optional()],
         default='Organization',
         description=_('Name of the event organizer')
     )
     description = StringField(
-        _('description'),
+        _('Description'),
         [Optional()],
         default='Payment for conference',
         description=_('A description of the product or service being purchased')
     )
     require_postal_code = BooleanField(
-        _('require registrants to input postal code'),
+        _('Require registrants to input postal code'),
         [Optional()],
         default=False,
         description=_(
