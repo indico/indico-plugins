@@ -39,6 +39,13 @@ class RHStripe(RH):
 
     CSRF_ENABLED = False
 
+    def _get_event_settings(self, settings_name):
+        event_settings = current_plugin.event_settings
+        return event_settings.get(
+            self.registration.registration_form.event,
+            settings_name
+        )
+
     def _process_args(self):
         # TODO: Validation?
         # Stripe-specific form data.
@@ -53,16 +60,8 @@ class RHStripe(RH):
 
     def _process(self):
 
-        event_settings = current_plugin.event_settings
-
-        sec_key = event_settings.get(
-            self.registration.registration_form.event,
-            'sec_key'
-        )
-        description = event_settings.get(
-            self.registration.registration_form.event,
-            'description'
-        )
+        sec_key = self._get_event_settings('sec_key')
+        description = self._get_event_settings('description')
 
         # Several redirect possibilities:
         # To registration form:
