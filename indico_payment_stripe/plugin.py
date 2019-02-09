@@ -57,11 +57,11 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         [DataRequired()],
         description=_('Secret API key for the stripe.com account')
        )
-    name = StringField(
-        _('name'),
+    org_name = StringField(
+        _('organizer name'),
         [Optional()],
-        default='Conference',
-        description=_('Name of the event')
+        default='Organization',
+        description=_('Name of the event organizer')
     )
     description = StringField(
         _('description'),
@@ -101,7 +101,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': None,
         'pub_key': None,
         'sec_key': None,
-        'name': None,
+        'org_name': None,
         'description': None,
         'require_postal_code': False,
     }

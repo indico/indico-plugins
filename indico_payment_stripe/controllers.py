@@ -55,7 +55,7 @@ class RHStripe(RH):
 
         event_settings = current_plugin.event_settings
 
-        api_key = event_settings.get(
+        sec_key = event_settings.get(
             self.registration.registration_form.event,
             'sec_key'
         )
@@ -81,7 +81,7 @@ class RHStripe(RH):
 
         try:
             charge = stripe.Charge.create(
-                api_key=api_key,
+                api_key=sec_key,
                 amount=conv_to_stripe_amount(
                     self.registration.price,
                     self.registration.currency
