@@ -60,8 +60,6 @@ def test_handler_process(
     rh.registration.registration_form.event = dummy_event
     rh.registration.price = indico_amount
     rh.registration.currency = curr
-    rh.registration.registration_form.event.sec_key = 'foo'
-    rh.registration.registration_form.event.description = 'bar'
     rh.registration.locator.registrant = {
         'confId': rh.event.id,
         'reg_form_id': rh.registration.registration_form_id,
