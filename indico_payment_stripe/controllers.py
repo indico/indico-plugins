@@ -90,7 +90,7 @@ class RHStripe(RH):
                     self.registration.price,
                     self.registration.currency
                 ),
-                currency=self.registration.currency,
+                currency=self.registration.currency.lower(),
                 # TODO: Use proper conference name.
                 description=description,
                 source=self.stripe_token,

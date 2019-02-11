@@ -105,7 +105,7 @@ def test_handler_process(
     stripe_charge.assert_called_once_with(
         api_key=eff_sec_key,
         amount=stripe_amount,
-        currency=curr,
+        currency=curr.lower(),
         description='mock_description',
         source='xxx',
     )
