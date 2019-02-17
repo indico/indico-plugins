@@ -17,6 +17,7 @@ from indico.modules.events.payment import (
     PaymentPluginSettingsFormBase,
 )
 from indico.web.forms.validators import HiddenUnless, UsedIf
+from indico.web.forms.widgets import SwitchWidget
 
 from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
@@ -59,8 +60,9 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         [Optional()],
         default=False,
         description=_(
-            'Check this box to override the organization Stripe API keys.'
-        )
+            'Override the organization Stripe API keys.'
+        ),
+        widget=SwitchWidget(),
     )
     pub_key = StringField(
         _('Publishable key'),
@@ -93,14 +95,15 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         description=_('A description of the product or service being purchased')
     )
     require_postal_code = BooleanField(
-        _('Require registrants to input postal code'),
+        _('Require postal code input'),
         [Optional()],
         default=False,
         description=_(
-            'Whether registrants are required to input their postal code'
-            ' when filling the payment form. Setting this to true will decrease'
-            ' the chance of the payment being detected as fraudulent.'
-        )
+            'Require registrants to input their postal code when filling the'
+            ' payment form. Enabling this will decrease the chance of the'
+            ' payment being marked as fraudulent.'
+        ),
+        widget=SwitchWidget(),
     )
 
 
