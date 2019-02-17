@@ -55,3 +55,6 @@ License
 =======
 
 This plugin is MIT-licensed. Refer to the ``LICENSE`` file for the full license.
+
+Use of the Stripe logo included in this plugin is covered by `Stripe's usage agreement
+<https://stripe.com/marks/legal>`_.
