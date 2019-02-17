@@ -25,6 +25,7 @@ setup(
         'Stripe payment support plugin for the Indico conference management'
         ' system.'
     ),
+    long_description=readme + "\n\n" + changelog,
     url=__homepage__,
     license='MIT',
     author=__author__,
