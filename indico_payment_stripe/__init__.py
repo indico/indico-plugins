@@ -17,5 +17,4 @@ __version__ = '.'.join(__version_info__)
 __version__ += '-dev' if not RELEASE else ''
 
 __author__ = 'NeIC'
-__contact__ = 'dummy@neic.no'
-__homepage__ = 'https://github.com/bow/pytest-pipeline'
+__homepage__ = 'https://github.com/neicnordic/indico-plugin-stripe'

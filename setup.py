@@ -5,9 +5,7 @@ from __future__ import unicode_literals
 
 from setuptools import find_packages, setup
 
-from indico_payment_stripe import (
-    __author__, __contact__, __homepage__, __version__
-)
+from indico_payment_stripe import __author__, __homepage__, __version__
 
 
 with open("README.rst") as src:
@@ -24,13 +22,12 @@ setup(
     name='indico-plugin-payment-stripe',
     version=__version__,
     description=(
-        'Payment plugin for Indico that uses Stripe accounts to'
-        ' charge credit cards'
+        'Stripe payment support plugin for the Indico conference management'
+        ' system.'
     ),
     url=__homepage__,
     license='MIT',
     author=__author__,
-    author_email=__contact__,
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,

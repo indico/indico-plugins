@@ -1,7 +1,24 @@
 indico-plugin-payment-stripe
 ============================
 
-This is an Indico plugin for the Stripe payment support.
+`Stripe <https://stripe.com/>`_ payment support plugin for the `Indico conference management system <https://indico.cern.ch/>`_.
+
+This plugin was tested and developed using:
+
+* Indico version 2.1.7
+* Stripe API version 2018-11-02.
+
+Other versions of Indico and/or Stripe may or may not function as intended. We recommend that you test your integration
+thoroughly before using this plugin.
+
+See the `Stripe testing documentation <https://stripe.com/docs/testing>`_ for a testing guide.
+
+
+Issues
+------
+
+Check out our `issue tracker <https://github.com/neicnordic/indico-plugin-stripe/issues>`_ for a complete list of
+outstanding issues. We welcome any kind of contributions, from bug reports to pull requests.
 
 
 Requirements
@@ -37,4 +54,4 @@ In general, the following steps can be your guide for setting a local developmen
 License
 =======
 
-See LICENSE.
+This plugin is MIT-licensed. Refer to the ``LICENSE`` file for the full license.
