@@ -135,6 +135,10 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'require_postal_code': False,
     }
 
+    @property
+    def logo_url(self):
+        return url_for_plugin(self.name + '.static', filename='images/logo.png')
+
     def get_blueprints(self):
         return blueprint
 
