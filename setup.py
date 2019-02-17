@@ -26,7 +26,7 @@ setup(
         ' system.'
     ),
     long_description=readme + '\n\n' + changelog,
-    long_description_content_type='text/rst',
+    long_description_content_type='text/x-rst',
     url=__homepage__,
     license='MIT',
     author=__author__,
