@@ -31,7 +31,7 @@ Development
 -----------
 
 Setup
-~~~~~
+^^^^^
 
 In general, the following steps can be your guide for setting a local development environment:
 
