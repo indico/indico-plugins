@@ -1,5 +1,8 @@
 .. :changelog:
 
+Changelog
+=========
+
 
 Version 0.0
 -----------
