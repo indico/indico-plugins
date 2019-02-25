@@ -1,7 +1,7 @@
 indico-plugin-payment-stripe
 ============================
 
-`Stripe <https://stripe.com/>`_ payment support plugin for the `Indico conference management system <https://indico.cern.ch/>`_.
+`Stripe <https://stripe.com/>`_ payment support plugin for the `Indico conference management system <https://getindico.io>`_.
 
 This plugin was tested and developed using:
 
