@@ -86,6 +86,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(VidyoPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
@@ -122,6 +123,14 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
+
+    def _event_metadata_postprocess(self, sender, event, data, **kwargs):
+        associations = event.vc_room_associations
+        if associations:
+            description = event.description
+            urls = '\n'.join([assoc.vc_room.vidyo_extension.get_join_url(use_chooser=False) for assoc in associations])
+            return {'description': '\n\n'.join(filter(None, [description, urls]))}
+        return {}
 
     def update_data_association(self, event, vc_room, event_vc_room, data):
         super(VidyoPlugin, self).update_data_association(event, vc_room, event_vc_room, data)

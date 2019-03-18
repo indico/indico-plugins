@@ -66,14 +66,24 @@ class VidyoExtension(db.Model):
         )
     )
 
-    @property
-    def join_url(self):
+    def get_join_url(self, use_chooser=True):
+        """
+        Produce an auto-join URL. By default, the client chooser URL is
+        returned if available.
+
+        :param use_chooser: whether to use a chooser URL if available
+        :return: The auto-join/chooser URL
+        """
         from indico_vc_vidyo.plugin import VidyoPlugin
         url = self.vc_room.data['url']
         custom_url_tpl = VidyoPlugin.settings.get('client_chooser_url')
-        if custom_url_tpl:
+        if use_chooser and custom_url_tpl:
             return custom_url_tpl + '?' + urllib.urlencode({'url': url})
         return url
+
+    @property
+    def join_url(self):
+        return self.get_join_url()
 
     @return_ascii
     def __repr__(self):
