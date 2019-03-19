@@ -60,7 +60,7 @@ def get_user_from_identifier(settings, identifier):
         emails = {email.lower() for email in identity_info.data.getlist('email') if email}
         if not emails:
             continue
-        user = User.find_first(~User.is_deleted, User.all_emails.contains(db.func.any(list(emails))))
+        user = User.find_first(~User.is_deleted, User.all_emails.in_(list(emails)))
         if user:
             return user
 
