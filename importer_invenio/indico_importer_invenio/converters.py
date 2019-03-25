@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface.common.tools import strip_ml_tags
+from indico.util.string import strip_tags
 
 from indico_importer.converter import APPEND, RecordConverter
 from indico_importer.util import convert_dt_tuple
@@ -83,7 +83,7 @@ class InvenioRecordConverter(InvenioRecordConverterBase):
                   ('111', APPEND, None, InvenioPlaceTimeConverter111),
                   ('245', 'title', lambda x: x[0]['a'][0]),
                   ('518', APPEND, None, InvenioPlaceTimeConverter518),
-                  ('520', 'summary', lambda x: strip_ml_tags(x[0]['a'][0])),
+                  ('520', 'summary', lambda x: strip_tags(x[0]['a'][0])),
                   ('700', 'secondaryAuthor', None, InvenioAuthorConverter),
                   ('61124', 'meetingName', lambda x: str(x[0]['a'][0])),
                   ('8564', 'materials', lambda x: x, InvenioLinkConverter)]
