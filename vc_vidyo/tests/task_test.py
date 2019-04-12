@@ -25,15 +25,15 @@ from indico_vc_vidyo.models.vidyo_extensions import VidyoExtension
 
 
 @pytest.fixture
-def create_dummy_room(db, dummy_avatar):
+def create_dummy_room(db, dummy_user):
     """Returns a callable which lets you create dummy Vidyo room occurrences"""
-    def _create_room(name, extension, owner, data, **kwargs):
+    def _create_room(name, extension, data, **kwargs):
         vc_room = VCRoom(
             name=name,
             data=data,
-            type="vidyo",
+            type='vidyo',
             status=kwargs.pop('status', VCRoomStatus.created),
-            created_by_id=kwargs.pop('created_by_id', dummy_avatar.id),
+            created_by_user=dummy_user,
             **kwargs
         )
         db.session.add(vc_room)
@@ -41,7 +41,7 @@ def create_dummy_room(db, dummy_avatar):
         extension = VidyoExtension(
             vc_room_id=vc_room.id,
             extension=extension,
-            owned_by_id=owner.id
+            owned_by_user=dummy_user
         )
         vc_room.vidyo_extension = extension
         return vc_room
@@ -49,7 +49,7 @@ def create_dummy_room(db, dummy_avatar):
     return _create_room
 
 
-def test_room_cleanup(create_event, create_dummy_room, dummy_avatar, freeze_time, db):
+def test_room_cleanup(create_event, create_dummy_room, freeze_time, db):
     """Test that 'old' Vidyo rooms are correctly detected"""
     freeze_time(datetime(2015, 2, 1))
 
@@ -65,11 +65,11 @@ def test_room_cleanup(create_event, create_dummy_room, dummy_avatar, freeze_time
                                                           (1235, 5679, (2,)),
                                                           (1236, 5670, (4,)),
                                                           (1237, 5671, ())), start=1):
-        room = create_dummy_room('test_room_{}'.format(id_), extension, dummy_avatar, {
+        room = create_dummy_room('test_room_{}'.format(id_), extension, {
             'vidyo_id': vidyo_id
         })
         for evt_id in evt_ids:
-            VCRoomEventAssociation(vc_room=room, linked_event=events[evt_id])
+            VCRoomEventAssociation(vc_room=room, linked_event=events[evt_id], data={})
             db.session.flush()
 
     from indico_vc_vidyo.task import find_old_vidyo_rooms
