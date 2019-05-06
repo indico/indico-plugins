@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-vc-vidyo',
-    version='3.0-dev',
+    version='2.2-dev',
     description='Vidyo video-conferencing plugin for Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',

@@ -21,7 +21,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-piwik',
-    version='3.0-dev',
+    version='2.2-dev',
     description='Piwik integration for global and event-specific statistics in Indico',
     url='https://github.com/indico/indico-plugins',
     license='https://www.gnu.org/licenses/gpl-3.0.txt',
