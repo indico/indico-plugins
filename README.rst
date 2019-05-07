@@ -5,8 +5,14 @@ Indico Plugins
 
 This repository contains all the official plugins for `Indico`_.
 
-Indico and its plugins are free software licenced under the terms of the
-GNU General Public Licence (GPL) v3.  They are provided on an "as is" basis.
+These plugins are licensed under the MIT license.
+
+Note
+----
+
+In applying the MIT license, CERN does not waive the privileges and immunities
+granted to it by virtue of its status as an Intergovernmental Organization
+or submit itself to any jurisdiction.
 
 
 .. |build-status| image:: https://travis-ci.org/indico/indico-plugins.svg?branch=master
