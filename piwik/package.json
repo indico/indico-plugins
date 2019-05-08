@@ -8,7 +8,7 @@
     "url": "git+https://github.com/indico/indico-plugins.git"
   },
   "author": "Indico Team <indico.team@cern.ch>",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/indico/indico-plugins/issues"
   },
