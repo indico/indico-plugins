@@ -24,7 +24,7 @@ setup(
     version='2.0',
     description='Framework for pushing Indico event data to external services',
     url='https://github.com/indico/indico-plugins',
-    license='https://www.gnu.org/licenses/gpl-3.0.txt',
+    license='MIT',
     author='Indico Team',
     author_email='indico-team@cern.ch',
     packages=find_packages(),
@@ -36,7 +36,7 @@ setup(
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7'
     ],
     entry_points={'indico.plugins': {'livesync = indico_livesync.plugin:LiveSyncPlugin'}}

@@ -24,7 +24,7 @@ setup(
     version='2.0.3',
     description='S3 storage backend for Indico',
     url='https://github.com/indico/indico-plugins',
-    license='https://www.gnu.org/licenses/gpl-3.0.txt',
+    license='MIT',
     author='Indico Team',
     author_email='indico-team@cern.ch',
     packages=find_packages(),
@@ -37,7 +37,7 @@ setup(
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7'
     ],
     entry_points={'indico.plugins': {'storage_s3 = indico_storage_s3.plugin:S3StoragePlugin'}}

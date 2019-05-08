@@ -24,7 +24,7 @@ setup(
     version='1.0',
     description='Jupyter notebook rendering for attachments in Indico',
     url='https://github.com/indico/indico-plugins',
-    license='https://www.gnu.org/licenses/gpl-3.0.txt',
+    license='MIT',
     author='Indico Team',
     author_email='indico-team@cern.ch',
     packages=find_packages(),
