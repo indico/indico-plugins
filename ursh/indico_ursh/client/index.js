@@ -62,11 +62,10 @@ function _validateAndFormatURL(url) {
     }
 
     // extract tokens
-    let protocol = urlTokens[1];
     const hostname = urlTokens[2];
     const path = urlTokens[3] ? urlTokens[3] : '/';
 
-    protocol = location.protocol;  // patch protocol to match server
+    const protocol = location.protocol;  // patch protocol to match server
     if (hostname !== location.hostname) {
         throw Error($t.gettext('Invalid host: only Indico URLs are allowed'));
     }
@@ -129,7 +128,7 @@ $(document)
     .on('click', '.ursh-get', _handleUrshClick)
     .on('input', '#ursh-custom-shortcut-input', (evt) => {
         const value = $(evt.target).val();
-        $('#ursh-custom-shortcut-submit-button').prop('disabled', !_validateUrshCustomShortcut(value))
+        $('#ursh-custom-shortcut-submit-button').prop('disabled', !_validateUrshCustomShortcut(value));
     })
     .on('mouseenter', '#ursh-custom-shortcut-submit-button', (evt) => {
         if (evt.target.disabled) {
