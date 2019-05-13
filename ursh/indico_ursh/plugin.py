@@ -1,22 +1,16 @@
-# This file is part of Indico.
-# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+# This file is part of the Indico plugins.
+# Copyright (C) 2002 - 2019 CERN
 #
-# Indico is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3 of the
-# License, or (at your option) any later version.
-#
-# Indico is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
 
 from __future__ import unicode_literals
 
 from flask_pluginengine import render_plugin_template
+from wtforms.fields.core import StringField
+from wtforms.fields.html5 import URLField
+from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
 from indico.web.flask.util import url_for
@@ -25,9 +19,6 @@ from indico.web.views import WPBase
 
 from indico_ursh import _
 from indico_ursh.blueprint import blueprint
-from wtforms.fields.core import StringField
-from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired
 
 
 class SettingsForm(IndicoForm):
