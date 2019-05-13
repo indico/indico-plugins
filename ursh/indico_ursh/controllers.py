@@ -60,31 +60,37 @@ class RHCustomShortURLPage(RHManageEventBase):
     def _make_absolute_url(self, url):
         return posixpath.join(config.BASE_URL, url[1:]) if url.startswith('/') else url
 
-    def _get_error_msg(self, response):
-        if response['status'] == 403:
+    def _get_error_msg(self, result):
+        if result['status'] == 409:
             return _('Shortcut already exists')
+        elif result['status'] == 400:
+            return _('Malformed shortcut')
+        return result['error'].get('description')
 
     def _process_args(self):
         from indico_ursh.plugin import UrshPlugin
         super(RHCustomShortURLPage, self)._process_args()
         api_host = url_parse(UrshPlugin.settings.get('api_host'))
-        self.ursh_host = strip_end(api_host.to_url(), api_host.path[1:])
+        self.ursh_host = strip_end(api_host.to_url(), api_host.path[1:]).rstrip('/') + '/'
 
     def _process_GET(self):
         original_url = self._make_absolute_url(request.args['original_url'])
         return WPShortenURLPage.render_template('ursh_custom_shortener_page.html',
                                                 event=self.event,
                                                 ursh_host=self.ursh_host,
-                                                original_url=original_url)
+                                                original_url=original_url,
+                                                submitted=False)
 
     def _process_POST(self):
         original_url = self._make_absolute_url(request.args['original_url'])
-        shortcut = request.form['shortcut']
+        shortcut = request.form['shortcut'].strip()
         result = register_shortcut(original_url, shortcut)
 
-        error = result.get('error')
-        kwargs = {'success': True} if not error else {'success': False, 'msg': self._get_error_msg(result)}
+        if result.get('error'):
+            kwargs = {'success': False, 'msg': self._get_error_msg(result)}
+        else:
+            kwargs = {'success': True, 'shorturl': result['short_url']}
 
         return jsonify_template('ursh_custom_shortener_page.html', render_plugin_template,
                                 event=self.event, ursh_host=self.ursh_host, shortcut=shortcut,
-                                original_url=original_url, **kwargs)
+                                original_url=original_url, submitted=True, **kwargs)

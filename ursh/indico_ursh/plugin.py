@@ -13,7 +13,6 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
-from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.views import WPBase
 
@@ -56,5 +55,4 @@ class UrshPlugin(IndicoPlugin):
                                           dropdown=dropdown, element_class=element_class, text=text, **kwargs)
 
     def _inject_ursh_footer(self, **kwargs):
-        url = url_for('plugin_ursh.shorten_url')
         return render_plugin_template('ursh_footer.html')

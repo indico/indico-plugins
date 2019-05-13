@@ -7,14 +7,14 @@
 {%- endblock %}
 
 {% block content -%}
-    {% if success == False %}
+    {% if submitted and not success %}
         <div class="error-message-box">
             <div class="message-box-content">
                 <span class="icon"></span>
                 <div class="message-text">{% trans %}Custom URL creation failed:{% endtrans %} {{ msg }}</div>
             </div>
         </div>
-    {% elif success == True %}
+    {% elif submitted and success %}
         <div class="success-message-box">
             <div class="message-box-content">
                 <span class="icon"></span>
@@ -27,15 +27,16 @@
         <input type="url" style="font-family:monospace;" value="{{ original_url }}" disabled>
     </div>
     <p>{% trans %}Please enter the desired shortcut below (at least 5 chars).{% endtrans %}</p>
-    <form id="ursh-custom-shortcut-form" method="POST">
+    <form method="POST">
         <div class="i-has-action">
-            <button id="ursh-host-button" type="button" class="i-button" style="font-family:monospace;" disabled>
+            <button type="button" class="i-button" style="font-family:monospace;" disabled>
                 {{- ursh_host -}}
             </button>
             <input id="ursh-custom-shortcut-input" name="shortcut" type="text" style="font-family:monospace;"
-                spellcheck="false" autocomplete="off" autocapitalize="off"
-                {% if shortcut %}value="{{ shortcut }}"{% endif %}
-                placeholder="{% trans %}Enter a shortcut...{% endtrans %}">
+                   spellcheck="false" autocomplete="off" autocapitalize="off"
+                   pattern="^[0-9a-zA-Z-]{5,}$"
+                   {% if shortcut %}value="{{ shortcut }}"{% endif %}
+                   placeholder="{% trans %}Enter a shortcut...{% endtrans %}">
             <button id="ursh-custom-shortcut-submit-button" type="submit" class="i-button" disabled>
                 {% trans -%}Create{%- endtrans %}
             </button>
@@ -43,16 +44,13 @@
     </form>
     <script>
         $(document).ready(() => {
-            const inputField = $('#ursh-custom-shortcut-input');
-            inputField.focus().select();
+            $('#ursh-custom-shortcut-input').focus().select();
         });
     </script>
-    {% if success == True %}
+    {% if submitted and success and shorturl %}
         <script>
             $(document).ready(() => {
-                const hostButton = $('#ursh-host-button');
-                const inputField = $('#ursh-custom-shortcut-input');
-                inputField.copyURLTooltip(`${hostButton.text()}${inputField.val()}`, 'unfocus');
+                $('#ursh-custom-shortcut-input').copyURLTooltip({{ shorturl | tojson }}, 'unfocus');
             });
         </script>
     {% endif %}
