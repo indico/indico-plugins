@@ -1,0 +1,30 @@
+Clicking on the <strong>Payfast</strong> button to get redirected to Payfast to complete your transaction.
+
+<dl class="i-data-list">
+    <dt>{% trans %}First name{% endtrans %}</dt>
+    <dd>{{ registration.first_name }}</dd>
+    <dt>{% trans %}Last name{% endtrans %}</dt>
+    <dd>{{ registration.last_name }}</dd>
+    <dt>{% trans %}Total amount{% endtrans %}</dt>
+    <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
+    <dt></dt>
+    <dd>
+        <form action="{{ settings.url }}" method="POST">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="{{ event_settings.business }}">
+            <input type="hidden" name="merchant_id" value="{{ event_settings.merchant_id }}">
+            <input type="hidden" name="merchant_key" value="{{ event_settings.merchant_key }}">
+            <input type="hidden" name="item_name" value="{{ item_name }}">
+            <input type="hidden" name="amount" value="{{ amount }}">
+            <input type="hidden" name="currency_code" value="{{ currency }}">
+            <input type="hidden" name="charset" value="utf-8">
+            <input type="hidden" name="invoice" value="{{ registration.event_id }}_{{ registration.id }}">
+            <input type="hidden" name="return" value="{{ return_url }}">
+            <input type="hidden" name="cancel_return" value="{{ cancel_url }}">
+            <input type="hidden" name="notify_url" value="{{ notify_url }}">
+            <input type="image" name="submit" src="https://sandbox.payfast.co.za/images/logo/sandbox_logo.png">
+        </form>
+    </dd>
+</dl>
+
+

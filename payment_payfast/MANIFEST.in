@@ -1,0 +1,5 @@
+graft indico_payment_payfast/static
+graft indico_payment_payfast/templates
+graft indico_payment_payfast/translations
+
+global-exclude *.pyc __pycache__ .keep

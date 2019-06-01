@@ -1,0 +1,31 @@
+{% extends 'events/payment/transaction_details.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block details %}
+    {% if not transaction.data._migrated %}
+        <dt>{% trans %}Transaction ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.txn_id }}</dd>
+        <dt>{% trans %}Invoice ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.invoice }}</dd>
+        <dt>{% trans %}Payer e-mail{% endtrans %}</dt>
+        <dd>{{ transaction.data.payer_email }}</dd>
+    {% endif %}
+{% endblock %}
+
+{% block warning_box %}
+    {% if transaction.amount != transaction.registration.price %}
+        {% call message_box('warning') %}
+            <p>
+                {%- trans %}The paid amount does not match the required amount. Please contact the registrant to solve the issue.{% endtrans -%}
+            </p>
+            <p>
+                {%- trans %}Paid: {% endtrans -%}
+                {{- format_currency(transaction.amount, transaction.currency, locale=session.lang) -}}
+            </p>
+            <p>
+                {%- trans %}Required: {% endtrans -%}
+                {{- transaction.registration.render_price() -}}
+            </p>
+        {% endcall %}
+    {% endif %}
+{% endblock %}
