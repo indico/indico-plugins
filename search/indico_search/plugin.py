@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from flask import g, request
 from flask_pluginengine import plugins_loaded
 
@@ -35,7 +37,7 @@ class SearchPlugin(IndicoPlugin):
         self.inject_bundle('main.css', WPBase)
 
     def _plugins_loaded(self, sender, **kwargs):
-        if not self.engine_plugin:
+        if not self.engine_plugin and 'INDICO_DUMPING_URLS' not in os.environ:
             raise RuntimeError('Search plugin active but no search engine plugin loaded')
 
     @property
