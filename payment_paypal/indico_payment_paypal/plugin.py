@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import render_plugin_template
+
 from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Optional
@@ -50,6 +52,10 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                               'method_name': None,
                               'business': None}
 
+    def init(self):
+        super(PaypalPaymentPlugin, self).init()
+        self.template_hook('event-manage-payment-plugin-before-form', self._get_encoding_warning)
+
     @property
     def logo_url(self):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
@@ -67,3 +73,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         data['return_url'] = url_for_plugin('payment_paypal.success', registration.locator.uuid, _external=True)
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
         data['notify_url'] = url_for_plugin('payment_paypal.notify', registration.locator.uuid, _external=True)
+
+    def _get_encoding_warning(self, plugin=None, event=None):
+        if plugin == self:
+            return render_plugin_template('event_settings_encoding_warning.html')

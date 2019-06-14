@@ -1,0 +1,9 @@
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('warning', fixed_width=true) %}
+    {%- trans link='<a href="https://www.paypal.com/al/smarthelp/article/why-did-i-get-the-error-paypal-cannot-process-this-transaction-because-of-a-problem-with-the-seller%27s-website-ts1628" target="_blank">'|safe, endlink='</a>'|safe -%}
+        Please make sure that you have your PayPal seller account configured to use <strong>UTF-8</strong> by default,
+        otherwise some transactions may end up not being acknowledged by Indico!<br>
+        You can find out how to set this up {{ link }}here{{ endlink }}.
+    {%- endtrans -%}
+{% endcall %}
