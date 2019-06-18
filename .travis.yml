@@ -8,7 +8,7 @@ env:
   - PLUGIN=payment_paypal
 before_install:
   - pip install -U pip setuptools
-  - pip install https://github.com/indico/indico/archive/master.zip
+  - pip install -e git+https://github.com/indico/indico.git@${TRAVIS_BRANCH}#egg=indico
 install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
   - pip install -e .
