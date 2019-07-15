@@ -8,141 +8,171 @@
 import './main.scss';
 
 (function(global) {
-    'use strict';
-    var $t = $T.domain('chat');
+  const $t = $T.domain('chat');
 
-    global.eventManageChat = function eventManageChat() {
-        $('.toggle-details').on('click', function(e) {
-            e.preventDefault();
-            var toggler = $(this);
-            toggler.closest('tr').next('tr').find('.details-container').slideToggle({
-                start: function() {
-                    toggler.toggleClass('icon-next icon-expand');
-                }
-            });
+  global.eventManageChat = function eventManageChat() {
+    $('.toggle-details').on('click', function(e) {
+      e.preventDefault();
+      const toggler = $(this);
+      toggler
+        .closest('tr')
+        .next('tr')
+        .find('.details-container')
+        .slideToggle({
+          start() {
+            toggler.toggleClass('icon-next icon-expand');
+          },
         });
+    });
 
-        $('.js-chat-remove-room').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var msg = $t.gettext('Do you really want to remove this chatroom from the event?');
-            if ($this.data('numEvents') == 1) {
-                msg += '<br>';
-                if ($this.data('customServer')) {
-                    msg += $t.gettext('Since it is on an external server, it will not be deleted on that server.');
-                } else {
-                    msg += $t.gettext('Since it is only used in this event, it will be deleted from the Jabber server, too!');
-                }
-            }
-            confirmPrompt(msg, $t.gettext('Delete this chatroom?')).then(function() {
-                var form = $('<form>', {
-                    action: $this.data('href'),
-                    method: 'post'
-                });
-                var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
-                form.append(csrf).appendTo('body').submit();
-            });
+    $('.js-chat-remove-room').on('click', function(e) {
+      e.preventDefault();
+      const $this = $(this);
+      let msg = $t.gettext('Do you really want to remove this chatroom from the event?');
+      if ($this.data('numEvents') == 1) {
+        msg += '<br>';
+        if ($this.data('customServer')) {
+          msg += $t.gettext(
+            'Since it is on an external server, it will not be deleted on that server.'
+          );
+        } else {
+          msg += $t.gettext(
+            'Since it is only used in this event, it will be deleted from the Jabber server, too!'
+          );
+        }
+      }
+      confirmPrompt(msg, $t.gettext('Delete this chatroom?')).then(function() {
+        const form = $('<form>', {
+          action: $this.data('href'),
+          method: 'post',
         });
-
-        $('.js-chat-refresh-room').on('click', function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: $(this).data('href'),
-                type: 'POST',
-                dataType: 'json',
-                complete: IndicoUI.Dialogs.Util.progress(),
-                success: function(data) {
-                    if (handleAjaxError(data)) {
-                        return;
-                    }
-                    if (data.result == 'not-found') {
-                        new AlertPopup($t.gettext('Chatroom not found'), $t.gettext('The chatroom does not exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.')).open();
-                    } else if (data.result == 'changed') {
-                        new AlertPopup($t.gettext('Chatroom updated'), $t.gettext('The chatroom data has been updated.'), function() {
-                            window.location.href = window.location.href;
-                        }).open();
-                    }
-                }
-            });
+        const csrf = $('<input>', {
+          type: 'hidden',
+          name: 'csrf_token',
+          value: $('#csrf-token').attr('content'),
         });
-    };
+        form
+          .append(csrf)
+          .appendTo('body')
+          .submit();
+      });
+    });
 
-    global.eventManageChatLogs = function eventManageChatLogs() {
-        var container = $('#chat-log-display-container');
-        var iframe = $('#chat-log-display');
-        var materialWidget = $('#chat-log-material');
-        var killProgress;
-        var logParams;
+    $('.js-chat-refresh-room').on('click', function(e) {
+      e.preventDefault();
+      $.ajax({
+        url: $(this).data('href'),
+        type: 'POST',
+        dataType: 'json',
+        complete: IndicoUI.Dialogs.Util.progress(),
+        success(data) {
+          if (handleAjaxError(data)) {
+            return;
+          }
+          if (data.result == 'not-found') {
+            new AlertPopup(
+              $t.gettext('Chatroom not found'),
+              $t.gettext(
+                'The chatroom does not exist on the Jabber server anymore. We recommend you to delete it chatroom from Indico as well.'
+              )
+            ).open();
+          } else if (data.result == 'changed') {
+            new AlertPopup(
+              $t.gettext('Chatroom updated'),
+              $t.gettext('The chatroom data has been updated.'),
+              function() {
+                window.location.href = window.location.href;
+              }
+            ).open();
+          }
+        },
+      });
+    });
+  };
 
-        $('#chat-log-form').ajaxForm({
-            dataType: 'json',
-            beforeSubmit: function() {
-                container.hide();
-                materialWidget.hide();
-                killProgress = IndicoUI.Dialogs.Util.progress();
-            },
-            error: handleAjaxError,
-            success: function(data) {
-                if (handleAjaxError(data)) {
-                    return;
-                }
-                else if (!data.success) {
-                    new AlertPopup($t.gettext('No logs available'), data.msg).open();
-                    return;
-                }
-                var doc = iframe[0].contentWindow.document;
-                doc.write(data.html);
-                doc.close();
-                logParams = data.params;
-                $('#chat-log-material').find('input, button').prop('disabled', false);
-                container.show();
-                materialWidget.show();
-            },
-            complete: function() {
-                killProgress();
-            }
-        });
+  global.eventManageChatLogs = function eventManageChatLogs() {
+    const container = $('#chat-log-display-container');
+    const iframe = $('#chat-log-display');
+    const materialWidget = $('#chat-log-material');
+    let killProgress, logParams;
 
-        $('#chat-create-material').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var materialName = $('#chat-material-name').val().trim();
-            if (!materialName) {
-                return;
-            }
-            var params = $.extend({}, logParams, {
-                material_name: materialName
-            });
-            $.ajax({
-                url: $this.data('href'),
-                type: 'POST',
-                data: params,
-                dataType: 'json',
-                error: handleAjaxError,
-                complete: IndicoUI.Dialogs.Util.progress(),
-                success: function(data) {
-                    if (handleAjaxError(data)) {
-                        return;
-                    }
-                    else if (!data.success) {
-                        new AlertPopup($t.gettext('Could not create material'), data.msg).open();
-                        return;
-                    }
-                    $('#chat-log-material').find('input, button').prop('disabled', true).blur();
-                    new AlertPopup($t.gettext('Material created'), $t.gettext('The chat logs have been attached to the event.')).open();
-                }
-            });
-        });
+    $('#chat-log-form').ajaxForm({
+      dataType: 'json',
+      beforeSubmit() {
+        container.hide();
+        materialWidget.hide();
+        killProgress = IndicoUI.Dialogs.Util.progress();
+      },
+      error: handleAjaxError,
+      success(data) {
+        if (handleAjaxError(data)) {
+          return;
+        } else if (!data.success) {
+          new AlertPopup($t.gettext('No logs available'), data.msg).open();
+          return;
+        }
+        const doc = iframe[0].contentWindow.document;
+        doc.write(data.html);
+        doc.close();
+        logParams = data.params;
+        $('#chat-log-material')
+          .find('input, button')
+          .prop('disabled', false);
+        container.show();
+        materialWidget.show();
+      },
+      complete() {
+        killProgress();
+      },
+    });
 
-        var rangeWidget = $('#chat-log-range');
-        rangeWidget.daterange({
-            allowPast: true,
-            fieldNames: ['start_date', 'end_date'],
-            startDate: rangeWidget.data('startDate'),
-            endDate: rangeWidget.data('endDate'),
-            pickerOptions: {
-                yearRange: 'c-1:c+1'
-            }
-        });
-    };
+    $('#chat-create-material').on('click', function(e) {
+      e.preventDefault();
+      const $this = $(this);
+      const materialName = $('#chat-material-name')
+        .val()
+        .trim();
+      if (!materialName) {
+        return;
+      }
+      const params = $.extend({}, logParams, {
+        material_name: materialName,
+      });
+      $.ajax({
+        url: $this.data('href'),
+        type: 'POST',
+        data: params,
+        dataType: 'json',
+        error: handleAjaxError,
+        complete: IndicoUI.Dialogs.Util.progress(),
+        success(data) {
+          if (handleAjaxError(data)) {
+            return;
+          } else if (!data.success) {
+            new AlertPopup($t.gettext('Could not create material'), data.msg).open();
+            return;
+          }
+          $('#chat-log-material')
+            .find('input, button')
+            .prop('disabled', true)
+            .blur();
+          new AlertPopup(
+            $t.gettext('Material created'),
+            $t.gettext('The chat logs have been attached to the event.')
+          ).open();
+        },
+      });
+    });
+
+    const rangeWidget = $('#chat-log-range');
+    rangeWidget.daterange({
+      allowPast: true,
+      fieldNames: ['start_date', 'end_date'],
+      startDate: rangeWidget.data('startDate'),
+      endDate: rangeWidget.data('endDate'),
+      pickerOptions: {
+        yearRange: 'c-1:c+1',
+      },
+    });
+  };
 })(window);
