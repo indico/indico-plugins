@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of the SixPay Indico EPayment Plugin.
-## Copyright (C) 2017 - 2018 Max Fischer
-##
-## This is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 3 of the
-## License, or (at your option) any later version.
-##
-## This software is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with SixPay Indico EPayment Plugin;if not, see <http://www.gnu.org/licenses/>.
+# This file is part of the SixPay Indico EPayment Plugin.
+# Copyright (C) 2017 - 2018 Max Fischer
+#
+# This is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with SixPay Indico EPayment Plugin;
+# if not, see <http://www.gnu.org/licenses/>.
 """
-Core of the SixPay plugin
+Core of the SixPay plugin.
 
 The entry point for indico is the :py:class:`~.SixpayPaymentPlugin`.
 It handles configuration via the settings forms, initiates payments
@@ -26,20 +26,37 @@ from __future__ import unicode_literals, absolute_import
 import urlparse
 
 import requests
-from werkzeug.exceptions import NotImplemented as HTTPNotImplemented, InternalServerError as HTTPInternalServerError
+from werkzeug.exceptions import (
+    NotImplemented as HTTPNotImplemented,
+    InternalServerError as HTTPInternalServerError
+)
 
-from wtforms.fields.core import StringField
+from wtforms.fields import StringField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, Optional, Regexp, Length, Email, ValidationError
+from wtforms.validators import (
+    DataRequired, Optional, Regexp, Length, Email, ValidationError
+)
+from indico.web.forms.fields import IndicoPasswordField
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.modules.events.payment import \
-    PaymentEventSettingsFormBase, PaymentPluginMixin, PaymentPluginSettingsFormBase
+from indico.modules.events.payment import (
+    PaymentEventSettingsFormBase,
+    PaymentPluginMixin,
+    PaymentPluginSettingsFormBase)
+from indico.modules.events.payment.models.transactions import (
+    PaymentTransaction,
+    TransactionAction
+)
 
-from .utility import gettext, to_small_currency
+
+from .utility import (
+    gettext, to_small_currency, get_request_header, get_terminal_id,
+    provider
+)
 # blueprint mounts the request handlers onto URLs
 from .blueprint import blueprint
 
+from .utility import saferpay_json_api_spec, saferpay_pp_init_url
 
 # Dear Future Maintainer,
 #
@@ -56,14 +73,13 @@ from .blueprint import blueprint
 # PaymentPluginSettingsFormBase from indico.modules.events.payment
 # - A codified Form for users to fill in. The *class attributes* define
 #   which fields exist, their shape, description, etc.
-# - Each field is a type from wtforms.fields.core.Field. You probably want to have:
+# - Each field is a type from wtforms.fields.core.Field. You probably want:
 #   - label: Name of the field, an internationalised identifier
 #   - validators: Input validation, see wtforms.validators
 #   - description: help text of the field, an internationalised text
 
 class FormatField(object):
-    """
-    Validator for format fields, i.e. strings with ``{key}`` placeholders
+    """Validator for format fields, i.e. strings with ``{key}`` placeholders.
 
     :param max_length: optional maximum length, checked on a test formatting
     :type max_length: int
@@ -75,6 +91,7 @@ class FormatField(object):
     The ``max_length`` is validated against the test-formatted field, which
     is an estimate for an average sized input.
     """
+
     #: default placeholders to test length after formatting
     default_field_map = {
         'user_id': 1234,
@@ -86,12 +103,24 @@ class FormatField(object):
     }
 
     def __init__(self, max_length=float('inf'), field_map=None):
+        """Format field validator, i.e. strings with ``{key}`` placeholders.
+
+        :param max_length: optional maximum length,
+                           checked on a test formatting
+        :type max_length: int
+        :param field_map: keyword arguments to use for test formatting
+        """
         self.max_length = max_length
         self.field_map = self.default_field_map.copy()
         if field_map is not None:
             self.field_map.update(field_map)
 
     def __call__(self, form, field):
+        """Validate format field data.
+
+        Returns true on successful validation, else an ValidationError is
+        thrown.
+        """
         if not field.data:
             return True
         try:
@@ -102,7 +131,9 @@ class FormatField(object):
             raise ValidationError('Malformed format string: {}'.format(err))
         if len(test_format) > self.max_length:
             raise ValidationError(
-                'Too long format string: shortest replacement with {0}, expected {1}'.format(
+                'Too long format string:'
+                ' shortest replacement with {0}, expected {1}'
+                .format(
                     len(test_format), self.max_length
                 )
             )
@@ -111,41 +142,72 @@ class FormatField(object):
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    """Configuration form for the Plugin across all events"""
+    """Configuration form for the Plugin across all events."""
+
     url = URLField(
-        gettext('SixPay Saferpay URL'),
-        [DataRequired()],
+        label=gettext('SixPay Saferpay URL'),
+        validators=[DataRequired()],
         description=gettext('URL to contact the Six Payment Service'),
+    )
+    username = StringField(
+        label=gettext('Username'),
+        validators=[DataRequired()],
+        description=gettext('SaferPay JSON API User name.')
+    )
+    password = IndicoPasswordField(
+        label=gettext('Password'),
+        validators=[DataRequired()],
+        description=gettext('SaferPay JSON API User password.'),
+        toggle=True,
     )
     account_id = StringField(
         label='Account ID',
         # can be set EITHER or BOTH globally and per event
-        validators=[Optional(), Regexp(r'[0-9-]{0,15}', message='Field must contain up to 15 digits or "-".')],
-        description=gettext('Default ID of your Saferpay account, such as "401860-17795278".')
+        validators=[
+            Optional(),
+            Regexp(
+                r'[0-9-]{0,15}',
+                message='Field must contain up to 15 digits or "-".'
+            )
+        ],
+        description=gettext(
+            'Default ID of your Saferpay account,'
+            ' such as "401860-17795278".'
+        )
     )
     order_description = StringField(
         label=gettext('Order Description'),
         validators=[DataRequired(), FormatField(max_length=80)],
-        description=gettext('The description of each order in a human readable way.'
-                            'This description is presented to the registrant during the transaction with SixPay.')
+        description=gettext(
+            'The description of each order in a human readable way. '
+            'This description is presented to the registrant during the '
+            'transaction with SixPay.'
+        )
     )
     order_identifier = StringField(
         label=gettext('Order Identifier'),
         validators=[DataRequired(), FormatField(max_length=80)],
-        description=gettext('The identifier of each order for further processing.')
+        description=gettext(
+            'The identifier of each order for further processing.'
+        )
     )
     notification_mail = StringField(
         label=gettext('Notification Email'),
         validators=[Optional(), Email(), Length(0, 50)],
-        description=gettext('Mail address to receive notifications of transactions.'
-                            'This is independent of Indico\'s own payment notifications.')
+        description=gettext(
+            'Mail address to receive notifications of transactions.'
+            'This is independent of Indico\'s own payment notifications.'
+        )
     )
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-    """Configuration form for the Plugin for a specific event"""
+    """Configuration form for the Plugin for a specific event."""
+
     # every setting may be overwritten for each event
-    url = PluginSettingsForm.url
+    #url = PluginSettingsForm.url
+    #username = PluginSettingsForm.username
+    #password = PluginSettingsForm.password
     account_id = PluginSettingsForm.account_id
     order_description = PluginSettingsForm.order_description
     order_identifier = PluginSettingsForm.order_identifier
@@ -153,14 +215,15 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
 
 
 # PaymentPluginMixin, IndicoPlugin
-# This is basically a registry of setting fields, logos and other rendering stuff
+# This is basically a registry of setting fields,
+# logos and other rendering stuff.
 # All the business logic is in :py:func:`adjust_payment_form_data`
 class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
-    """
-    SixPay Saferpay
+    """SixPay Saferpay plugin.
 
     Provides an EPayment method using the SixPay Saferpay API.
     """
+
     configurable = True
     #: form for default configuration across events
     settings_form = PluginSettingsForm
@@ -169,9 +232,12 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     #: global default settings - should be a reasonable default
     default_settings = {
         'method_name': 'SixPay',
-        'url': 'https://www.saferpay.com/hosting/',
+        'url': 'https://www.saferpay.com/api/',
+        'username': None,
+        'password': None,
         'account_id': None,
-        'order_description': '{event_title}, {registration_title}, {user_name}',
+        'order_description':
+            '{event_title}, {registration_title}, {user_name}',
         'order_identifier': '{eventuser_id}',
         'notification_mail': None
     }
@@ -179,7 +245,9 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     default_event_settings = {
         'enabled': False,
         'method_name': None,
-        'url': None,
+        # 'url': None,
+        # 'username': None,
+        # 'password': None,
         'account_id': None,
         'order_description': None,
         'order_identifier': None,
@@ -187,44 +255,61 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     }
 
     def get_blueprints(self):
-        """Blueprint for URL endpoints with callbacks"""
+        """Blueprint for URL endpoints with callbacks."""
         return blueprint
 
     # Dear Future Maintainer,
     # - business logic is here!
     # - see PaymentPluginMixin.render_payment_form for what `data` provides
     # - What happens here
-    #   - We already send all payment details to SixPay to get a *signed* request url for this transaction
-    #   - We have added `success`, `cancel` and `failure` for *sixpay* to redirect the user back to us AFTER his request
-    #   - We have added `notify` for *sixpay* to inform us asynchronously about the result
-    #   - We put the transaction URL we got into `data` for the *user* to perform his request securely
-    #   - Return uses `indico_sixpay/templates/event_payment_form.html`, presenting a trigger button to the user
+    #   - We add `success`, `cancel` and `failure` for *sixpay* to redirect the
+    #     user back to us AFTER his request
+    #   - We add `notify` for *sixpay* to inform us asynchronously about
+    #     the result
+    #   - We send a request to initialize the pyment page to SixPay to get a
+    #     request url for this transaction
+    #   - We put the payment page URL and token we got into `data`
+    #   - Return uses `indico_sixpay/templates/event_payment_form.html`,
+    #     presenting a trigger button to the user
     def adjust_payment_form_data(self, data):
-        """Prepare the payment form shown to registrants"""
-        registration = data['registration']
+        """Prepare the payment form shown to registrants."""
         # indico does not seem to provide stacking of settings
-        # we merge event on top of global settings, but remove placeholder defaults
-        event_settings, global_settings = data['event_settings'], data['settings']
+        # we merge event on top of global settings, but remove defaults
+        event_settings = data['event_settings']
+        global_settings = data['settings']
         plugin_settings = {
-            key: event_settings[key] if event_settings.get(key) is not None else global_settings[key]
-            for key in
-            (set(event_settings) | set(global_settings))
+            key: event_settings[key]
+            if event_settings.get(key) is not None
+            else global_settings[key]
+            for key in (set(event_settings) | set(global_settings))
         }
         # parameters of the transaction - amount, currency, ...
-        transaction = self._get_transaction_parameters(data)
-        # callbacks of the transaction - where to announce success, failure, ...
-        # where to redirect the user
-        transaction['SUCCESSLINK'] = url_for_plugin('payment_sixpay.success', registration.locator.uuid, _external=True)
-        transaction['BACKLINK'] = url_for_plugin('payment_sixpay.cancel', registration.locator.uuid, _external=True)
-        transaction['FAILLINK'] = url_for_plugin('payment_sixpay.failure', registration.locator.uuid, _external=True)
-        # where to asynchronously call back from SixPay
-        transaction['NOTIFYURL'] = url_for_plugin('payment_sixpay.notify', registration.locator.uuid, _external=True)
-        data['payment_url'] = self._get_payment_url(sixpay_url=plugin_settings.get('url'), transaction_data=transaction)
+        transaction = self._get_transaction_parameters(data, plugin_settings)
+        init_response = self._init_payment_page(
+            sixpay_url=plugin_settings['url'],
+            transaction_data=transaction,
+            credentials=(
+                plugin_settings['username'], plugin_settings['password'])
+        )
+        data['payment_url'] = init_response['RedirectUrl']
+
+        # create pending transaction and store Saferpay transaction token
+        if not PaymentTransaction.create_next(
+            registration=data['registration'],
+            amount=data['amount'],
+            currency=data['currency'],
+            action=TransactionAction.pending,
+            provider=provider,
+            data={'Init_PP_response': init_response}
+        ):
+            data['registration'].transaction.data = {
+                'Init_PP_response': init_response
+            }
         return data
 
     @staticmethod
     def get_field_format_map(registration):
-        """Generates dict which provides registration information for format fields"""
+        """Generate dict which provides registration information."""
         return {
             'user_id': registration.user_id,
             'user_name': registration.full_name,
@@ -232,52 +317,116 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             'user_lastname': registration.last_name,
             'event_id': registration.event_id,
             'event_title': registration.event.title,
-            'eventuser_id': 'e{0}u{1}'.format(registration.event_id, registration.user_id),
+            'eventuser_id':
+                'e{0}u{1}'.format(registration.event_id, registration.user_id),
             'registration_title': registration.registration_form.title
         }
 
-    def _get_transaction_parameters(self, payment_data):
-        """Parameters for formulating a transaction request *without* any business logic hooks"""
-        plugin_settings = payment_data['event_settings']
-        format_map = self.get_field_format_map(payment_data['registration'])
+    def _get_transaction_parameters(self, payment_data, plugin_settings):
+        """Parameters for formulating a transaction request."""
+        registration = payment_data['registration']
+        format_map = self.get_field_format_map(registration)
         for format_field in 'order_description', 'order_identifier':
             try:
-                if not plugin_settings.has_key(format_field):
-                    raise KeyError
-                payment_data[format_field] = plugin_settings.get(format_field).format(**format_map)
+                payment_data[format_field] = (
+                    plugin_settings[format_field].format(**format_map)
+                )
             except ValueError:
-                message = "Invalid format field placeholder for {0}, please contact the event organisers!"
-                raise HTTPNotImplemented((
-                        gettext(message) + '\n\n[' + message + ']'
-                    ).format(self.name)
+                message = (
+                    "Invalid format field placeholder for {0},"
+                    " please contact the event organisers!"
+                )
+                raise HTTPNotImplemented(
+                    (gettext(message) + '\n\n[' + message + ']')
+                    .format(self.name)
                  )
             except KeyError:
-                message = "Unknown format field placeholder '{0}' for {1}, please contact the event organisers!"
+                message = (
+                    'Unknown format field placeholder "{0}" for {1},'
+                    ' please contact the event organisers!'
+                )
                 raise HTTPNotImplemented((
                         gettext(message) + '\n\n[' + message + ']'
                     ).format(format_field, self.name)
                 )
-        # see the SixPay Manual on what these things mean
+
+        # see the SixPay Manual
+        # https://saferpay.github.io/jsonapi/#Payment_v1_PaymentPage_Initialize
+        # on what these things mean
         transaction_parameters = {
-            'ACCOUNTID': str(plugin_settings.get('account_id')),
-            # indico handles price as largest currency, but six expects smallest
-            # e.g. EUR: indico uses 100.2 Euro, but six expects 10020 Cent
-            'AMOUNT': '{:.0f}'.format(to_small_currency(payment_data['amount'], payment_data['currency'])),
-            'CURRENCY': payment_data['currency'],
-            'DESCRIPTION': payment_data['order_description'][:50],
-            'ORDERID': payment_data['order_identifier'][:80],
-            'SHOWLANGUAGES': 'yes',
+            'RequestHeader': get_request_header(
+                saferpay_json_api_spec, plugin_settings['account_id']
+            ),
+            'TerminalId': str(
+                get_terminal_id(plugin_settings['account_id'])
+            ),
+            'Payment': {
+                'Amount': {
+                    # indico handles price as largest currency, but six expects
+                    # smallest. E.g. EUR: indico uses 100.2 Euro, but six
+                    # expects 10020 Cent
+                    'Value': '{:d}'.format(
+                        to_small_currency(
+                            payment_data['amount'],
+                            payment_data['currency']
+                        )
+                    ),
+                    'CurrencyCode': payment_data['currency'],
+                },
+                'OrderId': payment_data['order_identifier'][:80],
+                'DESCRIPTION': payment_data['order_description'][:1000],
+            },
+            # callbacks of the transaction - where to announce success, ...
+            # where to redirect the user
+            'ReturnUrls': {
+                'Success': url_for_plugin(
+                    'payment_sixpay.success',
+                    registration.locator.uuid,
+                    _external=True
+                ),
+                'Fail': url_for_plugin(
+                    'payment_sixpay.failure',
+                    registration.locator.uuid,
+                    _external=True
+                ),
+                'Abort': url_for_plugin(
+                    'payment_sixpay.cancel',
+                    registration.locator.uuid,
+                    _external=True
+                )
+            },
+            'Notification': {
+                # where to asynchronously call back from SixPay
+                'NotifyUrl': url_for_plugin(
+                    'payment_sixpay.notify',
+                    registration.locator.uuid,
+                    _external=True
+                )
+            }
         }
-        if plugin_settings.get('notification_mail'):
-            transaction_parameters['NOTIFYADDRESS'] = plugin_settings.get('notification_mail')
+        if 'notification_mail' in plugin_settings:
+            transaction_parameters['Notification']['MerchantEmails'] = (
+                plugin_settings['notification_mail']
+            )
         return transaction_parameters
 
-    def _get_payment_url(self, sixpay_url, transaction_data):
-        """Send transaction data to SixPay to get a signed URL for the user request"""
-        endpoint = urlparse.urljoin(sixpay_url, 'CreatePayInit.asp')
-        url_request = requests.post(endpoint, data=transaction_data)
+    def _init_payment_page(self, sixpay_url, transaction_data, credentials):
+        """Initialize payment page."""
+        endpoint = urlparse.urljoin(sixpay_url, saferpay_pp_init_url)
+        url_request = requests.post(
+            endpoint,
+            json=transaction_data,
+            auth=credentials
+        )
         # raise any HTTP errors
         url_request.raise_for_status()
-        if url_request.text.startswith('ERROR'):
-            raise HTTPInternalServerError('Failed request to SixPay service: %s' % url_request.text)
-        return url_request.text
+        response = url_request.json()
+        if 'ErrorName' in response:
+            if 'ErrorDetail' not in response:
+                response['ErrorDetail'] = ''
+            raise HTTPInternalServerError(
+                'Failed request to SixPay service:'
+                ' {ErrorMessage}. {ErrorDetail}'
+                .format(response)
+            )
+        return response
