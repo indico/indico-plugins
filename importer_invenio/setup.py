@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-importer-invenio',
-    version='1.0',
+    version='2.2',
     description='Invenio data source for the Indico Importer plugin',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -22,8 +22,8 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0',
-        'indico-plugin-importer>=1.0'
+        'indico>=2.2.dev0',
+        'indico-plugin-importer>=2.2'
     ],
     classifiers=[
         'Environment :: Plugins',

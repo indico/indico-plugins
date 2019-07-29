@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-vc-vidyo',
-    version='2.2-dev',
+    version='2.2',
     description='Vidyo video-conferencing plugin for Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',

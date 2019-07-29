@@ -13,19 +13,19 @@ from setuptools import setup
 # Do not modify this block manually - use `update-meta.py` instead!
 # BEGIN GENERATED REQUIREMENTS
 plugins_require = [
-    'indico-plugin-chat==2.2-dev',
-    'indico-plugin-importer==2.2-dev',
-    'indico-plugin-importer-invenio==1.0',
+    'indico-plugin-chat==2.2',
+    'indico-plugin-importer==2.2',
+    'indico-plugin-importer-invenio==2.2',
     'indico-plugin-livesync==2.0',
     'indico-plugin-livesync-invenio==1.0',
     'indico-plugin-payment-manual==1.0.1',
-    'indico-plugin-payment-paypal==1.0',
-    'indico-plugin-piwik==2.2-dev',
+    'indico-plugin-payment-paypal==2.2',
+    'indico-plugin-piwik==2.2',
     'indico-plugin-previewer-code==1.0',
     'indico-plugin-previewer-jupyter==1.0',
-    'indico-plugin-search==2.2-dev',
+    'indico-plugin-search==2.2',
     'indico-plugin-storage-s3==2.0.3',
-    'indico-plugin-vc-vidyo==2.2-dev',
+    'indico-plugin-vc-vidyo==2.2',
 ]
 extras_require = {
     'xrootd': ['indico-plugin-storage-xrootd==1.0'],
@@ -35,7 +35,7 @@ extras_require = {
 
 setup(
     name='indico-plugins',
-    version='2.2-dev',
+    version='2.2',
     description='A meta-package containing the official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='MIT',

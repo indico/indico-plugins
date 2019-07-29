@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-importer',
-    version='2.2-dev',
+    version='2.2',
     description='Framework for importing timetable data from external sources into Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
