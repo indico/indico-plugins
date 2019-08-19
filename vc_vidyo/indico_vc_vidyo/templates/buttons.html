@@ -1,7 +1,7 @@
 {% macro render_make_me_owner(event, vc_room, event_vc_room, extra_classes='') %}
     {% if session.user != vc_room.vidyo_extension.owned_by_user and event.can_manage(session.user) %}
         <a class="i-button highlight arrow {{ extra_classes }}" data-toggle="dropdown"></a>
-        <ul class="dropdown" data-level="level1">
+        <ul class="i-dropdown" data-level="level1">
             <li>
                 <a href="#"
                    title="{% trans name=vc_room.data.owner_identity %}You will be the owner of this Vidyo room, replacing {{name}}.{% endtrans %}"

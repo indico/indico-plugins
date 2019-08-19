@@ -94,7 +94,7 @@
                title="{% if not backends %}{% trans %}No backend plugins enabled{% endtrans %}{% endif %}">
                 {% trans %}Add{% endtrans %}
             </a>
-            <ul class="dropdown">
+            <ul class="i-dropdown">
                 {% for name, backend in backends.viewitems() | sort(attribute='1.title') %}
                     <li>{{ add_agent_link(name, backend) }}</li>
                 {% endfor %}
