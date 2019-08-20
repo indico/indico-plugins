@@ -6,7 +6,7 @@
     <ul class="dropdown">
         <li>
             <a class="ursh-get" data-original-url="{{ target }}">
-                {{ trans }}Obtain short URL{{ end_trans }}
+                {{ trans }}Get short URL{{ end_trans }}
             </a>
         </li>
         {%- if event_manager %}
@@ -18,7 +18,7 @@
                    data-params='{"original_url": "{{ target }}"}'
                    data-ajax-dialog
                    data-hide-page-header>
-                    {{ trans }}Create short URL{{ end_trans }}
+                    {{ trans }}Create custom short URL{{ end_trans }}
                 </a>
             </li>
         {% endif -%}
