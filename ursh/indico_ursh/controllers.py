@@ -24,6 +24,9 @@ from indico_ursh.util import register_shortcut, request_short_url, strip_end
 from indico_ursh.views import WPShortenURLPage
 
 
+CUSTOM_SHORTCUT_ALPHABET = frozenset('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+
+
 class RHGetShortURL(RH):
     """Make a request to the URL shortening service"""
 
@@ -84,6 +87,10 @@ class RHCustomShortURLPage(RHManageEventBase):
     def _process_POST(self):
         original_url = self._make_absolute_url(request.args['original_url'])
         shortcut = request.form['shortcut'].strip()
+
+        if not (set(shortcut) <= CUSTOM_SHORTCUT_ALPHABET):
+            raise BadRequest('Invalid shortcut')
+
         result = register_shortcut(original_url, shortcut, session.user)
 
         if result.get('error'):
