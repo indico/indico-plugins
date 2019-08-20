@@ -1,0 +1,8 @@
+<a href="{{ url_for('plugin_ursh.shorten_url') }}"
+   data-title="{{ _("URL Shortener") }}"
+   data-href="{{ url_for('plugin_ursh.shorten_url', url=request.url) }}"
+   data-ajax-dialog
+   data-hide-page-header
+   data-close-button>
+    {% trans %}URL Shortener{% endtrans %}
+</a>

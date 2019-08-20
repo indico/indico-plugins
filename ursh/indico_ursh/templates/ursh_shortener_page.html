@@ -1,0 +1,36 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block title -%}
+    {% trans %}URL Shortener{% endtrans %}
+{%- endblock %}
+
+{% block content -%}
+    <p>
+        {% trans -%}
+            In this page, you can generate short links for any Indico URL.
+            Just enter the URL below and click "Shorten".
+        {%- endtrans %}
+    </p>
+    <div id="ursh-shorten-request-form" class="i-has-action">
+        <input id="ursh-shorten-input" name="ursh-shorten-original-url" type="url" style="font-family:monospace;"
+               spellcheck="false" autocomplete="off" autocapitalize="off"
+               value="{{ request.args.url }}"
+               placeholder="{% trans %}Enter an Indico URL to shorten...{% endtrans %}">
+        <button id="ursh-shorten-button" type="button" class="i-button">{% trans %}Shorten{% endtrans %}</button>
+    </div>
+    <div id="ursh-shorten-response-form" class="i-has-action" style="margin-top:1em;display:none">
+        <input id="ursh-shorten-output" name="ursh-shorten-short-url" type="url" style="font-family:monospace;"
+               spellcheck="false" autocomplete="off" autocapitalize="off" readonly>
+        <button type="button" class="i-button icon-clipboard js-copy-to-clipboard"
+                title="{% trans %}Copy to clipboard{% endtrans %}"
+                data-clipboard-target="#ursh-shorten-output"></button>
+    </div>
+    <p>
+        {% trans -%}
+            <strong>Tip:</strong> You can also generate short links by using the quick-links in various
+            places within Indico! Just look for the <span class="icon-link"></span> icon.
+        {%- endtrans %}
+    </p>
+{%- endblock %}

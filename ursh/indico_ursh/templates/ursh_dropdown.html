@@ -1,0 +1,23 @@
+<a href="" class="arrow js-dropdown ursh-dropdown {{ element_class }}" data-toggle="dropdown"
+   title="{% trans %}Short URL options{% endtrans %}"></a>
+<ul class="i-dropdown">
+    <li>
+        <a class="ursh-get"
+           data-original-url="{{ target }}">
+            {{ trans }}Get short URL{{ end_trans }}
+        </a>
+    </li>
+    {%- if allow_create %}
+        <li>
+            <a href="{{ url_for('plugin_ursh.shorten_url_custom') }}"
+            class="ursh-create" data-original-url="{{ target }}"
+            data-title="{{ _('Create short URL') }}"
+            data-href="{{ url_for('plugin_ursh.shorten_url_custom') }}"
+            data-params='{"original_url": "{{ target }}"}'
+            data-ajax-dialog
+            data-hide-page-header>
+                {{ trans }}Create custom short URL{{ end_trans }}
+            </a>
+        </li>
+    {% endif -%}
+</ul>

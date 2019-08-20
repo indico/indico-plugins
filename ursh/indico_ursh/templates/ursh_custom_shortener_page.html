@@ -1,0 +1,57 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block title -%}
+    {% trans %}Create custom shortcut{% endtrans %}
+{%- endblock %}
+
+{% block content -%}
+    {% if submitted and not success %}
+        <div class="error-message-box">
+            <div class="message-box-content">
+                <span class="icon"></span>
+                <div class="message-text">{% trans %}Custom URL creation failed:{% endtrans %} {{ msg }}</div>
+            </div>
+        </div>
+    {% elif submitted and success %}
+        <div class="success-message-box">
+            <div class="message-box-content">
+                <span class="icon"></span>
+                <div class="message-text">{% trans %}Custom URL created successfully{% endtrans %}</div>
+            </div>
+        </div>
+    {% endif %}
+    <p>{% trans %}Creating a custom shortcut for the following URL:{% endtrans %}</p>
+    <div class="i-has-action">
+        <input type="url" style="font-family:monospace;" value="{{ original_url }}" disabled>
+    </div>
+    <p>{% trans %}Please enter the desired shortcut below (at least 5 chars).{% endtrans %}</p>
+    <form method="POST">
+        <div class="i-has-action">
+            <button type="button" class="i-button" style="font-family:monospace;" disabled>
+                {{- ursh_host -}}
+            </button>
+            <input id="ursh-custom-shortcut-input" name="shortcut" type="text" style="font-family:monospace;"
+                   spellcheck="false" autocomplete="off" autocapitalize="off"
+                   pattern="^[0-9a-zA-Z-]{5,}$"
+                   {% if shortcut %}value="{{ shortcut }}"{% endif %}
+                   placeholder="{% trans %}Enter a shortcut...{% endtrans %}">
+            <button id="ursh-custom-shortcut-submit-button" type="submit" class="i-button" disabled>
+                {% trans -%}Create{%- endtrans %}
+            </button>
+        </div>
+    </form>
+    <script>
+        $(document).ready(() => {
+            $('#ursh-custom-shortcut-input').focus().select();
+        });
+    </script>
+    {% if submitted and success and shorturl %}
+        <script>
+            $(document).ready(() => {
+                $('#ursh-custom-shortcut-input').copyURLTooltip({{ shorturl | tojson }}, 'unfocus');
+            });
+        </script>
+    {% endif %}
+{%- endblock %}

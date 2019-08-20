@@ -1,0 +1,4 @@
+graft indico_ursh/static
+graft indico_ursh/translations
+
+global-exclude *.pyc __pycache__ .keep
