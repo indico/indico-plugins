@@ -27,12 +27,10 @@ def _get_settings():
 def request_short_url(original_url):
     api_key, api_host = _get_settings()
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
-    url = posixpath.join(api_host, 'urls/')
+    url = posixpath.join(api_host, 'api/urls/')
 
     response = requests.post(url, data={'url': original_url, 'allow_reuse': True}, headers=headers)
-    if response.status_code not in (400,):
-        response.raise_for_status()
-
+    response.raise_for_status()
     data = response.json()
     return data['short_url']
 
@@ -40,7 +38,7 @@ def request_short_url(original_url):
 def register_shortcut(original_url, shortcut):
     api_key, api_host = _get_settings()
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
-    url = posixpath.join(api_host, 'urls', shortcut)
+    url = posixpath.join(api_host, 'api/urls', shortcut)
 
     response = requests.put(url, data={'url': original_url, 'allow_reuse': True}, headers=headers)
     if not (400 <= response.status_code < 500):
