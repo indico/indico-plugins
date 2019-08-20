@@ -43,7 +43,7 @@ def register_shortcut(original_url, shortcut, user):
     api_key, api_host = _get_settings()
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls', shortcut)
-    data = {'url': original_url, 'allow_reuse': True, 'metadata': {'indico.user': user.id}}
+    data = {'url': original_url, 'allow_reuse': True, 'meta': {'indico.user': user.id}}
 
     response = requests.put(url, data=json.dumps(data), headers=headers)
     if not (400 <= response.status_code < 500):
