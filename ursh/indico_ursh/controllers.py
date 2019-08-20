@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 import posixpath
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 from flask_pluginengine import render_plugin_template
 from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_parse
@@ -17,7 +17,7 @@ from werkzeug.urls import url_parse
 from indico.core.config import config
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.web.rh import RH
-from indico.web.util import jsonify, jsonify_template
+from indico.web.util import jsonify_template
 
 from indico_ursh import _
 from indico_ursh.util import register_shortcut, request_short_url, strip_end
@@ -84,7 +84,7 @@ class RHCustomShortURLPage(RHManageEventBase):
     def _process_POST(self):
         original_url = self._make_absolute_url(request.args['original_url'])
         shortcut = request.form['shortcut'].strip()
-        result = register_shortcut(original_url, shortcut)
+        result = register_shortcut(original_url, shortcut, session.user)
 
         if result.get('error'):
             kwargs = {'success': False, 'msg': self._get_error_msg(result)}

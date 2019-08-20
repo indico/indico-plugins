@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import json
 import posixpath
 
 import requests
@@ -26,21 +27,21 @@ def _get_settings():
 
 def request_short_url(original_url):
     api_key, api_host = _get_settings()
-    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
+    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls/')
 
-    response = requests.post(url, data={'url': original_url, 'allow_reuse': True}, headers=headers)
+    response = requests.post(url, data=json.dumps({'url': original_url, 'allow_reuse': True}), headers=headers)
     response.raise_for_status()
     data = response.json()
     return data['short_url']
 
 
-def register_shortcut(original_url, shortcut):
+def register_shortcut(original_url, shortcut, user):
     api_key, api_host = _get_settings()
-    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key)}
+    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls', shortcut)
-
-    response = requests.put(url, data={'url': original_url, 'allow_reuse': True}, headers=headers)
+    data = {'url': original_url, 'allow_reuse': True, 'metadata': {'indico.user': user.id}}
+    response = requests.put(url, data=json.dumps(data), headers=headers)
     if not (400 <= response.status_code < 500):
         response.raise_for_status()
 
