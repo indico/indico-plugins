@@ -26,6 +26,7 @@ def _get_settings():
 
 
 def request_short_url(original_url):
+    from indico_ursh.plugin import UrshPlugin
     api_key, api_host = _get_settings()
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls/')
@@ -33,19 +34,25 @@ def request_short_url(original_url):
     response = requests.post(url, data=json.dumps({'url': original_url, 'allow_reuse': True}), headers=headers)
     response.raise_for_status()
     data = response.json()
+    UrshPlugin.logger.info('Shortcut created: %s -> %s', data['shortcut'], original_url)
     return data['short_url']
 
 
 def register_shortcut(original_url, shortcut, user):
+    from indico_ursh.plugin import UrshPlugin
     api_key, api_host = _get_settings()
     headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls', shortcut)
     data = {'url': original_url, 'allow_reuse': True, 'metadata': {'indico.user': user.id}}
+
     response = requests.put(url, data=json.dumps(data), headers=headers)
     if not (400 <= response.status_code < 500):
         response.raise_for_status()
 
-    return response.json()
+    data = response.json()
+    if not data.get('error'):
+        UrshPlugin.logger.info('Shortcut created: %s -> %s', data['shortcut'], original_url)
+    return data
 
 
 def strip_end(text, suffix):
