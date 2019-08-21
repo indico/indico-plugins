@@ -11,7 +11,7 @@ import posixpath
 
 from flask import jsonify, request, session
 from flask_pluginengine import render_plugin_template
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
@@ -20,7 +20,7 @@ from indico.web.rh import RH
 from indico.web.util import jsonify_template
 
 from indico_ursh import _
-from indico_ursh.util import register_shortcut, request_short_url, strip_end
+from indico_ursh.util import is_configured, register_shortcut, request_short_url, strip_end
 from indico_ursh.views import WPShortenURLPage
 
 
@@ -51,9 +51,11 @@ class RHGetShortURL(RH):
 
 
 class RHShortURLPage(RH):
-    """Provide a simple page, where users can submit a URL to be shortened"""
+    """Provide a simple page where users can submit a URL to be shortened"""
 
     def _process(self):
+        if not is_configured():
+            raise NotFound('Plugin is not configured')
         return WPShortenURLPage.render_template('ursh_shortener_page.html')
 
 

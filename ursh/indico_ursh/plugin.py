@@ -18,6 +18,7 @@ from indico.web.views import WPBase
 
 from indico_ursh import _
 from indico_ursh.blueprint import blueprint
+from indico_ursh.util import is_configured
 
 
 class SettingsForm(IndicoForm):
@@ -50,9 +51,10 @@ class UrshPlugin(IndicoPlugin):
         return blueprint
 
     def _inject_ursh_link(self, target=None, event=None, dropdown=False, element_class='', text='', **kwargs):
-        if self.settings.get('api_key') and self.settings.get('api_host') and (target or event):
+        if is_configured() and (target or event):
             return render_plugin_template('ursh_link.html', target=target, event=event,
                                           dropdown=dropdown, element_class=element_class, text=text, **kwargs)
 
     def _inject_ursh_footer(self, **kwargs):
-        return render_plugin_template('ursh_footer.html')
+        if is_configured():
+            return render_plugin_template('ursh_footer.html')

@@ -25,6 +25,14 @@ def _get_settings():
     return api_key, api_host
 
 
+def is_configured():
+    """Check whether the plugin is properly configured."""
+    from indico_ursh.plugin import UrshPlugin
+    api_key = UrshPlugin.settings.get('api_key')
+    api_host = UrshPlugin.settings.get('api_host')
+    return bool(api_key and api_host)
+
+
 def request_short_url(original_url):
     from indico_ursh.plugin import UrshPlugin
     api_key, api_host = _get_settings()
