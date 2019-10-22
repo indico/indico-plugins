@@ -59,8 +59,8 @@ class S3StorageBase(Storage):
         if 'addressing_style' in data:
             self.client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
         self.bucket_policy_file = data.get('bucket_policy_file')
-        self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
-        if data.get('proxy') in ('1', 'true', 'yes'):
+        self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes', 'on')
+        if data.get('proxy') in ('1', 'true', 'yes', 'on'):
             self.proxy_downloads = ProxyDownloadsMode.local
         elif data.get('proxy') in ('xaccelredirect', 'nginx'):
             self.proxy_downloads = ProxyDownloadsMode.nginx
