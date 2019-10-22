@@ -13,6 +13,7 @@ import sys
 import threading
 from contextlib import contextmanager
 from datetime import date
+from enum import Enum
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
@@ -31,6 +32,12 @@ from indico.web.flask.util import send_file
 
 
 s3_session_cache = threading.local()
+
+
+class ProxyDownloadsMode(Enum):
+    disabled = 0
+    local = 1
+    nginx = 2
 
 
 class S3StorageBase(Storage):
@@ -53,7 +60,12 @@ class S3StorageBase(Storage):
             self.client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes')
-        self.proxy_downloads = data.get('proxy') in ('1', 'true', 'yes')
+        if data.get('proxy') in ('1', 'true', 'yes'):
+            self.proxy_downloads = ProxyDownloadsMode.local
+        elif data.get('proxy') in ('xaccelredirect', 'nginx'):
+            self.proxy_downloads = ProxyDownloadsMode.nginx
+        else:
+            self.proxy_downloads = ProxyDownloadsMode.disabled
         self.meta = data.get('meta')
 
     @cached_property
@@ -115,7 +127,7 @@ class S3StorageBase(Storage):
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename, inline=True):
-        if self.proxy_downloads:
+        if self.proxy_downloads == ProxyDownloadsMode.local:
             return send_file(filename, self.open(file_id), content_type, inline=inline)
 
         try:
@@ -129,7 +141,12 @@ class S3StorageBase(Storage):
                                                              'ResponseContentDisposition': h.get('Content-Disposition'),
                                                              'ResponseContentType': content_type},
                                                      ExpiresIn=120)
-            return redirect(url)
+            response = redirect(url)
+            if self.proxy_downloads == ProxyDownloadsMode.nginx:
+                # nginx can proxy the request to S3 to avoid exposing the redirect and
+                # bucket URL to the end user (since it is quite ugly and temporary)
+                response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + url.replace('://', '/', 1)
+            return response
         except Exception as e:
             raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
