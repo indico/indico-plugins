@@ -115,7 +115,7 @@ class S3StorageBase(Storage):
     def delete(self, file_id):
         bucket, id_ = self._parse_file_id(file_id)
         try:
-            self.client.delete_object(bucket, id_)
+            self.client.delete_object(Bucket=bucket, Key=id_)
         except Exception as e:
             raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
