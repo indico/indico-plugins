@@ -1,0 +1,21 @@
+[flake8]
+max-line-length = 120
+
+# colored output
+format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+
+exclude =
+    build
+    dist
+    docs
+    ext_modules
+    htmlcov
+    indico.egg-info
+    node_modules
+    # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
+    .git
+    __pycache__
+
+extend-ignore =
+    # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
+    E731
