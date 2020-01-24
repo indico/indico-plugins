@@ -174,6 +174,8 @@ class RHStripe(RH):
             flash(flash_msg, flash_type)
             return redirect(reg_url)
 
+        transaction_data = request.form.to_dict()
+        transaction_data['charge_id'] = charge['id']
         register_transaction(
             registration=self.registration,
             amount=conv_from_stripe_amount(
@@ -183,7 +185,7 @@ class RHStripe(RH):
             currency=charge['currency'],
             action=STRIPE_TRX_ACTION_MAP[charge['status']],
             provider='stripe',
-            data=request.form,
+            data=transaction_data
         )
 
         flash(flash_msg, flash_type)
