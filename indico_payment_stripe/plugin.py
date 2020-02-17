@@ -22,6 +22,7 @@ from indico.web.forms.widgets import SwitchWidget
 from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
 
+import stripe
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
@@ -143,7 +144,21 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return blueprint
 
     def adjust_payment_form_data(self, data):
+
         registration = data['registration']
+
+        stripe.api_key = (
+            data['event_settings']['sec_key']
+            if data['event_settings']['use_event_api_keys'] else
+            data['settings']['sec_key']
+        )
+
+        data['pub_key'] = (
+            data['event_settings']['pub_key']
+            if data['event_settings']['use_event_api_keys'] else
+            data['settings']['pub_key']
+        )
+
         data['stripe_amount'] = conv_to_stripe_amount(
             registration.price,
             registration.currency,
@@ -155,8 +170,16 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             _external=True,
         )
 
-        data['pub_key'] = (
-            data['event_settings']['pub_key']
-            if data['event_settings']['use_event_api_keys'] else
-            data['settings']['pub_key']
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'name': 'Custom t-shirt',
+                'description': 'Your custom designed t-shirt',
+                'amount': int(registration.price),
+                'currency': registration.currency,
+                'quantity': 1,
+            }],
+            success_url='https://example.com/success',
+            cancel_url='https://example.com/cancel',
         )
+        data['stripe_session_id'] = session.id

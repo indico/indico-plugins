@@ -12,22 +12,20 @@
       <dt>{% trans %}Total amount{% endtrans %}</dt>
       <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
       <dt></dt>
-      <form action="{{ handler_url }}" method="POST">
-        <script
-          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-          data-key="{{ pub_key }}"
-          data-amount="{{ stripe_amount }}"
-          data-currency="{{ currency }}"
-          data-name="{{ event_settings.org_name }}"
-          data-description="{{ event_settings.description }}"
-          data-locale="auto"
-          data-zip-code="{{ event_settings.require_postal_code|string|lower }}"
-          data-email="{{ user_email }}"
-          data-allow-remember-me="false"
-          data-image="https://stripe.com/img/documentation/checkout/marketplace.png">
-        </script>
-      </form>
-      </dd>
+      <button id="checkout-button">Pay</button>
     </dl>
+    <script src="https://js.stripe.com/v3"></script>
+    <script>
+      window.addEventListener('load', function () {
+        var stripe = Stripe('{{ pub_key }}');
+        stripe.redirectToCheckout({
+          sessionId: '{{stripe_session_id}}'
+        }).then(function (result) {
+          // If `redirectToCheckout` fails due to a browser or network
+          // error, display the localized error message to your customer
+          // using `result.error.message`.
+        });
+      });
+    </script>
   </body>
 </html>
