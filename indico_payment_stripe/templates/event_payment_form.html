@@ -14,18 +14,28 @@
       <dt></dt>
       <button id="checkout-button">Pay</button>
     </dl>
-    <script src="https://js.stripe.com/v3"></script>
     <script>
-      window.addEventListener('load', function () {
-        var stripe = Stripe('{{ pub_key }}');
-        stripe.redirectToCheckout({
-          sessionId: '{{stripe_session_id}}'
-        }).then(function (result) {
-          // If `redirectToCheckout` fails due to a browser or network
-          // error, display the localized error message to your customer
-          // using `result.error.message`.
+      js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "https://js.stripe.com/v3";
+      js.onload = event => {
+        var checkoutButton = document.querySelector('#checkout-button');
+        checkoutButton.addEventListener('click', function () {
+          var stripe = Stripe("{{ pub_key }}");
+          console.log(stripe);
+          stripe
+            .redirectToCheckout({
+              sessionId: "{{stripe_session_id}}"
+            })
+            .then(function(result) {
+              // If `redirectToCheckout` fails due to a browser or network
+              // error, display the localized error message to your customer
+              // using `result.error.message`.
+            });
         });
-      });
+      };
+      let s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(js, s);
     </script>
   </body>
 </html>
