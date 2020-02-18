@@ -179,6 +179,9 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                 'currency': registration.currency,
                 'quantity': 1,
             }],
+            metadata={
+                'registration_id': registration.id
+            },
             success_url='https://example.com/success',
             cancel_url='https://example.com/cancel',
         )
