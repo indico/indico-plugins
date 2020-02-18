@@ -6,6 +6,7 @@
     The actual plugin definitions.
 
 """
+from indico.web.flask.util import url_for
 
 from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
@@ -22,6 +23,7 @@ from indico.web.forms.widgets import SwitchWidget
 from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
 
+import stripe
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
@@ -40,7 +42,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
             'Secret API key for the stripe.com account. Event managers can'
             ' override this.'
         )
-       )
+    )
     org_name = StringField(
         _('Organization name'),
         [Optional()],
@@ -81,7 +83,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
             DataRequired(),
         ],
         description=_('Secret API key for the stripe.com account')
-       )
+    )
     org_name = StringField(
         _('Organizer name'),
         [Optional()],
@@ -143,16 +145,13 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return blueprint
 
     def adjust_payment_form_data(self, data):
+
         registration = data['registration']
-        data['stripe_amount'] = conv_to_stripe_amount(
-            registration.price,
-            registration.currency,
-        )
-        data['user_email'] = registration.email
-        data['handler_url'] = url_for_plugin(
-            'payment_stripe.handler',
-            registration.locator.uuid,
-            _external=True,
+
+        stripe.api_key = (
+            data['event_settings']['sec_key']
+            if data['event_settings']['use_event_api_keys'] else
+            data['settings']['sec_key']
         )
 
         data['pub_key'] = (
@@ -160,3 +159,31 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             if data['event_settings']['use_event_api_keys'] else
             data['settings']['pub_key']
         )
+
+        price = conv_to_stripe_amount(
+            registration.price,
+            registration.currency,
+        )
+
+        name = registration.event.title
+        description = registration.registration_form.title
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'name': name,
+                'description': description,
+                'amount': price,
+                'currency': registration.currency,
+                'quantity': 1,
+            }],
+            success_url=url_for_plugin('payment_stripe.handler',
+                                       registration.event,
+                                       registration.registration_form,
+                                       _external=True)
+            + '?session_id={CHECKOUT_SESSION_ID}'
+            + '&registration_uuid=' + registration.uuid,
+            cancel_url=url_for('payment.event_payment',
+                               registration.registration_form,
+                               _external=True),
+        )
+        data['stripe_session_id'] = session.id

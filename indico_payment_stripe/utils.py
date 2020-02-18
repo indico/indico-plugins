@@ -60,9 +60,8 @@ def conv_to_stripe_amount(
 
     """
     return (
-        int(indico_amount)
-        if curr.upper() in zero_decimal_currs else
-        int(indico_amount * 100)
+        int(indico_amount) if curr.upper() in zero_decimal_currs
+        else int(indico_amount * 100)
     )
 
 

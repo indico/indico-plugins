@@ -22,4 +22,4 @@ blueprint = IndicoPluginBlueprint(
     )
 )
 
-blueprint.add_url_rule('/handler', 'handler', RHStripe, methods=['POST'])
+blueprint.add_url_rule('/handler', 'handler', RHStripe, methods=['GET'])

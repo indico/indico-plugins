@@ -1,12 +1,14 @@
 indico-plugin-payment-stripe
 ============================
 
+**This fork uses Strip's checkout instead of the v2 API, allowing it to be SCA-complaint.**
+
 `Stripe <https://stripe.com/>`_ payment support plugin for the `Indico conference management system <https://getindico.io>`_.
 
 This plugin was tested and developed using:
 
-* Indico version 2.1.7
-* Stripe API version 2018-11-02.
+* Indico version 2.2.4
+* Stripe API version 2020-02-18.
 
 Other versions of Indico and/or Stripe may or may not function as intended. We recommend that you test your integration
 thoroughly before using this plugin.
