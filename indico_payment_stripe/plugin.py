@@ -6,6 +6,7 @@
     The actual plugin definitions.
 
 """
+from indico.web.flask.util import url_for
 
 from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
@@ -41,7 +42,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
             'Secret API key for the stripe.com account. Event managers can'
             ' override this.'
         )
-       )
+    )
     org_name = StringField(
         _('Organization name'),
         [Optional()],
@@ -82,7 +83,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
             DataRequired(),
         ],
         description=_('Secret API key for the stripe.com account')
-       )
+    )
     org_name = StringField(
         _('Organizer name'),
         [Optional()],
@@ -159,30 +160,30 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             data['settings']['pub_key']
         )
 
-        data['stripe_amount'] = conv_to_stripe_amount(
+        price = conv_to_stripe_amount(
             registration.price,
             registration.currency,
         )
-        data['user_email'] = registration.email
-        data['handler_url'] = url_for_plugin(
-            'payment_stripe.handler',
-            registration.locator.uuid,
-            _external=True,
-        )
 
+        name = registration.event.title
+        description = registration.registration_form.title
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
-                'name': 'Custom t-shirt',
-                'description': 'Your custom designed t-shirt',
-                'amount': int(registration.price),
+                'name': name,
+                'description': description,
+                'amount': price,
                 'currency': registration.currency,
                 'quantity': 1,
             }],
-            metadata={
-                'registration_id': registration.id
-            },
-            success_url='https://example.com/success',
-            cancel_url='https://example.com/cancel',
+            success_url=url_for_plugin('payment_stripe.handler',
+                                       registration.event,
+                                       registration.registration_form,
+                                       _external=True)
+            + '?session_id={CHECKOUT_SESSION_ID}'
+            + '&registration_uuid=' + registration.uuid,
+            cancel_url=url_for('payment.event_payment',
+                               registration.registration_form,
+                               _external=True),
         )
         data['stripe_session_id'] = session.id

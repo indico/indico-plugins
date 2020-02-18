@@ -19,13 +19,13 @@
       js.type = "text/javascript";
       js.src = "https://js.stripe.com/v3";
       js.onload = event => {
-        var checkoutButton = document.querySelector('#checkout-button');
-        checkoutButton.addEventListener('click', function () {
+        var checkoutButton = document.querySelector("#checkout-button");
+        checkoutButton.addEventListener("click", function() {
           var stripe = Stripe("{{ pub_key }}");
           console.log(stripe);
           stripe
             .redirectToCheckout({
-              sessionId: "{{stripe_session_id}}"
+              sessionId: "{{ stripe_session_id }}"
             })
             .then(function(result) {
               // If `redirectToCheckout` fails due to a browser or network
