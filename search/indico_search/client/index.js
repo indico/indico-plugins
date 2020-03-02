@@ -321,28 +321,14 @@ import './main.scss';
 
     _transition(title, no_check) {
       const $tag = this.$tag;
-      const old_width = $tag.width();
 
       $tag
         .fadeTo('fast', 0.3)
-        .width('')
         .find('.where')
         .html(title);
-      const new_width = $tag.width();
 
-      // store target width
       $tag
         .fadeTo('fast', 0.5)
-        .width(old_width)
-        .data('target-width', new_width);
-
-      $tag.animate(
-        {
-          width: new_width < old_width && !no_check ? old_width : new_width,
-        },
-        200,
-        'linear'
-      );
     },
 
     _create() {
@@ -350,8 +336,8 @@ import './main.scss';
 
       const tag_template = _.template(
         '<div class="search-tag">' +
-          '<div class="cross">x</div>' +
           '<div class="where"><%= categ_title %></div>' +
+          '<div class="cross">x</div>' +
           '</div>'
       );
 
@@ -412,11 +398,7 @@ import './main.scss';
         .removeClass('in-category-over');
       this.options.form.attr('action', this.options.search_category_url);
 
-      // use target-width as search-tag may still be growing
       $tag.animate(
-        {
-          width: $tag.data('target-width') + $('.cross', $tag).width() + 10,
-        },
         200,
         'swing',
         function() {

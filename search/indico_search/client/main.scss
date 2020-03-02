@@ -169,11 +169,9 @@
 
 .search-tag {
     max-width: 112px;
-    display: table-cell;
+    display: flex;
     line-height: 13px;
-    height: 13px;
     vertical-align: middle;
-    margin: 1px 1px 1px 1px;
     padding: 2px 5px;
     float: left;
     -ms-user-select: none;
