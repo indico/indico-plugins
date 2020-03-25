@@ -5,6 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+# flake8: noqa
+
 """
 Tools to connect to distant Invenio servers using Invenio APIs.
 
