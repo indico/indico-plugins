@@ -1,0 +1,6 @@
+{% extends 'vc/event_buttons.html' %}
+{% from 'vc_zoom:buttons.html' import render_join_button  %}
+
+{% block buttons %}
+    {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% from '_password.html' import password %}
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set owner = vc_room.zoom_meeting.owned_by_user %}
+{% set phone_link = settings.get('zoom_phone_link') %}
+<dl class="details-container">
+    <dt>{% trans %}Meeting Topic{% endtrans %}</dt>
+    <dd>{{ vc_room.data.description }}</dd>
+    <dt>{% trans %}Meeting ID{% endtrans %}</dt>
+    <dd>{{ vc_room.zoom_meeting.meeting }}</dd>
+    <dt>{% trans %}Owner{% endtrans %}</dt>
+    <dd>
+        {% if owner %}
+            {{ owner.full_name }}
+        {% else %}
+            {{ vc_room.data.owner_account }} <em>(deleted)</em>
+        {% endif %}
+    </dd>
+    <dt>{% trans %}Linked to{% endtrans %}</dt>
+    <dd>
+        {% set obj = event_vc_room.link_object %}
+        {% if obj is none %}
+            <em>(missing {{ event_vc_room.link_type.name }})</em>
+        {% elif event_vc_room.link_type.name == 'event' %}
+            {% trans %}the whole event{% endtrans %}
+        {% elif event_vc_room.link_type.name == 'contribution' %}
+            {% trans %}Contribution{% endtrans %}: {{ obj.title }}
+        {% elif event_vc_room.link_type.name == 'block' %}
+            {% trans %}Session{% endtrans %}: {{ obj.full_title }}
+        {% endif %}
+    </dd>
+    {% if vc_room.data.room_pin %}
+        <dt>{% trans %}Room PIN{% endtrans %}</dt>
+        <dd>
+            {{ password('vc-room-pin-%s'|format(event_vc_room.id), value=vc_room.data.room_pin, toggle=True,
+                        readonly=true) }}
+        </dd>
+    {% endif %}
+    {% if vc_room.data.moderation_pin %}
+        <dt>{% trans %}Moderation PIN{% endtrans %}</dt>
+        <dd>
+            {{ password('vc-moderation-pin-%s'|format(event_vc_room.id), value=vc_room.data.moderation_pin,
+                        toggle=True, readonly=true) }}
+        </dd>
+    {% endif %}
+    <dt>{% trans %}Zoom URL{% endtrans %}</dt>
+    <dd>
+        {{ clipboard_input(vc_room.zoom_meeting.join_url, name="vc-room-url") }}
+    </dd>
+    <dt>{% trans %}Created on{% endtrans %}</dt>
+    <dd>{{ vc_room.created_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% if vc_room.modified_dt %}
+        <dt>{% trans %}Modified on{% endtrans %}</dt>
+        <dd>{{ vc_room.modified_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% endif %}
+</dl>

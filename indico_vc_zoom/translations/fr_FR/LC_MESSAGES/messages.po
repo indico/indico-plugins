@@ -1,0 +1,289 @@
+# Translations template for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-10-18 11:55+0200\n"
+"PO-Revision-Date: 2017-10-30 11:04+0000\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
+"Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: indico_vc_zoom/controllers.py:38
+msgid "You are now the owner of the room '{room.name}'"
+msgstr "Vous êtes maintenant responsable de la salle '{room.name}'"
+
+#: indico_vc_zoom/forms.py:32
+msgid "The PIN must be a number"
+msgstr "Le code confidentiel doit être un nombre entier"
+
+#: indico_vc_zoom/forms.py:37
+msgid "Show PIN"
+msgstr "Afficher le code confidentiel"
+
+#: indico_vc_zoom/forms.py:39
+msgid "Show the VC Room PIN on the event page (insecure!)"
+msgstr "Afficher le code confidentiel de la salle Vidyo sur la page de l'événement (peu sûr!)"
+
+#: indico_vc_zoom/forms.py:40
+msgid "Show Auto-join URL"
+msgstr "Afficher l'URL de connexion"
+
+#: indico_vc_zoom/forms.py:42
+msgid "Show the auto-join URL on the event page"
+msgstr "Afficher l'URL de connexion sur la page de l'événement"
+
+#: indico_vc_zoom/forms.py:43
+msgid "Show Phone Access numbers"
+msgstr "Afficher les numéros d'accès téléphonique"
+
+#: indico_vc_zoom/forms.py:45
+msgid "Show a link to the list of phone access numbers"
+msgstr "Afficher un lien vers la liste des numéros d'accès téléphonique"
+
+#: indico_vc_zoom/forms.py:58 indico_vc_zoom/templates/info_box.html:7
+#: indico_vc_zoom/templates/manage_event_info_box.html:6
+msgid "Description"
+msgstr "Description"
+
+#: indico_vc_zoom/forms.py:58
+msgid "The description of the room"
+msgstr "La description de la salle"
+
+#: indico_vc_zoom/forms.py:59 indico_vc_zoom/templates/info_box.html:14
+#: indico_vc_zoom/templates/manage_event_info_box.html:10
+msgid "Owner"
+msgstr "Responsable"
+
+#: indico_vc_zoom/forms.py:59
+msgid "The owner of the room"
+msgstr "Le responsable de la salle"
+
+#: indico_vc_zoom/forms.py:60
+#: indico_vc_zoom/templates/manage_event_info_box.html:39
+msgid "Moderation PIN"
+msgstr "Code confidentiel de modération"
+
+#: indico_vc_zoom/forms.py:61
+msgid "Used to moderate the VC Room. Only digits allowed."
+msgstr "Utilisé pour modérer la salle de VC. Seuls les chiffres sont autorisés."
+
+#: indico_vc_zoom/forms.py:62 indico_vc_zoom/templates/info_box.html:18
+#: indico_vc_zoom/templates/manage_event_info_box.html:32
+msgid "Room PIN"
+msgstr "Code confidentiel de la salle"
+
+#: indico_vc_zoom/forms.py:63
+msgid ""
+"Used to protect the access to the VC Room (leave blank for open access). "
+"Only digits allowed."
+msgstr "Utilisé pour protéger l'accès à la salle de VC (laisser vide pour un accès ouvert). Seuls les chiffres sont autorisés."
+
+#: indico_vc_zoom/forms.py:65
+msgid "Auto mute"
+msgstr "Coupure automatique des périphériques d'entrée"
+
+#: indico_vc_zoom/forms.py:66
+msgid "On"
+msgstr "Activé"
+
+#: indico_vc_zoom/forms.py:66
+msgid "Off"
+msgstr "Désactivé"
+
+#: indico_vc_zoom/forms.py:67
+msgid ""
+"The VidyoDesktop clients will join the VC room muted by default (audio and "
+"video)"
+msgstr "Les clients VidyoDesktop rejoindront la salle Vidyo avec le micro et la caméra coupés par défaut"
+
+#: indico_vc_zoom/forms.py:82
+msgid "Unable to find this user in Indico."
+msgstr "Impossible de trouver cet utilisateur dans Indico."
+
+#: indico_vc_zoom/forms.py:84
+msgid "This user does not have a suitable account to use Vidyo."
+msgstr "Cet utilisateur n'a pas de compte qui lui permet d'utiliser Vidyo."
+
+#: indico_vc_zoom/plugin.py:49
+msgid "Vidyo email support"
+msgstr "Adresse électronique de l'assistance Vidyo"
+
+#: indico_vc_zoom/plugin.py:50
+msgid "Username"
+msgstr "Identifiant"
+
+#: indico_vc_zoom/plugin.py:50
+msgid "Indico username for Vidyo"
+msgstr "Identifiant Indico pour Vidyo"
+
+#: indico_vc_zoom/plugin.py:51
+msgid "Password"
+msgstr "Mot de passe"
+
+#: indico_vc_zoom/plugin.py:52
+msgid "Indico password for Vidyo"
+msgstr "Mot de passe utilisateur pour Vidyo"
+
+#: indico_vc_zoom/plugin.py:53
+msgid "Admin API WSDL URL"
+msgstr "URL WSDL pour l'API admin"
+
+#: indico_vc_zoom/plugin.py:54
+msgid "User API WSDL URL"
+msgstr "URL WSDL pour l'API utilisateur"
+
+#: indico_vc_zoom/plugin.py:55
+msgid "Indico tenant prefix"
+msgstr "Préfixe de tenant pour Indico"
+
+#: indico_vc_zoom/plugin.py:56
+msgid "The tenant prefix for Indico rooms created on this server"
+msgstr "Le préfixe de tenant pour les salles Vidyo créées sur ce serveur Indico"
+
+#: indico_vc_zoom/plugin.py:57
+msgid "Public rooms' group name"
+msgstr "Nom du groupe Vidyo pour les salles Vidyo"
+
+#: indico_vc_zoom/plugin.py:58
+msgid "Group name for public videoconference rooms created by Indico"
+msgstr "Nom du groupe pour les salles publiques de visioconférence créées par Indico"
+
+#: indico_vc_zoom/plugin.py:59
+msgid "Authenticators"
+msgstr "Services d'authentification"
+
+#: indico_vc_zoom/plugin.py:60
+msgid "Identity providers to convert Indico users to Vidyo accounts"
+msgstr "Fournisseurs d'identité pour convertir des utilisateurs Indico en comptes Vidyo"
+
+#: indico_vc_zoom/plugin.py:61
+msgid "VC room age threshold"
+msgstr "Limite d'âge pour les salles Vidyo"
+
+#: indico_vc_zoom/plugin.py:62
+msgid ""
+"Number of days after an Indico event when a videoconference room is "
+"considered old"
+msgstr "Nombre de jours à partir de la fin d'un événement dans Indico après lesquels une salle de visioconférence est considérée comme agée"
+
+#: indico_vc_zoom/plugin.py:64
+msgid "Max. num. VC rooms before warning"
+msgstr "Nombre maximum de salles Vidyo avant un message d'alerte"
+
+#: indico_vc_zoom/plugin.py:65
+msgid "Maximum number of rooms until a warning is sent to the managers"
+msgstr "Nombre maximum de salles Vidyo créées sur ce serveur avant qu'un message d'alerte soit envoyé aux administrateurs"
+
+#: indico_vc_zoom/plugin.py:66
+msgid "VidyoVoice phone number"
+msgstr "Numéros de téléphone VidyoVoice"
+
+#: indico_vc_zoom/plugin.py:67
+msgid "Link to the list of VidyoVoice phone numbers"
+msgstr "Lien vers la liste des numéros de téléphones VidyoVoice"
+
+#: indico_vc_zoom/plugin.py:68
+msgid "Client Chooser URL"
+msgstr "URL de sélection du client"
+
+#: indico_vc_zoom/plugin.py:69
+msgid ""
+"URL for client chooser interface. The room key will be passed as a 'url' GET"
+" query argument"
+msgstr "L'URL pour l'interface de sélection du client. Le code de la salle sera passé comme argument de requête GET."
+
+#: indico_vc_zoom/plugin.py:71
+msgid "Creation email footer"
+msgstr "Pied de page du courriel de création"
+
+#: indico_vc_zoom/plugin.py:72
+msgid "Footer to append to emails sent upon creation of a VC room"
+msgstr "Pied de page ajouté au courriel envoyé à la création d'une nouvelle salle Vidyo"
+
+#: indico_vc_zoom/plugin.py:162 indico_vc_zoom/plugin.py:202
+#: indico_vc_zoom/plugin.py:240 indico_vc_zoom/plugin.py:269
+msgid "No valid Vidyo account found for this user"
+msgstr "Pas de compte Vidyo valide pour cet utilisateur"
+
+#: indico_vc_zoom/plugin.py:198 indico_vc_zoom/plugin.py:263
+msgid "Room name already in use"
+msgstr "Ce nom de salle est déjà utilisé"
+
+#: indico_vc_zoom/plugin.py:213
+msgid "Could not find newly created room in Vidyo"
+msgstr "Impossible de trouver la nouvelle salle dans Vidyo"
+
+#: indico_vc_zoom/plugin.py:232 indico_vc_zoom/plugin.py:259
+#: indico_vc_zoom/plugin.py:288
+msgid "This room has been deleted from Vidyo"
+msgstr "Cette salle a été supprimée de Vidyo"
+
+#: indico_vc_zoom/templates/buttons.html:7
+#, python-format
+msgid "You will be the owner of this Vidyo room, replacing %(name)s."
+msgstr "Vous deviendrez le responsable de cette salle Vidyo, à la place de %(name)s."
+
+#: indico_vc_zoom/templates/buttons.html:9
+msgid "Make me owner"
+msgstr "Nommez moi responsable"
+
+#: indico_vc_zoom/templates/buttons.html:19
+msgid "Join"
+msgstr "Rejoindre"
+
+#: indico_vc_zoom/templates/info_box.html:5
+msgid "Name"
+msgstr "Nom"
+
+#: indico_vc_zoom/templates/info_box.html:10
+#: indico_vc_zoom/templates/manage_event_info_box.html:8
+msgid "Extension"
+msgstr "Extension"
+
+#: indico_vc_zoom/templates/info_box.html:22
+#: indico_vc_zoom/templates/manage_event_info_box.html:45
+msgid "Auto-join URL"
+msgstr "URL pour connexion à la salle"
+
+#: indico_vc_zoom/templates/info_box.html:29
+msgid "Useful links"
+msgstr "Liens utiles"
+
+#: indico_vc_zoom/templates/info_box.html:33
+msgid "Phone numbers"
+msgstr "Numéros de téléphone"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:18
+msgid "Linked to"
+msgstr "attachée à"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:24
+msgid "the whole event"
+msgstr "l'événement entier"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:26
+msgid "Contribution"
+msgstr "La contribution"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:28
+msgid "Session"
+msgstr "La session"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:49
+msgid "Created on"
+msgstr "Créée le "
+
+#: indico_vc_zoom/templates/manage_event_info_box.html:52
+msgid "Modified on"
+msgstr "Modifiée le "

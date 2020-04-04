@@ -1,0 +1,37 @@
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set owner = vc_room.zoom_meeting.owned_by_user %}
+{% set phone_link = settings.get('zoom_phone_link') %}
+<dl>
+    <dt>{% trans %}Name{% endtrans %}</dt>
+    <dd>{{ vc_room.name }}</dd>
+    <dt>{% trans %}Meeting Topic{% endtrans %}</dt>
+    <dd>{{ vc_room.data.description }}</dd>
+    {% if vc_room.zoom_meeting %}
+        <dt>{% trans %}Meeting ID{% endtrans %}</dt>
+        <dd>{{ vc_room.zoom_meeting.meeting }}</dd>
+    {% endif %}
+    {% if owner %}
+        <dt>{% trans %}Owner{% endtrans %}</dt>
+        <dd>{{ owner.full_name }}</dd>
+    {% endif %}
+    {% if event_vc_room.data.show_pin and vc_room.data.room_pin %}
+        <dt>{% trans %}Room PIN{% endtrans %}</dt>
+        <dd>{{ vc_room.data.room_pin }}</dd>
+    {% endif %}
+    {% if event_vc_room.data.show_autojoin %}
+        <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
+        <dd class="large-row">
+            {{ clipboard_input(vc_room.zoom_meeting.join_url, name="vc-room-url-%s"|format(event_vc_room.id)) }}
+        </dd>
+    {% endif %}
+    {% if event_vc_room.data.show_phone_numbers and phone_link %}
+        <dt>
+            {% trans %}Useful links{% endtrans %}
+        </dt>
+        <dd>
+            <a href="{{ phone_link }}" target="_blank">
+                {% trans %}Phone numbers{% endtrans %}
+            </a>
+        </dd>
+    {% endif %}
+</dl>

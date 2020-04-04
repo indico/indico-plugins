@@ -1,0 +1,16 @@
+{% extends 'vc/emails/created.html' %}
+
+{% block plugin_specific_info %}
+    <li>
+        <strong>Zoom URL</strong>:
+        <a href="{{ vc_room.zoom_meeting.join_url }}">{{ vc_room.zoom_meeting.join_url }}</a>
+    </li>
+   
+{% endblock %}
+
+{% block custom_footer %}
+    {% if plugin.settings.get('creation_email_footer') %}
+        <hr>
+        {{ plugin.settings.get('creation_email_footer') | sanitize_html }}
+    {% endif %}
+{% endblock %}

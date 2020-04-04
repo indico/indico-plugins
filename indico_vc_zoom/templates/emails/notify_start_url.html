@@ -1,0 +1,18 @@
+{% extends 'emails/base.html' %}
+
+{% block subject -%}
+    [DON'T SHARE] Zoom Host URL - {{ vc_room.name }} 
+{%- endblock %}
+
+{% block header -%}
+
+<li>
+    <strong> HOST Zoom URL</strong>:
+    <a href="{{ vc_room.data.start_url }}">{{ vc_room.data.start_url }}</a>
+</li>
+
+Please don't share this link. 
+
+{% block custom_footer %}{% endblock %}
+
+{%- endblock %}

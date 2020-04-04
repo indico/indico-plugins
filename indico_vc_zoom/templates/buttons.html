@@ -1,0 +1,6 @@
+{% macro render_join_button(vc_room, extra_classes="") %}
+    <a class="i-button highlight {{ extra_classes }}"
+       href="{{ vc_room.zoom_meeting.join_url }}" target="_blank">
+        {% trans %}Join{% endtrans %}
+    </a>
+{% endmacro %}
