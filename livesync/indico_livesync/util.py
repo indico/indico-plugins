@@ -43,15 +43,15 @@ def obj_deref(ref):
     """Returns the object identified by `ref`"""
     from indico_livesync.models.queue import EntryType
     if ref['type'] == EntryType.category:
-        return Category.get_one(ref['category_id'])
+        return Category.get_or_404(ref['category_id'])
     elif ref['type'] == EntryType.event:
-        return Event.get_one(ref['event_id'])
+        return Event.get_or_404(ref['event_id'])
     elif ref['type'] == EntryType.session:
-        return Session.get_one(ref['session_id'])
+        return Session.get_or_404(ref['session_id'])
     elif ref['type'] == EntryType.contribution:
-        return Contribution.get_one(ref['contrib_id'])
+        return Contribution.get_or_404(ref['contrib_id'])
     elif ref['type'] == EntryType.subcontribution:
-        return SubContribution.get_one(ref['subcontrib_id'])
+        return SubContribution.get_or_404(ref['subcontrib_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
 

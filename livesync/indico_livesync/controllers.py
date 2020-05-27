@@ -30,7 +30,7 @@ class RHDeleteAgent(RHAdminBase):
     """Deletes a LiveSync agent"""
 
     def _process_args(self):
-        self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
+        self.agent = LiveSyncAgent.get_or_404(request.view_args['agent_id'])
 
     def _process(self):
         db.session.delete(self.agent)
@@ -66,7 +66,7 @@ class RHEditAgent(RHAdminBase):
     """Edits a LiveSync agent"""
 
     def _process_args(self):
-        self.agent = LiveSyncAgent.get_one(request.view_args['agent_id'])
+        self.agent = LiveSyncAgent.get_or_404(request.view_args['agent_id'])
         if self.agent.backend is None:
             flash(_('Cannot edit an agent that is not loaded'), 'error')
             return redirect(url_for('plugins.details', plugin='livesync'))

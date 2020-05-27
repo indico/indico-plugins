@@ -44,7 +44,7 @@ class ReportBase(Serializer):
 
     @property
     def event(self):
-        return Event.get_one(self.event_id, is_deleted=False)
+        return Event.get_or_404(self.event_id, is_deleted=False)
 
     @classmethod
     def get(cls, *args, **kwargs):
@@ -139,7 +139,7 @@ class ReportMaterial(ReportBase):
     __public__ = ['material']
 
     def _build_report(self):
-        event = Event.get_one(self.params['event_id'], is_deleted=False)
+        event = Event.get_or_404(self.params['event_id'], is_deleted=False)
         new_material = get_nested_attached_items(event)
         self.material = {'tree': [self._format_data(new_material)]}
 
