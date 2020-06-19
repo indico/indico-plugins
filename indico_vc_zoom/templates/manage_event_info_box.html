@@ -3,8 +3,6 @@
 {% set owner = vc_room.zoom_meeting.owned_by_user %}
 {% set phone_link = settings.get('zoom_phone_link') %}
 <dl class="details-container">
-    <dt>{% trans %}Meeting Topic{% endtrans %}</dt>
-    <dd>{{ vc_room.data.description }}</dd>
     <dt>{% trans %}Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.zoom_meeting.meeting }}</dd>
     <dt>{% trans %}Owner{% endtrans %}</dt>
@@ -28,20 +26,8 @@
             {% trans %}Session{% endtrans %}: {{ obj.full_title }}
         {% endif %}
     </dd>
-    {% if vc_room.data.room_pin %}
-        <dt>{% trans %}Room PIN{% endtrans %}</dt>
-        <dd>
-            {{ password('vc-room-pin-%s'|format(event_vc_room.id), value=vc_room.data.room_pin, toggle=True,
-                        readonly=true) }}
-        </dd>
-    {% endif %}
-    {% if vc_room.data.moderation_pin %}
-        <dt>{% trans %}Moderation PIN{% endtrans %}</dt>
-        <dd>
-            {{ password('vc-moderation-pin-%s'|format(event_vc_room.id), value=vc_room.data.moderation_pin,
-                        toggle=True, readonly=true) }}
-        </dd>
-    {% endif %}
+    <dt>{% trans %}Password{% endtrans %}</dt>
+    <dd>{{ vc_room.data.password }}</dd>
     <dt>{% trans %}Zoom URL{% endtrans %}</dt>
     <dd>
         {{ clipboard_input(vc_room.zoom_meeting.join_url, name="vc-room-url") }}

@@ -16,7 +16,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'indico>=2',
-        'requests', 
         'PyJWT'
     ],
     classifiers=[

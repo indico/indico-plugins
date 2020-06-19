@@ -10,7 +10,7 @@ from indico.modules.vc.exceptions import VCRoomError
 from indico.util.i18n import _
 
 
-class RHZoomRoomOwner(RHVCSystemEventBase):
+class RHRoomOwner(RHVCSystemEventBase):
     def _process(self):
         result = {}
         self.vc_room.zoom_meeting.owned_by_user = session.user

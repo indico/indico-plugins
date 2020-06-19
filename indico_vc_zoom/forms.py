@@ -1,27 +1,26 @@
-
-
 from __future__ import unicode_literals
 from flask import session
 
 from wtforms.fields.core import BooleanField
-from wtforms.fields.simple import TextAreaField, HiddenField
-from wtforms.validators import DataRequired, Length, Optional, Regexp, ValidationError
+from wtforms.fields.simple import TextAreaField
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.web.forms.base import generated_data
-from indico.web.forms.fields import IndicoPasswordField, PrincipalField
+from indico.web.forms.fields import IndicoRadioField, PrincipalField
+from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
-from indico_vc_zoom.util import iter_user_identities, retrieve_principal
-
-
-PIN_VALIDATORS = [Optional(), Length(min=3, max=10), Regexp(r'^\d+$', message=_("The PIN must be a number"))]
+from indico_vc_zoom.util import retrieve_principal
 
 
 class ZoomAdvancedFormMixin(object):
     # Advanced options (per event)
-    
+
+    show_password = BooleanField(_('Show Password'),
+                                 widget=SwitchWidget(),
+                                 description=_("Show the Zoom Room Password on the event page"))
     show_autojoin = BooleanField(_('Show Auto-join URL'),
                                  widget=SwitchWidget(),
                                  description=_("Show the auto-join URL on the event page"))
@@ -35,33 +34,46 @@ class VCRoomAttachForm(VCRoomAttachFormBase, ZoomAdvancedFormMixin):
 
 
 class VCRoomForm(VCRoomFormBase, ZoomAdvancedFormMixin):
-    """Contains all information concerning a Zoom booking"""
+    """Contains all information concerning a Zoom booking."""
 
-    advanced_fields = {'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
+    advanced_fields = {'show_password', 'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
-    description = TextAreaField(_('Description'), [DataRequired()], description=_('The description of the room'))
-    #owner_user = PrincipalField(_('Owner'), [DataRequired()], description=_('The owner of the room'))
-    #owner_user = HiddenField(default=session.user)
-    #moderation_pin = IndicoPasswordField(_('Moderation PIN'), PIN_VALIDATORS, toggle=True,
-    #                                     description=_('Used to moderate the VC Room. Only digits allowed.'))
-    #room_pin = IndicoPasswordField(_('Room PIN'), PIN_VALIDATORS, toggle=True,
-    #                               description=_('Used to protect the access to the VC Room (leave blank for open '
-    #                                             'access). Only digits allowed.'))
-                               
+    description = TextAreaField(_('Description'), description=_('The description of the room'))
+
+    owner_choice = IndicoRadioField(_("Owner of Room"), [DataRequired()],
+                                    choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
+    owner_user = PrincipalField(_("User"),
+                                [HiddenUnless('owner_choice', 'someone_else'), DataRequired()])
+
+    mute_audio = BooleanField(_('Mute audio'),
+                              widget=SwitchWidget(),
+                              description=_('Participants will join the VC room muted by default '))
+
+    mute_host_video = BooleanField(_('Mute video (host)'),
+                                   widget=SwitchWidget(),
+                                   description=_('The host will join the VC room with video disabled'))
+
+    mute_participant_video = BooleanField(_('Mute video (participants)'),
+                                          widget=SwitchWidget(),
+                                          description=_('Participants will join the VC room with video disabled'))
+
+    waiting_room = BooleanField(_('Waiting room'),
+                                widget=SwitchWidget(),
+                                description=_('Participants may be kept in a waiting room by the host'))
 
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
         if defaults.owner_user is None and defaults.owner is not None:
-            defaults.owner_user = retrieve_principal(defaults.owner)
+            owner = retrieve_principal(defaults.owner)
+            defaults.owner_choice = 'myself' if owner == session.user else 'someone_else'
+            defaults.owner_user = None if owner == session.user else owner
         super(VCRoomForm, self).__init__(*args, **kwargs)
 
-    #@generated_data
-    #def owner(self):
-    #    return self.owner_user.data.default
+    @generated_data
+    def owner(self):
+        return session.user.as_principal if self.owner_choice.data == 'myself' else self.owner_user.data.as_principal
 
     def validate_owner_user(self, field):
         if not field.data:
             raise ValidationError(_("Unable to find this user in Indico."))
-        #if not next(iter_user_identities(field.data), None):
-        #    raise ValidationError(_("This user does not have a suitable account to use Zoom."))

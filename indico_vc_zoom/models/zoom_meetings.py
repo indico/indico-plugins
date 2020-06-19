@@ -1,8 +1,4 @@
-
-
 from __future__ import unicode_literals
-
-import urllib
 
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.attributes import flag_modified
@@ -59,7 +55,6 @@ class ZoomMeeting(db.Model):
 
     @property
     def join_url(self):
-        from indico_vc_zoom.plugin import ZoomPlugin
         url = self.vc_room.data['url']
         return url
 

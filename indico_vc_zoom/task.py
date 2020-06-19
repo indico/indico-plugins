@@ -10,12 +10,11 @@ from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.plugins import get_plugin_template_module
 from indico.modules.events import Event
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 from indico.modules.vc.notifications import _send
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
-
-from indico_vc_zoom.api import APIException, RoomNotFoundAPIException
 
 
 def find_old_zoom_rooms(max_room_event_age):
@@ -48,7 +47,7 @@ def zoom_cleanup(dry_run=False):
     max_room_event_age = ZoomPlugin.settings.get('num_days_old')
 
     ZoomPlugin.logger.info('Deleting Zoom rooms that are not used or linked to events all older than %d days',
-                            max_room_event_age)
+                           max_room_event_age)
     candidate_rooms = find_old_zoom_rooms(max_room_event_age)
     ZoomPlugin.logger.info('%d rooms found', len(candidate_rooms))
 
@@ -63,8 +62,8 @@ def zoom_cleanup(dry_run=False):
             ZoomPlugin.logger.info('Room %s deleted from Zoom server', vc_room)
             notify_owner(ZoomPlugin.instance, vc_room)
             vc_room.status = VCRoomStatus.deleted
-        except RoomNotFoundAPIException:
+        except VCRoomNotFoundError:
             ZoomPlugin.logger.warning('Room %s had been already deleted from the Zoom server', vc_room)
             vc_room.status = VCRoomStatus.deleted
-        except APIException:
+        except VCRoomError:
             ZoomPlugin.logger.exception('Impossible to delete Zoom room %s', vc_room)

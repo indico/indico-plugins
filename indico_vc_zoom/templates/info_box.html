@@ -4,8 +4,6 @@
 <dl>
     <dt>{% trans %}Name{% endtrans %}</dt>
     <dd>{{ vc_room.name }}</dd>
-    <dt>{% trans %}Meeting Topic{% endtrans %}</dt>
-    <dd>{{ vc_room.data.description }}</dd>
     {% if vc_room.zoom_meeting %}
         <dt>{% trans %}Meeting ID{% endtrans %}</dt>
         <dd>{{ vc_room.zoom_meeting.meeting }}</dd>
@@ -13,6 +11,10 @@
     {% if owner %}
         <dt>{% trans %}Owner{% endtrans %}</dt>
         <dd>{{ owner.full_name }}</dd>
+    {% endif %}
+    {% if vc_room.data.password %}
+        <dt>{% trans %}Password{% endtrans %}</dt>
+        <dd>{{ vc_room.data.password }}</dd>
     {% endif %}
     {% if event_vc_room.data.show_pin and vc_room.data.room_pin %}
         <dt>{% trans %}Room PIN{% endtrans %}</dt>

@@ -9,4 +9,4 @@ _ = make_bound_gettext('vc_zoom')
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico_vc_zoom.task
+    import indico_vc_zoom.task  # noqa: F401

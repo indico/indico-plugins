@@ -1,79 +1,118 @@
-
-
 from __future__ import unicode_literals
 
-from flask import session
-from flask_pluginengine import current_plugin
+import random
+import string
+
+from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
+from werkzeug.exceptions import Forbidden, NotFound
 from wtforms.fields.core import BooleanField
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.fields.simple import StringField, BooleanField
+from wtforms.fields.simple import StringField
 
+from indico.web.forms.fields.simple import IndicoPasswordField
 from indico.web.forms.widgets import SwitchWidget
 
 from indico.web.flask.templating import get_template_module
 from wtforms.validators import DataRequired, NumberRange
 from indico.core.notifications import make_email, send_email
-from indico.core.plugins import get_plugin_template_module
 from indico.core import signals
-from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
-from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.http_api.hooks.base import HTTPAPIHook
-from indico.modules.vc.notifications import _send
 
 from indico_vc_zoom import _
-from indico_vc_zoom.api import ZoomIndicoClient, APIException, RoomNotFoundAPIException
+from indico_vc_zoom.api import ZoomIndicoClient
 from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.http_api import DeleteVCRoomAPI
 from indico_vc_zoom.models.zoom_meetings import ZoomMeeting
-from indico_vc_zoom.util import iter_extensions, iter_user_identities, retrieve_principal, update_room_from_obj
+from indico_vc_zoom.util import find_enterprise_email, retrieve_principal
+
+
+def _gen_random_password():
+    return ''.join(random.sample(string.ascii_lowercase + string.ascii_uppercase + string.digits, 10))
+
+
+def _fetch_zoom_meeting(vc_room, client=None):
+    try:
+        client = client or ZoomIndicoClient()
+        return client.get_meeting(vc_room.data['zoom_id'])
+    except HTTPError as e:
+        if e.response.status_code == 404:
+            # Indico will automatically mark this room as deleted
+            raise VCRoomNotFoundError(_("This room has been deleted from Zoom"))
+        else:
+            ZoomPlugin.logger.exception('Error getting Zoom Room: %s', e.response.content)
+            raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
+
+
+def _update_zoom_meeting(zoom_id, changes):
+    client = ZoomIndicoClient()
+    try:
+        client.update_meeting(zoom_id, changes)
+    except HTTPError as e:
+        ZoomPlugin.logger.exception("Error updating meeting '%s': %s", zoom_id, e.response.content)
+        raise VCRoomError(_("Can't update meeting. Please contact support if the error persists."))
+
+
+def _get_schedule_args(obj):
+    return {
+        'start_time': obj.start_dt,
+        'duration': (obj.end_dt - obj.start_dt).total_seconds() / 60,
+    }
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     support_email = EmailField(_('Zoom email support'))
 
-    api_key = StringField(_('API KEY'), [DataRequired()])
+    api_key = StringField(_('API Key'), [DataRequired()])
 
-    api_secret = StringField(_('API SECRET'), [DataRequired()])
+    api_secret = IndicoPasswordField(_('API Secret'), [DataRequired()], toggle=True)
 
-    auto_mute = BooleanField(_('Auto mute'),
-                             widget=SwitchWidget(_('On'), _('Off')),
-                             description=_('The Zoom clients will join the VC room muted by default '))
+    email_domains = StringField(_('E-mail domains'), [DataRequired()],
+                                description=_("Comma-separated list of e-mail domains which can use the Zoom API."))
 
-    host_video = BooleanField(_('Host Video'),
-                             widget=SwitchWidget(_('On'), _('Off')),
-                             description=_('Start video when the host joins the meeting.'))
+    assistant_id = StringField(_('Assistant Zoom ID'), [DataRequired()],
+                               description=_('Account to be used as owner of all rooms. It will get "assistant" '
+                                             'privileges on all accounts for which it books rooms'))
 
-    participant_video = BooleanField(_('Participant Video'),
-                             widget=SwitchWidget(_('On'), _('Off')),
-                             description=_('Start video when participants join the meeting. '))
+    mute_audio = BooleanField(_('Mute audio'),
+                              widget=SwitchWidget(),
+                              description=_('Participants will join the VC room muted by default '))
+
+    mute_host_video = BooleanField(_('Mute video (host)'),
+                                   widget=SwitchWidget(),
+                                   description=_('The host will join the VC room with video disabled'))
+
+    mute_participant_video = BooleanField(_('Mute video (participants)'),
+                                          widget=SwitchWidget(),
+                                          description=_('Participants will join the VC room with video disabled'))
 
     join_before_host = BooleanField(_('Join Before Host'),
-                             widget=SwitchWidget(_('On'), _('Off')),
-                             description=_('Allow participants to join the meeting before the host starts the meeting. Only used for scheduled or recurring meetings.'))
+                                    widget=SwitchWidget(),
+                                    description=_('Allow participants to join the meeting before the host starts the '
+                                                  'meeting. Only used for scheduled or recurring meetings.'))
 
-    #indico_room_prefix = IntegerField(_('Indico tenant prefix'), [NumberRange(min=0)],
-    #                                  description=_('The tenant prefix for Indico rooms created on this server'))
-    #room_group_name = StringField(_("Public rooms' group name"), [DataRequired()],
-    #                              description=_('Group name for public videoconference rooms created by Indico'))
+    waiting_room = BooleanField(_('Waiting room'),
+                                widget=SwitchWidget(),
+                                description=_('Participants may be kept in a waiting room by the host'))
+
     num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
                                 description=_('Number of days after an Indico event when a videoconference room is '
                                               'considered old'))
     max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1), DataRequired()],
                                      description=_('Maximum number of rooms until a warning is sent to the managers'))
     zoom_phone_link = URLField(_('ZoomVoice phone number'),
-                                description=_('Link to the list of ZoomVoice phone numbers'))
-    
+                               description=_('Link to the list of ZoomVoice phone numbers'))
+
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=CKEditorWidget(),
                                           description=_('Footer to append to emails sent upon creation of a VC room'))
 
@@ -81,8 +120,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     """Zoom
 
-    Videoconferencing with Zoom
-    """
+    Zoom Plugin for Indico."""
+
     configurable = True
     settings_form = PluginSettingsForm
     vc_room_form = VCRoomForm
@@ -101,17 +140,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def default_settings(self):
         return dict(VCPluginMixin.default_settings, **{
             'support_email': config.SUPPORT_EMAIL,
+            'assistant_id': config.SUPPORT_EMAIL,
             'api_key': '',
             'api_secret': '',
-            #'indico_room_prefix': 10,
-            'auto_mute':True,
-            'host_video':False,
-            'participant_video':True,
-            'join_before_host':True,
-            #'room_group_name': 'Indico',
-            # we skip identity providers in the default list if they don't support get_identity.
-            # these providers (local accounts, oauth) are unlikely be the correct ones to integrate
-            # with the zoom infrastructure.
+            'email_domains': '',
+            'mute_host_video': True,
+            'mute_audio': True,
+            'mute_participant_video': True,
+            'join_before_host': True,
+            'waiting_room': False,
             'num_days_old': 5,
             'max_rooms_warning': 5000,
             'zoom_phone_link': None,
@@ -129,91 +166,178 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
 
-    def update_data_association(self, event, vc_room, event_vc_room, data):
-        super(ZoomPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
+    def update_data_association(self, event, vc_room, room_assoc, data):
+        # XXX: This feels slightly hacky. Maybe we should change the API on the core?
+        association_is_new = room_assoc.vc_room is None
+        old_link = room_assoc.link_object
+        super(ZoomPlugin, self).update_data_association(event, vc_room, room_assoc, data)
 
-        event_vc_room.data.update({key: data.pop(key) for key in [
+        if vc_room.data:
+            # this is not a new room
+            if association_is_new:
+                # this means we are updating an existing meeting with a new vc_room-event association
+                _update_zoom_meeting(vc_room.data['zoom_id'], {
+                    'start_time': None,
+                    'duration': None,
+                    'type': 3
+                })
+            elif room_assoc.link_object != old_link:
+                # the booking should now be linked to something else
+                new_schedule_args = _get_schedule_args(room_assoc.link_object)
+                meeting = _fetch_zoom_meeting(vc_room)
+                current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'}}
+
+                # check whether the start time / duration of the scheduled meeting differs
+                if new_schedule_args != current_schedule_args:
+                    _update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+
+        room_assoc.data.update({key: data.pop(key) for key in [
+            'show_password',
             'show_autojoin',
             'show_phone_numbers'
         ]})
 
-        flag_modified(event_vc_room, 'data')
+        flag_modified(room_assoc, 'data')
 
     def update_data_vc_room(self, vc_room, data):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
 
-        for key in ['description', 'owner', 'auto_mute', 'host_video', 'participant_video', 'join_before_host']:
+        for key in {'description', 'owner', 'mute_audio', 'mute_participant_video', 'mute_host_video',
+                    'join_before_host', 'waiting_room'}:
             if key in data:
                 vc_room.data[key] = data.pop(key)
 
         flag_modified(vc_room, 'data')
 
+    def _check_indico_is_assistant(self, user_id):
+        client = ZoomIndicoClient()
+        assistant_id = self.settings.get('assistant_id')
+
+        if user_id != assistant_id:
+            try:
+                assistants = {assist['email'] for assist in client.get_assistants_for_user(user_id)['assistants']}
+            except HTTPError as e:
+                if e.response.status_code == 404:
+                    raise NotFound(_("No Zoom account found for this user"))
+                self.logger.exception('Error getting assistants for account %s: %s', user_id, e.response.content)
+                raise VCRoomError(_("Problem getting information about Zoom account"))
+            if assistant_id not in assistants:
+                client.add_assistant_to_user(user_id, assistant_id)
+
     def create_room(self, vc_room, event):
         """Create a new Zoom room for an event, given a VC room.
 
-        In order to create the Zoom room, the function will try to do so with
-        all the available identities of the user based on the authenticators
-        defined in Zoom plugin's settings, in that order.
+        In order to create the Zoom room, the function will try to get
+        a valid e-mail address for the user in question, which can be
+        use with the Zoom API.
 
-        :param vc_room: VCRoom -- The VC room from which to create the Zoom
-                        room
-        :param event: Event -- The event to the Zoom room will be attached
+        :param vc_room: the VC room from which to create the Zoom room
+        :param event: the event to the Zoom room will be attached
         """
-        client = ZoomIndicoClient(self.settings)
-        #owner = retrieve_principal(vc_room.data['owner'])
-        owner= session.user  
-        user_id=owner.email
-        topic=vc_room.name
-        time_zone=event.timezone
-        start=event.start_dt_local
-        end=event.end_dt
-        topic=vc_room.data['description']
-        type_meeting=2
-        host_video=self.settings.get('host_video')
-        participant_video=self.settings.get('participant_video')
-        join_before_host=self.settings.get('join_before_host')
-        mute_upon_entry=self.settings.get('auto_mute')
+        client = ZoomIndicoClient()
+        owner = retrieve_principal(vc_room.data['owner'])
+        owner_id = find_enterprise_email(owner)
 
+        # get the object that this booking is linked to
+        vc_room_assoc = vc_room.events[0]
+        link_obj = vc_room_assoc.link_object
 
-        meeting_obj = client.create_meeting(user_id=user_id,
-                                            type=type_meeting,
-                                            start_time=start,
-                                            topic=topic,
-                                            timezone=time_zone,
-                                            host_video=host_video,
-                                            participant_video=participant_video,
-                                            join_before_host=join_before_host,
-                                            mute_upon_entry=mute_upon_entry)
+        scheduling_args = _get_schedule_args(link_obj) if link_obj.start_dt else {}
 
-        if not meeting_obj:
-            raise VCRoomNotFoundError(_("Could not find newly created room in Zoom"))
+        self._check_indico_is_assistant(owner_id)
+
+        try:
+            settings = {
+                'host_video': vc_room.data['mute_host_video'],
+                'participant_video': not vc_room.data['mute_participant_video'],
+                'join_before_host': self.settings.get('join_before_host'),
+                'mute_upon_entry': vc_room.data['mute_audio'],
+                'waiting_room': vc_room.data['waiting_room']
+            }
+            meeting_obj = client.create_meeting(self.settings.get('assistant_id'),
+                                                type=2 if scheduling_args else 3,  # scheduled vs. recurring meeting
+                                                topic=vc_room.name,
+                                                password=_gen_random_password(),
+                                                schedule_for=owner_id,
+                                                timezone=event.timezone,
+                                                settings=settings,
+                                                **scheduling_args)
+        except HTTPError as e:
+            self.logger.exception('Error creating Zoom Room: %s', e.response.content)
+            raise VCRoomError(_("Could not create the room in Zoom. Please contact support if the error persists"))
+
         vc_room.data.update({
             'zoom_id': unicode(meeting_obj['id']),
             'url': meeting_obj['join_url'],
-            'start_url':meeting_obj['start_url']
+            'start_url': meeting_obj['start_url'],
+            'password': meeting_obj['password']
         })
 
         flag_modified(vc_room, 'data')
         vc_room.zoom_meeting = ZoomMeeting(vc_room_id=vc_room.id, meeting=meeting_obj['id'],
-                                                 owned_by_user=owner, url_zoom=meeting_obj['join_url'])
+                                           owned_by_user=owner, url_zoom=meeting_obj['join_url'])
         self.notify_owner_start_url(vc_room)
-              
 
     def update_room(self, vc_room, event):
-        pass
+        client = ZoomIndicoClient()
+        zoom_meeting = _fetch_zoom_meeting(vc_room, client=client)
+        changes = {}
+
+        owner = retrieve_principal(vc_room.data['owner'])
+        host_id = zoom_meeting['host_id']
+
+        try:
+            host_data = client.get_user(host_id)
+        except HTTPError as e:
+            self.logger.exception("Error retrieving user '%s': %s", host_id, e.response.content)
+            raise VCRoomError(_("Can't get information about user. Please contact support if the error persists."))
+
+        # owner changed
+        if host_data['email'] not in owner.all_emails:
+            email = find_enterprise_email(owner)
+
+            if not email:
+                raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
+
+            changes['schedule_for'] = email
+            self._check_indico_is_assistant(email)
+            vc_room.zoom_meeting.owned_by_user = owner
+
+        if vc_room.name != zoom_meeting['topic']:
+            changes['topic'] = vc_room.name
+
+        zoom_meeting_settings = zoom_meeting['settings']
+        if vc_room.data['mute_audio'] != zoom_meeting_settings['mute_upon_entry']:
+            changes.setdefault('settings', {})['mute_upon_entry'] = vc_room.data['mute_audio']
+        if vc_room.data['mute_participant_video'] == zoom_meeting_settings['participant_video']:
+            changes.setdefault('settings', {})['participant_video'] = not vc_room.data['mute_participant_video']
+        if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
+            changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
+        if vc_room.data['waiting_room'] != zoom_meeting_settings['waiting_room']:
+            changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
+
+        if changes:
+            _update_zoom_meeting(vc_room.data['zoom_id'], changes)
 
     def refresh_room(self, vc_room, event):
-        pass
+        zoom_meeting = _fetch_zoom_meeting(vc_room)
+        vc_room.name = zoom_meeting['topic']
+        vc_room.data.update({
+            'url': zoom_meeting['start_url'],
+            'zoom_id': zoom_meeting['id']
+        })
+        flag_modified(vc_room, 'data')
 
     def delete_room(self, vc_room, event):
-        client = ZoomIndicoClient(self.settings)
+        client = ZoomIndicoClient()
         zoom_id = vc_room.data['zoom_id']
-        client.delete_meeting(zoom_id)
-        
-
-    def get_meeting(self, vc_room):
-        client = ZoomIndicoClient(self.settings)
-        return client.get_meeting(vc_room.data['zoom_id'])
+        try:
+            client.delete_meeting(zoom_id)
+        except HTTPError as e:
+            # if there's a 404, there is no problem, since the room is supposed to be gone anyway
+            if not e.response.status_code == 404:
+                self.logger.exception('Error getting Zoom Room: %s', e.response.content)
+                raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
 
     def get_blueprints(self):
         return blueprint
@@ -221,18 +345,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_vc_room_form_defaults(self, event):
         defaults = super(ZoomPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
+            'mute_audio': self.settings.get('mute_audio'),
+            'mute_host_video': self.settings.get('mute_host_video'),
+            'mute_participant_video': self.settings.get('mute_participant_video'),
+            'waiting_room': self.settings.get('waiting_room'),
             'show_autojoin': True,
             'show_phone_numbers': True,
-            'owner_user': session.user
+            'show_password': True,
+            'owner_choice': 'myself',
+            'owner_user': None
         })
-
         return defaults
 
     def get_vc_room_attach_form_defaults(self, event):
         defaults = super(ZoomPlugin, self).get_vc_room_attach_form_defaults(event)
         defaults.update({
             'show_autojoin': True,
-            'show_phone_numbers': True
+            'show_phone_numbers': True,
+            'show_password': True
         })
         return defaults
 
@@ -248,13 +378,18 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_notification_cc_list(self, action, vc_room, event):
         return {vc_room.zoom_meeting.owned_by_user.email}
 
-
     def notify_owner_start_url(self, vc_room):
         user = vc_room.zoom_meeting.owned_by_user
         to_list = {user.email}
 
-        template_module = get_template_module('vc_zoom:emails/notify_start_url.html', plugin=ZoomPlugin.instance, vc_room=vc_room, event=None,
-                                         vc_room_event=None, user=user)
+        template_module = get_template_module(
+            'vc_zoom:emails/notify_start_url.html',
+            plugin=ZoomPlugin.instance,
+            vc_room=vc_room,
+            event=None,
+            vc_room_event=None,
+            user=user
+        )
 
         email = make_email(to_list, template=template_module, html=True)
-        send_email(email, None, 'Zoom') 
+        send_email(email, None, 'Zoom')
