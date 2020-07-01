@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from flask import session
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import IntegerField, TextAreaField
@@ -22,6 +24,7 @@ from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
+from indico.util.string import remove_accents
 from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.http_api.hooks.base import HTTPAPIHook
@@ -301,6 +304,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     def get_vc_room_form_defaults(self, event):
         defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
+            'name': re.sub(r'[^\w_-]', '_', remove_accents(event.title, reencode=False)),
             'auto_mute': True,
             'show_pin': False,
             'show_autojoin': True,

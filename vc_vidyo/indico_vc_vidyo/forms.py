@@ -8,12 +8,13 @@
 from __future__ import unicode_literals
 
 from wtforms.fields.core import BooleanField
-from wtforms.fields.simple import TextAreaField
+from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, Regexp, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import IndicoPasswordField, PrincipalField
+from indico.web.forms.validators import IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_vidyo import _
@@ -42,6 +43,11 @@ class VCRoomAttachForm(VCRoomAttachFormBase, VidyoAdvancedFormMixin):
 
 class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
     """Contains all information concerning a Vidyo booking"""
+
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), IndicoRegexp(r'[\w\-]+')],
+                       description=_('The name of the room. It can contain only alphanumerical characters, underscores '
+                                     'and dashes. No spaces allowed.'),
+                       render_kw={'data-sanitize-vidyo-room-name': ''})
 
     advanced_fields = {'show_pin', 'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields

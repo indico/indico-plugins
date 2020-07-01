@@ -12,7 +12,6 @@ import re
 from flask_multipass import IdentityRetrievalFailed
 
 from indico.core.auth import multipass
-from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
 

@@ -5,14 +5,16 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-$(function() {
+const sanitizeRoomName = text => text.trim().replace(/[^\w-]+/g, '_');
+
+$(() => {
   $('.vc-toolbar').dropdown({
     positioning: {
-      level1: {my: 'right top', at: 'right bottom', offset: '0px 0px'},
+      level1: { my: 'right top', at: 'right bottom', offset: '0px 0px' },
     },
   });
 
-  $('.vc-toolbar .action-make-owner').click(function() {
+  $('.vc-toolbar .action-make-owner').click(function () {
     const $this = $(this);
 
     $.ajax({
@@ -20,15 +22,34 @@ $(function() {
       method: 'POST',
       complete: IndicoUI.Dialogs.Util.progress(),
     })
-      .done(function(result) {
+      .done(result => {
         if (handleAjaxError(result)) {
           return;
         } else {
           location.reload();
         }
       })
-      .fail(function(error) {
+      .fail(error => {
         handleAjaxError(error);
       });
+  });
+
+  $('body').on('indico:dialogOpen', ({target}) => {
+    const element = target.querySelector('form[data-vc-type="vidyo"] #vc-name');
+
+    if (!element) {
+      return;
+    }
+
+    element.addEventListener('change', ({target}) => {
+      const currentText = target.value;
+      const sanitizedText = sanitizeRoomName(currentText);
+
+      if (currentText !== sanitizedText) {
+        target.classList.add('highlight');
+        target.value = sanitizedText;
+        setTimeout(() => target.classList.remove('highlight'), 1000);
+      }
+    });
   });
 });
