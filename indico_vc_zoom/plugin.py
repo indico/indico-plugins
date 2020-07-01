@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import random
 import string
 
+from flask import flash
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, NotFound
@@ -131,6 +132,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super(ZoomPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.connect(signals.event.times_changed, self._times_changed)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
@@ -393,3 +395,26 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         email = make_email(to_list, template=template_module, html=True)
         send_email(email, None, 'Zoom')
+
+    def _times_changed(self, sender, obj, **kwargs):
+        from indico.modules.events.models.events import Event
+        from indico.modules.events.contributions.models.contributions import Contribution
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+
+        if not hasattr(obj, 'vc_room_associations'):
+            return
+
+        if any(assoc.vc_room.type == 'zoom' and len(assoc.vc_room.events) == 1 for assoc in obj.vc_room_associations):
+            if sender == Event:
+                message = _("There are one or more scheduled Zoom meetings associated with this event which were not "
+                            "automatically updated.")
+            elif sender == Contribution:
+                message = _("There are one or more scheduled Zoom meetings associated with contribution '{}' which "
+                            " were not automatically updated.").format(obj.title)
+            elif sender == SessionBlock:
+                message = _("There are one or more scheduled Zoom meetings associated with this session block which "
+                            "were not automatically updated.")
+            else:
+                return
+
+            flash(message, 'warning')
