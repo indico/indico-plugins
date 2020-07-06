@@ -6,13 +6,13 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
+from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import IndicoRadioField, PrincipalField
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
-from indico_vc_zoom.util import retrieve_principal
 
 
 class ZoomAdvancedFormMixin(object):
@@ -65,14 +65,14 @@ class VCRoomForm(VCRoomFormBase, ZoomAdvancedFormMixin):
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
         if defaults.owner_user is None and defaults.owner is not None:
-            owner = retrieve_principal(defaults.owner)
+            owner = principal_from_identifier(defaults.owner)
             defaults.owner_choice = 'myself' if owner == session.user else 'someone_else'
             defaults.owner_user = None if owner == session.user else owner
         super(VCRoomForm, self).__init__(*args, **kwargs)
 
     @generated_data
     def owner(self):
-        return session.user.as_principal if self.owner_choice.data == 'myself' else self.owner_user.data.as_principal
+        return session.user.identifier if self.owner_choice.data == 'myself' else self.owner_user.data.identifier
 
     def validate_owner_user(self, field):
         if not field.data:

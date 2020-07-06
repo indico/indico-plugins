@@ -13,7 +13,7 @@ from indico.util.i18n import _
 class RHRoomOwner(RHVCSystemEventBase):
     def _process(self):
         result = {}
-        self.vc_room.zoom_meeting.owned_by_user = session.user
+        self.vc_room.data['owner'] = session.user.identifier
         try:
             self.plugin.update_room(self.vc_room, self.event)
         except VCRoomError as err:

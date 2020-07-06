@@ -6,8 +6,6 @@ from pytz import utc
 
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
-from indico_vc_zoom.models.zoom_meetings import ZoomMeeting
-
 
 @pytest.fixture
 def create_dummy_room(db, dummy_user):

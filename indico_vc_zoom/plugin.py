@@ -24,7 +24,9 @@ from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.modules.vc.models.vc_rooms import VCRoom
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
+from indico.util.user import principal_from_identifier
 from indico.web.forms.widgets import CKEditorWidget
 from indico.web.http_api.hooks.base import HTTPAPIHook
 
@@ -34,8 +36,7 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.http_api import DeleteVCRoomAPI
-from indico_vc_zoom.models.zoom_meetings import ZoomMeeting
-from indico_vc_zoom.util import find_enterprise_email, retrieve_principal
+from indico_vc_zoom.util import find_enterprise_email
 
 
 def _gen_random_password():
@@ -237,7 +238,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         :param event: the event to the Zoom room will be attached
         """
         client = ZoomIndicoClient()
-        owner = retrieve_principal(vc_room.data['owner'])
+        owner = principal_from_identifier(vc_room.data['owner'])
         owner_id = find_enterprise_email(owner)
 
         # get the object that this booking is linked to
@@ -272,12 +273,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'zoom_id': unicode(meeting_obj['id']),
             'url': meeting_obj['join_url'],
             'start_url': meeting_obj['start_url'],
-            'password': meeting_obj['password']
+            'password': meeting_obj['password'],
+            'owner': owner.identifier
         })
 
         flag_modified(vc_room, 'data')
-        vc_room.zoom_meeting = ZoomMeeting(vc_room_id=vc_room.id, meeting=meeting_obj['id'],
-                                           owned_by_user=owner, url_zoom=meeting_obj['join_url'])
         self.notify_owner_start_url(vc_room)
 
     def update_room(self, vc_room, event):
@@ -285,7 +285,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_meeting = _fetch_zoom_meeting(vc_room, client=client)
         changes = {}
 
-        owner = retrieve_principal(vc_room.data['owner'])
+        owner = principal_from_identifier(vc_room.data['owner'])
         host_id = zoom_meeting['host_id']
 
         try:
@@ -303,7 +303,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             changes['schedule_for'] = email
             self._check_indico_is_assistant(email)
-            vc_room.zoom_meeting.owned_by_user = owner
 
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
@@ -369,19 +368,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def can_manage_vc_room(self, user, room):
-        return user == room.zoom_meeting.owned_by_user or super(ZoomPlugin, self).can_manage_vc_room(user, room)
+        return (
+            user == principal_from_identifier(room.data['owner']) or
+            super(ZoomPlugin, self).can_manage_vc_room(user, room)
+        )
 
     def _merge_users(self, target, source, **kwargs):
         super(ZoomPlugin, self)._merge_users(target, source, **kwargs)
-        for ext in ZoomMeeting.find(owned_by_user=source):
-            ext.owned_by_user = target
-            flag_modified(ext.vc_room, 'data')
+        for room in VCRoom.query.filter(
+            VCRoom.type == self.service_name, VCRoom.data.contains({'owner': source.identifier})
+        ):
+            room.data['owner'] = target.id
+            flag_modified(room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
-        return {vc_room.zoom_meeting.owned_by_user.email}
+        return {principal_from_identifier(vc_room.data['owner']).email}
 
     def notify_owner_start_url(self, vc_room):
-        user = vc_room.zoom_meeting.owned_by_user
+        user = principal_from_identifier(vc_room.data['owner'])
         to_list = {user.email}
 
         template_module = get_template_module(

@@ -21,17 +21,3 @@ def find_enterprise_email(user):
         db.or_(UserEmail.email.ilike("%%@{}".format(provider)) for provider in providers)
     ).join(User).first()
     return result.email if result else None
-
-
-def retrieve_principal(principal):
-    """Retrieve a user using a "principal tuple".
-
-    :param principal: a tuple in the form `('Avatar'|'User', <id>)`.
-    :return: the corresponding `User`.
-    """
-    from indico.modules.users import User
-    type_, id_ = principal
-    if type_ in {'Avatar', 'User'}:
-        return User.get(int(id_))
-    else:
-        raise ValueError('Unexpected type: {}'.format(type_))
