@@ -18,15 +18,13 @@ from indico_vc_zoom import _
 class ZoomAdvancedFormMixin(object):
     # Advanced options (per event)
 
-    show_password = BooleanField(_('Show Password'),
-                                 widget=SwitchWidget(),
-                                 description=_("Show the Zoom Room Password on the event page"))
-    show_autojoin = BooleanField(_('Show Auto-join URL'),
-                                 widget=SwitchWidget(),
-                                 description=_("Show the auto-join URL on the event page"))
-    show_phone_numbers = BooleanField(_('Show Phone Access numbers'),
-                                      widget=SwitchWidget(),
-                                      description=_("Show a link to the list of phone access numbers"))
+    password_visibility = IndicoRadioField(_("Password visibility"),
+                                           description=_("Who should be able to know this meeting's password"),
+                                           orientation='horizontal',
+                                           choices=[
+                                               ('everyone', _('Everyone')),
+                                               ('logged_in', _('Logged-in users')),
+                                               ('no_one', _("No one"))])
 
 
 class VCRoomAttachForm(VCRoomAttachFormBase, ZoomAdvancedFormMixin):
@@ -36,13 +34,15 @@ class VCRoomAttachForm(VCRoomAttachFormBase, ZoomAdvancedFormMixin):
 class VCRoomForm(VCRoomFormBase, ZoomAdvancedFormMixin):
     """Contains all information concerning a Zoom booking."""
 
-    advanced_fields = {'show_password', 'show_autojoin', 'show_phone_numbers'} | VCRoomFormBase.advanced_fields
+    advanced_fields = {'mute_audio', 'mute_host_video', 'mute_participant_video'} | VCRoomFormBase.advanced_fields
+
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     description = TextAreaField(_('Description'), description=_('The description of the room'))
 
     owner_choice = IndicoRadioField(_("Owner of Room"), [DataRequired()],
                                     choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
+
     owner_user = PrincipalField(_("User"),
                                 [HiddenUnless('owner_choice', 'someone_else'), DataRequired()])
 

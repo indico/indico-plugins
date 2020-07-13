@@ -194,12 +194,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 if new_schedule_args != current_schedule_args:
                     _update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
 
-        room_assoc.data.update({key: data.pop(key) for key in [
-            'show_password',
-            'show_autojoin',
-            'show_phone_numbers'
-        ]})
-
+        room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
 
     def update_data_vc_room(self, vc_room, data):
@@ -272,6 +267,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room.data.update({
             'zoom_id': unicode(meeting_obj['id']),
             'url': meeting_obj['join_url'],
+            'public_url': meeting_obj['join_url'].split('?')[0],
             'start_url': meeting_obj['start_url'],
             'password': meeting_obj['password'],
             'owner': owner.identifier
@@ -324,7 +320,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_meeting = _fetch_zoom_meeting(vc_room)
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
-            'url': zoom_meeting['start_url'],
+            'url': zoom_meeting['join_url'],
+            'public_url': zoom_meeting['join_url'].split('?')[0],
             'zoom_id': zoom_meeting['id']
         })
         flag_modified(vc_room, 'data')
@@ -350,21 +347,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'show_autojoin': True,
-            'show_phone_numbers': True,
-            'show_password': True,
             'owner_choice': 'myself',
-            'owner_user': None
+            'owner_user': None,
+            'password_visibility': 'logged_in'
         })
         return defaults
 
     def get_vc_room_attach_form_defaults(self, event):
         defaults = super(ZoomPlugin, self).get_vc_room_attach_form_defaults(event)
-        defaults.update({
-            'show_autojoin': True,
-            'show_phone_numbers': True,
-            'show_password': True
-        })
+        defaults['password_visibility'] = 'logged_in'
         return defaults
 
     def can_manage_vc_room(self, user, room):

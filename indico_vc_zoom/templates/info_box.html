@@ -2,21 +2,16 @@
 {% set owner = vc_room.data.owner %}
 {% set phone_link = settings.get('zoom_phone_link') %}
 <dl>
-    <dt>{% trans %}Name{% endtrans %}</dt>
-    <dd>{{ vc_room.name }}</dd>
-    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
+    <dt>{% trans %}Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
     {% if owner %}
         <dt>{% trans %}Owner{% endtrans %}</dt>
         <dd>{{ (owner|decodeprincipal).full_name }}</dd>
     {% endif %}
-    {% if vc_room.data.password %}
+    {% if event_vc_room.data.password_visibility == 'everyone' or is_manager or
+        (session.user and event_vc_room.data.password_visibility == 'logged_in') %}
         <dt>{% trans %}Password{% endtrans %}</dt>
         <dd>{{ vc_room.data.password }}</dd>
-    {% endif %}
-    {% if event_vc_room.data.show_pin and vc_room.data.room_pin %}
-        <dt>{% trans %}Room PIN{% endtrans %}</dt>
-        <dd>{{ vc_room.data.room_pin }}</dd>
     {% endif %}
     {% if event_vc_room.data.show_autojoin %}
         <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>

@@ -1,6 +1,21 @@
-{% macro render_join_button(vc_room, extra_classes="") %}
-    <a class="i-button highlight {{ extra_classes }}"
-       href="{{ vc_room.data.url }}" target="_blank">
-        {% trans %}Join{% endtrans %}
-    </a>
+{% macro render_join_button(vc_room, event_vc_room, extra_classes="", is_manager=false) %}
+    {% if event_vc_room.data.password_visibility == 'everyone' or is_manager or
+        (session.user and event_vc_room.data.password_visibility == 'logged_in') %}
+        <a class="i-button icon-play highlight {{ extra_classes }}"
+           href="{{ vc_room.data.url }}" target="_blank">
+            {% trans %}Join{% endtrans %}
+        </a>
+    {% elif event_vc_room.data.password_visibility == 'no_one' %}
+        <a class="i-button icon-lock-center warning {{ extra_classes }}"
+           title="{% trans %}You will need a password to join this Zoom meeting{% endtrans %}"
+           href="{{ vc_room.data.public_url }}">
+            {% trans %}Join{% endtrans %}
+        </a>
+    {% else %}
+        <a class="i-button icon-lock-center {{ extra_classes }}"
+           title="{% trans %}This Zoom Meeting can only be seen by logged in users{% endtrans %}"
+           href="{{ url_for_login(request.relative_url) }}">
+            {% trans %}Please log in{% endtrans %}
+        </a>
+    {% endif %}
 {% endmacro %}

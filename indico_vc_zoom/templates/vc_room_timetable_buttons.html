@@ -3,5 +3,5 @@
 {% set vc_room = event_vc_room.vc_room %}
 
 {% block buttons %}
-    {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
+    {{ render_join_button(vc_room, event_vc_room, "i-button-small event-service-right-button join-button") }}
 {% endblock %}
