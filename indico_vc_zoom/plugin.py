@@ -118,6 +118,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=CKEditorWidget(),
                                           description=_('Footer to append to emails sent upon creation of a VC room'))
 
+    send_host_url = BooleanField(_('Send host URL'),
+                                 widget=SwitchWidget(),
+                                 description=_('Whether to send an e-mail with the Host URL to the meeting host upon '
+                                               'creation of a meeting'))
+
 
 class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     """Zoom
@@ -155,7 +160,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'num_days_old': 5,
             'max_rooms_warning': 5000,
             'zoom_phone_link': None,
-            'creation_email_footer': None
+            'creation_email_footer': None,
+            'send_host_url': False
         })
 
     @property
@@ -274,7 +280,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         })
 
         flag_modified(vc_room, 'data')
-        self.notify_owner_start_url(vc_room)
+
+        # e-mail Host URL to meeting host
+        if self.settings.get('send_host_url'):
+            self.notify_owner_start_url(vc_room)
 
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()

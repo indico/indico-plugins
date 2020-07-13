@@ -2,6 +2,10 @@
 
 {% block plugin_specific_info %}
     <li>
+        <strong>Host</strong>:
+        <span>{{ (vc_room.data.owner|decodeprincipal).full_name }}</span>
+    </li>
+    <li>
         <strong>Zoom URL</strong>:
         <a href="{{ vc_room.data.url }}">{{ vc_room.data.url }}</a>
     </li>
