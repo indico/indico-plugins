@@ -10,10 +10,10 @@ from indico.modules.vc.exceptions import VCRoomError
 from indico.util.i18n import _
 
 
-class RHRoomOwner(RHVCSystemEventBase):
+class RHRoomHost(RHVCSystemEventBase):
     def _process(self):
         result = {}
-        self.vc_room.data['owner'] = session.user.identifier
+        self.vc_room.data['host'] = session.user.identifier
         try:
             self.plugin.update_room(self.vc_room, self.event)
         except VCRoomError as err:
@@ -21,6 +21,6 @@ class RHRoomOwner(RHVCSystemEventBase):
             result['success'] = False
             db.session.rollback()
         else:
-            flash(_("You are now the owner of the room '{room.name}'".format(room=self.vc_room)), 'success')
+            flash(_("You are now the host of room '{room.name}'".format(room=self.vc_room)), 'success')
             result['success'] = True
         return jsonify(result)

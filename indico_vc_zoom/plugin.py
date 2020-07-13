@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import random
 import string
 
-from flask import flash
+from flask import flash, session
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, NotFound
@@ -11,13 +11,8 @@ from wtforms.fields.core import BooleanField
 from wtforms.fields import IntegerField, TextAreaField
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.fields.simple import StringField
-
-from indico.web.forms.fields.simple import IndicoPasswordField
-from indico.web.forms.widgets import SwitchWidget
-
-from indico.web.flask.templating import get_template_module
 from wtforms.validators import DataRequired, NumberRange
-from indico.core.notifications import make_email, send_email
+
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, url_for_plugin
@@ -27,7 +22,8 @@ from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import principal_from_identifier
-from indico.web.forms.widgets import CKEditorWidget
+from indico.web.forms.fields.simple import IndicoPasswordField
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 from indico.web.http_api.hooks.base import HTTPAPIHook
 
 from indico_vc_zoom import _
@@ -36,6 +32,7 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.http_api import DeleteVCRoomAPI
+from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
 from indico_vc_zoom.util import find_enterprise_email
 
 
@@ -206,7 +203,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
 
-        for key in {'description', 'owner', 'mute_audio', 'mute_participant_video', 'mute_host_video',
+        for key in {'description', 'host', 'mute_audio', 'mute_participant_video', 'mute_host_video',
                     'join_before_host', 'waiting_room'}:
             if key in data:
                 vc_room.data[key] = data.pop(key)
@@ -239,8 +236,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         :param event: the event to the Zoom room will be attached
         """
         client = ZoomIndicoClient()
-        owner = principal_from_identifier(vc_room.data['owner'])
-        owner_id = find_enterprise_email(owner)
+        host = principal_from_identifier(vc_room.data['host'])
+        host_id = find_enterprise_email(host)
 
         # get the object that this booking is linked to
         vc_room_assoc = vc_room.events[0]
@@ -248,7 +245,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         scheduling_args = _get_schedule_args(link_obj) if link_obj.start_dt else {}
 
-        self._check_indico_is_assistant(owner_id)
+        self._check_indico_is_assistant(host_id)
 
         try:
             settings = {
@@ -262,7 +259,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                                                 type=2 if scheduling_args else 3,  # scheduled vs. recurring meeting
                                                 topic=vc_room.name,
                                                 password=_gen_random_password(),
-                                                schedule_for=owner_id,
+                                                schedule_for=host_id,
                                                 timezone=event.timezone,
                                                 settings=settings,
                                                 **scheduling_args)
@@ -276,21 +273,21 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'public_url': meeting_obj['join_url'].split('?')[0],
             'start_url': meeting_obj['start_url'],
             'password': meeting_obj['password'],
-            'owner': owner.identifier
+            'host': host.identifier
         })
 
         flag_modified(vc_room, 'data')
 
         # e-mail Host URL to meeting host
         if self.settings.get('send_host_url'):
-            self.notify_owner_start_url(vc_room)
+            notify_host_start_url(vc_room)
 
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()
         zoom_meeting = _fetch_zoom_meeting(vc_room, client=client)
         changes = {}
 
-        owner = principal_from_identifier(vc_room.data['owner'])
+        host = principal_from_identifier(vc_room.data['host'])
         host_id = zoom_meeting['host_id']
 
         try:
@@ -299,15 +296,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             self.logger.exception("Error retrieving user '%s': %s", host_id, e.response.content)
             raise VCRoomError(_("Can't get information about user. Please contact support if the error persists."))
 
-        # owner changed
-        if host_data['email'] not in owner.all_emails:
-            email = find_enterprise_email(owner)
+        # host changed
+        if host_data['email'] not in host.all_emails:
+            email = find_enterprise_email(host)
 
             if not email:
                 raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
 
             changes['schedule_for'] = email
             self._check_indico_is_assistant(email)
+            notify_new_host(session.user, vc_room)
 
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
@@ -356,8 +354,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'owner_choice': 'myself',
-            'owner_user': None,
+            'host_choice': 'myself',
+            'host_user': None,
             'password_visibility': 'logged_in'
         })
         return defaults
@@ -369,36 +367,20 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def can_manage_vc_room(self, user, room):
         return (
-            user == principal_from_identifier(room.data['owner']) or
+            user == principal_from_identifier(room.data['host']) or
             super(ZoomPlugin, self).can_manage_vc_room(user, room)
         )
 
     def _merge_users(self, target, source, **kwargs):
         super(ZoomPlugin, self)._merge_users(target, source, **kwargs)
         for room in VCRoom.query.filter(
-            VCRoom.type == self.service_name, VCRoom.data.contains({'owner': source.identifier})
+            VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.identifier})
         ):
-            room.data['owner'] = target.id
+            room.data['host'] = target.id
             flag_modified(room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
-        return {principal_from_identifier(vc_room.data['owner']).email}
-
-    def notify_owner_start_url(self, vc_room):
-        user = principal_from_identifier(vc_room.data['owner'])
-        to_list = {user.email}
-
-        template_module = get_template_module(
-            'vc_zoom:emails/notify_start_url.html',
-            plugin=ZoomPlugin.instance,
-            vc_room=vc_room,
-            event=None,
-            vc_room_event=None,
-            user=user
-        )
-
-        email = make_email(to_list, template=template_module, html=True)
-        send_email(email, None, 'Zoom')
+        return {principal_from_identifier(vc_room.data['host']).email}
 
     def _times_changed(self, sender, obj, **kwargs):
         from indico.modules.events.models.events import Event

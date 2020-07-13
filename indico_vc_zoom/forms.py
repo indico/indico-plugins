@@ -15,9 +15,7 @@ from indico.web.forms.widgets import SwitchWidget
 from indico_vc_zoom import _
 
 
-class ZoomAdvancedFormMixin(object):
-    # Advanced options (per event)
-
+class VCRoomAttachForm(VCRoomAttachFormBase):
     password_visibility = IndicoRadioField(_("Password visibility"),
                                            description=_("Who should be able to know this meeting's password"),
                                            orientation='horizontal',
@@ -27,24 +25,26 @@ class ZoomAdvancedFormMixin(object):
                                                ('no_one', _("No one"))])
 
 
-class VCRoomAttachForm(VCRoomAttachFormBase, ZoomAdvancedFormMixin):
-    pass
-
-
-class VCRoomForm(VCRoomFormBase, ZoomAdvancedFormMixin):
+class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Zoom booking."""
 
     advanced_fields = {'mute_audio', 'mute_host_video', 'mute_participant_video'} | VCRoomFormBase.advanced_fields
 
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
-    description = TextAreaField(_('Description'), description=_('The description of the room'))
+    host_choice = IndicoRadioField(_("Meeting Host"), [DataRequired()],
+                                   choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
 
-    owner_choice = IndicoRadioField(_("Owner of Room"), [DataRequired()],
-                                    choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
+    host_user = PrincipalField(_("User"),
+                               [HiddenUnless('host_choice', 'someone_else'), DataRequired()])
 
-    owner_user = PrincipalField(_("User"),
-                                [HiddenUnless('owner_choice', 'someone_else'), DataRequired()])
+    password_visibility = IndicoRadioField(_("Password visibility"),
+                                           description=_("Who should be able to know this meeting's password"),
+                                           orientation='horizontal',
+                                           choices=[
+                                               ('everyone', _('Everyone')),
+                                               ('logged_in', _('Logged-in users')),
+                                               ('no_one', _("No one"))])
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -62,18 +62,20 @@ class VCRoomForm(VCRoomFormBase, ZoomAdvancedFormMixin):
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
+    description = TextAreaField(_('Description'), description=_('The description of the room'))
+
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
-        if defaults.owner_user is None and defaults.owner is not None:
-            owner = principal_from_identifier(defaults.owner)
-            defaults.owner_choice = 'myself' if owner == session.user else 'someone_else'
-            defaults.owner_user = None if owner == session.user else owner
+        if defaults.host_user is None and defaults.host is not None:
+            host = principal_from_identifier(defaults.host)
+            defaults.host_choice = 'myself' if host == session.user else 'someone_else'
+            defaults.host_user = None if host == session.user else host
         super(VCRoomForm, self).__init__(*args, **kwargs)
 
     @generated_data
-    def owner(self):
-        return session.user.identifier if self.owner_choice.data == 'myself' else self.owner_user.data.identifier
+    def host(self):
+        return session.user.identifier if self.host_choice.data == 'myself' else self.host_user.data.identifier
 
-    def validate_owner_user(self, field):
+    def validate_host_user(self, field):
         if not field.data:
             raise ValidationError(_("Unable to find this user in Indico."))

@@ -1,13 +1,13 @@
 {% from '_password.html' import password %}
 {% from '_clipboard_input.html' import clipboard_input %}
-{% set owner = vc_room.data.owner %}
+{% set host = vc_room.data.host %}
 {% set phone_link = settings.get('zoom_phone_link') %}
 <dl class="details-container">
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
-    <dt>{% trans %}Owner{% endtrans %}</dt>
+    <dt>{% trans %}Host{% endtrans %}</dt>
     <dd>
-        {{ (owner|decodeprincipal).full_name }}
+        {{ (host|decodeprincipal).full_name }}
     </dd>
     <dt>{% trans %}Linked to{% endtrans %}</dt>
     <dd>
