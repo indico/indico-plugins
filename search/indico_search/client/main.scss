@@ -79,7 +79,7 @@
 #category-search-form {
     .search-box {
         position: absolute;
-        right: 0.5em;
+        right: 1.5em;
         top: 50px;
         border: none;
         font-size: 13px;
@@ -121,7 +121,7 @@
     .extra-options {
         border: 1px solid #888888;
         border-radius: 6px;
-        min-width: 250px;
+        min-width: 275px;
         white-space: nowrap;
         width: 100%;
         display: none;
@@ -129,7 +129,7 @@
         top: 23px;
         right: 0;
         background-color: white;
-        overflow: hidden;
+        overflow: visible;
 
         table {
             width: auto;

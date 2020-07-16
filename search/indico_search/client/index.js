@@ -502,7 +502,6 @@ import './main.scss';
       options.categoryNamesUrl
     );
 
-    $('#search-start_date, #search-end_date').datepicker();
     $E('search-phrase').replaceWith(intelligentSearchBox.draw());
 
     $('.search-button').on('click', function() {
