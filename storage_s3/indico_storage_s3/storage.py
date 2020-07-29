@@ -28,7 +28,7 @@ from indico.core.storage import Storage, StorageError
 from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyError
 from indico.util.fs import get_file_checksum
 from indico.util.string import return_ascii
-from indico.web.flask.util import send_file
+from indico.web.flask.util import make_content_disposition_args, send_file
 
 
 s3_session_cache = threading.local()
@@ -134,7 +134,7 @@ class S3StorageBase(Storage):
             bucket, id_ = self._parse_file_id(file_id)
             content_disp = 'inline' if inline else 'attachment'
             h = Headers()
-            h.add('Content-Disposition', content_disp, filename=filename)
+            h.add('Content-Disposition', content_disp, **make_content_disposition_args(filename))
             url = self.client.generate_presigned_url('get_object',
                                                      Params={'Bucket': bucket,
                                                              'Key': id_,
