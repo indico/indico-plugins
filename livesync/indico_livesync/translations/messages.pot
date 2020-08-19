@@ -1,56 +1,56 @@
 # Translations template for PROJECT.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-10-18 11:55+0200\n"
+"POT-Creation-Date: 2020-08-19 20:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.8.0\n"
 
-#: indico_livesync/controllers.py:46
+#: indico_livesync/controllers.py:37
 msgid "Agent deleted"
 msgstr ""
 
-#: indico_livesync/controllers.py:67
+#: indico_livesync/controllers.py:58
 msgid "Agent added"
 msgstr ""
 
-#: indico_livesync/controllers.py:68
+#: indico_livesync/controllers.py:59
 msgid "Don't forget to run the initial export!"
 msgstr ""
 
-#: indico_livesync/controllers.py:80
+#: indico_livesync/controllers.py:71
 msgid "Cannot edit an agent that is not loaded"
 msgstr ""
 
-#: indico_livesync/controllers.py:89
+#: indico_livesync/controllers.py:80
 msgid "Agent updated"
 msgstr ""
 
-#: indico_livesync/forms.py:28
+#: indico_livesync/forms.py:19
 #: indico_livesync/templates/plugin_details_extra.html:26
 msgid "Name"
 msgstr ""
 
-#: indico_livesync/forms.py:29
+#: indico_livesync/forms.py:20
 msgid "The name of the agent. Only used in the administration interface."
 msgstr ""
 
-#: indico_livesync/plugin.py:35
+#: indico_livesync/plugin.py:26
 msgid "Queue entry TTL"
 msgstr ""
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py:27
 msgid ""
 "How many days should processed entries be kept in the queue. The time "
 "counts from the creation of the queue entries, so if the LiveSync task is"
@@ -58,15 +58,15 @@ msgid ""
 "run after processing them. Setting it to 0 disables automatic deletion."
 msgstr ""
 
-#: indico_livesync/plugin.py:41
+#: indico_livesync/plugin.py:32
 msgid "Excluded categories"
 msgstr ""
 
-#: indico_livesync/plugin.py:42
+#: indico_livesync/plugin.py:33
 msgid "Category ID"
 msgstr ""
 
-#: indico_livesync/plugin.py:43
+#: indico_livesync/plugin.py:34
 msgid ""
 "Changes to objects inside these categories or any of their subcategories "
 "are excluded."

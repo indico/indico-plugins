@@ -1,228 +1,227 @@
 # Translations template for PROJECT.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-10-18 11:55+0200\n"
+"POT-Creation-Date: 2020-08-19 20:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.8.0\n"
 
-#: indico_importer/static/js/importer.js:31
+#: indico_importer/client/index.js:23
 msgid "Jan"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:32
+#: indico_importer/client/index.js:24
 msgid "Feb"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:33
+#: indico_importer/client/index.js:25
 msgid "Mar"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:34
+#: indico_importer/client/index.js:26
 msgid "Apr"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:35
+#: indico_importer/client/index.js:27
 msgid "May"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:36
+#: indico_importer/client/index.js:28
 msgid "Jun"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:37
+#: indico_importer/client/index.js:29
 msgid "Jul"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:38
+#: indico_importer/client/index.js:30
 msgid "Aug"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:39
+#: indico_importer/client/index.js:31
 msgid "Sep"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:40
+#: indico_importer/client/index.js:32
 msgid "Oct"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:41
+#: indico_importer/client/index.js:33
 msgid "Nov"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:42
+#: indico_importer/client/index.js:34
 msgid "Dec"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:111
+#: indico_importer/client/index.js:107
 msgid "Something went wrong"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:270
+#: indico_importer/client/index.js:270
 msgid "search"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:301
+#: indico_importer/client/index.js:321
 msgid "in"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:308
+#: indico_importer/client/index.js:335
 msgid "Proceed..."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:322
+#: indico_importer/client/index.js:359
 msgid "Close"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:331
+#: indico_importer/client/index.js:370
 msgid "Please select contributions to be added and their destination."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:357
+#: indico_importer/client/index.js:396
 msgid "Import Entries"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:397
+#: indico_importer/client/index.js:440
 msgid "Please type your search phrase and press 'search'."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:398
+#: indico_importer/client/index.js:442
 msgid "here"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:402
+#: indico_importer/client/index.js:446
 msgid ""
 "Your entries were inserted successfully. Please specify a new query or "
 "click"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:402
+#: indico_importer/client/index.js:452
 msgid "to see the previous results."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:477
+#: indico_importer/client/index.js:537
 msgid "Duration time of every inserted contribution:"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:478
+#: indico_importer/client/index.js:538
 msgid "Start time of the first contribution:"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:479
+#: indico_importer/client/index.js:539
 msgid "Show me the destination:"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:604
+#: indico_importer/client/index.js:668
 msgid "Insert"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:686
+#: indico_importer/client/index.js:777
 msgid "Cancel"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:708
+#: indico_importer/client/index.js:801
 msgid "Adjust entries"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:944
+#: indico_importer/client/index.js:1052
 msgid "Report number(s)"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:951
+#: indico_importer/client/index.js:1060
 msgid "Title"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:954
+#: indico_importer/client/index.js:1065
 msgid "Meeting"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:958
+#: indico_importer/client/index.js:1073
 msgid "Primary author"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:961
+#: indico_importer/client/index.js:1083
 msgid "Secondary author"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:964
+#: indico_importer/client/index.js:1093
 msgid "Speaker"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:970
-#: indico_importer/static/js/importer.js:994
+#: indico_importer/client/index.js:1103 indico_importer/client/index.js:1132
 msgid "Summary"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:974
+#: indico_importer/client/index.js:1107
 msgid " (show all)"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:984
+#: indico_importer/client/index.js:1119
 msgid " (hide)"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:999
+#: indico_importer/client/index.js:1144
 msgid "Place"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1003
+#: indico_importer/client/index.js:1149
 msgid "Materials"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1044
+#: indico_importer/client/index.js:1193
 msgid "st"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1047
+#: indico_importer/client/index.js:1196
 msgid "nd"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1050
+#: indico_importer/client/index.js:1199
 msgid "rd"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1053
+#: indico_importer/client/index.js:1202
 msgid "th"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1136
+#: indico_importer/client/index.js:1291
 msgid "One entry was found. "
 msgid_plural "{0} entries were found. "
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico_importer/static/js/importer.js:1201
+#: indico_importer/client/index.js:1367
 msgid "Please select the results you want to insert."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1202
+#: indico_importer/client/index.js:1371
 msgid "No results were found. Please change the search phrase."
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1203
+#: indico_importer/client/index.js:1375
 msgid "Step 1: Search results:"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1208
+#: indico_importer/client/index.js:1393
 msgid "more results"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1445
+#: indico_importer/client/index.js:1667
 msgid "Step 2: Choose destination:"
 msgstr ""
 
-#: indico_importer/static/js/importer.js:1446
+#: indico_importer/client/index.js:1670
 msgid "Please select the place in which the contributions will be inserted."
 msgstr ""
 

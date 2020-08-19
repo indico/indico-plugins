@@ -17,20 +17,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: indico_search/client/index.js:45
-msgid "Some category suggestions..."
+#: indico_storage_s3/plugin.py:35
+msgid "Bucket info API"
 msgstr ""
 
-#: indico_search/client/index.js:347 indico_search/client/index.js:413
-#: indico_search/client/index.js:457
-msgid "Everywhere"
+#: indico_storage_s3/plugin.py:36
+msgid "Username"
 msgstr ""
 
-#: indico_search/client/index.js:433
-msgid "Click to search inside <span class=\"label\">{title}</span>"
+#: indico_storage_s3/plugin.py:37
+msgid "The username to access the S3 bucket info endpoint"
 msgstr ""
 
-#: indico_search/templates/searchbox_conference.html:7
-msgid "Search..."
+#: indico_storage_s3/plugin.py:38
+msgid "Password"
+msgstr ""
+
+#: indico_storage_s3/plugin.py:41
+msgid "The password to access the S3 bucket info endpoint"
+msgstr ""
+
+#: indico_storage_s3/plugin.py:46
+msgid ""
+"Enables an API on {url} that returns information on all S3 buckets "
+"currently in use, including dynamically-named ones."
 msgstr ""
 

@@ -17,20 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: indico_search/client/index.js:45
-msgid "Some category suggestions..."
+#: indico_ursh/client/index.js:49
+msgid "Please fill in a URL to shorten"
 msgstr ""
 
-#: indico_search/client/index.js:347 indico_search/client/index.js:413
-#: indico_search/client/index.js:457
-msgid "Everywhere"
+#: indico_ursh/client/index.js:62 indico_ursh/client/index.js:105
+msgid "This does not look like a valid URL"
 msgstr ""
 
-#: indico_search/client/index.js:433
-msgid "Click to search inside <span class=\"label\">{title}</span>"
+#: indico_ursh/client/index.js:71
+msgid "Invalid host: only Indico URLs are allowed"
 msgstr ""
 
-#: indico_search/templates/searchbox_conference.html:7
-msgid "Search..."
+#: indico_ursh/client/index.js:138
+msgid "Please check that the shortcut is correct"
 msgstr ""
 
