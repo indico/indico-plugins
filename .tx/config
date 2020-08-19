@@ -72,3 +72,15 @@ file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_ME
 source_file = importer_invenio/indico_importer_invenio/translations/messages.pot
 source_lang = en
 type = PO
+
+[indico.ursh-messages]
+file_filter = ursh/indico_ursh/translations/<lang>/LC_MESSAGES/messages.po
+source_file = ursh/indico_ursh/translations/messages.pot
+source_lang = en
+type = PO
+
+[indico.storage_s3-messages]
+file_filter = storage_s3/indico_storage_s3/translations/<lang>/LC_MESSAGES/messages.po
+source_file = storage_s3/indico_storage_s3/translations/messages.pot
+source_lang = en
+type = PO
