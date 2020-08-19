@@ -23,6 +23,7 @@ if [[ ! "init extract update compile" =~ $ACTION ]]; then
 fi
 
 for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;); do
+    [[ "$plugin" == "_meta" ]] && continue
     pushd "${plugin}" >/dev/null
     if [[ "$ACTION" == "init" ]]; then
         require_locale
@@ -36,7 +37,7 @@ for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;
             echo "deleting empty dict ${TRANSLATIONS_DIR}/messages.pot"
             rm "${TRANSLATIONS_DIR}/messages.pot"
         fi
-        pybabel extract -o "${TRANSLATIONS_DIR}/messages-js.pot" "indico_${plugin}" -k 'gettext' -k 'ngettext:1,2' -k '$T' -F ../babel-js.cfg
+        pybabel extract -o "${TRANSLATIONS_DIR}/messages-js.pot" "indico_${plugin}" -k '$t.gettext' -k '$t.ngettext:1,2' -F ../babel-js.cfg
         num_strings=$(grep msgid "${TRANSLATIONS_DIR}/messages-js.pot" | wc -l)
         if (( $num_strings == 1 )); then
             echo "deleting empty js dict ${TRANSLATIONS_DIR}/messages-js.pot"
