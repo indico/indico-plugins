@@ -13,13 +13,14 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 
 
 def obj_ref(obj):
-    """Returns a tuple identifying a category/event/contrib/subcontrib"""
+    """Return a tuple identifying a category/event/contrib/subcontrib/note."""
     from indico_livesync.models.queue import EntryType
     if isinstance(obj, Category):
         ref = {'type': EntryType.category, 'category_id': obj.id}
@@ -31,6 +32,8 @@ def obj_ref(obj):
         ref = {'type': EntryType.contribution, 'contrib_id': obj.id}
     elif isinstance(obj, SubContribution):
         ref = {'type': EntryType.subcontribution, 'subcontrib_id': obj.id}
+    elif isinstance(obj, EventNote):
+        ref = {'type': EntryType.note, 'note_id': obj.id}
     else:
         raise ValueError(f'Unexpected object: {obj.__class__.__name__}')
     return ImmutableDict(ref)
@@ -38,7 +41,7 @@ def obj_ref(obj):
 
 @memoize_request
 def obj_deref(ref):
-    """Returns the object identified by `ref`"""
+    """Return the object identified by `ref`."""
     from indico_livesync.models.queue import EntryType
     if ref['type'] == EntryType.category:
         return Category.get_or_404(ref['category_id'])
@@ -50,12 +53,14 @@ def obj_deref(ref):
         return Contribution.get_or_404(ref['contrib_id'])
     elif ref['type'] == EntryType.subcontribution:
         return SubContribution.get_or_404(ref['subcontrib_id'])
+    elif ref['type'] == EntryType.note:
+        return EventNote.get_or_404(ref['note_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
 
 def clean_old_entries():
-    """Deletes obsolete entries from the queues"""
+    """Delete obsolete entries from the queues."""
     from indico_livesync.models.queue import LiveSyncQueueEntry
     from indico_livesync.plugin import LiveSyncPlugin
 
@@ -63,9 +68,8 @@ def clean_old_entries():
     if not queue_entry_ttl:
         return
     expire_threshold = now_utc() - timedelta(days=queue_entry_ttl)
-    query = LiveSyncQueueEntry.query.filter(LiveSyncQueueEntry.processed,
-                                            LiveSyncQueueEntry.timestamp < expire_threshold)
-    query.delete(synchronize_session='fetch')
+    LiveSyncQueueEntry.find(LiveSyncQueueEntry.processed,
+                            LiveSyncQueueEntry.timestamp < expire_threshold).delete(synchronize_session='fetch')
 
 
 @memoize_request

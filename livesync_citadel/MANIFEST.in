@@ -1,0 +1,4 @@
+graft indico_livesync_citadel/migrations
+graft indico_livesync_citadel/translations
+
+global-exclude *.pyc __pycache__ .keep

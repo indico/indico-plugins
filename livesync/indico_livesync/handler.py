@@ -16,6 +16,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
 
 from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
@@ -57,9 +58,9 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Session)
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # notes
-    plugin.connect(signals.event.notes.note_added, _note_changed)
-    plugin.connect(signals.event.notes.note_deleted, _note_changed)
-    plugin.connect(signals.event.notes.note_modified, _note_changed)
+    plugin.connect(signals.event.notes.note_added, _created)
+    plugin.connect(signals.event.notes.note_deleted, _deleted)
+    plugin.connect(signals.event.notes.note_modified, _updated)
     # attachments
     plugin.connect(signals.attachments.folder_deleted, _attachment_changed)
     plugin.connect(signals.attachments.attachment_created, _attachment_changed)
@@ -86,6 +87,8 @@ def _created(obj, **kwargs):
         parent = obj.event
     elif isinstance(obj, SubContribution):
         parent = obj.contribution
+    elif isinstance(obj, EventNote):
+        parent = obj.event if isinstance(obj.object, Session) else obj.object
     else:
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
     if parent:
@@ -140,11 +143,6 @@ def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
         register = old_access != new_access
     if register:
         _register_change(obj, ChangeType.protection_changed)
-
-
-def _note_changed(note, **kwargs):
-    obj = note.event if isinstance(note.object, Session) else note.object
-    _register_change(obj, ChangeType.data_changed)
 
 
 def _attachment_changed(attachment_or_folder, **kwargs):
