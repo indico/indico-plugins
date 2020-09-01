@@ -40,6 +40,7 @@ from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
+from indico.modules.files.models.files import File
 from indico.util.console import cformat
 from indico.util.date_time import format_human_timedelta
 from indico.util.fs import secure_filename
@@ -171,6 +172,12 @@ class S3Importer(object):
         self.emit_update(obj, backend, new_storage_path, new_filename)
 
     def build_storage_path(self, obj, _new_path_re=re.compile(r'^(event/\d+/registrations/\d+/\d+/\d+-)(\d+)(-.*)$')):
+        if isinstance(obj, File):
+            # ``File``` was added in 2.3 and thus always has the correct paths
+            # we cannot re-generate the storage path for it since it uses
+            # a __context attribute which is only present during the initial
+            # `save()` call and not stored anywhere.
+            return obj.storage_file_id, obj.filename
         old_filename = obj.filename
         new_filename = secure_filename(obj.filename, None)
         assert new_filename
