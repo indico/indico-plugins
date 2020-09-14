@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-piwik',
-    version='2.3-dev',
+    version='2.3',
     description='Piwik integration for global and event-specific statistics in Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',

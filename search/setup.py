@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-search',
-    version='2.3-dev',
+    version='2.3',
     description='Framework for searching content in Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',

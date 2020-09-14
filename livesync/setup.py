@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-livesync',
-    version='2.3-dev',
+    version='2.3',
     description='Framework for pushing Indico event data to external services',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
