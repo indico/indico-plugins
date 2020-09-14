@@ -4,6 +4,12 @@ max-line-length = 120
 # colored output
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
 
+# decent quote styles
+inline-quotes = single
+multiline-quotes = single
+docstring-quotes = double
+avoid-escape = true
+
 exclude =
     build
     dist
