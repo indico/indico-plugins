@@ -15,6 +15,7 @@ from collections import defaultdict
 
 import click
 import yaml
+from packaging.version import Version
 
 
 click.disable_unicode_literals_warning = True
@@ -35,7 +36,8 @@ def _find_plugins():
         if name is None or version is None:
             click.secho('Could not extract name/version from {}'.format(path), fg='red', bold=True)
             continue
-        yield name.group(2), version.group(2)
+        minver = str(Version(version.group(2)))
+        yield name.group(2), minver
 
 
 def _get_config():
@@ -65,18 +67,23 @@ def _update_meta(data):
 
 
 @click.command()
-def cli():
+@click.argument('nextver')
+def cli(nextver):
     if not os.path.isdir('_meta/'):
         click.secho('Could not find meta package (_meta subdir)', fg='red', bold=True)
         sys.exit(1)
 
+    nextver = Version(nextver)
+    if nextver.dev is None:
+        nextver = Version(str(nextver) + '-dev')
+
     config = _get_config()
     plugins_require = []
     extras_require = defaultdict(list)
-    for name, version in sorted(_find_plugins()):
+    for name, minver in sorted(_find_plugins()):
         if name in config['skip']:
             continue
-        pkgspec = '{}=={}'.format(name, version)
+        pkgspec = '{}>={},<{}'.format(name, minver, nextver)
         if name in config['extras']:
             extras_require[config['extras'][name]].append(pkgspec)
         else:
