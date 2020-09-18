@@ -20,7 +20,7 @@ div.treeListContainer {
 
 div.treeListHeader {
   color: #4e4c46;
-  font-family: 'Times New Roman', Verdana, Arial;
+  font-family: 'Times New Roman', Verdana, Arial, sans-serif;
   font-size: 20px;
   height: 20px;
   letter-spacing: 1px;
@@ -68,7 +68,7 @@ div.entryListContainer {
 
 div.entryListHeader {
   color: #4e4c46;
-  font-family: 'Times New Roman', Verdana, Arial;
+  font-family: 'Times New Roman', Verdana, Arial, sans-serif;
   font-size: 20px;
   height: 20px;
   letter-spacing: 1px;
