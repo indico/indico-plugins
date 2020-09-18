@@ -30,7 +30,7 @@ div.treeListHeader {
 
 div.treeListDescription {
   text-align: center;
-  color: #777777;
+  color: #777;
   font-size: 12px;
   font-style: italic;
   font-weight: normal;
@@ -41,9 +41,9 @@ div.treeListDescription {
 .treeListDayName {
   -moz-border-radius: 20px;
   border-radius: 20px;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   padding: 10px;
-  background-color: #ffffff;
+  background-color: #fff;
   cursor: pointer;
   float: left;
 }
@@ -51,10 +51,10 @@ div.treeListDescription {
 .treeListEntry {
   -moz-border-radius: 10px;
   border-radius: 10px;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   padding: 7px;
   width: 80%;
-  background-color: #ffffff;
+  background-color: #fff;
   cursor: pointer;
 }
 
@@ -78,7 +78,7 @@ div.entryListHeader {
 
 div.entryListDesctiption {
   text-align: center;
-  color: #777777;
+  color: #777;
   font-size: 12px;
   font-style: italic;
   font-weight: normal;
@@ -89,12 +89,12 @@ div.entryListDesctiption {
 ul.entryList li {
   -moz-border-radius: 20px;
   border-radius: 20px;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   padding: 7px;
   width: 90%;
   margin-bottom: 10px;
   list-style: none;
-  background-color: #ffffff;
+  background-color: #fff;
   cursor: pointer;
 }
 
@@ -106,11 +106,12 @@ ul.entryList em {
   font-weight: bold;
   font-style: normal;
 }
+
 .entryListSelected {
   background-color: #cdeb8b !important;
-  box-shadow: 3px 3px 5px #000000;
-  -moz-box-shadow: 3px 3px 5px #000000;
-  -webkit-box-shadow: 3px 3px 5px #000000;
+  box-shadow: 3px 3px 5px #000;
+  -moz-box-shadow: 3px 3px 5px #000;
+  -webkit-box-shadow: 3px 3px 5px #000;
 }
 
 div.importDialogHeader {
@@ -130,7 +131,7 @@ div.importDialogHeader input[type='text'] {
 .entryListIndex {
   -moz-border-radius: 100% 100% 100% 100%;
   border-radius: 100% 100% 100% 100%;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   left: -51px;
   position: relative;
   text-align: center;
@@ -148,8 +149,8 @@ div.expandButtonsDiv {
 div.presearchContainer {
   -moz-border-radius: 20px 20px 20px 20px;
   border-radius: 20px 20px 20px 20px;
-  border: 1px solid #cccccc;
-  color: #777777;
+  border: 1px solid #ccc;
+  color: #777;
   font-size: 14px;
   margin-top: 25px;
   padding: 15px;

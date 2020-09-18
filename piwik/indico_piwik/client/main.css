@@ -17,7 +17,7 @@ div#statsHeader {
 div#statsWidgetsWrapper {
   width: 740px;
   height: auto;
-  padding: 10px 0px 10px 0px;
+  padding: 10px 0 10px 0;
 }
 
 div.statsInfo {
@@ -52,8 +52,8 @@ div.statsRow {
 div.statsWidget {
   display: block;
   border-left: 1px solid #efefef;
-  padding: 0px 5px 0px 5px;
-  margin: 0px 16px 15px 0px;
+  padding: 0 5px 0 5px;
+  margin: 0 16px 15px 0;
   float: left;
   height: 100%;
 }
@@ -72,7 +72,7 @@ div.statsWidget.full {
 }
 
 div.statsWidget.edge {
-  margin-right: 0px !important;
+  margin-right: 0 !important;
 }
 
 div.statsWidget.large {
@@ -102,7 +102,7 @@ div.statsWidgetContent {
 }
 
 div.statsTableDivider {
-  padding: 10px 0px 5px 0px;
+  padding: 10px 0 5px 0;
   margin-bottom: 5px;
   display: block;
   width: 100%;
@@ -136,8 +136,8 @@ div#materialContainer {
 /* jqTree Formatting */
 
 div#materialTree ul {
-  margin: 0px;
-  padding: 0 0 0px 10px;
+  margin: 0;
+  padding: 0 0 0 10px;
   line-height: 1.5em;
 }
 
