@@ -32,6 +32,13 @@ class VCRoomForm(VCRoomFormBase):
 
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
+    meeting_type = IndicoRadioField(_("Meeting Type"),
+                                    description=_("The type of Zoom meeting ot be created"),
+                                    orientation='horizontal',
+                                    choices=[
+                                        ('regular', _('Regular Meeting')),
+                                        ('webinar', _('Webinar'))])
+
     host_choice = IndicoRadioField(_("Meeting Host"), [DataRequired()],
                                    choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
 
@@ -47,6 +54,7 @@ class VCRoomForm(VCRoomFormBase):
                                                ('no_one', _("No one"))])
 
     mute_audio = BooleanField(_('Mute audio'),
+                              [HiddenUnless('meeting_type', 'regular')],
                               widget=SwitchWidget(),
                               description=_('Participants will join the VC room muted by default '))
 
@@ -55,14 +63,16 @@ class VCRoomForm(VCRoomFormBase):
                                    description=_('The host will join the VC room with video disabled'))
 
     mute_participant_video = BooleanField(_('Mute video (participants)'),
+                                          [HiddenUnless('meeting_type', 'regular')],
                                           widget=SwitchWidget(),
                                           description=_('Participants will join the VC room with video disabled'))
 
     waiting_room = BooleanField(_('Waiting room'),
+                                [HiddenUnless('meeting_type', 'regular')],
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
-    description = TextAreaField(_('Description'), description=_('The description of the room'))
+    description = TextAreaField(_('Description'), description=_('Optional description for this room'))
 
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
@@ -74,6 +84,8 @@ class VCRoomForm(VCRoomFormBase):
 
     @generated_data
     def host(self):
+        if self.host_choice is None:
+            return None
         return session.user.identifier if self.host_choice.data == 'myself' else self.host_user.data.identifier
 
     def validate_host_user(self, field):

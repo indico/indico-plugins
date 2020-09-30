@@ -2,7 +2,7 @@
 {% set host = vc_room.data.host %}
 {% set phone_link = settings.get('zoom_phone_link') %}
 <dl>
-    <dt>{% trans %}Meeting ID{% endtrans %}</dt>
+    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
     {% if host %}
         <dt>{% trans %}Host{% endtrans %}</dt>

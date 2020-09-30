@@ -83,8 +83,35 @@ class MeetingComponent(BaseComponent):
             "{}/meetings/{}".format(self.base_uri, meeting_id), json=kwargs
         )
 
-    def get_invitation(self, meeting_id, **kwargs):
-        return self.session.get("{}/meetings/{}/invitation".format(self.base_uri, meeting_id), json=kwargs)
+
+class WebinarComponent(BaseComponent):
+    def list(self, user_id, **kwargs):
+        return self.get(
+            "{}/users/{}/webinars".format(self.base_uri, user_id), params=kwargs
+        )
+
+    def create(self, user_id, **kwargs):
+        if kwargs.get("start_time"):
+            kwargs["start_time"] = format_iso_dt(kwargs["start_time"])
+        return self.session.post(
+            "{}/users/{}/webinars".format(self.base_uri, user_id),
+            json=kwargs
+        )
+
+    def get(self, meeting_id, **kwargs):
+        return self.session.get("{}/webinars/{}".format(self.base_uri, meeting_id), json=kwargs)
+
+    def update(self, meeting_id, **kwargs):
+        if kwargs.get("start_time"):
+            kwargs["start_time"] = format_iso_dt(kwargs["start_time"])
+        return self.session.patch(
+            "{}/webinars/{}".format(self.base_uri, meeting_id), json=kwargs
+        )
+
+    def delete(self, meeting_id, **kwargs):
+        return self.session.delete(
+            "{}/webinars/{}".format(self.base_uri, meeting_id), json=kwargs
+        )
 
 
 class UserComponent(BaseComponent):
@@ -118,7 +145,8 @@ class ZoomClient(object):
 
     _components = {
         'user': UserComponent,
-        'meeting': MeetingComponent
+        'meeting': MeetingComponent,
+        'webinar': WebinarComponent
     }
 
     def __init__(self, api_key, api_secret, timeout=15):
@@ -180,11 +208,20 @@ class ZoomIndicoClient(object):
     def update_meeting(self, meeting_id, data):
         return _handle_response(self.client.meeting.update(meeting_id, **data), 204, expects_json=False)
 
-    def get_meeting_invitation(self, meeting_id):
-        return _handle_response(self.client.meeting.get_invitation(meeting_id))
-
     def delete_meeting(self, meeting_id):
         return _handle_response(self.client.meeting.delete(meeting_id), 204, expects_json=False)
+
+    def create_webinar(self, user_id, **kwargs):
+        return _handle_response(self.client.webinar.create(user_id, **kwargs), 201)
+
+    def get_webinar(self, webinar_id):
+        return _handle_response(self.client.webinar.get(webinar_id))
+
+    def update_webinar(self, webinar_id, data):
+        return _handle_response(self.client.webinar.update(webinar_id, **data), 204, expects_json=False)
+
+    def delete_webinar(self, webinar_id):
+        return _handle_response(self.client.webinar.delete(webinar_id), 204, expects_json=False)
 
     def check_user_meeting_time(self, user_id, start_dt, end_dt):
         pass

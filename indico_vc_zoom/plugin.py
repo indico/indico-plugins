@@ -15,12 +15,13 @@ from wtforms.validators import DataRequired, NumberRange
 
 from indico.core import signals
 from indico.core.config import config
-from indico.core.plugins import IndicoPlugin, url_for_plugin
+from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
+from indico.util.date_time import now_utc
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields.simple import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
@@ -40,12 +41,14 @@ def _gen_random_password():
     return ''.join(random.sample(string.ascii_lowercase + string.ascii_uppercase + string.digits, 10))
 
 
-def _fetch_zoom_meeting(vc_room, client=None):
+def _fetch_zoom_meeting(vc_room, client=None, is_webinar=False):
     try:
         client = client or ZoomIndicoClient()
+        if is_webinar:
+            return client.get_webinar(vc_room.data['zoom_id'])
         return client.get_meeting(vc_room.data['zoom_id'])
     except HTTPError as e:
-        if e.response.status_code == 404:
+        if e.response.status_code in {400, 404}:
             # Indico will automatically mark this room as deleted
             raise VCRoomNotFoundError(_("This room has been deleted from Zoom"))
         else:
@@ -53,19 +56,27 @@ def _fetch_zoom_meeting(vc_room, client=None):
             raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
 
 
-def _update_zoom_meeting(zoom_id, changes):
+def _update_zoom_meeting(zoom_id, changes, is_webinar=False):
     client = ZoomIndicoClient()
     try:
-        client.update_meeting(zoom_id, changes)
+        if is_webinar:
+            client.update_webinar(zoom_id, changes)
+        else:
+            client.update_meeting(zoom_id, changes)
     except HTTPError as e:
         ZoomPlugin.logger.exception("Error updating meeting '%s': %s", zoom_id, e.response.content)
         raise VCRoomError(_("Can't update meeting. Please contact support if the error persists."))
 
 
 def _get_schedule_args(obj):
+    duration = obj.end_dt - obj.start_dt
+
+    if obj.start_dt < now_utc():
+        return {}
+
     return {
         'start_time': obj.start_dt,
-        'duration': (obj.end_dt - obj.start_dt).total_seconds() / 60,
+        'duration': duration.total_seconds() / 60,
     }
 
 
@@ -136,6 +147,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super(ZoomPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._times_changed)
+        self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
@@ -169,6 +181,25 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def icon_url(self):
         return url_for_plugin(self.name + '.static', filename='images/zoom_logo.png')
 
+    def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
+        """Override the default room form creation mechanism."""
+        form = super(ZoomPlugin, self).create_form(
+            event,
+            existing_vc_room=existing_vc_room,
+            existing_event_vc_room=existing_event_vc_room
+        )
+
+        if existing_vc_room:
+            # if we're editing a VC room, we will not allow the meeting type to be changed
+            form.meeting_type.render_kw = {'disabled': True}
+
+            if form.data['meeting_type'] == 'webinar':
+                # webinar hosts cannot be changed through the API
+                form.host_choice.render_kw = {'disabled': True}
+                form.host_user.render_kw = {'disabled': True}
+
+        return form
+
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
 
@@ -200,11 +231,20 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
 
-    def update_data_vc_room(self, vc_room, data):
+    def update_data_vc_room(self, vc_room, data, is_new=False):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
+        fields = {'description'}
+        if data['meeting_type'] == 'webinar':
+            fields |= {'mute_host_video'}
+            if is_new:
+                fields |= {'host', 'meeting_type'}
+        else:
+            fields |= {
+                'meeting_type', 'host', 'mute_audio', 'mute_participant_video', 'mute_host_video', 'join_before_host',
+                'waiting_room'
+            }
 
-        for key in {'description', 'host', 'mute_audio', 'mute_participant_video', 'mute_host_video',
-                    'join_before_host', 'waiting_room'}:
+        for key in fields:
             if key in data:
                 vc_room.data[key] = data.pop(key)
 
@@ -237,32 +277,50 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         """
         client = ZoomIndicoClient()
         host = principal_from_identifier(vc_room.data['host'])
-        host_id = find_enterprise_email(host)
+        host_email = find_enterprise_email(host)
 
         # get the object that this booking is linked to
         vc_room_assoc = vc_room.events[0]
         link_obj = vc_room_assoc.link_object
-
+        is_webinar = vc_room.data['meeting_type'] == 'webinar'
         scheduling_args = _get_schedule_args(link_obj) if link_obj.start_dt else {}
 
-        self._check_indico_is_assistant(host_id)
+        self._check_indico_is_assistant(host_email)
 
         try:
             settings = {
                 'host_video': vc_room.data['mute_host_video'],
-                'participant_video': not vc_room.data['mute_participant_video'],
-                'join_before_host': self.settings.get('join_before_host'),
-                'mute_upon_entry': vc_room.data['mute_audio'],
-                'waiting_room': vc_room.data['waiting_room']
             }
-            meeting_obj = client.create_meeting(self.settings.get('assistant_id'),
-                                                type=2 if scheduling_args else 3,  # scheduled vs. recurring meeting
-                                                topic=vc_room.name,
-                                                password=_gen_random_password(),
-                                                schedule_for=host_id,
-                                                timezone=event.timezone,
-                                                settings=settings,
-                                                **scheduling_args)
+
+            kwargs = {}
+            if is_webinar:
+                kwargs = {
+                    'type': 5 if scheduling_args else 6,
+                    'host_email': host_email
+                }
+            else:
+                kwargs = {
+                    'type': 2 if scheduling_args else 3,
+                    'schedule_for': host_email
+                }
+                settings.update({
+                    'mute_upon_entry': vc_room.data['mute_audio'],
+                    'participant_video': not vc_room.data['mute_participant_video'],
+                    'waiting_room': vc_room.data['waiting_room'],
+                    'join_before_host': self.settings.get('join_before_host'),
+                })
+
+            kwargs.update({
+                'topic': vc_room.name,
+                'password': _gen_random_password(),
+                'timezone': event.timezone,
+                'settings': settings
+            })
+            kwargs.update(scheduling_args)
+            if is_webinar:
+                meeting_obj = client.create_webinar(self.settings.get('assistant_id'), **kwargs)
+            else:
+                meeting_obj = client.create_meeting(self.settings.get('assistant_id'), **kwargs)
         except HTTPError as e:
             self.logger.exception('Error creating Zoom Room: %s', e.response.content)
             raise VCRoomError(_("Could not create the room in Zoom. Please contact support if the error persists"))
@@ -284,7 +342,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()
-        zoom_meeting = _fetch_zoom_meeting(vc_room, client=client)
+        is_webinar = vc_room.data['meeting_type'] == 'webinar'
+        zoom_meeting = _fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
         changes = {}
 
         host = principal_from_identifier(vc_room.data['host'])
@@ -303,7 +362,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if not email:
                 raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
 
-            changes['schedule_for'] = email
+            changes['host_email' if is_webinar else 'schedule_for'] = email
             self._check_indico_is_assistant(email)
             notify_new_host(session.user, vc_room)
 
@@ -311,20 +370,23 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             changes['topic'] = vc_room.name
 
         zoom_meeting_settings = zoom_meeting['settings']
-        if vc_room.data['mute_audio'] != zoom_meeting_settings['mute_upon_entry']:
-            changes.setdefault('settings', {})['mute_upon_entry'] = vc_room.data['mute_audio']
-        if vc_room.data['mute_participant_video'] == zoom_meeting_settings['participant_video']:
-            changes.setdefault('settings', {})['participant_video'] = not vc_room.data['mute_participant_video']
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
             changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
-        if vc_room.data['waiting_room'] != zoom_meeting_settings['waiting_room']:
-            changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
+
+        if not is_webinar:
+            if vc_room.data['mute_audio'] != zoom_meeting_settings['mute_upon_entry']:
+                changes.setdefault('settings', {})['mute_upon_entry'] = vc_room.data['mute_audio']
+            if vc_room.data['mute_participant_video'] == zoom_meeting_settings['participant_video']:
+                changes.setdefault('settings', {})['participant_video'] = not vc_room.data['mute_participant_video']
+            if vc_room.data['waiting_room'] != zoom_meeting_settings['waiting_room']:
+                changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
 
         if changes:
-            _update_zoom_meeting(vc_room.data['zoom_id'], changes)
+            _update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
 
     def refresh_room(self, vc_room, event):
-        zoom_meeting = _fetch_zoom_meeting(vc_room)
+        is_webinar = vc_room.data['meeting_type'] == 'webinar'
+        zoom_meeting = _fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
             'url': zoom_meeting['join_url'],
@@ -336,8 +398,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def delete_room(self, vc_room, event):
         client = ZoomIndicoClient()
         zoom_id = vc_room.data['zoom_id']
+        is_webinar = vc_room.data['meeting_type'] == 'webinar'
         try:
-            client.delete_meeting(zoom_id)
+            if is_webinar:
+                client.delete_webinar(zoom_id)
+            else:
+                client.delete_meeting(zoom_id)
         except HTTPError as e:
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
             if not e.response.status_code == 404:
@@ -350,6 +416,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_vc_room_form_defaults(self, event):
         defaults = super(ZoomPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
+            'meeting_type': 'regular',
             'mute_audio': self.settings.get('mute_audio'),
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
@@ -381,6 +448,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_notification_cc_list(self, action, vc_room, event):
         return {principal_from_identifier(vc_room.data['host']).email}
+
+    def _render_vc_room_labels(self, event, vc_room, **kwargs):
+        if vc_room.plugin != self:
+            return
+        return render_plugin_template('room_labels.html', vc_room=vc_room)
 
     def _times_changed(self, sender, obj, **kwargs):
         from indico.modules.events.models.events import Event
