@@ -213,14 +213,17 @@ class DynamicS3Storage(S3StorageBase):
                               self.session._session.get_scoped_config().get('indico_bucket_secret', ''))
         if not any(x in self.bucket_name_template for x in ('<year>', '<month>', '<week>')):
             raise StorageError('At least one date placeholder is required when using dynamic bucket names')
-        if not self.bucket_secret:
-            raise StorageError('A bucket secret is required when using dynamic bucket names')
         if len(self._replace_bucket_placeholders(self.bucket_name_template, date.today())) > 46:
             raise StorageError('Bucket name cannot be longer than 46 chars (to keep at least 16 hash chars)')
+        self._check_bucket_secret()
 
     @return_ascii
     def __repr__(self):
         return '<{}: {}>'.format(type(self).__name__, self.bucket_name_template)
+
+    def _check_bucket_secret(self):
+        if not self.bucket_secret:
+            raise StorageError('A bucket secret is required when using dynamic bucket names')
 
     def _parse_file_id(self, file_id):
         return file_id.split('//', 1)
@@ -261,3 +264,9 @@ class ReadOnlyDynamicS3Storage(ReadOnlyStorageMixin, DynamicS3Storage):
 
     def _create_bucket(self, name):
         raise StorageReadOnlyError('Cannot write to read-only storage')
+
+    def _check_bucket_secret(self):
+        # we only need the bucket secret to create buckets and save new files
+        # as the bucket name is saved with in the file_id afterwards, so when
+        # we are in read-only mode we don't care about it
+        pass
