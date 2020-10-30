@@ -18,6 +18,7 @@ from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 import boto3
+from boto3.s3.transfer import TransferConfig
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from werkzeug.datastructures import Headers
@@ -108,8 +109,18 @@ class S3StorageBase(Storage):
         checksum = get_file_checksum(fileobj)
         fileobj.seek(0)
         content_md5 = checksum.decode('hex').encode('base64').strip()
-        self.client.put_object(Body=fileobj, Bucket=bucket, Key=name,
-                               ContentType=content_type, ContentMD5=content_md5)
+        metadata = {
+            'ContentType': content_type,
+            # the md5chksum header is used by tools like rclone in case the etag
+            # is not a md5 (in case of chunked uploads)
+            'Metadata': {'md5chksum': content_md5},
+        }
+        # only switch to chunked upload for large files
+        transfer_config = TransferConfig(
+            multipart_threshold=(512 * 1024 * 1024),
+            multipart_chunksize=(256 * 1024 * 1024)
+        )
+        self.client.upload_fileobj(Fileobj=fileobj, Bucket=bucket, Key=name, ExtraArgs=metadata, Config=transfer_config)
         return checksum
 
     def delete(self, file_id):
