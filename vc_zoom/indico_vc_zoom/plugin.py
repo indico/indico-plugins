@@ -1,27 +1,23 @@
 from __future__ import unicode_literals
 
-import random
-import string
-
 from flask import flash, session
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, NotFound
 from wtforms.fields.core import BooleanField
-from wtforms.fields import IntegerField, TextAreaField
-from wtforms.fields.html5 import EmailField, URLField
+from wtforms.fields import TextAreaField
+from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms.validators import DataRequired
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
-from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoom
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
-from indico.util.date_time import now_utc
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields.simple import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
@@ -34,50 +30,8 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.http_api import DeleteVCRoomAPI
 from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
-from indico_vc_zoom.util import find_enterprise_email
-
-
-def _gen_random_password():
-    return ''.join(random.sample(string.ascii_lowercase + string.ascii_uppercase + string.digits, 10))
-
-
-def _fetch_zoom_meeting(vc_room, client=None, is_webinar=False):
-    try:
-        client = client or ZoomIndicoClient()
-        if is_webinar:
-            return client.get_webinar(vc_room.data['zoom_id'])
-        return client.get_meeting(vc_room.data['zoom_id'])
-    except HTTPError as e:
-        if e.response.status_code in {400, 404}:
-            # Indico will automatically mark this room as deleted
-            raise VCRoomNotFoundError(_("This room has been deleted from Zoom"))
-        else:
-            ZoomPlugin.logger.exception('Error getting Zoom Room: %s', e.response.content)
-            raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
-
-
-def _update_zoom_meeting(zoom_id, changes, is_webinar=False):
-    client = ZoomIndicoClient()
-    try:
-        if is_webinar:
-            client.update_webinar(zoom_id, changes)
-        else:
-            client.update_meeting(zoom_id, changes)
-    except HTTPError as e:
-        ZoomPlugin.logger.exception("Error updating meeting '%s': %s", zoom_id, e.response.content)
-        raise VCRoomError(_("Can't update meeting. Please contact support if the error persists."))
-
-
-def _get_schedule_args(obj):
-    duration = obj.end_dt - obj.start_dt
-
-    if obj.start_dt < now_utc():
-        return {}
-
-    return {
-        'start_time': obj.start_dt,
-        'duration': duration.total_seconds() / 60,
-    }
+from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_random_password, get_schedule_args,
+                                 update_zoom_meeting)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -203,20 +157,20 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             # this is not a new room
             if association_is_new:
                 # this means we are updating an existing meeting with a new vc_room-event association
-                _update_zoom_meeting(vc_room.data['zoom_id'], {
+                update_zoom_meeting(vc_room.data['zoom_id'], {
                     'start_time': None,
                     'duration': None,
                     'type': 3
                 })
             elif room_assoc.link_object != old_link:
                 # the booking should now be linked to something else
-                new_schedule_args = _get_schedule_args(room_assoc.link_object)
-                meeting = _fetch_zoom_meeting(vc_room)
+                new_schedule_args = get_schedule_args(room_assoc.link_object)
+                meeting = fetch_zoom_meeting(vc_room)
                 current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'}}
 
                 # check whether the start time / duration of the scheduled meeting differs
                 if new_schedule_args != current_schedule_args:
-                    _update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                    update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
 
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
@@ -273,7 +227,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room_assoc = vc_room.events[0]
         link_obj = vc_room_assoc.link_object
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
-        scheduling_args = _get_schedule_args(link_obj) if link_obj.start_dt else {}
+        scheduling_args = get_schedule_args(link_obj) if link_obj.start_dt else {}
 
         self._check_indico_is_assistant(host_email)
 
@@ -302,7 +256,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             kwargs.update({
                 'topic': vc_room.name,
-                'password': _gen_random_password(),
+                'password': gen_random_password(),
                 'timezone': event.timezone,
                 'settings': settings
             })
@@ -333,7 +287,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
-        zoom_meeting = _fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
+        zoom_meeting = fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
         changes = {}
 
         host = principal_from_identifier(vc_room.data['host'])
@@ -372,11 +326,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
 
         if changes:
-            _update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
+            update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
 
     def refresh_room(self, vc_room, event):
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
-        zoom_meeting = _fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
+        zoom_meeting = fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
             'url': zoom_meeting['join_url'],
