@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from flask import flash, jsonify, session
 
 from indico.core.db import db

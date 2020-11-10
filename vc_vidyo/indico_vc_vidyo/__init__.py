@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from indico.core import signals
 from indico.util.i18n import make_bound_gettext
 

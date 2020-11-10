@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, Regexp, ValidationError

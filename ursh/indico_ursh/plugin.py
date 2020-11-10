@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from flask_pluginengine import render_plugin_template
 from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField

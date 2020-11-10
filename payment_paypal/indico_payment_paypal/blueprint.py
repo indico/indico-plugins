@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from indico.core.plugins import IndicoPluginBlueprint
 
 from indico_payment_paypal.controllers import RHPaypalCancel, RHPaypalIPN, RHPaypalSuccess

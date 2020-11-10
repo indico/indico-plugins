@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from flask_pluginengine import depends, trim_docstring
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
