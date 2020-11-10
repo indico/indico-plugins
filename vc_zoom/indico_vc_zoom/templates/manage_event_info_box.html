@@ -1,0 +1,37 @@
+{% from '_password.html' import password %}
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set host = vc_room.data.host %}
+{% set phone_link = settings.get('zoom_phone_link') %}
+<dl class="details-container">
+    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
+    <dd>{{ vc_room.data.zoom_id }}</dd>
+    <dt>{% trans %}Host{% endtrans %}</dt>
+    <dd>
+        {{ (host|decodeprincipal).full_name }}
+    </dd>
+    <dt>{% trans %}Linked to{% endtrans %}</dt>
+    <dd>
+        {% set obj = event_vc_room.link_object %}
+        {% if obj is none %}
+            <em>(missing {{ event_vc_room.link_type.name }})</em>
+        {% elif event_vc_room.link_type.name == 'event' %}
+            {% trans %}the whole event{% endtrans %}
+        {% elif event_vc_room.link_type.name == 'contribution' %}
+            {% trans %}Contribution{% endtrans %}: {{ obj.title }}
+        {% elif event_vc_room.link_type.name == 'block' %}
+            {% trans %}Session{% endtrans %}: {{ obj.full_title }}
+        {% endif %}
+    </dd>
+    <dt>{% trans %}Password{% endtrans %}</dt>
+    <dd>{{ vc_room.data.password }}</dd>
+    <dt>{% trans %}Zoom URL{% endtrans %}</dt>
+    <dd>
+        {{ clipboard_input(vc_room.data.url, name="vc-room-url") }}
+    </dd>
+    <dt>{% trans %}Created on{% endtrans %}</dt>
+    <dd>{{ vc_room.created_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% if vc_room.modified_dt %}
+        <dt>{% trans %}Modified on{% endtrans %}</dt>
+        <dd>{{ vc_room.modified_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% endif %}
+</dl>
