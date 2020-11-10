@@ -5,9 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from urllib.parse import urlparse
+
 from flask import request, session
 from flask_pluginengine import render_plugin_template
-from urllib2 import urlparse
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, url_for_plugin
@@ -110,7 +111,7 @@ class PiwikPlugin(IndicoPlugin):
     def _get_tracking_url(self):
         url = self.settings.get('server_url')
         url = url if url.endswith('/') else url + '/'
-        url = urlparse.urlparse(url)
+        url = urlparse(url)
         return url.netloc + url.path
 
 

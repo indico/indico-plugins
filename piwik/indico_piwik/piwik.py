@@ -6,10 +6,10 @@
 # see the LICENSE file for more details.
 
 import socket
+from urllib.parse import urlparse
 
 import requests
 from flask_pluginengine import current_plugin
-from urllib2 import urlparse
 
 
 class PiwikRequest:
@@ -29,7 +29,7 @@ class PiwikRequest:
 
     @property
     def api_url(self):
-        url = urlparse.urlparse(self.server_url)
+        url = urlparse(self.server_url)
         scheme = url.scheme if url.scheme else 'https'
         return f'{scheme}://{url.netloc}{url.path}{self.query_script}'
 
