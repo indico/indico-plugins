@@ -24,7 +24,7 @@ class EscapablePlaceholder(ParametrizedPlaceholder):
     def render(cls, param, regform, registration):
         rv = getattr(registration, cls.field)
         if param == 'url':
-            rv = quote_plus(rv.encode('utf-8')).decode('utf-8')
+            rv = quote_plus(rv)
         return rv
 
     @classmethod

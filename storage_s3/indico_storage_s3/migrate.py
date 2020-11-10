@@ -25,6 +25,7 @@ from jinja2.filters import do_filesizeformat
 from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload, lazyload, load_only
 from sqlalchemy.sql.elements import Tuple
+from sqlalchemy.util.compat import b64encode
 
 from indico.cli.core import cli_group
 from indico.core.config import config
@@ -164,7 +165,7 @@ class S3Importer:
                 self.queue_for_rclone(obj, bucket_name, new_storage_path)
             else:
                 with obj.open() as f:
-                    content_md5 = obj.md5.decode('hex').encode('base64').strip()
+                    content_md5 = b64encode(bytes.fromhex(obj.md5)).strip()
                     self.s3_client.put_object(Body=f, Bucket=bucket_name, Key=new_storage_path,
                                               ContentType=obj.content_type, ContentMD5=content_md5)
         self.emit_update(obj, backend, new_storage_path, new_filename)

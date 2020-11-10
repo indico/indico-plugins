@@ -9,6 +9,7 @@ import hashlib
 import hmac
 import sys
 import threading
+from base64 import b64encode
 from contextlib import contextmanager
 from datetime import date
 from enum import Enum
@@ -105,7 +106,7 @@ class S3StorageBase(Storage):
         fileobj = self._ensure_fileobj(fileobj)
         checksum = get_file_checksum(fileobj)
         fileobj.seek(0)
-        content_md5 = checksum.decode('hex').encode('base64').strip()
+        content_md5 = b64encode(bytes.fromhex(checksum)).strip()
         metadata = {
             'ContentType': content_type,
             # the md5chksum header is used by tools like rclone in case the etag
@@ -239,7 +240,7 @@ class DynamicS3Storage(S3StorageBase):
 
     def _get_bucket_name(self, date):
         name = self._replace_bucket_placeholders(self.bucket_name_template, date)
-        token = hmac.new(self.bucket_secret.encode('utf-8'), name, hashlib.md5).hexdigest()
+        token = hmac.new(self.bucket_secret.encode(), name, hashlib.md5).hexdigest()
         return f'{name}-{token}'[:63]
 
     def _replace_bucket_placeholders(self, name, date):
