@@ -16,7 +16,6 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time, now_utc, utc_to_server
 from indico.util.serializer import Serializer
-from indico.util.string import to_unicode
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
 from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
@@ -131,8 +130,7 @@ class ReportGeneral(ReportBase):
             cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                    else contribution.id)
             key = '{}t{}'.format(contribution.event_id, cid)
-            self.contributions[key] = u'{} ({})'.format(contribution.title,
-                                                        to_unicode(format_time(contribution.start_dt)))
+            self.contributions[key] = u'{} ({})'.format(contribution.title, format_time(contribution.start_dt))
 
 
 class ReportMaterial(ReportBase):
