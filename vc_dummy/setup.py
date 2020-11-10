@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-vc-dummy',
-    version='1.0',
+    version='3.0-dev',
     description='Dummy/example video-conferencing plugin for Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -21,14 +21,13 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    install_requires=[
-        'indico>=2.0'
-    ],
+    install_requires=['indico>=3.0.dev0'],
+    python_requires='~=3.9',
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.9'
     ],
     entry_points={'indico.plugins': {'vc_dummy = indico_vc_dummy.plugin:DummyPlugin'}}
 )

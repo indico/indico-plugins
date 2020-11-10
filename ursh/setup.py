@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-ursh',
-    version='2.3',
+    version='3.0-dev',
     description='URL shortening service for Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -21,14 +21,13 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    install_requires=[
-        'indico>=2.3.dev0',
-    ],
+    install_requires=['indico>=3.0.dev0'],
+    python_requires='~=3.9',
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.9'
     ],
     entry_points={'indico.plugins': {'ursh = indico_ursh.plugin:UrshPlugin'}}
 )

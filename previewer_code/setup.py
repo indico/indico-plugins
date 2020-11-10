@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-previewer-code',
-    version='1.0',
+    version='3.0-dev',
     description='Syntax highlighter for code attachments in Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -22,8 +22,9 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0',
-        'pygments'
+        'indico>=3.0.dev0',
+        'pygments',
     ],
+    python_requires='~=3.9',
     entry_points={'indico.plugins': {'previewer_code = indico_previewer_code:CodePreviewerPlugin'}}
 )

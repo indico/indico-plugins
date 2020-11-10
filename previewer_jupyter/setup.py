@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-previewer-jupyter',
-    version='1.0',
+    version='3.0-dev',
     description='Jupyter notebook rendering for attachments in Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -22,9 +22,9 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0',
+        'indico>=3.0.dev0',
         'nbconvert>=4.0.0',
-        'functools32'
     ],
+    python_requires='~=3.9',
     entry_points={'indico.plugins': {'previewer_jupyter = indico_previewer_jupyter:JupyterPreviewerPlugin'}}
 )

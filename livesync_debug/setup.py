@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-livesync-debug',
-    version='1.0',
+    version='3.0-dev',
     description='Debug target for the Indico LiveSync plugin',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -22,14 +22,15 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2.0',
-        'indico-plugin-livesync>=1.0'
+        'indico>=3.0.dev0',
+        'indico-plugin-livesync>=3.0.dev0',
     ],
+    python_requires='~=3.9',
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.9'
     ],
     entry_points={'indico.plugins': {'livesync_debug = indico_livesync_debug.plugin:LiveSyncDebugPlugin'}}
 )
