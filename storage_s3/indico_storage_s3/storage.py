@@ -7,7 +7,6 @@
 
 import hashlib
 import hmac
-import sys
 import threading
 from base64 import b64encode
 from contextlib import contextmanager
@@ -92,8 +91,8 @@ class S3StorageBase(Storage):
         try:
             s3_object = self.client.get_object(Bucket=bucket, Key=id_)['Body']
             return BytesIO(s3_object.read())
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not open "{file_id}": {exc}') from exc
 
     @contextmanager
     def get_local_path(self, file_id):
@@ -125,15 +124,15 @@ class S3StorageBase(Storage):
         bucket, id_ = self._parse_file_id(file_id)
         try:
             self.client.delete_object(Bucket=bucket, Key=id_)
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not delete "{file_id}": {exc}') from exc
 
     def getsize(self, file_id):
         bucket, id_ = self._parse_file_id(file_id)
         try:
             return self.client.head_object(Bucket=bucket, Key=id_)['ContentLength']
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not get size of "{file_id}": {exc}') from exc
 
     def send_file(self, file_id, content_type, filename, inline=True):
         if self.proxy_downloads == ProxyDownloadsMode.local:
@@ -156,8 +155,8 @@ class S3StorageBase(Storage):
                 # bucket URL to the end user (since it is quite ugly and temporary)
                 response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + url.replace('://', '/', 1)
             return response
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not send file "{file_id}": {exc}') from exc
 
     def _create_bucket(self, name):
         from indico_storage_s3.plugin import S3StoragePlugin
@@ -207,8 +206,8 @@ class S3Storage(S3StorageBase):
             bucket = self._get_current_bucket_name()
             checksum = self._save(bucket, name, content_type, fileobj)
             return name, checksum
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not save "{name}": {exc}') from exc
 
 
 class DynamicS3Storage(S3StorageBase):
@@ -255,8 +254,8 @@ class DynamicS3Storage(S3StorageBase):
             checksum = self._save(bucket, name, content_type, fileobj)
             file_id = f'{bucket}//{name}'
             return file_id, checksum
-        except Exception as e:
-            raise None.with_traceback(sys.exc_info()[2])
+        except Exception as exc:
+            raise StorageError(f'Could not save "{name}": {exc}') from exc
 
 
 class ReadOnlyS3Storage(ReadOnlyStorageMixin, S3Storage):
