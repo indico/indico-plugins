@@ -28,14 +28,12 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields.simple import IndicoPasswordField
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
-from indico.web.http_api.hooks.base import HTTPAPIHook
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
 from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
-from indico_vc_zoom.http_api import DeleteVCRoomAPI
 from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
 from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_random_password, get_schedule_args,
                                  update_zoom_meeting)
@@ -105,7 +103,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
-        HTTPAPIHook.register(DeleteVCRoomAPI)
 
     @property
     def default_settings(self):
