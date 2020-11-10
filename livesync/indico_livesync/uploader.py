@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.util.struct.iterables import grouper
@@ -13,7 +12,7 @@ from indico.util.struct.iterables import grouper
 from indico_livesync import MARCXMLGenerator, process_records
 
 
-class Uploader(object):
+class Uploader:
     """Handles batch data upload to a remote service."""
 
     #: Number of queue entries to process at a time
@@ -35,7 +34,7 @@ class Uploader(object):
             self.logger.info('%s processing batch %d', self_name, i)
             try:
                 for j, proc_batch in enumerate(grouper(
-                        process_records(batch).iteritems(), self.BATCH_SIZE, skip_missing=True), 1):
+                        process_records(batch).items(), self.BATCH_SIZE, skip_missing=True), 1):
                     self.logger.info('%s uploading chunk #%d (batch %d)', self_name, j, i)
                     self.upload_records({k: v for k, v in proc_batch}, from_queue=True)
             except Exception:

@@ -5,8 +5,9 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
-from mock import MagicMock
 from wtforms import ValidationError
 
 from indico_payment_paypal.util import validate_business

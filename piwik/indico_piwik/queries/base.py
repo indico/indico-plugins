@@ -8,7 +8,7 @@
 from indico_piwik.piwik import PiwikRequest
 
 
-class PiwikQueryBase(object):
+class PiwikQueryBase:
     """Base Piwik query"""
 
     def __init__(self, query_script):
@@ -27,18 +27,18 @@ class PiwikQueryReportBase(PiwikQueryBase):
 
     def __init__(self):
         from indico_piwik.plugin import PiwikPlugin
-        super(PiwikQueryReportBase, self).__init__(query_script=PiwikPlugin.report_script)
+        super().__init__(query_script=PiwikPlugin.report_script)
 
     def call(self, date=('last7',), period='day', **query_params):
-        date = ','.join(map(unicode, date))
-        return super(PiwikQueryReportBase, self).call(date=date, period=period, **query_params)
+        date = ','.join(map(str, date))
+        return super().call(date=date, period=period, **query_params)
 
 
 class PiwikQueryReportEventBase(PiwikQueryReportBase):
     """Base Piwik query to request reports of events and contributions"""
 
     def __init__(self, event_id, start_date, end_date, contrib_id=None):
-        super(PiwikQueryReportEventBase, self).__init__()
+        super().__init__()
         self.event_id = event_id
         self.contrib_id = contrib_id
         self.start_date = start_date
@@ -47,7 +47,7 @@ class PiwikQueryReportEventBase(PiwikQueryReportBase):
     def call(self, segmentation_enabled=True, **query_params):
         if segmentation_enabled:
             query_params['segment'] = self.get_segmentation()
-        return super(PiwikQueryReportEventBase, self).call(module='API', date=[self.start_date, self.end_date],
+        return super().call(module='API', date=[self.start_date, self.end_date],
                                                            **query_params)
 
     def get_segmentation(self):
@@ -59,8 +59,8 @@ class PiwikQueryReportEventBase(PiwikQueryReportBase):
             segmentation['customVariablePageValue2'] = ('==', self.contrib_id)
 
         segments = set()
-        for name, (equality, value) in segmentation.iteritems():
-            segment = '{}{}{}'.format(name, equality, value)
+        for name, (equality, value) in segmentation.items():
+            segment = f'{name}{equality}{value}'
             segments.add(segment)
 
         return ';'.join(segments)

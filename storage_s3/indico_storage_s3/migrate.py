@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import errno
 import json
@@ -88,11 +87,11 @@ def rmlinktree(path):
         elif stat.S_ISLNK(mode):
             os.remove(fullname)
         else:
-            raise Exception('Tried to delete {} (not a directory/symlink)'.format(fullname))
+            raise Exception(f'Tried to delete {fullname} (not a directory/symlink)')
     os.rmdir(path)
 
 
-class S3Importer(object):
+class S3Importer:
     def __init__(self, get_bucket_name, static_bucket_name, output_file, source_backend_names, rclone_remote,
                  s3_endpoint, s3_profile, s3_bucket_policy):
         self.get_bucket_name = get_bucket_name
@@ -133,12 +132,12 @@ class S3Importer(object):
 
     def run(self):
         models = {model: self.make_query(model).count() for model in StoredFileMixin.__subclasses__()}
-        models = {model: total for model, total in models.iteritems() if total}
+        models = {model: total for model, total in models.items() if total}
         labels = {model: cformat('Processing %{blue!}{}%{reset} (%{cyan}{}%{reset} rows)').format(model.__name__, total)
-                  for model, total in models.iteritems()}
-        max_length = max(len(x) for x in labels.itervalues())
-        labels = {model: label.ljust(max_length) for model, label in labels.iteritems()}
-        for model, total in sorted(models.items(), key=itemgetter(1)):
+                  for model, total in models.items()}
+        max_length = max(len(x) for x in labels.values())
+        labels = {model: label.ljust(max_length) for model, label in labels.items()}
+        for model, total in sorted(list(models.items()), key=itemgetter(1)):
             with click.progressbar(self.query_chunked(model, 1000), length=total, label=labels[model],
                                    show_percent=True, show_pos=True) as objects:
                 for obj in self.flush_rclone_iterator(objects, 1000):
@@ -149,14 +148,14 @@ class S3Importer(object):
                                    .format(obj, exc))
         click.secho('All done!', fg='green')
         click.echo('Add the following entries to your STORAGE_BACKENDS:')
-        for bucket, data in sorted(self.buckets.viewitems(), key=itemgetter(0)):
+        for bucket, data in sorted(self.buckets.items(), key=itemgetter(0)):
             click.echo("'{}': 's3-readonly:host={},bucket={}',".format(
                 data['backend'], self.s3_endpoint.replace('https://', ''), bucket))
 
     def process_obj(self, obj):
         new_storage_path, new_filename = self.build_storage_path(obj)
         if new_storage_path in self.used_storage_paths:
-            raise Exception('Non-unique storage path: {}'.format(new_storage_path))
+            raise Exception(f'Non-unique storage path: {new_storage_path}')
         self.used_storage_paths.add(new_storage_path)
         bucket_name, backend = self.get_bucket_name(self.get_object_dt(obj))
         bucket_info = self.get_bucket_info(bucket_name, backend, create=(not self.rclone_remote))
@@ -202,7 +201,7 @@ class S3Importer(object):
         with obj.get_local_path() as file_path:
             pass
         while not os.path.exists(file_path):
-            raw_input(cformat('\n%{red}File not found on disk: %{yellow}{}').format(file_path))
+            input(cformat('\n%{red}File not found on disk: %{yellow}{}').format(file_path))
         try:
             queue_entry = self.rclone_queue[bucket]
         except KeyError:
@@ -235,18 +234,18 @@ class S3Importer(object):
         if not self.rclone_remote or not self.rclone_queue:
             return
         click.echo()
-        for name, data in self.buckets.viewitems():
+        for name, data in self.buckets.items():
             if not data['exists']:
                 self.create_bucket(name)
                 data['exists'] = True
-        for bucket, data in self.rclone_queue.viewitems():
+        for bucket, data in self.rclone_queue.items():
             click.echo(cformat('Copying %{cyan}{}%{reset} files (%{cyan}{}%{reset}) to %{cyan}{}%{reset} via rclone')
                        .format(data['files'], do_filesizeformat(data['bytes']), bucket))
             start = datetime.now()
             try:
                 subprocess.check_call([
                     'rclone', 'copy', '--copy-links',
-                    data['path'], '{}:{}'.format(self.rclone_remote, bucket)
+                    data['path'], f'{self.rclone_remote}:{bucket}'
                 ])
             except subprocess.CalledProcessError:
                 click.secho('\nError while running rclone', fg='red')
@@ -335,17 +334,17 @@ def apply_changes(data_file, revert=False):
     data = defaultdict(list)
     for line in data_file:
         line_data = json.loads(line)
-        converted = {mapping[k]: v for k, v in line_data.viewitems() if k in mapping}
+        converted = {mapping[k]: v for k, v in line_data.items() if k in mapping}
         data[line_data['m']].append(converted)
 
     models = {model: len(data[model.__name__])
               for model in StoredFileMixin.__subclasses__()
               if model.__name__ in data and len(data[model.__name__])}
     labels = {model: cformat('Processing %{blue!}{}%{reset} (%{cyan}{}%{reset} rows)').format(model.__name__, total)
-              for model, total in models.iteritems()}
-    max_length = max(len(x) for x in labels.itervalues())
-    labels = {model: label.ljust(max_length) for model, label in labels.iteritems()}
-    for model, total in sorted(models.items(), key=itemgetter(1)):
+              for model, total in models.items()}
+    max_length = max(len(x) for x in labels.values())
+    labels = {model: label.ljust(max_length) for model, label in labels.items()}
+    for model, total in sorted(list(models.items()), key=itemgetter(1)):
         pks = inspect(model).primary_key
         with click.progressbar(data[model.__name__], length=total, label=labels[model],
                                show_percent=True, show_pos=True) as entries:
@@ -368,7 +367,7 @@ def monkeypatch_registration_file_time():
     # here we want reliable filenames
     from indico.modules.events.registration.models import registrations
 
-    class FakeTime(object):
+    class FakeTime:
         def time(self):
             return 0
 
@@ -472,7 +471,7 @@ def copy(source_backend_names, bucket_names, static_bucket_name, s3_endpoint, s3
     code.append('    backend = backend.replace("<week>", dt.strftime("%W"))')
     code.append('    return bucket, backend')
     d = {}
-    exec '\n'.join(code) in d
+    exec('\n'.join(code), d)
     if not source_backend_names:
         source_backend_names = [x for x in config.STORAGE_BACKENDS if not isinstance(get_storage(x), S3StorageBase)]
     if rclone:

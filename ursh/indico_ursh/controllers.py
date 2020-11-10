@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -74,7 +73,7 @@ class RHCustomShortURLPage(RHManageEventBase):
 
     def _process_args(self):
         from indico_ursh.plugin import UrshPlugin
-        super(RHCustomShortURLPage, self)._process_args()
+        super()._process_args()
         api_host = url_parse(UrshPlugin.settings.get('api_host'))
         self.ursh_host = strip_end(api_host.to_url(), api_host.path[1:]).rstrip('/') + '/'
 

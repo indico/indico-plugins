@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import click
 from flask_pluginengine import current_plugin
@@ -27,15 +26,15 @@ def cli():
 @cli.command()
 def available_backends():
     """Lists the currently available backend types"""
-    print 'The following LiveSync agents are available:'
-    for name, backend in current_plugin.backend_classes.iteritems():
-        print cformat('  - %{white!}{}%{reset}: {} ({})').format(name, backend.title, backend.description)
+    print('The following LiveSync agents are available:')
+    for name, backend in current_plugin.backend_classes.items():
+        print(cformat('  - %{white!}{}%{reset}: {} ({})').format(name, backend.title, backend.description))
 
 
 @cli.command()
 def agents():
     """Lists the currently active agents"""
-    print 'The following LiveSync agents are active:'
+    print('The following LiveSync agents are active:')
     agent_list = LiveSyncAgent.find().order_by(LiveSyncAgent.backend_name, db.func.lower(LiveSyncAgent.name)).all()
     table_data = [['ID', 'Name', 'Backend', 'Initial Export', 'Queue']]
     for agent in agent_list:
@@ -45,16 +44,16 @@ def agents():
             backend_title = cformat('%{red!}invalid backend ({})%{reset}').format(agent.backend_name)
         else:
             backend_title = agent.backend.title
-        table_data.append([unicode(agent.id), agent.name, backend_title, initial,
-                           unicode(agent.queue.filter_by(processed=False).count())])
+        table_data.append([str(agent.id), agent.name, backend_title, initial,
+                           str(agent.queue.filter_by(processed=False).count())])
     table = AsciiTable(table_data)
     table.justify_columns[4] = 'right'
-    print table.table
+    print(table.table)
     if not all(a.initial_data_exported for a in agent_list):
-        print
-        print "You need to perform the initial data export for some agents."
-        print cformat("To do so, run "
-                      "%{yellow!}indico livesync initial-export %{reset}%{yellow}<agent_id>%{reset} for those agents.")
+        print()
+        print("You need to perform the initial data export for some agents.")
+        print(cformat("To do so, run "
+                      "%{yellow!}indico livesync initial-export %{reset}%{yellow}<agent_id>%{reset} for those agents."))
 
 
 @cli.command()
@@ -64,15 +63,15 @@ def initial_export(agent_id, force):
     """Performs the initial data export for an agent"""
     agent = LiveSyncAgent.find_first(id=agent_id)
     if agent is None:
-        print 'No such agent'
+        print('No such agent')
         return
     if agent.backend is None:
-        print cformat('Cannot run agent %{red!}{}%{reset} (backend not found)').format(agent.name)
+        print(cformat('Cannot run agent %{red!}{}%{reset} (backend not found)').format(agent.name))
         return
-    print cformat('Selected agent: %{white!}{}%{reset} ({})').format(agent.name, agent.backend.title)
+    print(cformat('Selected agent: %{white!}{}%{reset} ({})').format(agent.name, agent.backend.title))
     if agent.initial_data_exported and not force:
-        print 'The initial export has already been performed for this agent.'
-        print cformat('To re-run it, use %{yellow!}--force%{reset}')
+        print('The initial export has already been performed for this agent.')
+        print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
     agent.create_backend().run_initial_export(Event.find(is_deleted=False))
@@ -90,18 +89,18 @@ def run(agent_id, force=False):
     else:
         agent = LiveSyncAgent.find_first(id=agent_id)
         if agent is None:
-            print 'No such agent'
+            print('No such agent')
             return
         agent_list = [agent]
 
     for agent in agent_list:
         if agent.backend is None:
-            print cformat('Skipping agent: %{red!}{}%{reset} (backend not found)').format(agent.name)
+            print(cformat('Skipping agent: %{red!}{}%{reset} (backend not found)').format(agent.name))
             continue
         if not agent.initial_data_exported and not force:
-            print cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name)
+            print(cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name))
             continue
-        print cformat('Running agent: %{white!}{}%{reset}').format(agent.name)
+        print(cformat('Running agent: %{white!}{}%{reset}').format(agent.name))
         try:
             agent.create_backend().run()
             db.session.commit()

@@ -45,7 +45,7 @@ class RHEventPreviewIPyNB(RH):
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        csp_header = "script-src cdn.mathjax.org 'nonce-{}';".format(nonce)
+        csp_header = f"script-src cdn.mathjax.org 'nonce-{nonce}';"
         response.headers['Content-Security-Policy'] = csp_header
         response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict

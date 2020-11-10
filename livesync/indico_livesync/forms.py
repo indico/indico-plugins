@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields.core import StringField
 from wtforms.validators import DataRequired

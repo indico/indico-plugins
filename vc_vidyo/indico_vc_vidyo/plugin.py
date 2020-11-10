@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import session
 from sqlalchemy.orm.attributes import flag_modified
@@ -75,7 +74,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
     friendly_name = 'Vidyo'
 
     def init(self):
-        super(VidyoPlugin, self).init()
+        super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
@@ -95,7 +94,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
             # we skip identity providers in the default list if they don't support get_identity.
             # these providers (local accounts, oauth) are unlikely be the correct ones to integrate
             # with the vidyo infrastructure.
-            'authenticators': ', '.join(p.name for p in multipass.identity_providers.itervalues() if p.supports_get),
+            'authenticators': ', '.join(p.name for p in multipass.identity_providers.values() if p.supports_get),
             'num_days_old': 365,
             'max_rooms_warning': 5000,
             'vidyo_phone_link': None,
@@ -115,7 +114,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return cli
 
     def update_data_association(self, event, vc_room, event_vc_room, data):
-        super(VidyoPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
+        super().update_data_association(event, vc_room, event_vc_room, data)
 
         event_vc_room.data.update({key: data.pop(key) for key in [
             'show_pin',
@@ -126,7 +125,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         flag_modified(event_vc_room, 'data')
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
-        super(VidyoPlugin, self).update_data_vc_room(vc_room, data)
+        super().update_data_vc_room(vc_room, data, is_new=is_new)
 
         for key in ['description', 'owner', 'room_pin', 'moderation_pin', 'auto_mute']:
             if key in data:
@@ -203,7 +202,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
                 if not created_room:
                     raise VCRoomNotFoundError(_("Could not find newly created room in Vidyo"))
                 vc_room.data.update({
-                    'vidyo_id': unicode(created_room.roomID),
+                    'vidyo_id': str(created_room.roomID),
                     'url': created_room.RoomMode.roomURL,
                     'owner_identity': created_room.ownerName
                 })
@@ -299,7 +298,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return blueprint
 
     def get_vc_room_form_defaults(self, event):
-        defaults = super(VidyoPlugin, self).get_vc_room_form_defaults(event)
+        defaults = super().get_vc_room_form_defaults(event)
         defaults.update({
             'auto_mute': True,
             'show_pin': False,
@@ -311,7 +310,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def get_vc_room_attach_form_defaults(self, event):
-        defaults = super(VidyoPlugin, self).get_vc_room_attach_form_defaults(event)
+        defaults = super().get_vc_room_attach_form_defaults(event)
         defaults.update({
             'show_pin': False,
             'show_autojoin': True,
@@ -320,10 +319,10 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def can_manage_vc_room(self, user, room):
-        return user == room.vidyo_extension.owned_by_user or super(VidyoPlugin, self).can_manage_vc_room(user, room)
+        return user == room.vidyo_extension.owned_by_user or super().can_manage_vc_room(user, room)
 
     def _merge_users(self, target, source, **kwargs):
-        super(VidyoPlugin, self)._merge_users(target, source, **kwargs)
+        super()._merge_users(target, source, **kwargs)
         for ext in VidyoExtension.find(owned_by_user=source):
             ext.owned_by_user = target
             flag_modified(ext.vc_room, 'data')

@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import NumberRange
@@ -48,7 +47,7 @@ class LiveSyncPlugin(IndicoPlugin):
     category = PluginCategory.synchronization
 
     def init(self):
-        super(LiveSyncPlugin, self).init()
+        super().init()
         self.backend_classes = {}
         connect_signals(self)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
@@ -62,7 +61,7 @@ class LiveSyncPlugin(IndicoPlugin):
 
     def register_backend_class(self, name, backend_class):
         if name in self.backend_classes:
-            raise RuntimeError('Duplicate livesync backend: {}'.format(name))
+            raise RuntimeError(f'Duplicate livesync backend: {name}')
         self.backend_classes[name] = backend_class
 
     def _extend_plugin_details(self, plugin, **kwargs):

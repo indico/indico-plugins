@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired
@@ -29,7 +28,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
     details = TextAreaField(_('Payment details'), [])
 
     def __init__(self, *args, **kwargs):
-        super(PluginSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
 
@@ -38,7 +37,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     details = TextAreaField(_('Payment details'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()])
 
     def __init__(self, *args, **kwargs):
-        super(EventSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.details.description = DETAILS_DESC + '\n' + render_placeholder_info('manual-payment-details',
                                                                                  regform=None, registration=None)
 
@@ -60,13 +59,13 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                               'details': ''}
 
     def init(self):
-        super(ManualPaymentPlugin, self).init()
+        super().init()
         self.connect(signals.get_placeholders, self._get_details_placeholders, sender='manual-payment-details')
 
     def _get_details_placeholders(self, sender, regform, registration, **kwargs):
-        from indico_payment_manual.placeholders import (FirstNamePlaceholder, LastNamePlaceholder, EmailPlaceholder,
-                                                        RegistrationIDPlaceholder, EventIDPlaceholder, PricePlaceholder,
-                                                        CurrencyPlaceholder)
+        from indico_payment_manual.placeholders import (CurrencyPlaceholder, EmailPlaceholder, EventIDPlaceholder,
+                                                        FirstNamePlaceholder, LastNamePlaceholder, PricePlaceholder,
+                                                        RegistrationIDPlaceholder)
         yield FirstNamePlaceholder
         yield LastNamePlaceholder
         yield EmailPlaceholder

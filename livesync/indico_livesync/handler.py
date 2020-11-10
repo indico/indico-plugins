@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -159,7 +158,7 @@ def _apply_changes(sender, **kwargs):
     if not hasattr(g, 'livesync_changes'):
         return
     excluded_categories = get_excluded_categories()
-    for ref, changes in g.livesync_changes.iteritems():
+    for ref, changes in g.livesync_changes.items():
         LiveSyncQueueEntry.create(changes, ref, excluded_categories=excluded_categories)
 
 

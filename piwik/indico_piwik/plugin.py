@@ -5,10 +5,9 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from urllib2 import urlparse
-
 from flask import request, session
 from flask_pluginengine import render_plugin_template
+from urllib2 import urlparse
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, url_for_plugin
@@ -38,9 +37,9 @@ class PiwikPlugin(IndicoPlugin):
         'enabled_for_events': True,
         'enabled_for_downloads': True,
         'cache_enabled': True,
-        'server_url': u'//127.0.0.1/piwik/',
-        'server_api_url': u'//127.0.0.1/piwik/',
-        'server_token': u'',
+        'server_url': '//127.0.0.1/piwik/',
+        'server_api_url': '//127.0.0.1/piwik/',
+        'server_token': '',
         'site_id_general': 1,
         'site_id_events': 2,
         'cache_ttl': 3600,
@@ -48,7 +47,7 @@ class PiwikPlugin(IndicoPlugin):
     }
 
     def init(self):
-        super(PiwikPlugin, self).init()
+        super().init()
         self.connect(signals.menu.items, self.add_sidemenu_item, sender='event-management-sidemenu')
         self.connect(signals.attachments.attachment_accessed, self.track_download)
         self.template_hook('html-head', self.inject_tracking)
@@ -67,7 +66,7 @@ class PiwikPlugin(IndicoPlugin):
     def add_sidemenu_item(self, sender, event, **kwargs):
         if not event.can_manage(session.user) or not PiwikPlugin.settings.get('site_id_events'):
             return
-        return SideMenuItem(u'statistics', _(u"Statistics"), url_for_plugin(u'piwik.view', event), section=u'reports')
+        return SideMenuItem('statistics', _("Statistics"), url_for_plugin('piwik.view', event), section='reports')
 
     def get_blueprints(self):
         return blueprint
@@ -84,10 +83,10 @@ class PiwikPlugin(IndicoPlugin):
             return
         if attachment.type == AttachmentType.link:
             resource_url = attachment.link_url
-            resource_title = u'Link - {0.title}'.format(attachment)
+            resource_title = f'Link - {attachment.title}'
         else:
             resource_url = request.base_url
-            resource_title = u'Download - {0.title}'.format(attachment)
+            resource_title = f'Download - {attachment.title}'
         track_download_request.delay(resource_url, resource_title)
 
     def _get_event_tracking_params(self):
@@ -96,16 +95,16 @@ class PiwikPlugin(IndicoPlugin):
             return {}
         params = {'site_id_events': site_id_events}
         if request.blueprint in ('event', 'events', 'contributions') and 'confId' in request.view_args:
-            if not unicode(request.view_args['confId']).isdigit():
+            if not str(request.view_args['confId']).isdigit():
                 return {}
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contrib_id')
-            if contrib_id is not None and unicode(contrib_id).isdigit():
+            if contrib_id is not None and str(contrib_id).isdigit():
                 contribution = Contribution.find_first(event_id=params['event_id'], id=contrib_id)
                 if contribution:
                     cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                            else contribution.id)
-                    params['contrib_id'] = '{}t{}'.format(contribution.event_id, cid)
+                    params['contrib_id'] = f'{contribution.event_id}t{cid}'
         return params
 
     def _get_tracking_url(self):

@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import TextAreaField
@@ -23,7 +22,7 @@ from indico_vc_vidyo.util import iter_user_identities, retrieve_principal
 PIN_VALIDATORS = [Optional(), Length(min=3, max=10), Regexp(r'^\d+$', message=_("The PIN must be a number"))]
 
 
-class VidyoAdvancedFormMixin(object):
+class VidyoAdvancedFormMixin:
     # Advanced options (per event)
     show_pin = BooleanField(_('Show PIN'),
                             widget=SwitchWidget(),
@@ -62,7 +61,7 @@ class VCRoomForm(VCRoomFormBase, VidyoAdvancedFormMixin):
         defaults = kwargs['obj']
         if defaults.owner_user is None and defaults.owner is not None:
             defaults.owner_user = retrieve_principal(defaults.owner)
-        super(VCRoomForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @generated_data
     def owner(self):

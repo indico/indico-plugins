@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import sys
 
@@ -41,7 +40,7 @@ class SettingsForm(IndicoForm):
                                    description=_("The password to access the S3 bucket info endpoint"))
 
     def __init__(self, *args, **kwargs):
-        super(SettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         url = Markup('<strong><code>{}</code></strong>').format(url_for_plugin('storage_s3.buckets'))
         self.bucket_info_enabled.description = _("Enables an API on {url} that returns information on all S3 buckets "
                                                  "currently in use, including dynamically-named ones.").format(url=url)
@@ -62,7 +61,7 @@ class S3StoragePlugin(IndicoPlugin):
     }
 
     def init(self):
-        super(S3StoragePlugin, self).init()
+        super().init()
         self.connect(signals.get_storage_backends, self._get_storage_backends)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
 
@@ -90,25 +89,25 @@ class S3StoragePlugin(IndicoPlugin):
                     storage_instance = get_storage(key)
                 except RuntimeError:
                     if storage:
-                        click.echo('Storage {} does not exist'.format(key))
+                        click.echo(f'Storage {key} does not exist')
                         sys.exit(1)
                     continue
 
                 if isinstance(storage_instance, ReadOnlyStorageMixin):
                     if storage:
-                        click.echo('Storage {} is read-only'.format(key))
+                        click.echo(f'Storage {key} is read-only')
                         sys.exit(1)
                     continue
 
                 if isinstance(storage_instance, S3StorageBase):
                     bucket_name = storage_instance._get_current_bucket_name()
                     if storage_instance._bucket_exists(bucket_name):
-                        click.echo('Storage {}: bucket {} already exists'.format(key, bucket_name))
+                        click.echo(f'Storage {key}: bucket {bucket_name} already exists')
                         continue
                     storage_instance._create_bucket(bucket_name)
-                    click.echo('Storage {}: bucket {} created'.format(key, bucket_name))
+                    click.echo(f'Storage {key}: bucket {bucket_name} created')
                 elif storage:
-                    click.echo('Storage {} is not an s3 storage'.format(key))
+                    click.echo(f'Storage {key} is not an s3 storage')
                     sys.exit(1)
 
         s3.add_command(migrate_cli, name='migrate')

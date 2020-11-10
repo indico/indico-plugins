@@ -25,12 +25,12 @@ class DeleteVCRoomAPI(HTTPAPIHook):
         return user in VidyoPlugin.settings.acls.get('managers')
 
     def _getParams(self):
-        super(DeleteVCRoomAPI, self)._getParams()
-        self._room_ids = map(int, request.form.getlist('rid'))
+        super()._getParams()
+        self._room_ids = list(map(int, request.form.getlist('rid')))
 
     def api_deletevcroom(self, user):
-        from indico_vc_vidyo.plugin import VidyoPlugin
         from indico_vc_vidyo.api import APIException
+        from indico_vc_vidyo.plugin import VidyoPlugin
 
         success = []
         failed = []

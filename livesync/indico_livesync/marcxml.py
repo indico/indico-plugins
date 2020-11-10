@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
 
@@ -27,7 +26,7 @@ class MARCXMLGenerator:
     @classmethod
     def records_to_xml(cls, records):
         mg = MARCXMLGenerator()
-        for entry, change in records.iteritems():
+        for entry, change in records.items():
             mg.safe_add_object(entry, bool(change & SimpleChange.deleted))
         return mg.get_xml()
 
@@ -79,7 +78,7 @@ class MARCXMLGenerator:
         elif isinstance(obj, Category):
             pass  # we don't send category updates
         else:
-            raise ValueError('unknown object ref: {}'.format(obj))
+            raise ValueError(f'unknown object ref: {obj}')
         return self.xml_generator.getXml()
 
     def get_xml(self):

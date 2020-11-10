@@ -39,7 +39,7 @@ def raises_api_error(wrapped):
     return _wrapper
 
 
-class ClientBase(object):
+class ClientBase:
     def __init__(self, wsdl, settings):
         session = Session()
         transport = Transport(session=session, cache=ZeepCache())
@@ -54,12 +54,12 @@ class ClientBase(object):
 
 class UserClient(ClientBase):
     def __init__(self, settings):
-        super(UserClient, self).__init__(settings.get('user_api_wsdl'), settings)
+        super().__init__(settings.get('user_api_wsdl'), settings)
 
 
 class AdminClient(ClientBase):
     def __init__(self, settings):
-        super(AdminClient, self).__init__(settings.get('admin_api_wsdl'), settings)
+        super().__init__(settings.get('admin_api_wsdl'), settings)
 
     def create_room_object(self, **kwargs):
         return self.factory.Room(**kwargs)

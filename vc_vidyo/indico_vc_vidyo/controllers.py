@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, session
 
@@ -26,6 +25,6 @@ class RHVidyoRoomOwner(RHVCSystemEventBase):
             result['success'] = False
             db.session.rollback()
         else:
-            flash(_("You are now the owner of the room '{room.name}'".format(room=self.vc_room)), 'success')
+            flash(_(f"You are now the owner of the room '{self.vc_room.name}'"), 'success')
             result['success'] = True
         return jsonify(result)

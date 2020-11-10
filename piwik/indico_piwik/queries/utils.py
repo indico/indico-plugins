@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 import json
+from functools import reduce
 
 from flask_pluginengine import current_plugin
 
@@ -33,7 +34,7 @@ def get_json_from_remote_server(func, **kwargs):
 
 def reduce_json(data):
     """Reduce a JSON object"""
-    return reduce(lambda x, y: int(x) + int(y), data.values())
+    return reduce(lambda x, y: int(x) + int(y), list(data.values()))
 
 
 def stringify_seconds(seconds=0):

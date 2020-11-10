@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin, render_plugin_template

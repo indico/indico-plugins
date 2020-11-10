@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask_pluginengine import depends, trim_docstring
 
@@ -27,14 +26,14 @@ class LiveSyncPluginBase(IndicoPlugin):  # pragma: no cover
     category = PluginCategory.synchronization
 
     def init(self):
-        super(LiveSyncPluginBase, self).init()
-        for name, backend_class in self.backend_classes.iteritems():
+        super().init()
+        for name, backend_class in self.backend_classes.items():
             assert backend_class.plugin is None
             backend_class.plugin = type(self)
             LiveSyncPlugin.instance.register_backend_class(name, backend_class)
 
 
-class LiveSyncBackendBase(object):
+class LiveSyncBackendBase:
     """Base class for livesync backends"""
 
     #: the plugin containing the agent

@@ -55,7 +55,7 @@ class ReportBase(Serializer):
             return cls(*args, **kwargs).to_serializable()
 
         cache = GenericCache('Piwik.Report')
-        key = u'{}-{}-{}'.format(cls.__name__, args, kwargs)
+        key = f'{cls.__name__}-{args}-{kwargs}'
 
         report = cache.get(key)
         if not report:
@@ -65,7 +65,6 @@ class ReportBase(Serializer):
 
     def _build_report(self):
         """To be overriden"""
-        pass
 
     def _init_date_range(self, start_date=None, end_date=None):
         """Set date range defaults if no dates are passed"""
@@ -112,7 +111,7 @@ class ReportGeneral(ReportBase):
                    'referrers': PiwikQueryReportEventMetricReferrers(**self.params),
                    'peak': PiwikQueryReportEventMetricPeakDateAndVisitors(**self.params)}
 
-        for query_name, query in queries.iteritems():
+        for query_name, query in queries.items():
             self.metrics[query_name] = query.get_result()
 
         self._fetch_contribution_info()
@@ -129,8 +128,8 @@ class ReportGeneral(ReportBase):
                 continue
             cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                    else contribution.id)
-            key = '{}t{}'.format(contribution.event_id, cid)
-            self.contributions[key] = u'{} ({})'.format(contribution.title, format_time(contribution.start_dt))
+            key = f'{contribution.event_id}t{cid}'
+            self.contributions[key] = '{} ({})'.format(contribution.title, format_time(contribution.start_dt))
 
 
 class ReportMaterial(ReportBase):
@@ -172,8 +171,8 @@ class ReportVisitsPerDay(ReportBase):
     def _reduce_metrics(self):
         reduced_metrics = defaultdict(dict)
 
-        for metric_type, records in self.metrics.iteritems():
-            for date, hits in records.iteritems():
+        for metric_type, records in self.metrics.items():
+            for date, hits in records.items():
                 reduced_metrics[date][metric_type] = int(hits)
 
         self.metrics = reduced_metrics

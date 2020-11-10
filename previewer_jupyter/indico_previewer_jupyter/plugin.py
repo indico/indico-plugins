@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import mimetypes
 import re
@@ -42,7 +41,7 @@ class JupyterPreviewerPlugin(IndicoPlugin):
     configurable = False
 
     def init(self):
-        super(JupyterPreviewerPlugin, self).init()
+        super().init()
         self.connect(signals.attachments.get_file_previewers, self._get_file_previewers)
 
     def get_blueprints(self):

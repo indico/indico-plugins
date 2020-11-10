@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.util.console import cformat
 from indico.util.struct.iterables import grouper
@@ -24,7 +23,7 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
     """
 
     def _print(self, msg=''):
-        print msg
+        print(msg)
 
     def run(self):
         records = self.fetch_records()
@@ -38,7 +37,7 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
 
         self._print()
         self._print(cformat('%{white!}Simplified/cascaded changes:%{reset}'))
-        for obj, change in process_records(records).iteritems():
+        for obj, change in process_records(records).items():
             self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj))
 
         self._print()
@@ -51,17 +50,17 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
         uploader = DebugUploader(self)
         uploader.run_initial(events)
         for i, batch in enumerate(grouper(events, 10, skip_missing=True), 1):
-            print
-            print cformat('%{white!}Batch {}:%{reset}').format(i)
-            print MARCXMLGenerator.objects_to_xml(event for event in batch if event is not None)
-            print
+            print()
+            print(cformat('%{white!}Batch {}:%{reset}').format(i))
+            print(MARCXMLGenerator.objects_to_xml(event for event in batch if event is not None))
+            print()
 
 
 class DebugUploader(Uploader):
     BATCH_SIZE = 5
 
     def __init__(self, *args, **kwargs):
-        super(DebugUploader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.n = 0
 
     def upload_records(self, records, from_queue):

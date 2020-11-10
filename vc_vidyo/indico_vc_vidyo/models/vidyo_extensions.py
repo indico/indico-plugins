@@ -5,10 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
-import urllib
-
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -63,12 +63,12 @@ class VidyoExtension(db.Model):
         url = self.vc_room.data['url']
         custom_url_tpl = VidyoPlugin.settings.get('client_chooser_url')
         if custom_url_tpl:
-            return custom_url_tpl + '?' + urllib.urlencode({'url': url})
+            return custom_url_tpl + '?' + six.moves.urllib.parse.urlencode({'url': url})
         return url
 
     @return_ascii
     def __repr__(self):
-        return '<VidyoExtension({}, {}, {})>'.format(self.vc_room, self.extension, self.owned_by_user)
+        return f'<VidyoExtension({self.vc_room}, {self.extension}, {self.owned_by_user})>'
 
 
 @listens_for(VidyoExtension.owned_by_user, 'set')

@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask_pluginengine import render_plugin_template
 from wtforms.fields.core import StringField
@@ -42,7 +41,7 @@ class UrshPlugin(IndicoPlugin):
     }
 
     def init(self):
-        super(UrshPlugin, self).init()
+        super().init()
         self.template_hook('url-shortener', self._inject_ursh_link)
         self.template_hook('page-footer', self._inject_ursh_footer)
         self.inject_bundle('main.js', WPBase)

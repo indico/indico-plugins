@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 import posixpath
@@ -36,7 +35,7 @@ def is_configured():
 def request_short_url(original_url):
     from indico_ursh.plugin import UrshPlugin
     api_key, api_host = _get_settings()
-    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
+    headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls/')
 
     response = requests.post(url, data=json.dumps({'url': original_url, 'allow_reuse': True}), headers=headers)
@@ -49,7 +48,7 @@ def request_short_url(original_url):
 def register_shortcut(original_url, shortcut, user):
     from indico_ursh.plugin import UrshPlugin
     api_key, api_host = _get_settings()
-    headers = {'Authorization': 'Bearer {api_key}'.format(api_key=api_key), 'Content-Type': 'application/json'}
+    headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'}
     url = posixpath.join(api_host, 'api/urls', shortcut)
     data = {'url': original_url, 'allow_reuse': True, 'meta': {'indico.user': user.id}}
 

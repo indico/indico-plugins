@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from indico_livesync.base import LiveSyncBackendBase
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry

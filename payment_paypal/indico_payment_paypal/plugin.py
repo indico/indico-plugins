@@ -5,10 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask_pluginengine import render_plugin_template
-
 from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Optional
@@ -53,7 +51,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                               'business': None}
 
     def init(self):
-        super(PaypalPaymentPlugin, self).init()
+        super().init()
         self.template_hook('event-manage-payment-plugin-before-form', self._get_encoding_warning)
 
     @property

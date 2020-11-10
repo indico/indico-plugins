@@ -5,10 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import division
 
 from operator import itemgetter
-from urllib2 import quote
+
+from six.moves.urllib.parse import quote
 
 from indico_piwik.queries.base import PiwikQueryReportEventBase
 from indico_piwik.queries.utils import get_json_from_remote_server, reduce_json, stringify_seconds
@@ -18,11 +18,10 @@ class PiwikQueryReportEventMetricBase(PiwikQueryReportEventBase):
     """Base Piwik query for retrieving metrics in JSON format"""
 
     def call(self, method, **query_params):
-        return super(PiwikQueryReportEventMetricBase, self).call(method=method, format='JSON', **query_params)
+        return super().call(method=method, format='JSON', **query_params)
 
     def get_result(self):
         """Perform the call and return the sum of all unique values"""
-        pass
 
 
 class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
@@ -35,7 +34,7 @@ class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def call(self, download_url, **query_params):
-        return super(PiwikQueryReportEventMetricDownloads, self).call(method='Actions.getDownload',
+        return super().call(method='Actions.getDownload',
                                                                       downloadUrl=quote(download_url),
                                                                       **query_params)
 
@@ -47,7 +46,7 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def _get_per_day_results(self, results):
         hits_calendar = {}
 
-        for date, hits in results.iteritems():
+        for date, hits in results.items():
             day_hits = {'total': 0, 'unique': 0}
             if hits:
                 for metrics in hits:
@@ -74,7 +73,7 @@ class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventMetricReferrers, self).call(method='Referrers.getReferrerType',
+        return super().call(method='Referrers.getReferrerType',
                                                                       period='range', **query_params)
 
     def get_result(self):
@@ -88,18 +87,18 @@ class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricUniqueVisits(PiwikQueryReportEventMetricVisitsBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventMetricUniqueVisits, self).call(method='VisitsSummary.getUniqueVisitors',
+        return super().call(method='VisitsSummary.getUniqueVisitors',
                                                                          **query_params)
 
 
 class PiwikQueryReportEventMetricVisits(PiwikQueryReportEventMetricVisitsBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventMetricVisits, self).call(method='VisitsSummary.getVisits', **query_params)
+        return super().call(method='VisitsSummary.getVisits', **query_params)
 
 
 class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventMetricVisitDuration, self).call(method='VisitsSummary.get', **query_params)
+        return super().call(method='VisitsSummary.get', **query_params)
 
     def get_result(self):
         """Perform the call and return a string with the time in hh:mm:ss"""
@@ -109,7 +108,7 @@ class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
 
     def _get_average_duration(self, result):
         seconds = 0
-        data = result.values()
+        data = list(result.values())
         if not data:
             return seconds
         for day in data:
@@ -120,14 +119,14 @@ class PiwikQueryReportEventMetricVisitDuration(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricPeakDateAndVisitors(PiwikQueryReportEventMetricBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventMetricPeakDateAndVisitors, self).call(method='VisitsSummary.getVisits',
+        return super().call(method='VisitsSummary.getVisits',
                                                                                 **query_params)
 
     def get_result(self):
         """Perform the call and return the peak date and how many users"""
         result = get_json_from_remote_server(self.call)
         if result:
-            date, value = max(result.iteritems(), key=itemgetter(1))
+            date, value = max(result.items(), key=itemgetter(1))
             return {'date': date, 'users': value}
         else:
             return {'date': "No Data", 'users': 0}

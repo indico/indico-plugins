@@ -30,12 +30,12 @@ class CppHighlighter(Preprocessor):
     python = 'python'
 
     def __init__(self, config=None, **kw):
-        super(CppHighlighter, self).__init__(config=config, **kw)
+        super().__init__(config=config, **kw)
 
         # Build regular expressions to catch language extensions or switches and choose
         # an adequate pygments lexer
         any_magic = "|".join(self.magics)
-        self.re_magic_language = re.compile(r"^\s*({0}).*".format(any_magic), re.DOTALL)
+        self.re_magic_language = re.compile(fr"^\s*({any_magic}).*", re.DOTALL)
 
     def matches(self, source, reg_expr):
         return bool(reg_expr.match(source))
@@ -62,4 +62,4 @@ class CppHighlighter(Preprocessor):
         except:
             # if no language metadata, keep python as default
             pass
-        return super(CppHighlighter, self).preprocess(nb, resources)
+        return super().preprocess(nb, resources)

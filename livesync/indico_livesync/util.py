@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -34,7 +33,7 @@ def obj_ref(obj):
     elif isinstance(obj, SubContribution):
         ref = {'type': EntryType.subcontribution, 'subcontrib_id': obj.id}
     else:
-        raise ValueError('Unexpected object: {}'.format(obj.__class__.__name__))
+        raise ValueError(f'Unexpected object: {obj.__class__.__name__}')
     return ImmutableDict(ref)
 
 
@@ -58,8 +57,8 @@ def obj_deref(ref):
 
 def clean_old_entries():
     """Deletes obsolete entries from the queues"""
-    from indico_livesync.plugin import LiveSyncPlugin
     from indico_livesync.models.queue import LiveSyncQueueEntry
+    from indico_livesync.plugin import LiveSyncPlugin
 
     queue_entry_ttl = LiveSyncPlugin.settings.get('queue_entry_ttl')
     if not queue_entry_ttl:
@@ -81,8 +80,8 @@ def compound_id(obj):
     if isinstance(obj, (Category, Session)):
         raise TypeError('Compound IDs are not supported for this entry type')
     elif isinstance(obj, Event):
-        return unicode(obj.id)
+        return str(obj.id)
     elif isinstance(obj, Contribution):
-        return '{}.{}'.format(obj.event_id, obj.id)
+        return f'{obj.event_id}.{obj.id}'
     elif isinstance(obj, SubContribution):
-        return '{}.{}.{}'.format(obj.contribution.event_id, obj.contribution_id, obj.id)
+        return f'{obj.contribution.event_id}.{obj.contribution_id}.{obj.id}'

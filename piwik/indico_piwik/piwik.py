@@ -6,13 +6,13 @@
 # see the LICENSE file for more details.
 
 import socket
-from urllib2 import urlparse
 
 import requests
 from flask_pluginengine import current_plugin
+from urllib2 import urlparse
 
 
-class PiwikRequest(object):
+class PiwikRequest:
     """Wrapper for Piwik API requests"""
 
     def __init__(self, server_url, query_script, site_id, api_token=None):
@@ -31,7 +31,7 @@ class PiwikRequest(object):
     def api_url(self):
         url = urlparse.urlparse(self.server_url)
         scheme = url.scheme if url.scheme else 'https'
-        return '{}://{}{}{}'.format(scheme, url.netloc, url.path, self.query_script)
+        return f'{scheme}://{url.netloc}{url.path}{self.query_script}'
 
     def call(self, default_response=None, **query_params):
         """Perform a query to the Piwik server and return the response.
@@ -50,7 +50,7 @@ class PiwikRequest(object):
         query_params['idSite'] = self.site_id
         if self.api_token is not None:
             query_params['token_auth'] = self.api_token
-        for key, value in query_params.iteritems():
+        for key, value in query_params.items():
             if isinstance(value, list):
                 value = ','.join(value)
             query += '{}={}&'.format(str(key), str(value))

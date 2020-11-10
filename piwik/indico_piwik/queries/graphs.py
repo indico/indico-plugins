@@ -20,7 +20,7 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
             query_params['height'] = height
         if width is not None:
             query_params['width'] = width
-        return super(PiwikQueryReportEventGraphBase, self).call(method='ImageGraph.get',
+        return super().call(method='ImageGraph.get',
                                                                 apiModule=apiModule, apiAction=apiAction,
                                                                 aliasedGraph='1', graphType=graphType, **query_params)
 
@@ -41,13 +41,13 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
 
 class PiwikQueryReportEventGraphCountries(PiwikQueryReportEventGraphBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventGraphCountries, self).call(apiModule='UserCountry', apiAction='getCountry',
+        return super().call(apiModule='UserCountry', apiAction='getCountry',
                                                                      period='range', width=490, height=260,
                                                                      graphType='horizontalBar', **query_params)
 
 
 class PiwikQueryReportEventGraphDevices(PiwikQueryReportEventGraphBase):
     def call(self, **query_params):
-        return super(PiwikQueryReportEventGraphDevices, self).call(apiModule='UserSettings', apiAction='getOS',
+        return super().call(apiModule='UserSettings', apiAction='getOS',
                                                                    period='range', width=320, height=260,
                                                                    graphType='horizontalBar', **query_params)

@@ -6,7 +6,8 @@
 # see the LICENSE file for more details.
 
 from datetime import datetime
-from urllib2 import quote
+
+from six.moves.urllib.parse import quote
 
 from indico.core.celery import celery
 

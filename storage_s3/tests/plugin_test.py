@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import hashlib
 import hmac
@@ -39,13 +38,13 @@ def test_resolve_bucket_name_static():
 ))
 def test_resolve_bucket_name_dynamic(freeze_time, date, name_template, expected_name):
     freeze_time(date)
-    storage = plugin.DynamicS3Storage('bucket_template={},bucket_secret=secret'.format(name_template))
+    storage = plugin.DynamicS3Storage(f'bucket_template={name_template},bucket_secret=secret')
     name, token = storage._get_current_bucket_name().rsplit('-', 1)
     assert name == expected_name
     assert token == hmac.new(b'secret', expected_name, hashlib.md5).hexdigest()
 
 
-class MockConfig(object):
+class MockConfig:
     def __init__(self):
         self.STORAGE_BACKENDS = {'s3': None}
 
@@ -68,9 +67,9 @@ def test_dynamic_bucket_creation_task(freeze_time, mocker, date, name_template, 
                                       expected_error):
     freeze_time(date)
     if '<' in name_template:
-        storage = plugin.DynamicS3Storage('bucket_template={},bucket_secret=secret'.format(name_template))
+        storage = plugin.DynamicS3Storage(f'bucket_template={name_template},bucket_secret=secret')
     else:
-        storage = plugin.S3Storage('bucket={}'.format(name_template))
+        storage = plugin.S3Storage(f'bucket={name_template}')
     mocker.patch('indico_storage_s3.task.config', MockConfig())
     mocker.patch('indico_storage_s3.task.get_storage', return_value=storage)
     create_bucket_call = mocker.patch.object(plugin.DynamicS3Storage, '_create_bucket')
@@ -81,7 +80,7 @@ def test_dynamic_bucket_creation_task(freeze_time, mocker, date, name_template, 
         create_bucket()
     if bucket_created:
         token = hmac.new(b'secret', expected_name, hashlib.md5).hexdigest()
-        create_bucket_call.assert_called_with('{}-{}'.format(expected_name, token))
+        create_bucket_call.assert_called_with(f'{expected_name}-{token}')
     else:
         assert not create_bucket_call.called
 

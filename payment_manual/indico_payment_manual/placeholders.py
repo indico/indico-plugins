@@ -5,10 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from decimal import Decimal
-from urllib import quote_plus
+
+from six.moves.urllib.parse import quote_plus
 
 from indico.modules.events.registration.placeholders.registrations import IDPlaceholder
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
@@ -74,11 +74,11 @@ class PricePlaceholder(ParametrizedPlaceholder):
     @classmethod
     def render(cls, param, regform, registration):
         if param == 'int':
-            return unicode(int(registration.price * 100))
+            return str(int(registration.price * 100))
         elif param == 'short' and int(registration.price) == registration.price:
-            return unicode(int(registration.price))
+            return str(int(registration.price))
         else:
-            return unicode(registration.price.quantize(Decimal('.01')))
+            return str(registration.price.quantize(Decimal('.01')))
 
     @classmethod
     def iter_param_info(cls, regform, registration):

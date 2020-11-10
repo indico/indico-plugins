@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import hashlib
 import hmac
@@ -71,7 +70,7 @@ class S3StorageBase(Storage):
 
     @cached_property
     def session(self):
-        key = '__'.join('{}_{}'.format(k, v) for k, v in sorted(self.session_kwargs.viewitems()))
+        key = '__'.join(f'{k}_{v}' for k, v in sorted(self.session_kwargs.items()))
         try:
             return getattr(s3_session_cache, key)
         except AttributeError:
@@ -95,7 +94,7 @@ class S3StorageBase(Storage):
             s3_object = self.client.get_object(Bucket=bucket, Key=id_)['Body']
             return BytesIO(s3_object.read())
         except Exception as e:
-            raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
     @contextmanager
     def get_local_path(self, file_id):
@@ -128,14 +127,14 @@ class S3StorageBase(Storage):
         try:
             self.client.delete_object(Bucket=bucket, Key=id_)
         except Exception as e:
-            raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
     def getsize(self, file_id):
         bucket, id_ = self._parse_file_id(file_id)
         try:
             return self.client.head_object(Bucket=bucket, Key=id_)['ContentLength']
         except Exception as e:
-            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
     def send_file(self, file_id, content_type, filename, inline=True):
         if self.proxy_downloads == ProxyDownloadsMode.local:
@@ -159,7 +158,7 @@ class S3StorageBase(Storage):
                 response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + url.replace('://', '/', 1)
             return response
         except Exception as e:
-            raise StorageError('Could not send file "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
     def _create_bucket(self, name):
         from indico_storage_s3.plugin import S3StoragePlugin
@@ -190,7 +189,7 @@ class S3Storage(S3StorageBase):
     name = 's3'
 
     def __init__(self, data):
-        super(S3Storage, self).__init__(data)
+        super().__init__(data)
         self.bucket_name = self.parsed_data['bucket']
         if len(self.bucket_name) > 63:
             raise StorageError('Bucket name cannot be longer than 63 chars')
@@ -211,14 +210,14 @@ class S3Storage(S3StorageBase):
             checksum = self._save(bucket, name, content_type, fileobj)
             return name, checksum
         except Exception as e:
-            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
 
 class DynamicS3Storage(S3StorageBase):
     name = 's3-dynamic'
 
     def __init__(self, data):
-        super(DynamicS3Storage, self).__init__(data)
+        super().__init__(data)
         self.bucket_name_template = self.parsed_data['bucket_template']
         self.bucket_secret = (self.parsed_data.get('bucket_secret', '') or
                               self.session._session.get_scoped_config().get('indico_bucket_secret', ''))
@@ -245,7 +244,7 @@ class DynamicS3Storage(S3StorageBase):
     def _get_bucket_name(self, date):
         name = self._replace_bucket_placeholders(self.bucket_name_template, date)
         token = hmac.new(self.bucket_secret.encode('utf-8'), name, hashlib.md5).hexdigest()
-        return '{}-{}'.format(name, token)[:63]
+        return f'{name}-{token}'[:63]
 
     def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))
@@ -257,10 +256,10 @@ class DynamicS3Storage(S3StorageBase):
         try:
             bucket = self._get_current_bucket_name()
             checksum = self._save(bucket, name, content_type, fileobj)
-            file_id = '{}//{}'.format(bucket, name)
+            file_id = f'{bucket}//{name}'
             return file_id, checksum
         except Exception as e:
-            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
+            raise None.with_traceback(sys.exc_info()[2])
 
 
 class ReadOnlyS3Storage(ReadOnlyStorageMixin, S3Storage):

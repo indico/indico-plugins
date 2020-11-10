@@ -20,8 +20,7 @@ class WPPiwikStatistics(WPStatistics):
     @property
     def additional_bundles(self):
         return {
-            'screen': map(lambda x: current_plugin.manifest[x],
-                          ('main.js', 'main.css')),
+            'screen': [current_plugin.manifest[x] for x in ('main.js', 'main.css')],
             'print': ()
         }
 

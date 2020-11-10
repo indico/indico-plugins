@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields.core import BooleanField
@@ -62,7 +61,7 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
         pass
 
     def update_data_association(self, event, vc_room, event_vc_room, data):
-        super(DummyPlugin, self).update_data_association(event, vc_room, event_vc_room, data)
+        super().update_data_association(event, vc_room, event_vc_room, data)
         event_vc_room.data.update({key: data.pop(key) for key in [
             'show_phone_numbers'
         ]})

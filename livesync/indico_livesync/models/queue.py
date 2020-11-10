@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import g
 from werkzeug.datastructures import ImmutableDict
@@ -47,14 +46,14 @@ _column_for_types = {
 
 
 def _make_checks():
-    available_columns = set(_column_for_types.viewvalues())
+    available_columns = set(_column_for_types.values())
     for link_type in EntryType:
         required_col = _column_for_types[link_type]
         forbidden_cols = available_columns - {required_col}
-        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-        criteria += ['{} IS NOT NULL'.format(required_col)]
+        criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+        criteria += [f'{required_col} IS NOT NULL']
         condition = 'type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_entry'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_entry')
 
 
 class LiveSyncQueueEntry(db.Model):

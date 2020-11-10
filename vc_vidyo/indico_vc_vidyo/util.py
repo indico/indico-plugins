@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -60,11 +59,11 @@ def iter_extensions(prefix, event_id):
     """Return extension (prefix + event_id) with an optional suffix which is
        incremented step by step in case of collision
     """
-    extension = '{prefix}{event_id}'.format(prefix=prefix, event_id=event_id)
+    extension = f'{prefix}{event_id}'
     yield extension
     suffix = 1
     while True:
-        yield '{extension}{suffix}'.format(extension=extension, suffix=suffix)
+        yield f'{extension}{suffix}'
         suffix += 1
 
 
@@ -77,7 +76,7 @@ def update_room_from_obj(settings, vc_room, room_obj):
 
     vc_room.data.update({
         'description': room_obj.description,
-        'vidyo_id': unicode(room_obj.roomID),
+        'vidyo_id': str(room_obj.roomID),
         'url': room_obj.RoomMode.roomURL,
         'owner_identity': room_obj.ownerName,
         'room_pin': room_obj.RoomMode.roomPIN if room_obj.RoomMode.hasPIN else "",
@@ -92,4 +91,4 @@ def retrieve_principal(principal):
     if type_ in {'Avatar', 'User'}:
         return User.get(int(id_))
     else:
-        raise ValueError('Unexpected type: {}'.format(type_))
+        raise ValueError(f'Unexpected type: {type_}')

@@ -31,7 +31,7 @@ def test_excluded_categories(mocker, monkeypatch, db, create_category):
 
     categories = {}
     with db.session.no_autoflush:
-        for cat_id in xrange(6):
+        for cat_id in range(6):
             category = (create_category(cat_id, title=str(cat_id), protection_mode=0,
                                         parent=categories[CATEGORY_PARENTS[cat_id]])
                         if cat_id else Category.get_root())
@@ -41,7 +41,7 @@ def test_excluded_categories(mocker, monkeypatch, db, create_category):
 
     db.session.flush()
 
-    for cat in categories.viewvalues():
+    for cat in categories.values():
         db = mocker.patch('indico_livesync.models.queue.db')
         LiveSyncQueueEntry.create({ChangeType.created}, obj_ref(cat), excluded_categories=get_excluded_categories())
         assert db.session.add.called == (cat.id not in {2, 3, 4, 5})

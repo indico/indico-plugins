@@ -56,7 +56,7 @@ def test_room_cleanup(create_event, create_dummy_room, freeze_time, db):
                                                           (1235, 5679, (2,)),
                                                           (1236, 5670, (4,)),
                                                           (1237, 5671, ())), start=1):
-        room = create_dummy_room('test_room_{}'.format(id_), extension, {
+        room = create_dummy_room(f'test_room_{id_}', extension, {
             'vidyo_id': vidyo_id
         })
         for evt_id in evt_ids:

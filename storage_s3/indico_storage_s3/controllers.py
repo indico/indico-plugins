@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import current_app, jsonify, request
 from werkzeug.exceptions import NotFound, Unauthorized

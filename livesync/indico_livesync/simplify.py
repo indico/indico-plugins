@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import itertools
 from collections import defaultdict
@@ -98,8 +97,7 @@ def _process_cascaded_category_contents(records):
     if category_move_records:
         changed_events.update(Event.find(Event.category_chain_overlaps(category_move_records)))
 
-    for elem in _process_cascaded_event_contents(records, additional_events=changed_events):
-        yield elem
+    yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
 
 def _process_cascaded_event_contents(records, additional_events=None):
@@ -124,8 +122,7 @@ def _process_cascaded_event_contents(records, additional_events=None):
     if event_records:
         changed_events.update(Event.find(Event.id.in_(event_records)))
 
-    for event in changed_events:
-        yield event
+    yield from changed_events
 
     # Sessions are added (explicitly changed only, since they don't need to be sent anywhere)
     if session_records:
@@ -147,5 +144,4 @@ def _process_cascaded_event_contents(records, additional_events=None):
     # Same for subcontributions
     if subcontribution_records:
         changed_subcontributions.update(SubContribution.find(SubContribution.id.in_(subcontribution_records)))
-    for subcontrib in changed_subcontributions:
-        yield subcontrib
+    yield from changed_subcontributions

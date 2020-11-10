@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import errno
 import os
@@ -24,8 +23,8 @@ END_MARKER = '# END GENERATED REQUIREMENTS'
 
 
 def _find_plugins():
-    subdirs = sorted((x for x in os.walk('.').next()[1]
-                      if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.py'))))
+    subdirs = sorted(x for x in os.walk('.').next()[1]
+                      if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.py')))
     for subdir in subdirs:
         path = os.path.join(subdir, 'setup.py')
         with open(path) as f:
@@ -34,7 +33,7 @@ def _find_plugins():
         name = re.search(r'''name=(['"])(.+)\1''', setup_py)
         version = re.search(r'''version=(['"])(.+)\1''', setup_py)
         if name is None or version is None:
-            click.secho('Could not extract name/version from {}'.format(path), fg='red', bold=True)
+            click.secho(f'Could not extract name/version from {path}', fg='red', bold=True)
             continue
         minver = str(Version(version.group(2)))
         yield name.group(2), minver
@@ -44,7 +43,7 @@ def _get_config():
     rv = {'extras': {}, 'skip': []}
     try:
         f = open('_meta/meta.yaml')
-    except IOError as exc:
+    except OSError as exc:
         if exc.errno != errno.ENOENT:
             raise
     else:
@@ -83,7 +82,7 @@ def cli(nextver):
     for name, minver in sorted(_find_plugins()):
         if name in config['skip']:
             continue
-        pkgspec = '{}>={},<{}'.format(name, minver, nextver)
+        pkgspec = f'{name}>={minver},<{nextver}'
         if name in config['extras']:
             extras_require[config['extras'][name]].append(pkgspec)
         else:
@@ -101,8 +100,8 @@ def cli(nextver):
         output.append('extras_require = {}')
     else:
         output.append('extras_require = {')
-        for extra, pkgspecs in sorted(extras_require.iteritems()):
-            output.append('    {!r}: {!r},'.format(extra, map(str, sorted(pkgspecs))))
+        for extra, pkgspecs in sorted(extras_require.items()):
+            output.append('    {!r}: {!r},'.format(extra, list(map(str, sorted(pkgspecs)))))
         output.append('}')
 
     if _update_meta('\n'.join(output)):

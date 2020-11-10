@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from itertools import chain
 
@@ -45,7 +44,7 @@ class RHPaypalIPN(RH):
 
     def _process(self):
         self._verify_business()
-        verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.iteritems()))
+        verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.items()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':
             current_plugin.logger.warning("Paypal IPN string %s did not validate (%s)", verify_params, result)

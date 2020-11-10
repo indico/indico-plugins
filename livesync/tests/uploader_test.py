@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from mock import MagicMock, Mock
+from unittest.mock import MagicMock, Mock
 
 from indico.modules.events import Event
 
@@ -17,13 +17,13 @@ from indico_livesync.uploader import MARCXMLUploader, Uploader
 class RecordingUploader(Uploader):
     """An uploader which logs each 'upload'"""
     def __init__(self, *args, **kwargs):
-        super(RecordingUploader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._uploaded = []
         self.logger = MagicMock()
 
     def upload_records(self, records, from_queue):
         if from_queue:
-            recs = set(records.viewitems())
+            recs = set(records.items())
             self._uploaded.append((recs, from_queue))
         else:
             self._uploaded.append((set(records), from_queue))
@@ -36,11 +36,11 @@ class RecordingUploader(Uploader):
 class FailingUploader(RecordingUploader):
     """An uploader where the second batch fails"""
     def __init__(self, *args, **kwargs):
-        super(FailingUploader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._n = 0
 
     def upload_records(self, records, from_queue):
-        super(FailingUploader, self).upload_records(records, from_queue)
+        super().upload_records(records, from_queue)
         self._n += 1
         if self._n == 2:
             raise Exception('All your data are belong to us!')
@@ -51,7 +51,7 @@ def test_run_initial(mocker):
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
     uploader = RecordingUploader(MagicMock())
     uploader.INITIAL_BATCH_SIZE = 3
-    records = tuple(Mock(spec=Event, id=evt_id) for evt_id in xrange(4))
+    records = tuple(Mock(spec=Event, id=evt_id) for evt_id in range(4))
     uploader.run_initial(records)
     # We expect two batches, with the second one being smaller (i.e. no None padding, just the events)
     batches = set(records[:3]), set(records[3:])
@@ -65,7 +65,7 @@ def test_run(mocker, db, create_event, dummy_agent):
     uploader = RecordingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
 
-    events = tuple(create_event(id_=evt_id) for evt_id in xrange(4))
+    events = tuple(create_event(id_=evt_id) for evt_id in range(4))
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt.id,
                                        agent=dummy_agent)
                     for evt in events)
@@ -91,7 +91,7 @@ def test_run_failing(mocker, db, create_event, dummy_agent):
     uploader = FailingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
 
-    events = tuple(create_event(id_=evt_id) for evt_id in xrange(10))
+    events = tuple(create_event(id_=evt_id) for evt_id in range(10))
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt.id,
                                        agent=dummy_agent)
                     for evt in events)

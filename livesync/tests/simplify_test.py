@@ -13,7 +13,7 @@ from indico_livesync import SimpleChange, process_records
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 
 
-class Dummy(object):
+class Dummy:
     pass
 
 
@@ -41,7 +41,7 @@ def test_process_records_category_ignored(mocker, change, invalid):
     else:
         result = process_records(records)
         assert len(result) == 1
-        assert result.values()[0] == SimpleChange.updated
+        assert list(result.values())[0] == SimpleChange.updated
 
 
 @pytest.mark.parametrize(('change', 'cascade'), (
@@ -96,7 +96,7 @@ def test_process_records_simplify(changes, mocker, db, create_event, dummy_agent
     assert result == process_records(reversed(queue))  # queue order shouldn't matter
     assert len(result) == sum(1 for x in expected if x)
 
-    result_refs = {obj.id: change for obj, change in result.viewitems()}
+    result_refs = {obj.id: change for obj, change in result.items()}
     for i, ref in enumerate(refs):
         assert (ref['event_id'] in list(result_refs)) == bool(expected[i])
         assert result_refs.get(ref['event_id'], 0) == expected[i]

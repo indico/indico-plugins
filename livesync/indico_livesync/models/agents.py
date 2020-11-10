@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
 
@@ -73,4 +72,4 @@ class LiveSyncAgent(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<LiveSyncAgent({}, {}, {})>'.format(self.id, self.backend_name, self.name)
+        return f'<LiveSyncAgent({self.id}, {self.backend_name}, {self.name})>'
