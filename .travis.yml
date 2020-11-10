@@ -1,6 +1,6 @@
 language: python
 python:
-  - 2.7
+  - 3.9
 addons:
   postgresql: 9.6
 env:
@@ -8,6 +8,7 @@ env:
   - PLUGIN=payment_paypal
 before_install:
   - pip install -U pip setuptools
+  - pip install wheel
   - pip install -e git+https://github.com/indico/indico.git@${TRAVIS_BRANCH}#egg=indico
 install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
