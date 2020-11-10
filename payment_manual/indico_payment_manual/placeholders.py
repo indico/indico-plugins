@@ -7,8 +7,7 @@
 
 
 from decimal import Decimal
-
-from six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 from indico.modules.events.registration.placeholders.registrations import IDPlaceholder
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder

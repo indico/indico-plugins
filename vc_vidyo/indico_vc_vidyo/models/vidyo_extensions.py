@@ -5,10 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from urllib.parse import urlencode
 
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -62,7 +60,7 @@ class VidyoExtension(db.Model):
         url = self.vc_room.data['url']
         custom_url_tpl = VidyoPlugin.settings.get('client_chooser_url')
         if custom_url_tpl:
-            return custom_url_tpl + '?' + six.moves.urllib.parse.urlencode({'url': url})
+            return custom_url_tpl + '?' + urlencode({'url': url})
         return url
 
     def __repr__(self):

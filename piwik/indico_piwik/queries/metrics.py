@@ -7,8 +7,7 @@
 
 
 from operator import itemgetter
-
-from six.moves.urllib.parse import quote
+from urllib.parse import quote
 
 from indico_piwik.queries.base import PiwikQueryReportEventBase
 from indico_piwik.queries.utils import get_json_from_remote_server, reduce_json, stringify_seconds
@@ -34,9 +33,7 @@ class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
 
 class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
     def call(self, download_url, **query_params):
-        return super().call(method='Actions.getDownload',
-                                                                      downloadUrl=quote(download_url),
-                                                                      **query_params)
+        return super().call(method='Actions.getDownload', downloadUrl=quote(download_url), **query_params)
 
     def get_result(self, download_url):
         result = get_json_from_remote_server(self.call, download_url=download_url, segmentation_enabled=False)
