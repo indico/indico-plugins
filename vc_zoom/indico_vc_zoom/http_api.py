@@ -1,5 +1,3 @@
-
-
 from flask import request
 
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
