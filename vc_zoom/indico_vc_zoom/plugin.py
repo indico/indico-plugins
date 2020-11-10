@@ -81,8 +81,6 @@ def _get_schedule_args(obj):
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
-    support_email = EmailField(_('Zoom email support'))
-
     api_key = StringField(_('API Key'), [DataRequired()])
 
     api_secret = IndicoPasswordField(_('API Secret'), [DataRequired()], toggle=True)
@@ -115,11 +113,6 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
-    num_days_old = IntegerField(_('VC room age threshold'), [NumberRange(min=1), DataRequired()],
-                                description=_('Number of days after an Indico event when a videoconference room is '
-                                              'considered old'))
-    max_rooms_warning = IntegerField(_('Max. num. VC rooms before warning'), [NumberRange(min=1), DataRequired()],
-                                     description=_('Maximum number of rooms until a warning is sent to the managers'))
     zoom_phone_link = URLField(_('ZoomVoice phone number'),
                                description=_('Link to the list of ZoomVoice phone numbers'))
 
@@ -156,7 +149,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     @property
     def default_settings(self):
         return dict(VCPluginMixin.default_settings, **{
-            'support_email': config.SUPPORT_EMAIL,
             'assistant_id': config.SUPPORT_EMAIL,
             'api_key': '',
             'api_secret': '',
@@ -166,8 +158,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_participant_video': True,
             'join_before_host': True,
             'waiting_room': False,
-            'num_days_old': 5,
-            'max_rooms_warning': 5000,
             'zoom_phone_link': None,
             'creation_email_footer': None,
             'send_host_url': False
