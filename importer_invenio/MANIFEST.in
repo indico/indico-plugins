@@ -1,3 +1,0 @@
-graft indico_importer_invenio/translations
-
-global-exclude *.pyc __pycache__ .keep

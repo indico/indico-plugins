@@ -1,6 +1,4 @@
-extras:
-  indico-plugin-importer: importer
-  indico-plugin-importer-invenio: importer
+extras: {}
 
 skip:
   - indico-plugin-livesync-debug

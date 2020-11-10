@@ -19,14 +19,11 @@ plugins_require = [
     'indico-plugin-piwik>=2.3,<2.4.dev0',
     'indico-plugin-previewer-code>=1.0,<2.4.dev0',
     'indico-plugin-previewer-jupyter>=1.0,<2.4.dev0',
-    'indico-plugin-search>=2.3,<2.4.dev0',
     'indico-plugin-storage-s3>=2.3,<2.4.dev0',
     'indico-plugin-ursh>=2.3,<2.4.dev0',
     'indico-plugin-vc-vidyo>=2.3,<2.4.dev0',
 ]
-extras_require = {
-    'importer': ['indico-plugin-importer-invenio>=2.2,<2.4.dev0', 'indico-plugin-importer>=2.2,<2.4.dev0'],
-}
+extras_require = {}
 # END GENERATED REQUIREMENTS
 
 

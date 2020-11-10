@@ -1,4 +1,0 @@
-graft indico_importer/static
-graft indico_importer/translations
-
-global-exclude *.pyc __pycache__ .keep
