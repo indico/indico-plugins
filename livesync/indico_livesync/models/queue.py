@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent
@@ -219,7 +219,6 @@ class LiveSyncQueueEntry(db.Model):
         return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
                              session_id=self.session_id, contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'agent_id', 'change', 'type',
                            category_id=None, event_id=None, session_id=None, contrib_id=None, subcontrib_id=None)

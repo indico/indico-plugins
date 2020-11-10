@@ -10,7 +10,6 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import UTCDateTime, db
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 
 
 class LiveSyncAgent(db.Model):
@@ -70,6 +69,5 @@ class LiveSyncAgent(db.Model):
         """Creates a new backend instance"""
         return self.backend(self)
 
-    @return_ascii
     def __repr__(self):
         return f'<LiveSyncAgent({self.id}, {self.backend_name}, {self.name})>'

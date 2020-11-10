@@ -13,7 +13,6 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.orm.attributes import flag_modified
 
 from indico.core.db.sqlalchemy import db
-from indico.util.string import return_ascii
 
 
 class VidyoExtension(db.Model):
@@ -66,7 +65,6 @@ class VidyoExtension(db.Model):
             return custom_url_tpl + '?' + six.moves.urllib.parse.urlencode({'url': url})
         return url
 
-    @return_ascii
     def __repr__(self):
         return f'<VidyoExtension({self.vc_room}, {self.extension}, {self.owned_by_user})>'
 

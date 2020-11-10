@@ -27,7 +27,6 @@ from indico.core.config import config
 from indico.core.storage import Storage, StorageError
 from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyError
 from indico.util.fs import get_file_checksum
-from indico.util.string import return_ascii
 from indico.web.flask.util import make_content_disposition_args, send_file
 
 
@@ -194,7 +193,6 @@ class S3Storage(S3StorageBase):
         if len(self.bucket_name) > 63:
             raise StorageError('Bucket name cannot be longer than 63 chars')
 
-    @return_ascii
     def __repr__(self):
         return '<{}: {}>'.format(type(self).__name__, self.bucket_name)
 
@@ -227,7 +225,6 @@ class DynamicS3Storage(S3StorageBase):
             raise StorageError('Bucket name cannot be longer than 46 chars (to keep at least 16 hash chars)')
         self._check_bucket_secret()
 
-    @return_ascii
     def __repr__(self):
         return '<{}: {}>'.format(type(self).__name__, self.bucket_name_template)
 
