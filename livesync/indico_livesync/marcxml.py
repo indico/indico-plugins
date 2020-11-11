@@ -40,7 +40,7 @@ class MARCXMLGenerator:
         self.closed = False
         self.xml_generator = XMLGen()
         self.xml_generator.initXml()
-        self.xml_generator.openTag(b'collection', [[b'xmlns', b'http://www.loc.gov/MARC21/slim']])
+        self.xml_generator.openTag('collection', [['xmlns', 'http://www.loc.gov/MARC21/slim']])
         # This is horrible. but refactoring all the code in the indico core would be just as bad.
         admin = User.find_first(is_admin=True)
         self.output_generator = outputGenerator(admin, self.xml_generator)
@@ -56,14 +56,14 @@ class MARCXMLGenerator:
             raise RuntimeError('Cannot add object to closed xml generator')
         if deleted:
             xg = XMLGen(init=False)
-            xg.openTag(b'record')
-            xg.openTag(b'datafield', [[b'tag', b'970'], [b'ind1', b' '], [b'ind2', b' ']])
-            xg.writeTag(b'subfield', b'INDICO.{}'.format(compound_id(obj)), [[b'code', b'a']])
-            xg.closeTag(b'datafield')
-            xg.openTag(b'datafield', [[b'tag', b'980'], [b'ind1', b' '], [b'ind2', b' ']])
-            xg.writeTag(b'subfield', b'DELETED', [[b'code', b'c']])
-            xg.closeTag(b'datafield')
-            xg.closeTag(b'record')
+            xg.openTag('record')
+            xg.openTag('datafield', [['tag', '970'], ['ind1', ' '], ['ind2', ' ']])
+            xg.writeTag('subfield', 'INDICO.{}'.format(compound_id(obj)), [['code', 'a']])
+            xg.closeTag('datafield')
+            xg.openTag('datafield', [['tag', '980'], ['ind1', ' '], ['ind2', ' ']])
+            xg.writeTag('subfield', 'DELETED', [['code', 'c']])
+            xg.closeTag('datafield')
+            xg.closeTag('record')
             self.xml_generator.xml += xg.xml
         elif isinstance(obj, (Event, Contribution, SubContribution)):
             if obj.is_deleted or obj.event.is_deleted:
@@ -82,26 +82,26 @@ class MARCXMLGenerator:
 
     def get_xml(self):
         if not self.closed:
-            self.xml_generator.closeTag(b'collection')
+            self.xml_generator.closeTag('collection')
         return self.xml_generator.getXml()
 
     def _event_to_marcxml(self, obj):
         xg = XMLGen(init=False)
-        xg.openTag(b'record')
+        xg.openTag('record')
         self.output_generator.confToXMLMarc21(obj, out=xg)
-        xg.closeTag(b'record')
+        xg.closeTag('record')
         return xg.xml
 
     def _contrib_to_marcxml(self, obj):
         xg = XMLGen(init=False)
-        xg.openTag(b'record')
+        xg.openTag('record')
         self.output_generator.contribToXMLMarc21(obj, out=xg)
-        xg.closeTag(b'record')
+        xg.closeTag('record')
         return xg.xml
 
     def _subcontrib_to_marcxml(self, obj):
         xg = XMLGen(init=False)
-        xg.openTag(b'record')
+        xg.openTag('record')
         self.output_generator.subContribToXMLMarc21(obj, out=xg)
-        xg.closeTag(b'record')
+        xg.closeTag('record')
         return xg.xml

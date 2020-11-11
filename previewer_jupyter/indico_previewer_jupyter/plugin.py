@@ -18,7 +18,7 @@ from indico_previewer_jupyter.blueprint import blueprint
 
 
 def register_custom_mimetypes():
-    mimetypes.add_type(b'application/x-ipynb+json', b'.ipynb')
+    mimetypes.add_type('application/x-ipynb+json', '.ipynb')
 
 
 register_custom_mimetypes()

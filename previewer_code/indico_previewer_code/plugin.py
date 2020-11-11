@@ -18,7 +18,7 @@ from indico.modules.attachments.preview import Previewer
 
 
 def register_custom_mimetypes():
-    mimetypes.add_type(b'text/x-csharp', b'.cs')
+    mimetypes.add_type('text/x-csharp', '.cs')
 
 
 register_custom_mimetypes()
