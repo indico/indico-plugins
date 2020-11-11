@@ -8,6 +8,7 @@
 from indico.core import signals
 from indico.util.i18n import make_bound_gettext
 
+
 _ = make_bound_gettext('livesync')
 __all__ = ('LiveSyncPluginBase', 'LiveSyncBackendBase', 'AgentForm', 'SimpleChange', 'process_records',
            'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
