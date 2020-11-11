@@ -54,7 +54,7 @@ def agents():
         print
         print "You need to perform the initial data export for some agents."
         print cformat("To do so, run "
-                      "%{yellow!}indico livesync initial_export %{reset}%{yellow}<agent_id>%{reset} for those agents.")
+                      "%{yellow!}indico livesync initial-export %{reset}%{yellow}<agent_id>%{reset} for those agents.")
 
 
 @cli.command()

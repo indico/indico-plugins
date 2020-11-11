@@ -113,7 +113,7 @@
         <pre class="code"><code>
             {%- filter dedent %}
                 {%- for agent in missing_initial_export -%}
-                    indico livesync initial_export {{ agent.id }}
+                    indico livesync initial-export {{ agent.id }}
                 {% endfor -%}
             {% endfilter -%}
         </code></pre>
