@@ -86,7 +86,7 @@
 
     <div class="toolbar space-before">
         {% if backends|length == 1 %}
-            {% set name, backend = backends.viewitems()|first %}
+            {% set name, backend = backends.items()|first %}
             {{ add_agent_link(name, backend, standalone=true) }}
         {% else %}
             <a class="i-button icon-plus {{ 'disabled' if not backends else 'arrow js-dropdown' }}"
@@ -95,7 +95,7 @@
                 {% trans %}Add{% endtrans %}
             </a>
             <ul class="i-dropdown">
-                {% for name, backend in backends.viewitems() | sort(attribute='1.title') %}
+                {% for name, backend in backends.items() | sort(attribute='1.title') %}
                     <li>{{ add_agent_link(name, backend) }}</li>
                 {% endfor %}
             </ul>

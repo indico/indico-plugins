@@ -39,7 +39,7 @@
                             {% trans %}Choose Event / Contribution{% endtrans %}
                             <select id="updateContribution">
                                 <option value="None">{% trans %}Event{% endtrans %}</option>
-                                {% for id, title in report.contributions.iteritems() %}
+                                {% for id, title in report.contributions.items() %}
                                     <option value="{{ id }}" {{ 'selected' if report.contrib_id == id }}>
                                         {% trans %}Contribution{% endtrans %}: {{ title }}
                                     </option>
