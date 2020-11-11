@@ -105,7 +105,7 @@ class S3StorageBase(Storage):
         fileobj = self._ensure_fileobj(fileobj)
         checksum = get_file_checksum(fileobj)
         fileobj.seek(0)
-        content_md5 = b64encode(bytes.fromhex(checksum)).strip()
+        content_md5 = b64encode(bytes.fromhex(checksum)).decode().strip()
         metadata = {
             'ContentType': content_type,
             # the md5chksum header is used by tools like rclone in case the etag

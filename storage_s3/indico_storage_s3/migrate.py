@@ -165,7 +165,7 @@ class S3Importer:
                 self.queue_for_rclone(obj, bucket_name, new_storage_path)
             else:
                 with obj.open() as f:
-                    content_md5 = b64encode(bytes.fromhex(obj.md5)).strip()
+                    content_md5 = b64encode(bytes.fromhex(obj.md5)).decode().strip()
                     self.s3_client.put_object(Body=f, Bucket=bucket_name, Key=new_storage_path,
                                               ContentType=obj.content_type, ContentMD5=content_md5)
         self.emit_update(obj, backend, new_storage_path, new_filename)
