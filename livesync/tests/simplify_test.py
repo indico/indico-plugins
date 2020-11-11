@@ -9,8 +9,8 @@ import pytest
 
 from indico.testing.util import bool_matrix
 
-from indico_livesync import SimpleChange, process_records
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
+from indico_livesync.simplify import SimpleChange, process_records
 
 
 class Dummy:

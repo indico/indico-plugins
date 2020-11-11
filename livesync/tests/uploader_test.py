@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, Mock
 
 from indico.modules.events import Event
 
-from indico_livesync import SimpleChange
+from indico_livesync.simplify import SimpleChange
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 from indico_livesync.uploader import MARCXMLUploader, Uploader
 

@@ -15,7 +15,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.models.events import Event
 from indico.modules.users import User
 
-from indico_livesync import SimpleChange
+from indico_livesync.simplify import SimpleChange
 from indico_livesync.util import compound_id, obj_ref
 
 

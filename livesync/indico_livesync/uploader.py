@@ -8,7 +8,8 @@
 from indico.core.db import db
 from indico.util.struct.iterables import grouper
 
-from indico_livesync import MARCXMLGenerator, process_records
+from indico_livesync.marcxml import MARCXMLGenerator
+from indico_livesync.simplify import process_records
 
 
 class Uploader:
