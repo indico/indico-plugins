@@ -10,18 +10,14 @@ multiline-quotes = single
 docstring-quotes = double
 avoid-escape = true
 
-exclude =
+extend-exclude =
     build
     dist
     docs
-    ext_modules
     htmlcov
-    indico.egg-info
+    *.egg-info
     node_modules
     .*/
-    # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
-    .git
-    __pycache__
 
 ignore =
     # allow omitting whitespace around arithmetic operators
@@ -33,8 +29,6 @@ ignore =
     E731
     # while single quotes are nicer, we have double quotes in way too many places
     Q000
-    # for non-docstring multiline strings we don't really enforce a quote style
-    Q001
 
 per-file-ignores =
     # allow nicely aligned parametrizations
