@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'indico>=3.0.dev0',
-        'nbconvert>=4.0.0',
+        'nbconvert==5.6.1',
     ],
     python_requires='~=3.9',
     entry_points={'indico.plugins': {'previewer_jupyter = indico_previewer_jupyter:JupyterPreviewerPlugin'}}
