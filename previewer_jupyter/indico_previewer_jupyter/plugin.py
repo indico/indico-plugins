@@ -29,8 +29,8 @@ class NotebookPreviewer(Previewer):
 
     @classmethod
     def generate_content(cls, attachment):
-        return render_template('previewer_jupyter:iframe_preview.html',
-                               source_url=url_for_plugin('previewer_jupyter.preview_ipynb', attachment))
+        source_url = url_for_plugin('previewer_jupyter.preview_ipynb', attachment_id=attachment.id)
+        return render_template('previewer_jupyter:iframe_preview.html', source_url=source_url)
 
 
 class JupyterPreviewerPlugin(IndicoPlugin):
