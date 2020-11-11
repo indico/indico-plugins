@@ -59,7 +59,7 @@ class CppHighlighter(Preprocessor):
         try:
             if nb.metadata.kernelspec.language == "c++":
                 self.preprocess_cell = self._preprocess_cell_cpp
-        except:
+        except Exception:
             # if no language metadata, keep python as default
             pass
         return super().preprocess(nb, resources)

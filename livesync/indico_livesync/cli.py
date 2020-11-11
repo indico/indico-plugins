@@ -103,6 +103,6 @@ def run(agent_id, force=False):
         try:
             agent.create_backend().run()
             db.session.commit()
-        except:
+        except Exception:
             db.session.rollback()
             raise

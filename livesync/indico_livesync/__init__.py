@@ -13,13 +13,13 @@ _ = make_bound_gettext('livesync')
 __all__ = ('LiveSyncPluginBase', 'LiveSyncBackendBase', 'AgentForm', 'SimpleChange', 'process_records',
            'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
 
-from .base import LiveSyncPluginBase, LiveSyncBackendBase  # isort:skip
-from .forms import AgentForm  # isort:skip
-from .simplify import SimpleChange, process_records  # isort:skip
-from .marcxml import MARCXMLGenerator  # isort:skip
-from .uploader import Uploader, MARCXMLUploader  # isort:skip
+from .base import LiveSyncBackendBase, LiveSyncPluginBase  # noqa:E402
+from .forms import AgentForm  # noqa:E402
+from .marcxml import MARCXMLGenerator  # noqa:E402
+from .simplify import SimpleChange, process_records  # noqa:E402
+from .uploader import MARCXMLUploader, Uploader  # noqa:E402
 
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico_livesync.task
+    import indico_livesync.task  # noqa: F401

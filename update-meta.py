@@ -23,7 +23,7 @@ END_MARKER = '# END GENERATED REQUIREMENTS'
 
 def _find_plugins():
     subdirs = sorted(x for x in os.walk('.').next()[1]
-                      if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.py')))
+                     if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.py')))
     for subdir in subdirs:
         path = os.path.join(subdir, 'setup.py')
         with open(path) as f:

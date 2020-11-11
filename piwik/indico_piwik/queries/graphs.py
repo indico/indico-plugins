@@ -20,9 +20,8 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
             query_params['height'] = height
         if width is not None:
             query_params['width'] = width
-        return super().call(method='ImageGraph.get',
-                                                                apiModule=apiModule, apiAction=apiAction,
-                                                                aliasedGraph='1', graphType=graphType, **query_params)
+        return super().call(method='ImageGraph.get', apiModule=apiModule, apiAction=apiAction, aliasedGraph='1',
+                            graphType=graphType, **query_params)
 
     def get_result(self):
         """Perform the call and return the graph data
@@ -41,13 +40,11 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
 
 class PiwikQueryReportEventGraphCountries(PiwikQueryReportEventGraphBase):
     def call(self, **query_params):
-        return super().call(apiModule='UserCountry', apiAction='getCountry',
-                                                                     period='range', width=490, height=260,
-                                                                     graphType='horizontalBar', **query_params)
+        return super().call(apiModule='UserCountry', apiAction='getCountry', period='range', width=490, height=260,
+                            graphType='horizontalBar', **query_params)
 
 
 class PiwikQueryReportEventGraphDevices(PiwikQueryReportEventGraphBase):
     def call(self, **query_params):
-        return super().call(apiModule='UserSettings', apiAction='getOS',
-                                                                   period='range', width=320, height=260,
-                                                                   graphType='horizontalBar', **query_params)
+        return super().call(apiModule='UserSettings', apiAction='getOS', period='range', width=320, height=260,
+                            graphType='horizontalBar', **query_params)

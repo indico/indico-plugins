@@ -31,3 +31,11 @@ ignore =
     W504
     # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
     E731
+    # while single quotes are nicer, we have double quotes in way too many places
+    Q000
+    # for non-docstring multiline strings we don't really enforce a quote style
+    Q001
+
+per-file-ignores =
+    # allow nicely aligned parametrizations
+    **/*_test.py:E241

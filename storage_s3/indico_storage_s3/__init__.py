@@ -14,4 +14,4 @@ _ = make_bound_gettext('storage_s3')
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico_storage_s3.task
+    import indico_storage_s3.task  # noqa: F401

@@ -14,4 +14,4 @@ _ = make_bound_gettext('vc_vidyo')
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico_vc_vidyo.task
+    import indico_vc_vidyo.task  # noqa: F401
