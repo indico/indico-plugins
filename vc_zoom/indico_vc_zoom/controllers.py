@@ -7,12 +7,18 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, jsonify, session
+from flask import flash, jsonify, request, session
+from flask_pluginengine import current_plugin
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 
 from indico.core.db import db
 from indico.modules.vc.controllers import RHVCSystemEventBase
 from indico.modules.vc.exceptions import VCRoomError
+from indico.modules.vc.models.vc_rooms import VCRoom
+from indico.web.rh import RH
 from indico.util.i18n import _
+from werkzeug.exceptions import Forbidden
 
 
 class RHRoomHost(RHVCSystemEventBase):
@@ -29,3 +35,30 @@ class RHRoomHost(RHVCSystemEventBase):
             flash(_("You are now the host of room '{room.name}'".format(room=self.vc_room)), 'success')
             result['success'] = True
         return jsonify(result)
+
+
+class RHWebhook(RH):
+    CSRF_ENABLED = False
+
+    def _check_access(self):
+        token = request.headers.get('Authorization')
+        expected_token = current_plugin.settings.get('webhook_token')
+        if not expected_token or not token or token != expected_token:
+            raise Forbidden
+
+    @use_kwargs({
+        'event': fields.String(),
+        'payload': fields.Dict()
+    })
+    def _process(self, event, payload):
+        meeting_id = payload['object']['id']
+        vc_room = VCRoom.query.filter(VCRoom.data.contains({'zoom_id': meeting_id})).first()
+
+        if not vc_room:
+            current_plugin.logger.warning('Action for unhandled Zoom room: %s', meeting_id)
+            return
+
+        if event in {'meeting.updated', 'webinar.updated', 'meeting.deleted', 'webinar.deleted'}:
+            current_plugin.refresh_room(vc_room, None)
+        else:
+            current_plugin.logger.warning('Unhandled Zoom webhook payload: %s', event)

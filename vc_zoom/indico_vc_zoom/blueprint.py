@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_vc_zoom.controllers import RHRoomHost
+from indico_vc_zoom.controllers import RHRoomHost, RHWebhook
 
 
 blueprint = IndicoPluginBlueprint('vc_zoom', 'indico_vc_zoom')
@@ -19,3 +19,4 @@ blueprint = IndicoPluginBlueprint('vc_zoom', 'indico_vc_zoom')
 # includes the service and normalization skips values provided in 'defaults'
 blueprint.add_url_rule('/event/<confId>/manage/videoconference/zoom/<int:event_vc_room_id>/room-host',
                        'set_room_host', RHRoomHost, methods=('POST',))
+blueprint.add_url_rule('/api/plugin/zoom/webhook', 'webhook', RHWebhook, methods=('POST',))

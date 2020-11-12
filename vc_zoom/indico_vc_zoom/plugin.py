@@ -44,6 +44,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 
     api_secret = IndicoPasswordField(_('API Secret'), [DataRequired()], toggle=True)
 
+    webhook_token = IndicoPasswordField(_('Webhook Token'), toggle=True,
+                                        description=_("Specify Zoom's webhook token if you want live updates"))
+
     email_domains = StringField(_('E-mail domains'), [DataRequired()],
                                 description=_("Comma-separated list of e-mail domains which can use the Zoom API."))
 
@@ -110,6 +113,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'assistant_id': config.SUPPORT_EMAIL,
             'api_key': '',
             'api_secret': '',
+            'webhook_token': '',
             'email_domains': '',
             'mute_host_video': True,
             'mute_audio': True,
