@@ -264,6 +264,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             kwargs.update({
                 'topic': vc_room.name,
+                'agenda': vc_room.data['description'],
                 'password': gen_random_password(),
                 'timezone': event.timezone,
                 'settings': settings
@@ -321,6 +322,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
 
+        if vc_room.data['description'] != zoom_meeting['agenda']:
+            changes['agenda'] = vc_room.data['description']
+
         zoom_meeting_settings = zoom_meeting['settings']
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
             changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
@@ -341,9 +345,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_meeting = fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
+            'description': zoom_meeting['agenda'],
             'url': zoom_meeting['join_url'],
             'public_url': zoom_meeting['join_url'].split('?')[0],
-            'zoom_id': zoom_meeting['id']
+            'zoom_id': zoom_meeting['id'],
+            'password': zoom_meeting['password'],
+            'mute_host_video': zoom_meeting['settings']['host_video'],
+
+            # these options will be empty for webinars
+            'mute_audio': zoom_meeting['settings'].get('mute_upon_entry'),
+            'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
+            'waiting_room': zoom_meeting['settings'].get('waiting_room')
         })
         flag_modified(vc_room, 'data')
 
