@@ -40,8 +40,8 @@ def find_enterprise_email(user):
 
 
 def gen_random_password():
-    """Generate a random 10-character-long alphanumeric string."""
-    return ''.join(random.sample(string.ascii_lowercase + string.ascii_uppercase + string.digits, 10))
+    """Generate a random 8-character-long numeric string."""
+    return ''.join(random.choice(string.digits) for _ in range(8))
 
 
 def fetch_zoom_meeting(vc_room, client=None, is_webinar=False):
