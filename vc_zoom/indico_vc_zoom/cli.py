@@ -24,7 +24,7 @@ def cli():
 def rooms(status=None):
     """Lists all Zoom rooms"""
 
-    room_query = VCRoom.find(type='zoom')
+    room_query = VCRoom.query.filter_by(type='zoom')
     table_data = [['ID', 'Name', 'Status', 'Zoom ID']]
 
     if status:
