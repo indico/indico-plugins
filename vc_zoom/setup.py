@@ -15,8 +15,8 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        'indico>=2',
-        'PyJWT'
+        'indico>=2.3.2.dev0',
+        'PyJWT<2'
     ],
     classifiers=[
         'Environment :: Plugins',
