@@ -410,7 +410,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         for room in VCRoom.query.filter(
             VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.identifier})
         ):
-            room.data['host'] = target.id
+            room.data['host'] = target.identifier
             flag_modified(room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
