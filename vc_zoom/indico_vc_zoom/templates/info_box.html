@@ -12,7 +12,7 @@
     {% endif %}
     {% if event_vc_room.data.password_visibility == 'everyone' or is_manager or
         (session.user and event_vc_room.data.password_visibility == 'logged_in') %}
-        <dt>{% trans %}Password{% endtrans %}</dt>
+        <dt>{% trans %}Passcode{% endtrans %}</dt>
         <dd>{{ vc_room.data.password }}</dd>
     {% endif %}
     {% if event_vc_room.data.show_autojoin %}

@@ -149,7 +149,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 # webinar hosts cannot be changed through the API
                 form.host_choice.render_kw = {'disabled': True}
                 form.host_user.render_kw = {'disabled': True}
-
+        else:
+            form.password.data = gen_random_password()
         return form
 
     def _extend_indico_cli(self, sender, **kwargs):
@@ -185,7 +186,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
-        fields = {'description'}
+        fields = {'description', 'password'}
         if data['meeting_type'] == 'webinar':
             fields |= {'mute_host_video'}
             if is_new:
@@ -265,7 +266,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             kwargs.update({
                 'topic': vc_room.name,
                 'agenda': vc_room.data['description'],
-                'password': gen_random_password(),
+                'password': vc_room.data['password'],
                 'timezone': event.timezone,
                 'settings': settings
             })
@@ -283,7 +284,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'url': meeting_obj['join_url'],
             'public_url': meeting_obj['join_url'].split('?')[0],
             'start_url': meeting_obj['start_url'],
-            'password': meeting_obj['password'],
             'host': host.identifier
         })
 
@@ -324,6 +324,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         if vc_room.data['description'] != zoom_meeting['agenda']:
             changes['agenda'] = vc_room.data['description']
+
+        if vc_room.data['password'] != zoom_meeting['password']:
+            changes['password'] = vc_room.data['password']
 
         zoom_meeting_settings = zoom_meeting['settings']
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:

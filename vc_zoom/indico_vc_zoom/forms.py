@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 from flask import session
 
-from wtforms.fields.core import BooleanField
+from wtforms.fields.core import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -16,15 +16,15 @@ from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import IndicoRadioField, PrincipalField
-from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
 
 
 class VCRoomAttachForm(VCRoomAttachFormBase):
-    password_visibility = IndicoRadioField(_("Password visibility"),
-                                           description=_("Who should be able to know this meeting's password"),
+    password_visibility = IndicoRadioField(_("Passcode visibility"),
+                                           description=_("Who should be able to know this meeting's passcode"),
                                            orientation='horizontal',
                                            choices=[
                                                ('everyone', _('Everyone')),
@@ -52,8 +52,12 @@ class VCRoomForm(VCRoomFormBase):
     host_user = PrincipalField(_("User"),
                                [HiddenUnless('host_choice', 'someone_else'), DataRequired()])
 
-    password_visibility = IndicoRadioField(_("Password visibility"),
-                                           description=_("Who should be able to know this meeting's password"),
+    password = StringField(_("Passcode"),
+                           [DataRequired(), IndicoRegexp(r'^\d{8,}$')],
+                           description=_("Meeting passcode (min. 8 digits)"))
+
+    password_visibility = IndicoRadioField(_("Passcode visibility"),
+                                           description=_("Who should be able to know this meeting's passcode"),
                                            orientation='horizontal',
                                            choices=[
                                                ('everyone', _('Everyone')),
