@@ -4,8 +4,10 @@
 <dl>
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
-    <dt>{% trans %}Description{% endtrans %}</dt>
-    <dd>{{ vc_room.data.description }}</dd>
+    {% if vc_room.data.description %}
+        <dt>{% trans %}Description{% endtrans %}</dt>
+        <dd>{{ vc_room.data.description }}</dd>
+    {% endif %}
     {% if host %}
         <dt>{% trans %}Host{% endtrans %}</dt>
         <dd>{{ (host|decodeprincipal).full_name }}</dd>
