@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from flask import flash, jsonify, request, session
 from flask_pluginengine import current_plugin
+from sqlalchemy.orm.attributes import flag_modified
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
@@ -25,12 +26,12 @@ class RHRoomHost(RHVCSystemEventBase):
     def _process(self):
         result = {}
         self.vc_room.data['host'] = session.user.identifier
+        flag_modified(self.vc_room, 'data')
         try:
             self.plugin.update_room(self.vc_room, self.event)
-        except VCRoomError as err:
-            result['error'] = {'message': err.message}
-            result['success'] = False
+        except VCRoomError:
             db.session.rollback()
+            raise
         else:
             flash(_("You are now the host of room '{room.name}'".format(room=self.vc_room)), 'success')
             result['success'] = True

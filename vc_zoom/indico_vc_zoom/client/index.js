@@ -5,30 +5,25 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-$(function() {
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+
+document.addEventListener('DOMContentLoaded', async () => {
   $('.vc-toolbar').dropdown({
     positioning: {
       level1: {my: 'right top', at: 'right bottom', offset: '0px 0px'},
     },
   });
 
-  $('.vc-toolbar .action-make-owner').click(function() {
-    const $this = $(this);
-
-    $.ajax({
-      url: $this.data('href'),
-      method: 'POST',
-      complete: IndicoUI.Dialogs.Util.progress(),
+  document.querySelectorAll('.vc-toolbar .action-make-host').forEach(elem => {
+    elem.addEventListener('click', async () => {
+      const killProgress = IndicoUI.Dialogs.Util.progress();
+      try {
+        await indicoAxios.post(elem.dataset.href);
+        window.location.reload();
+      } catch (error) {
+        handleAxiosError(error);
+        killProgress();
+      }
     })
-      .done(function(result) {
-        if (handleAjaxError(result)) {
-          return;
-        } else {
-          location.reload();
-        }
-      })
-      .fail(function(error) {
-        handleAjaxError(error);
-      });
-  });
+  })
 });

@@ -17,6 +17,10 @@ blueprint = IndicoPluginBlueprint('vc_zoom', 'indico_vc_zoom')
 # Room management
 # using any(zoom) instead of defaults since the event vc room locator
 # includes the service and normalization skips values provided in 'defaults'
-blueprint.add_url_rule('/event/<confId>/manage/videoconference/zoom/<int:event_vc_room_id>/room-host',
-                       'set_room_host', RHRoomHost, methods=('POST',))
+blueprint.add_url_rule(
+    '/event/<confId>/manage/videoconference/<any(zoom):service>/<int:event_vc_room_id>/make-me-host',
+    'make_me_host',
+    RHRoomHost,
+    methods=('POST',)
+)
 blueprint.add_url_rule('/api/plugin/zoom/webhook', 'webhook', RHWebhook, methods=('POST',))
