@@ -18,7 +18,22 @@ https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate#r
 ) property in the Zoom API). The *assistant user* owns every Zoom meeting, with the `scheduled_for` property being
 used to grant the required privileges to the desired hosts.
 
-## Configuration
+## Zoom App Configuration
+
+### Webhook (optional)
+
+**URL:** `https://yourserver/api/plugin/zoom/webhook`
+
+(write down the "Verification Token", as you will need it in the plugin configuration below)
+
+Select the following "Event types":
+ * `Meeting has been updated`
+ * `Meeting has been deleted`
+ * `Webinar has been updated`
+ * `Webinar has been deleted`
+
+
+## Plugin Configuration
 
 These are the most relevant configuration options:
 
@@ -26,8 +41,10 @@ These are the most relevant configuration options:
  * **E-mail domains** - Comma-separated list of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
  * **Asistant Zoom ID** - Zoom ID (or e-mail) of the account which shall be used as an assistant to all hosts and
 shall own all meetings
+ * **Webhook token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
 
-### Zoom API key/secret
+
+### Zoom API key/secret (JWT)
 To obtain API key and API secret, please visit [https://marketplace.zoom.us/docs/guides/auth/jwt](https://marketplace.zoom.us/docs/guides/auth/jwt).
 
 
