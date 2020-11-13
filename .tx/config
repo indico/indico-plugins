@@ -7,18 +7,6 @@ source_file = vc_vidyo/indico_vc_vidyo/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.search-messages]
-file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages.po
-source_file = search/indico_search/translations/messages.pot
-source_lang = en
-type = PO
-
-[indico.search-messages-js]
-file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = search/indico_search/translations/messages-js.pot
-source_lang = en
-type = PO
-
 [indico.piwik-messages]
 file_filter = piwik/indico_piwik/translations/<lang>/LC_MESSAGES/messages.po
 source_file = piwik/indico_piwik/translations/messages.pot
@@ -52,24 +40,6 @@ type = PO
 [indico.livesync-messages-js]
 file_filter = livesync/indico_livesync/translations/<lang>/LC_MESSAGES/messages-js.po
 source_file = livesync/indico_livesync/translations/messages-js.pot
-source_lang = en
-type = PO
-
-[indico.importer-messages]
-file_filter = importer/indico_importer/translations/<lang>/LC_MESSAGES/messages.po
-source_file = importer/indico_importer/translations/messages.pot
-source_lang = en
-type = PO
-
-[indico.importer-messages-js]
-file_filter = importer/indico_importer/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = importer/indico_importer/translations/messages-js.pot
-source_lang = en
-type = PO
-
-[indico.importer-invenio-messages]
-file_filter = importer_invenio/indico_importer_invenio/translations/<lang>/LC_MESSAGES/messages.po
-source_file = importer_invenio/indico_importer_invenio/translations/messages.pot
 source_lang = en
 type = PO
 
