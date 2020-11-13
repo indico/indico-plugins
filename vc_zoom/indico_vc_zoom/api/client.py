@@ -16,7 +16,7 @@ from pytz import utc
 
 
 def format_iso_dt(d):
-    """Convertdatetime objects to a UTC-based string.
+    """Convert a datetime objects to a UTC-based string.
 
     :param d: The :class:`datetime.datetime` to convert to a string
     :returns: The string representation of the date
