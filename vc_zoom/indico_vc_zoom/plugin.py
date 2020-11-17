@@ -261,7 +261,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         try:
             settings = {
-                'host_video': vc_room.data['mute_host_video'],
+                'host_video': not vc_room.data['mute_host_video'],
             }
 
             kwargs = {}
