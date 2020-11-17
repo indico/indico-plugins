@@ -40,6 +40,14 @@ from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
+    _fieldsets = [
+        ('API Credentials', ['api_key', 'api_secret', 'webhook_token']),
+        ('Zoom Account', ['email_domains', 'assistant_id']),
+        ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
+                           'waiting_room']),
+        ('Notifications', ['zoom_phone_link', 'creation_email_footer', 'send_host_url'])
+    ]
+
     api_key = StringField(_('API Key'), [DataRequired()])
 
     api_secret = IndicoPasswordField(_('API Secret'), [DataRequired()], toggle=True)
