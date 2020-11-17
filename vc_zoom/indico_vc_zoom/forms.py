@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from wtforms.fields.core import BooleanField, StringField
-from wtforms.fields.simple import TextAreaField
+from wtforms.fields.simple import HiddenField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
@@ -65,7 +65,6 @@ class VCRoomForm(VCRoomFormBase):
                                                ('no_one', _("No one"))])
 
     mute_audio = BooleanField(_('Mute audio'),
-                              [HiddenUnless('meeting_type', 'regular')],
                               widget=SwitchWidget(),
                               description=_('Participants will join the VC room muted by default '))
 
@@ -74,12 +73,10 @@ class VCRoomForm(VCRoomFormBase):
                                    description=_('The host will join the VC room with video disabled'))
 
     mute_participant_video = BooleanField(_('Mute video (participants)'),
-                                          [HiddenUnless('meeting_type', 'regular')],
                                           widget=SwitchWidget(),
                                           description=_('Participants will join the VC room with video disabled'))
 
     waiting_room = BooleanField(_('Waiting room'),
-                                [HiddenUnless('meeting_type', 'regular')],
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
@@ -92,6 +89,12 @@ class VCRoomForm(VCRoomFormBase):
             defaults.host_choice = 'myself' if host == session.user else 'someone_else'
             defaults.host_user = None if host == session.user else host
         super(VCRoomForm, self).__init__(*args, **kwargs)
+
+        if defaults.meeting_type is None:
+            del self.meeting_type
+        else:
+            for f in {self.mute_audio, self.mute_participant_video, self.waiting_room}:
+                f.validators = [HiddenUnless('meeting_type', 'regular')]
 
     @generated_data
     def host(self):

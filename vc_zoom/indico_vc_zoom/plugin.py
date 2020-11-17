@@ -42,7 +42,7 @@ from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         ('API Credentials', ['api_key', 'api_secret', 'webhook_token']),
-        ('Zoom Account', ['email_domains', 'assistant_id']),
+        ('Zoom Account', ['email_domains', 'assistant_id', 'allow_webinars']),
         ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                            'waiting_room']),
         ('Notifications', ['zoom_phone_link', 'creation_email_footer', 'send_host_url'])
@@ -61,6 +61,10 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     assistant_id = StringField(_('Assistant Zoom ID'), [DataRequired()],
                                description=_('Account to be used as owner of all rooms. It will get "assistant" '
                                              'privileges on all accounts for which it books rooms'))
+
+    allow_webinars = BooleanField(_('Allow Webinars'),
+                                  widget=SwitchWidget(),
+                                  description=_('Allow webinars to be created through Indico'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -123,6 +127,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'api_secret': '',
             'webhook_token': '',
             'email_domains': '',
+            'allow_webinars': True,
             'mute_host_video': True,
             'mute_audio': True,
             'mute_participant_video': True,
@@ -195,6 +200,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data, is_new=False):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
         fields = {'description', 'password'}
+
+        if is_new:
+            # in a freshly-created VCRoom, we may end up not getting a meeting_type from the form
+            # (i.e. webinars are disabled)
+            data.setdefault('meeting_type', 'regular')
+
         if data['meeting_type'] == 'webinar':
             fields |= {'mute_host_video'}
             if is_new:
@@ -243,7 +254,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # get the object that this booking is linked to
         vc_room_assoc = vc_room.events[0]
         link_obj = vc_room_assoc.link_object
-        is_webinar = vc_room.data['meeting_type'] == 'webinar'
+        is_webinar = vc_room.data.setdefault('meeting_type', 'regular') == 'webinar'
         scheduling_args = get_schedule_args(link_obj) if link_obj.start_dt else {}
 
         self._check_indico_is_assistant(host_email)
@@ -391,7 +402,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_vc_room_form_defaults(self, event):
         defaults = super(ZoomPlugin, self).get_vc_room_form_defaults(event)
         defaults.update({
-            'meeting_type': 'regular',
+            'meeting_type': 'regular' if self.settings.get('allow_webinars') else None,
             'mute_audio': self.settings.get('mute_audio'),
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
