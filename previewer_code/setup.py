@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'indico>=3.0.dev0',
-        'pygments',
+        'Pygments>=2.7.2,<3',
     ],
     python_requires='~=3.9',
     entry_points={'indico.plugins': {'previewer_code = indico_previewer_code:CodePreviewerPlugin'}}

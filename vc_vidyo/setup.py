@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'indico>=3.0.dev0',
-        'zeep',
+        'zeep>=4.0.0,<5',
     ],
     python_requires='~=3.9',
     classifiers=[
