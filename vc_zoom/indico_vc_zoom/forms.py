@@ -40,7 +40,7 @@ class VCRoomForm(VCRoomFormBase):
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
     meeting_type = IndicoRadioField(_("Meeting Type"),
-                                    description=_("The type of Zoom meeting ot be created"),
+                                    description=_("The type of Zoom meeting to be created"),
                                     orientation='horizontal',
                                     choices=[
                                         ('regular', _('Regular Meeting')),
