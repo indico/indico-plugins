@@ -100,7 +100,10 @@ class VCRoomForm(VCRoomFormBase):
     def host(self):
         if self.host_choice is None:
             return None
-        return session.user.identifier if self.host_choice.data == 'myself' else self.host_user.data.identifier
+        elif self.host_choice.data == 'myself':
+            return session.user.identifier
+        else:
+            return self.host_user.data.identifier if self.host_user.data else None
 
     def validate_host_user(self, field):
         if not field.data:
