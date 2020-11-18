@@ -29,12 +29,12 @@ def find_enterprise_email(user):
     :return: the e-mail address if it exists, otherwise `None`
     """
     from indico_vc_zoom.plugin import ZoomPlugin
-    providers = [auth.strip() for auth in ZoomPlugin.settings.get('email_domains').split(',')]
+    domains = [auth.strip() for auth in ZoomPlugin.settings.get('email_domains').split(',')]
     result = UserEmail.query.filter(
         UserEmail.user == user,
         ~User.is_blocked,
         ~User.is_deleted,
-        db.or_(UserEmail.email.ilike("%%@{}".format(provider)) for provider in providers)
+        db.or_(UserEmail.email.ilike('%@{}'.format(domain)) for domain in domains)
     ).join(User).first()
     return result.email if result else None
 

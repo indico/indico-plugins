@@ -28,10 +28,7 @@ def _handle_response(resp, expected_code=200, expects_json=True):
     resp.raise_for_status()
     if resp.status_code != expected_code:
         raise HTTPError("Unexpected status code {}".format(resp.status_code), response=resp)
-    if expects_json:
-        return resp.json()
-    else:
-        return resp
+    return resp.json() if expects_json else resp
 
 
 class APIException(Exception):
@@ -150,6 +147,8 @@ class UserComponent(BaseComponent):
 class ZoomClient(object):
     """Zoom REST API Python Client."""
 
+    BASE_URI = "https://api.zoom.us/v2"
+
     _components = {
         'user': UserComponent,
         'meeting': MeetingComponent,
@@ -163,8 +162,6 @@ class ZoomClient(object):
         :param api_secret: the Zoom JWT API Secret
         :param timeout: the time out to use for API requests
         """
-        BASE_URI = "https://api.zoom.us/v2"
-
         # Setup the config details
         config = {
             "api_key": api_key,
@@ -172,38 +169,33 @@ class ZoomClient(object):
         }
 
         # Instantiate the components
-
         self.components = {
-            key: component(base_uri=BASE_URI, config=config, timeout=timeout)
+            key: component(base_uri=self.BASE_URI, config=config, timeout=timeout)
             for key, component in self._components.viewitems()
         }
 
     @property
     def meeting(self):
         """Get the meeting component."""
-        return self.components.get("meeting")
+        return self.components['meeting']
 
     @property
     def user(self):
         """Get the user component."""
-        return self.components.get("user")
+        return self.components['user']
 
     @property
     def webinar(self):
-        """Get the user component."""
-        return self.components.get("webinar")
+        """Get the webinar component."""
+        return self.components['webinar']
 
 
 class ZoomIndicoClient(object):
     def __init__(self):
-        self._refresh_client()
-
-    def _refresh_client(self):
         from indico_vc_zoom.plugin import ZoomPlugin
-        settings = ZoomPlugin.settings
         self.client = ZoomClient(
-            settings.get('api_key'),
-            settings.get('api_secret')
+            ZoomPlugin.settings.get('api_key'),
+            ZoomPlugin.settings.get('api_secret')
         )
 
     def create_meeting(self, user_id, **kwargs):
@@ -229,9 +221,6 @@ class ZoomIndicoClient(object):
 
     def delete_webinar(self, webinar_id):
         return _handle_response(self.client.webinar.delete(webinar_id), 204, expects_json=False)
-
-    def check_user_meeting_time(self, user_id, start_dt, end_dt):
-        pass
 
     def get_user(self, user_id):
         return _handle_response(self.client.user.get(user_id))

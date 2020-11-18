@@ -26,7 +26,7 @@ def notify_host_start_url(vc_room):
     )
 
     email = make_email(to_list, template=template_module, html=True)
-    send_email(email, None, 'Zoom')
+    send_email(email)
 
 
 def notify_new_host(actor, vc_room):
@@ -41,4 +41,4 @@ def notify_new_host(actor, vc_room):
 
     new_host = principal_from_identifier(vc_room.data['host'])
     email = make_email({new_host.email}, cc_list={actor.email}, template=template_module, html=True)
-    send_email(email, None, 'Zoom')
+    send_email(email)

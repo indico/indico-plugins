@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import click
 from terminaltables import AsciiTable
@@ -36,4 +36,4 @@ def rooms(status=None):
     table = AsciiTable(table_data)
     for col in (0, 3, 4):
         table.justify_columns[col] = 'right'
-    print table.table
+    print(table.table)

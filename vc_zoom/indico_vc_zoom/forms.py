@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from wtforms.fields.core import BooleanField, StringField
-from wtforms.fields.simple import HiddenField, TextAreaField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
