@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 from flask import session
+from flask_pluginengine import current_plugin
 
 from wtforms.fields.core import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
@@ -16,6 +17,7 @@ from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import IndicoRadioField, PrincipalField
+from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
@@ -88,13 +90,17 @@ class VCRoomForm(VCRoomFormBase):
             host = principal_from_identifier(defaults.host)
             defaults.host_choice = 'myself' if host == session.user else 'someone_else'
             defaults.host_user = None if host == session.user else host
+
+        allow_webinars = current_plugin.settings.get('allow_webinars')
+
+        if allow_webinars:
+            for field_name in {'mute_audio', 'mute_participant_video', 'waiting_room'}:
+                inject_validators(self, field_name, [HiddenUnless('meeting_type', 'regular')])
+
         super(VCRoomForm, self).__init__(*args, **kwargs)
 
-        if defaults.meeting_type is None:
+        if not allow_webinars:
             del self.meeting_type
-        else:
-            for f in {self.mute_audio, self.mute_participant_video, self.waiting_room}:
-                f.validators = [HiddenUnless('meeting_type', 'regular')]
 
     @generated_data
     def host(self):

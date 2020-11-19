@@ -146,13 +146,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         )
 
         if existing_vc_room:
-            # if we're editing a VC room, we will not allow the meeting type to be changed
-            form.meeting_type.render_kw = {'disabled': True}
+            if self.settings.get('allow_webinars'):
+                # if we're editing a VC room, we will not allow the meeting type to be changed
+                form.meeting_type.render_kw = {'disabled': True}
 
-            if form.data['meeting_type'] == 'webinar':
-                # webinar hosts cannot be changed through the API
-                form.host_choice.render_kw = {'disabled': True}
-                form.host_user.render_kw = {'disabled': True}
+                if form.data['meeting_type'] == 'webinar':
+                    # webinar hosts cannot be changed through the API
+                    form.host_choice.render_kw = {'disabled': True}
+                    form.host_user.render_kw = {'disabled': True}
         else:
             form.password.data = gen_random_password()
         return form
@@ -192,10 +193,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
         fields = {'description', 'password'}
 
-        if is_new:
-            # in a freshly-created VCRoom, we may end up not getting a meeting_type from the form
-            # (i.e. webinars are disabled)
-            data.setdefault('meeting_type', 'regular')
+        # we may end up not getting a meeting_type from the form
+        # (i.e. webinars are disabled)
+        data.setdefault('meeting_type', 'regular' if is_new else vc_room.data['meeting_type'])
 
         if data['meeting_type'] == 'webinar':
             fields |= {'mute_host_video'}
@@ -332,7 +332,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
 
-        if vc_room.data['description'] != zoom_meeting['agenda']:
+        if vc_room.data['description'] != zoom_meeting.get('agenda'):
             changes['agenda'] = vc_room.data['description']
 
         if vc_room.data['password'] != zoom_meeting['password']:
