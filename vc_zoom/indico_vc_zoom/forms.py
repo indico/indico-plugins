@@ -110,7 +110,3 @@ class VCRoomForm(VCRoomFormBase):
             return session.user.identifier
         else:
             return self.host_user.data.identifier if self.host_user.data else None
-
-    def validate_host_user(self, field):
-        if not field.data:
-            raise ValidationError(_("Unable to find this user in Indico."))
