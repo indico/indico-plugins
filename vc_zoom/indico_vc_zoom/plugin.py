@@ -13,7 +13,6 @@ from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, NotFound
 from wtforms.fields.core import BooleanField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired
 
@@ -44,7 +43,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         ('Zoom Account', ['email_domains', 'assistant_id', 'allow_webinars']),
         ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                            'waiting_room']),
-        ('Notifications', ['zoom_phone_link', 'creation_email_footer', 'send_host_url'])
+        ('Notifications', ['creation_email_footer', 'send_host_url'])
     ]
 
     api_key = StringField(_('API Key'), [DataRequired()])
@@ -86,9 +85,6 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
-    zoom_phone_link = URLField(_('ZoomVoice phone number'),
-                               description=_('Link to the list of ZoomVoice phone numbers'))
-
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=CKEditorWidget(),
                                           description=_('Footer to append to emails sent upon creation of a VC room'))
 
@@ -120,7 +116,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'mute_participant_video': True,
         'join_before_host': True,
         'waiting_room': False,
-        'zoom_phone_link': None,
         'creation_email_footer': None,
         'send_host_url': False
     })

@@ -1,6 +1,5 @@
 {% from '_clipboard_input.html' import clipboard_input %}
 {% set host = vc_room.data.host %}
-{% set phone_link = settings.get('zoom_phone_link') %}
 <dl>
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
@@ -21,16 +20,6 @@
         <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
         <dd class="large-row">
             {{ clipboard_input(vc_room.data.url, name="vc-room-url-%s"|format(event_vc_room.id)) }}
-        </dd>
-    {% endif %}
-    {% if event_vc_room.data.show_phone_numbers and phone_link %}
-        <dt>
-            {% trans %}Useful links{% endtrans %}
-        </dt>
-        <dd>
-            <a href="{{ phone_link }}" target="_blank">
-                {% trans %}Phone numbers{% endtrans %}
-            </a>
         </dd>
     {% endif %}
 </dl>

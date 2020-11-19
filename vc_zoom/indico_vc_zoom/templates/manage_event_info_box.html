@@ -1,7 +1,6 @@
 {% from '_password.html' import password %}
 {% from '_clipboard_input.html' import clipboard_input %}
 {% set host = vc_room.data.host %}
-{% set phone_link = settings.get('zoom_phone_link') %}
 <dl class="details-container">
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
