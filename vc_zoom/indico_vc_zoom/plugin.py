@@ -18,7 +18,6 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -109,6 +108,22 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
+    default_settings = dict(VCPluginMixin.default_settings, **{
+        'assistant_id': '',
+        'api_key': '',
+        'api_secret': '',
+        'webhook_token': '',
+        'email_domains': '',
+        'allow_webinars': True,
+        'mute_host_video': True,
+        'mute_audio': True,
+        'mute_participant_video': True,
+        'join_before_host': True,
+        'waiting_room': False,
+        'zoom_phone_link': None,
+        'creation_email_footer': None,
+        'send_host_url': False
+    })
 
     def init(self):
         super(ZoomPlugin, self).init()
@@ -118,25 +133,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
-
-    @property
-    def default_settings(self):
-        return dict(VCPluginMixin.default_settings, **{
-            'assistant_id': config.SUPPORT_EMAIL,
-            'api_key': '',
-            'api_secret': '',
-            'webhook_token': '',
-            'email_domains': '',
-            'allow_webinars': True,
-            'mute_host_video': True,
-            'mute_audio': True,
-            'mute_participant_video': True,
-            'join_before_host': True,
-            'waiting_room': False,
-            'zoom_phone_link': None,
-            'creation_email_footer': None,
-            'send_host_url': False
-        })
 
     @property
     def logo_url(self):
