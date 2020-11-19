@@ -30,12 +30,13 @@ def find_enterprise_email(user):
     """
     from indico_vc_zoom.plugin import ZoomPlugin
     domains = [auth.strip() for auth in ZoomPlugin.settings.get('email_domains').split(',')]
+    # get all matching e-mails, primary first
     result = UserEmail.query.filter(
         UserEmail.user == user,
         ~User.is_blocked,
         ~User.is_deleted,
-        db.or_(UserEmail.email.ilike('%@{}'.format(domain)) for domain in domains)
-    ).join(User).first()
+        db.or_(UserEmail.email.endswith(domain) for domain in domains)
+    ).join(User).order_by(UserEmail.is_primary.desc()).first()
     return result.email if result else None
 
 
