@@ -17,9 +17,20 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import User
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.util.date_time import now_utc
+from indico.util.struct.enum import RichIntEnum
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
+
+
+class ZoomMeetingType(RichIntEnum):
+    instant_meeting = 1
+    scheduled_meeting = 2
+    recurring_meeting_no_time = 3
+    recurring_meeting_fixed_time = 4
+    webinar = 5
+    recurring_webinar_no_time = 6
+    recurring_meeting_fixed_time = 9
 
 
 def find_enterprise_email(user):

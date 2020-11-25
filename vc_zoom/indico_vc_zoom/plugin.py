@@ -34,7 +34,7 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
 from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_random_password, get_schedule_args,
-                                 update_zoom_meeting)
+                                 update_zoom_meeting, ZoomMeetingType)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -60,9 +60,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                description=_('Account to be used as owner of all rooms. It will get "assistant" '
                                              'privileges on all accounts for which it books rooms'))
 
-    allow_webinars = BooleanField(_('Allow Webinars'),
+    allow_webinars = BooleanField(_('Allow Webinars (Experimental)'),
                                   widget=SwitchWidget(),
-                                  description=_('Allow webinars to be created through Indico'))
+                                  description=_('Allow webinars to be created through Indico. Use at your own risk.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -110,7 +110,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'api_secret': '',
         'webhook_token': '',
         'email_domains': '',
-        'allow_webinars': True,
+        'allow_webinars': False,
         'mute_host_video': True,
         'mute_audio': True,
         'mute_participant_video': True,
@@ -165,6 +165,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # XXX: This feels slightly hacky. Maybe we should change the API on the core?
         association_is_new = room_assoc.vc_room is None
         old_link = room_assoc.link_object
+
+        # in a new room, `meeting_type` comes in `data`, otherwise it's already in the VCRoom
+        is_webinar = data.get('meeting_type', vc_room.data and vc_room.data.get('meeting_type')) == 'webinar'
+
         super(ZoomPlugin, self).update_data_association(event, vc_room, room_assoc, data)
 
         if vc_room.data:
@@ -174,7 +178,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 update_zoom_meeting(vc_room.data['zoom_id'], {
                     'start_time': None,
                     'duration': None,
-                    'type': 3
+                    'type': (
+                        ZoomMeetingType.recurring_webinar_no_time
+                        if is_webinar
+                        else ZoomMeetingType.recurring_meeting_no_time
+                    )
                 })
             elif room_assoc.link_object != old_link:
                 # the booking should now be linked to something else
@@ -257,13 +265,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             kwargs = {}
             if is_webinar:
-                kwargs = {
-                    'type': 5 if scheduling_args else 6,
-                    'host_email': host_email
-                }
+                kwargs['type'] = (ZoomMeetingType.webinar
+                                  if scheduling_args
+                                  else ZoomMeetingType.recurring_webinar_no_time)
+                settings['alternative_hosts'] = host_email
             else:
                 kwargs = {
-                    'type': 2 if scheduling_args else 3,
+                    'type': (
+                        ZoomMeetingType.scheduled_meeting
+                        if scheduling_args
+                        else ZoomMeetingType.recurring_meeting_no_time
+                    ),
                     'schedule_for': host_email
                 }
                 settings.update({
@@ -325,7 +337,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if not email:
                 raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
 
-            changes['host_email' if is_webinar else 'schedule_for'] = email
+            if is_webinar:
+                changes.setdefault('settings', {})['alternative_hosts'] = email
+            else:
+                changes['schedule_for'] = email
             self._check_indico_is_assistant(email)
             notify_new_host(session.user, vc_room)
 
@@ -383,9 +398,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 client.delete_meeting(zoom_id)
         except HTTPError as e:
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
-            if not e.response.status_code == 404:
-                self.logger.exception('Error getting Zoom Room: %s', e.response.content)
-                raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
+            if e.response.status_code == 404:
+                flash(_("Room didn't existing in Zoom anymore"), 'warning')
+            else:
+                self.logger.error("Can't delete room")
+                raise VCRoomError(_("Problem deleting room"))
 
     def get_blueprints(self):
         return blueprint
