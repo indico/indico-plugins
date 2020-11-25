@@ -7,6 +7,12 @@ source_file = vc_vidyo/indico_vc_vidyo/translations/messages.pot
 source_lang = en
 type = PO
 
+[indico.vc-zoom-messages]
+file_filter = vc_zoom/indico_vc_zoom/translations/<lang>/LC_MESSAGES/messages.po
+source_file = vc_zoom/indico_vc_zoom/translations/messages.pot
+source_lang = en
+type = PO
+
 [indico.search-messages]
 file_filter = search/indico_search/translations/<lang>/LC_MESSAGES/messages.po
 source_file = search/indico_search/translations/messages.pot
