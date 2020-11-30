@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='indico-plugin-vc-zoom',
-    version='2.3-dev',
+    version='2.3b1',
     description='Zoom video-conferencing plugin for Indico',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
