@@ -154,7 +154,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     # webinar hosts cannot be changed through the API
                     form.host_choice.render_kw = {'disabled': True}
                     form.host_user.render_kw = {'disabled': True}
-        else:
+        elif not form.is_submitted():
             form.password.data = gen_random_password()
         return form
 
