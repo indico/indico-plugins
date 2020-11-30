@@ -18,6 +18,6 @@ setup(
     version='2.3b1',
     install_requires=[
         'indico>=2.3.2.dev0',
-        'PyJWT<2'
+        'PyJWT>=1.7.1,<2'
     ],
 )
