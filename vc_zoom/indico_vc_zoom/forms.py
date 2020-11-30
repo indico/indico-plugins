@@ -117,6 +117,10 @@ class VCRoomForm(VCRoomFormBase):
         if email is None or ZoomIndicoClient().get_user(email, silent=True) is None:
             raise ValidationError(_('This user has no Zoom account'))
 
+    def validate_name(self, field):
+        # Duplicate names are fine on Zoom
+        pass
+
     @generated_data
     def host(self):
         if self.host_choice is None:
