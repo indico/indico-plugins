@@ -56,7 +56,8 @@ class RHWebhook(RH):
         vc_room = VCRoom.query.filter(VCRoom.data.contains({'zoom_id': meeting_id})).first()
 
         if not vc_room:
-            current_plugin.logger.warning('Action for unhandled Zoom room: %s', meeting_id)
+            # This usually happens when a room wasn't created via indico
+            current_plugin.logger.debug('Action for unhandled Zoom room: %s', meeting_id)
             return
 
         if event in {'meeting.updated', 'webinar.updated', 'meeting.deleted', 'webinar.deleted'}:
