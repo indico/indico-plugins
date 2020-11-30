@@ -48,7 +48,7 @@ for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;
         pybabel update -i "./indico_${plugin}/translations/messages.pot" -l "$LOCALE" -d "./indico_${plugin}/translations"
     elif [[ "$ACTION" == "compile" ]]; then
         require_locale
-        pybabel compile -d "./indico_${plugin}/translations/" -l "$LOCALE"
+        pybabel compile -f -d "./indico_${plugin}/translations/" -l "$LOCALE"
     fi
     popd >/dev/null
 done
