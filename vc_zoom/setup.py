@@ -26,6 +26,7 @@ setup(
         'indico>=2.3.2.dev0',
         'PyJWT<2'
     ],
+    python_requires='~=2.7',
     classifiers=[
         'Environment :: Plugins',
         'Environment :: Web Environment',
