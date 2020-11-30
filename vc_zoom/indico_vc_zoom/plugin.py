@@ -228,13 +228,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if user_id != assistant_id:
             try:
                 assistants = {assist['email'] for assist in client.get_assistants_for_user(user_id)['assistants']}
+                if assistant_id not in assistants:
+                    client.add_assistant_to_user(user_id, assistant_id)
             except HTTPError as e:
                 if e.response.status_code == 404:
                     raise NotFound(_("No Zoom account found for this user"))
-                self.logger.exception('Error getting assistants for account %s: %s', user_id, e.response.content)
-                raise VCRoomError(_("Problem getting information about Zoom account"))
-            if assistant_id not in assistants:
-                client.add_assistant_to_user(user_id, assistant_id)
+                raise VCRoomError(_("Problem setting Zoom account assistants"))
 
     def create_room(self, vc_room, event):
         """Create a new Zoom room for an event, given a VC room.
