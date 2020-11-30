@@ -22,6 +22,8 @@ from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
+from indico_vc_zoom.api.client import ZoomIndicoClient
+from indico_vc_zoom.util import find_enterprise_email
 
 
 class VCRoomAttachForm(VCRoomAttachFormBase):
@@ -101,6 +103,19 @@ class VCRoomForm(VCRoomFormBase):
 
         if not allow_webinars:
             del self.meeting_type
+
+    def validate_host_choice(self, field):
+        if field.data == 'myself':
+            self._check_zoom_user(session.user)
+
+    def validate_host_user(self, field):
+        if self.host_choice.data == 'someone_else':
+            self._check_zoom_user(field.data)
+
+    def _check_zoom_user(self, user):
+        email = find_enterprise_email(user)
+        if email is None or ZoomIndicoClient().get_user(email, silent=True) is None:
+            raise ValidationError(_('This user has no Zoom account'))
 
     @generated_data
     def host(self):

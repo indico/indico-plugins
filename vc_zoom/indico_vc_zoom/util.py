@@ -40,7 +40,7 @@ def find_enterprise_email(user):
     :return: the e-mail address if it exists, otherwise `None`
     """
     from indico_vc_zoom.plugin import ZoomPlugin
-    domains = [auth.strip() for auth in ZoomPlugin.settings.get('email_domains').split(',')]
+    domains = [domain.strip() for domain in ZoomPlugin.settings.get('email_domains').split(',')]
     # get all matching e-mails, primary first
     result = UserEmail.query.filter(
         UserEmail.user == user,

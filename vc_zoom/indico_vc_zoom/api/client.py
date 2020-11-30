@@ -227,8 +227,11 @@ class ZoomIndicoClient(object):
     def delete_webinar(self, webinar_id):
         return _handle_response(self.client.webinar.delete(webinar_id), 204, expects_json=False)
 
-    def get_user(self, user_id):
-        return _handle_response(self.client.user.get(user_id))
+    def get_user(self, user_id, silent=False):
+        resp = self.client.user.get(user_id)
+        if resp.status_code == 404 and silent:
+            return None
+        return _handle_response(resp)
 
     def get_assistants_for_user(self, user_id):
         return _handle_response(self.client.user.get_assistants(user_id))
