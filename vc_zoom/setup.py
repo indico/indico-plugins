@@ -7,31 +7,17 @@
 
 from __future__ import unicode_literals
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
+# XXX: keeping some entries in here to make bulk updates easier while
+# other plugins still have this metadata in setup.py; everything else
+# is in setup.cfg now
 setup(
     name='indico-plugin-vc-zoom',
     version='2.3b1',
-    description='Zoom video-conferencing plugin for Indico',
-    url='https://github.com/indico/indico-plugins',
-    license='MIT',
-    author='Giovanni Mariano (ENEA) and Indico Team (CERN)',
-    author_email='indico-team@cern.ch',
-    packages=find_packages(),
-    zip_safe=False,
-    platforms='any',
-    include_package_data=True,
     install_requires=[
         'indico>=2.3.2.dev0',
         'PyJWT<2'
     ],
-    python_requires='~=2.7',
-    classifiers=[
-        'Environment :: Plugins',
-        'Environment :: Web Environment',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7'
-    ],
-    entry_points={'indico.plugins': {'vc_zoom = indico_vc_zoom.plugin:ZoomPlugin'}}
 )
