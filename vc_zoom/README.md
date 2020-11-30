@@ -13,9 +13,7 @@
 
 Rooms are created under the account of an *assistant user* which can be set using the **Assistant Zoom ID**
 configuration setting. This account will also be added automatically as an assistant to every meeting host.
-This is needed in order to allow for the host to be changed ([`scheduled_for`](
-https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate#request-body
-) property in the Zoom API). The *assistant user* owns every Zoom meeting, with the `scheduled_for` property being
+This is needed in order to allow for the host to be changed ([`scheduled_for`](https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate#request-body) property in the Zoom API). The *assistant user* owns every Zoom meeting, with the `scheduled_for` property being
 used to grant the required privileges to the desired hosts.
 
 ## Zoom App Configuration
@@ -45,6 +43,7 @@ shall own all meetings
 
 
 ### Zoom API key/secret (JWT)
+
 To obtain API key and API secret, please visit [https://marketplace.zoom.us/docs/guides/auth/jwt](https://marketplace.zoom.us/docs/guides/auth/jwt).
 
 
