@@ -16,14 +16,15 @@ from indico.core.db import db
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import User
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.struct.enum import RichIntEnum
+from indico.util.struct.enum import IndicoEnum, RichEnum
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
 
 
-class ZoomMeetingType(RichIntEnum):
+class ZoomMeetingType(int, IndicoEnum):
     instant_meeting = 1
     scheduled_meeting = 2
     recurring_meeting_no_time = 3
@@ -33,22 +34,63 @@ class ZoomMeetingType(RichIntEnum):
     recurring_meeting_fixed_time = 9
 
 
-def find_enterprise_email(user):
-    """Find a user's first e-mail address which can be used by the Zoom API.
+class UserLookupMode(unicode, RichEnum):
+    __titles__ = {
+        'email_domains': _('Email domains'),
+        'authenticators': _('Authenticators'),
+    }
+
+    @property
+    def title(self):
+        return RichEnum.title.__get__(self, type(self))
+
+    email_domains = 'email_domains'
+    authenticators = 'authenticators'
+
+
+def _iter_user_identifiers(user):
+    """Iterates over all existing user identifiers that can be used with Zoom"""
+    from indico_vc_zoom.plugin import ZoomPlugin
+    done = set()
+    for provider in ZoomPlugin.settings.get('authenticators'):
+        for __, identifier in user.iter_identifiers(check_providers=True, providers={provider}):
+            if identifier in done:
+                continue
+            done.add(identifier)
+            yield identifier
+
+
+def _iter_user_emails(user):
+    """Yield all emails of a user that may work with zoom.
 
     :param user: the `User` in question
-    :return: the e-mail address if it exists, otherwise `None`
     """
     from indico_vc_zoom.plugin import ZoomPlugin
-    domains = [domain.strip() for domain in ZoomPlugin.settings.get('email_domains').split(',')]
-    # get all matching e-mails, primary first
-    result = UserEmail.query.filter(
-        UserEmail.user == user,
-        ~User.is_blocked,
-        ~User.is_deleted,
-        db.or_(UserEmail.email.endswith(domain) for domain in domains)
-    ).join(User).order_by(UserEmail.is_primary.desc()).first()
-    return result.email if result else None
+    mode = ZoomPlugin.settings.get('user_lookup_mode')
+    if mode == UserLookupMode.email_domains:
+        domains = ZoomPlugin.settings.get('email_domains')
+        if not domains:
+            return
+        # get all matching e-mails, primary first
+        query = UserEmail.query.filter(
+            UserEmail.user == user,
+            ~User.is_blocked,
+            ~User.is_deleted,
+            db.or_(UserEmail.email.endswith('@{}'.format(domain)) for domain in domains)
+        ).join(User).order_by(UserEmail.is_primary.desc())
+        for entry in query:
+            yield entry.email
+    elif mode == UserLookupMode.authenticators:
+        domain = ZoomPlugin.settings.get('enterprise_domain')
+        for username in _iter_user_identifiers(user):
+            yield '{}@{}'.format(username, domain)
+
+
+@memoize_request
+def find_enterprise_email(user):
+    """Get the email address of a user that has a zoom account."""
+    client = ZoomIndicoClient()
+    return next((email for email in _iter_user_emails(user) if client.get_user(email, silent=True)), None)
 
 
 def gen_random_password():

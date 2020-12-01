@@ -113,8 +113,7 @@ class VCRoomForm(VCRoomFormBase):
             self._check_zoom_user(field.data)
 
     def _check_zoom_user(self, user):
-        email = find_enterprise_email(user)
-        if email is None or ZoomIndicoClient().get_user(email, silent=True) is None:
+        if find_enterprise_email(user) is None:
             raise ValidationError(_('This user has no Zoom account'))
 
     def validate_name(self, field):

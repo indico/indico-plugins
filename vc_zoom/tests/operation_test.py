@@ -107,6 +107,7 @@ def test_room_creation(create_meeting, zoom_api):
 
 
 def test_host_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api, request_context):
+    mocker.patch('indico_vc_zoom.plugin.find_enterprise_email', return_value='joe.bidon@megacorp.xyz')
     notify_new_host = mocker.patch('indico_vc_zoom.plugin.notify_new_host')
 
     create_user(2, email='joe.bidon@megacorp.xyz')

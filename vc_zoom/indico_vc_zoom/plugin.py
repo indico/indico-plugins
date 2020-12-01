@@ -8,15 +8,17 @@
 from __future__ import unicode_literals
 
 from flask import flash, session
+from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, NotFound
 from wtforms.fields.core import BooleanField
 from wtforms.fields import TextAreaField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.core import signals
+from indico.core.auth import multipass
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -24,7 +26,8 @@ from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoom
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import principal_from_identifier
-from indico.web.forms.fields.simple import IndicoPasswordField
+from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
+from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 from indico_vc_zoom import _
@@ -33,14 +36,15 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
-from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_random_password, get_schedule_args,
-                                 get_url_data_args, update_zoom_meeting, ZoomMeetingType)
+from indico_vc_zoom.util import (UserLookupMode, fetch_zoom_meeting, find_enterprise_email, gen_random_password,
+                                 get_schedule_args, get_url_data_args, update_zoom_meeting, ZoomMeetingType)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         ('API Credentials', ['api_key', 'api_secret', 'webhook_token']),
-        ('Zoom Account', ['email_domains', 'assistant_id', 'allow_webinars']),
+        ('Zoom Account', ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain', 'assistant_id',
+                          'allow_webinars']),
         ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                            'waiting_room']),
         ('Notifications', ['creation_email_footer', 'send_host_url'])
@@ -53,8 +57,27 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     webhook_token = IndicoPasswordField(_('Webhook Token'), toggle=True,
                                         description=_("Specify Zoom's webhook token if you want live updates"))
 
-    email_domains = StringField(_('E-mail domains'), [DataRequired()],
-                                description=_('Comma-separated list of e-mail domains which can use the Zoom API.'))
+    user_lookup_mode = IndicoEnumSelectField(_('User lookup mode'), [DataRequired()], enum=UserLookupMode,
+                                             description=_('Specify how Indico should look up the zoom user that '
+                                                           'corresponds to an Indico user.'))
+
+    email_domains = TextListField(_('E-mail domains'),
+                                  [HiddenUnless('user_lookup_mode', UserLookupMode.email_domains), DataRequired()],
+                                  description=_('List of e-mail domains which can use the Zoom API. Indico attempts '
+                                                'to find Zoom accounts using all email addresses of a user which use '
+                                                'those domains.'))
+
+    authenticators = TextListField(_('Indico identity providers'),
+                                   [HiddenUnless('user_lookup_mode', UserLookupMode.authenticators), DataRequired()],
+                                   description=_('Identity providers from which to get usernames. '
+                                                 'Indico queries those providers using the email addresses of the user '
+                                                 'and attempts to find Zoom accounts having an email address looking '
+                                                 'like <username>@<enterprise-domain>.'))
+
+    enterprise_domain = StringField(_('Enterprise domain'),
+                                    [HiddenUnless('user_lookup_mode', UserLookupMode.authenticators), DataRequired()],
+                                    description=_('The domain name used together with the usernames from the Indico '
+                                                  'identity provider'))
 
     assistant_id = StringField(_('Assistant Zoom ID'), [DataRequired()],
                                description=_('Account to be used as owner of all rooms. It will get "assistant" '
@@ -93,6 +116,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                  description=_('Whether to send an e-mail with the Host URL to the meeting host upon '
                                                'creation of a meeting'))
 
+    def validate_authenticators(self, field):
+        invalid = set(field.data) - set(multipass.identity_providers)
+        if invalid:
+            raise ValidationError(_('Invalid identity providers: {}').format(escape(', '.join(invalid))))
+
 
 class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     """Zoom
@@ -109,7 +137,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'api_key': '',
         'api_secret': '',
         'webhook_token': '',
-        'email_domains': '',
+        'user_lookup_mode': UserLookupMode.email_domains,
+        'email_domains': [],
+        'authenticators': [],
+        'enterprise_domain': '',
         'allow_webinars': False,
         'mute_host_video': True,
         'mute_audio': True,
@@ -334,12 +365,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if not email:
                 raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
 
-            if is_webinar:
-                changes.setdefault('settings', {})['alternative_hosts'] = email
-            else:
-                changes['schedule_for'] = email
-            self._check_indico_is_assistant(email)
-            notify_new_host(session.user, vc_room)
+            # When using authenticator mode for user lookups, the email address used on zoom
+            # may not be an email address the Indico user has, so we can only check if the host
+            # really changed after checking for the zoom account.
+            if host_data['email'] != email:
+                if is_webinar:
+                    changes.setdefault('settings', {})['alternative_hosts'] = email
+                else:
+                    changes['schedule_for'] = email
+                self._check_indico_is_assistant(email)
+                notify_new_host(session.user, vc_room)
 
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
