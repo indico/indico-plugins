@@ -71,11 +71,11 @@ def fetch_zoom_meeting(vc_room, client=None, is_webinar=False):
     except HTTPError as e:
         if e.response.status_code in {400, 404}:
             # Indico will automatically mark this room as deleted
-            raise VCRoomNotFoundError(_("This room has been deleted from Zoom"))
+            raise VCRoomNotFoundError(_('This room has been deleted from Zoom'))
         else:
             from indico_vc_zoom.plugin import ZoomPlugin
             ZoomPlugin.logger.exception('Error getting Zoom Room: %s', e.response.content)
-            raise VCRoomError(_("Problem fetching room from Zoom. Please contact support if the error persists."))
+            raise VCRoomError(_('Problem fetching room from Zoom. Please contact support if the error persists.'))
 
 
 def update_zoom_meeting(zoom_id, changes, is_webinar=False):

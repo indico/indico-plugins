@@ -27,13 +27,13 @@ from indico_vc_zoom.util import find_enterprise_email
 
 
 class VCRoomAttachForm(VCRoomAttachFormBase):
-    password_visibility = IndicoRadioField(_("Passcode visibility"),
+    password_visibility = IndicoRadioField(_('Passcode visibility'),
                                            description=_("Who should be able to know this meeting's passcode"),
                                            orientation='horizontal',
                                            choices=[
                                                ('everyone', _('Everyone')),
                                                ('logged_in', _('Logged-in users')),
-                                               ('no_one', _("No one"))])
+                                               ('no_one', _('No one'))])
 
 
 class VCRoomForm(VCRoomFormBase):
@@ -43,30 +43,30 @@ class VCRoomForm(VCRoomFormBase):
 
     skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
 
-    meeting_type = IndicoRadioField(_("Meeting Type"),
-                                    description=_("The type of Zoom meeting to be created"),
+    meeting_type = IndicoRadioField(_('Meeting Type'),
+                                    description=_('The type of Zoom meeting to be created'),
                                     orientation='horizontal',
                                     choices=[
                                         ('regular', _('Regular Meeting')),
                                         ('webinar', _('Webinar'))])
 
-    host_choice = IndicoRadioField(_("Meeting Host"), [DataRequired()],
-                                   choices=[('myself', _("Myself")), ('someone_else', _("Someone else"))])
+    host_choice = IndicoRadioField(_('Meeting Host'), [DataRequired()],
+                                   choices=[('myself', _('Myself')), ('someone_else', _('Someone else'))])
 
-    host_user = PrincipalField(_("User"),
+    host_user = PrincipalField(_('User'),
                                [HiddenUnless('host_choice', 'someone_else'), DataRequired()])
 
-    password = StringField(_("Passcode"),
+    password = StringField(_('Passcode'),
                            [DataRequired(), IndicoRegexp(r'^\d{8,}$')],
-                           description=_("Meeting passcode (min. 8 digits)"))
+                           description=_('Meeting passcode (min. 8 digits)'))
 
-    password_visibility = IndicoRadioField(_("Passcode visibility"),
+    password_visibility = IndicoRadioField(_('Passcode visibility'),
                                            description=_("Who should be able to know this meeting's passcode"),
                                            orientation='horizontal',
                                            choices=[
                                                ('everyone', _('Everyone')),
                                                ('logged_in', _('Logged-in users')),
-                                               ('no_one', _("No one"))])
+                                               ('no_one', _('No one'))])
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),

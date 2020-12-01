@@ -54,7 +54,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                         description=_("Specify Zoom's webhook token if you want live updates"))
 
     email_domains = StringField(_('E-mail domains'), [DataRequired()],
-                                description=_("Comma-separated list of e-mail domains which can use the Zoom API."))
+                                description=_('Comma-separated list of e-mail domains which can use the Zoom API.'))
 
     assistant_id = StringField(_('Assistant Zoom ID'), [DataRequired()],
                                description=_('Account to be used as owner of all rooms. It will get "assistant" '
@@ -232,8 +232,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     client.add_assistant_to_user(user_id, assistant_id)
             except HTTPError as e:
                 if e.response.status_code == 404:
-                    raise NotFound(_("No Zoom account found for this user"))
-                raise VCRoomError(_("Problem setting Zoom account assistants"))
+                    raise NotFound(_('No Zoom account found for this user'))
+                raise VCRoomError(_('Problem setting Zoom account assistants'))
 
     def create_room(self, vc_room, event):
         """Create a new Zoom room for an event, given a VC room.
@@ -298,7 +298,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 meeting_obj = client.create_meeting(self.settings.get('assistant_id'), **kwargs)
         except HTTPError as e:
             self.logger.exception('Error creating Zoom Room: %s', e.response.content)
-            raise VCRoomError(_("Could not create the room in Zoom. Please contact support if the error persists"))
+            raise VCRoomError(_('Could not create the room in Zoom. Please contact support if the error persists'))
 
         vc_room.data.update({
             'zoom_id': unicode(meeting_obj['id']),
@@ -401,7 +401,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 flash(_("Room didn't existing in Zoom anymore"), 'warning')
             else:
                 self.logger.error("Can't delete room")
-                raise VCRoomError(_("Problem deleting room"))
+                raise VCRoomError(_('Problem deleting room'))
 
     def get_blueprints(self):
         return blueprint
@@ -457,14 +457,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         if any(assoc.vc_room.type == 'zoom' and len(assoc.vc_room.events) == 1 for assoc in obj.vc_room_associations):
             if sender == Event:
-                message = _("There are one or more scheduled Zoom meetings associated with this event which were not "
-                            "automatically updated.")
+                message = _('There are one or more scheduled Zoom meetings associated with this event which were not '
+                            'automatically updated.')
             elif sender == Contribution:
-                message = _("There are one or more scheduled Zoom meetings associated with contribution '{}' which "
-                            " were not automatically updated.").format(obj.title)
+                message = _('There are one or more scheduled Zoom meetings associated with the contribution "{}" which '
+                            ' were not automatically updated.').format(obj.title)
             elif sender == SessionBlock:
-                message = _("There are one or more scheduled Zoom meetings associated with this session block which "
-                            "were not automatically updated.")
+                message = _('There are one or more scheduled Zoom meetings associated with this session block which '
+                            'were not automatically updated.')
             else:
                 return
 
