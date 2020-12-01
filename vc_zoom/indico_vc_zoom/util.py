@@ -111,3 +111,14 @@ def get_schedule_args(obj):
         'start_time': obj.start_dt,
         'duration': duration.total_seconds() / 60,
     }
+
+
+def get_url_data_args(url):
+    """Create a dictionary with proper public/private "join URL" fields.""
+
+    :param url: the original URL
+    """
+    return {
+        'url': url,
+        'public_url': url.split('?')[0],
+    }

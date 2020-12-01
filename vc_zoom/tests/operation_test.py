@@ -71,9 +71,7 @@ def zoom_api(create_user, mocker):
     }
 
     api_update_meeting = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.update_meeting')
-    api_update_meeting.return_value = {
-
-    }
+    api_update_meeting.return_value = {}
 
     create_user(1, email='don.orange@megacorp.xyz')
 
@@ -128,3 +126,42 @@ def test_host_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api,
         'schedule_for': 'joe.bidon@megacorp.xyz',
         'agenda': 'something else'
     }),)
+
+
+def test_password_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api):
+    mocker.patch('indico_vc_zoom.plugin.notify_new_host')
+
+    create_user(2, email='joe.bidon@megacorp.xyz')
+    vc_room = create_meeting()
+    vc_room.data['password'] = '1337'
+
+    # simulate changes between calls of "GET meeting"
+    def _get_meeting(self, meeting_id):
+        result = {
+            'id': meeting_id,
+            'join_url': 'https://example.com/llamas' if _get_meeting.called else 'https://example.com/kitties',
+            'start_url': 'https://example.com/puppies',
+            'password': '1337' if _get_meeting.called else '1234',
+            'host_id': 'don.orange@megacorp.xyz',
+            'topic': 'New Room',
+            'agenda': 'something something',
+            'settings': {
+                'host_video': True,
+                'mute_upon_entry': False,
+                'participant_video': True,
+                'waiting_room': False
+            }
+        }
+        _get_meeting.called = True
+        return result
+    _get_meeting.called = False
+    mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.get_meeting', _get_meeting)
+
+    zoom_plugin.update_room(vc_room, vc_room.events[0].event)
+
+    zoom_api['update_meeting'].assert_called_with('12345abc', {
+        'password': '1337'
+    })
+
+    assert vc_room.data['password'] == '1337'
+    assert vc_room.data['url'] == 'https://example.com/llamas'

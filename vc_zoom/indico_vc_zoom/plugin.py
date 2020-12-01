@@ -34,7 +34,7 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
 from indico_vc_zoom.util import (fetch_zoom_meeting, find_enterprise_email, gen_random_password, get_schedule_args,
-                                 update_zoom_meeting, ZoomMeetingType)
+                                 get_url_data_args, update_zoom_meeting, ZoomMeetingType)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -302,12 +302,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         vc_room.data.update({
             'zoom_id': unicode(meeting_obj['id']),
-            'url': meeting_obj['join_url'],
-            'public_url': meeting_obj['join_url'].split('?')[0],
             'start_url': meeting_obj['start_url'],
             'host': host.identifier
         })
-
+        vc_room.data.update(get_url_data_args(meeting_obj['join_url']))
         flag_modified(vc_room, 'data')
 
         # e-mail Host URL to meeting host
@@ -366,6 +364,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         if changes:
             update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
+            # always refresh meeting URL (it may have changed if password changed)
+            zoom_meeting = fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
+            vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
 
     def refresh_room(self, vc_room, event):
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
@@ -373,8 +374,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
             'description': zoom_meeting['agenda'],
-            'url': zoom_meeting['join_url'],
-            'public_url': zoom_meeting['join_url'].split('?')[0],
             'zoom_id': zoom_meeting['id'],
             'password': zoom_meeting['password'],
             'mute_host_video': zoom_meeting['settings']['host_video'],
@@ -384,6 +383,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
             'waiting_room': zoom_meeting['settings'].get('waiting_room')
         })
+        vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
         flag_modified(vc_room, 'data')
 
     def delete_room(self, vc_room, event):
