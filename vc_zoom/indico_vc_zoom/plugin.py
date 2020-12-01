@@ -344,7 +344,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
 
-        if vc_room.data['description'] != zoom_meeting.get('agenda'):
+        if vc_room.data['description'] != zoom_meeting.get('agenda', ''):
             changes['agenda'] = vc_room.data['description']
 
         if vc_room.data['password'] != zoom_meeting['password']:
@@ -373,7 +373,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_meeting = fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
-            'description': zoom_meeting['agenda'],
+            'description': zoom_meeting.get('agenda', ''),
             'zoom_id': zoom_meeting['id'],
             'password': zoom_meeting['password'],
             'mute_host_video': zoom_meeting['settings']['host_video'],
