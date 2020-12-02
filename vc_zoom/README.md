@@ -9,6 +9,22 @@
  * Protection of Zoom link (only logged in, everyone or no one)
  * Webinar mode;
 
+## Changelog
+
+### 2.3b2
+
+- Improve logging when a Zoom API request fails
+- Fail more gracefully if no Zoom account could be found for a user
+- Allow using the same name for multiple Zoom rooms
+- Update the join url when changing the passcode
+- Provide an alternative method of looking up the Zoom user corresponding to an Indico user
+
+**Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
+
+### 2.3b1
+
+- Initial beta release
+
 ## Implementation details
 
 Rooms are created under the account of an *assistant user* which can be set using the **Assistant Zoom ID**
