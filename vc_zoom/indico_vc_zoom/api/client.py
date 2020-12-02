@@ -31,7 +31,7 @@ def _handle_response(resp, expected_code=200, expects_json=True):
             raise HTTPError('Unexpected status code {}'.format(resp.status_code), response=resp)
     except HTTPError:
         from indico_vc_zoom.plugin import ZoomPlugin
-        ZoomPlugin.logger.error('Error in API call to %s : %s', resp.url, resp.content)
+        ZoomPlugin.logger.error('Error in API call to %s: %s', resp.url, resp.content)
         raise
     return resp.json() if expects_json else resp
 
