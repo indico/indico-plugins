@@ -71,8 +71,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                    [HiddenUnless('user_lookup_mode', UserLookupMode.authenticators), DataRequired()],
                                    description=_('Identity providers from which to get usernames. '
                                                  'Indico queries those providers using the email addresses of the user '
-                                                 'and attempts to find Zoom accounts having an email address looking '
-                                                 'like <username>@<enterprise-domain>.'))
+                                                 'and attempts to find Zoom accounts having an email address with the '
+                                                 'format username@enterprise-domain.'))
 
     enterprise_domain = StringField(_('Enterprise domain'),
                                     [HiddenUnless('user_lookup_mode', UserLookupMode.authenticators), DataRequired()],
