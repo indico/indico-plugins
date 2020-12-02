@@ -18,6 +18,8 @@
 - Allow using the same name for multiple Zoom rooms
 - Update the join url when changing the passcode
 - Provide an alternative method of looking up the Zoom user corresponding to an Indico user
+- Always show the full join link and passcode to event managers
+- The meeting passcode can be restricted to registered participants
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 

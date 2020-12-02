@@ -22,7 +22,6 @@ from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
-from indico_vc_zoom.api.client import ZoomIndicoClient
 from indico_vc_zoom.util import find_enterprise_email
 
 
@@ -33,6 +32,7 @@ class VCRoomAttachForm(VCRoomAttachFormBase):
                                            choices=[
                                                ('everyone', _('Everyone')),
                                                ('logged_in', _('Logged-in users')),
+                                               ('registered', _('Registered participants')),
                                                ('no_one', _('No one'))])
 
 
@@ -66,6 +66,7 @@ class VCRoomForm(VCRoomFormBase):
                                            choices=[
                                                ('everyone', _('Everyone')),
                                                ('logged_in', _('Logged-in users')),
+                                               ('registered', _('Registered participants')),
                                                ('no_one', _('No one'))])
 
     mute_audio = BooleanField(_('Mute audio'),

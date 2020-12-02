@@ -11,8 +11,10 @@
         <dt>{% trans %}Host{% endtrans %}</dt>
         <dd>{{ (host|decodeprincipal).full_name }}</dd>
     {% endif %}
-    {% if event_vc_room.data.password_visibility == 'everyone' or is_manager or
-        (session.user and event_vc_room.data.password_visibility == 'logged_in') %}
+    {% if event_vc_room.data.password_visibility == 'everyone' or
+        event_vc_room.event.can_manage(session.user) or
+        (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+        (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user)) %}
         <dt>{% trans %}Passcode{% endtrans %}</dt>
         <dd>{{ vc_room.data.password }}</dd>
     {% endif %}
