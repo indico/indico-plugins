@@ -444,6 +444,25 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 self.logger.error("Can't delete room")
                 raise VCRoomError(_('Problem deleting room'))
 
+    def clone_room(self, old_event_vc_room, link_object):
+        vc_room = old_event_vc_room.vc_room
+        is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
+        has_only_one_association = len({assoc.event_id for assoc in vc_room.events}) == 1
+        new_assoc = super(ZoomPlugin, self).clone_room(old_event_vc_room, link_object)
+
+        if has_only_one_association:
+            update_zoom_meeting(vc_room.data['zoom_id'], {
+                'start_time': None,
+                'duration': None,
+                'type': (
+                    ZoomMeetingType.recurring_webinar_no_time
+                    if is_webinar
+                    else ZoomMeetingType.recurring_meeting_no_time
+                )
+            })
+
+        return new_assoc
+
     def get_blueprints(self):
         return blueprint
 
