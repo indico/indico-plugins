@@ -21,6 +21,7 @@
 - Always show the full join link and passcode to event managers
 - The meeting passcode can be restricted to registered participants
 - Show "Make me host" button in the management area and in contributions/sessions as well
+- Warn the user if they delete a Zoom meeting linked to multiple events if they aren't the host
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 

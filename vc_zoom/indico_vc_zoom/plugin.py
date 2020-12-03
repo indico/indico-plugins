@@ -189,6 +189,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             form.password.data = gen_random_password()
         return form
 
+    def get_extra_delete_msg(self, vc_room, event_vc_room):
+        host = principal_from_identifier(vc_room.data['host'])
+        if host == session.user or len(vc_room.events) <= 1:
+            return ''
+        return render_plugin_template('vc_zoom:extra_delete_msg.html', host=host.full_name)
+
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
 
