@@ -20,6 +20,7 @@
 - Provide an alternative method of looking up the Zoom user corresponding to an Indico user
 - Always show the full join link and passcode to event managers
 - The meeting passcode can be restricted to registered participants
+- Show "Make me host" button in the management area and in contributions/sessions as well
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 
