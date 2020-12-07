@@ -440,7 +440,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
             if e.response.status_code == 404:
                 flash(_("Room didn't existing in Zoom anymore"), 'warning')
-            if e.response.status_code == 400:
+            elif e.response.status_code == 400:
                 # some sort of operational error on Zoom's side, deserves a specific error message
                 raise VCRoomError(_('Zoom Error: "{}"').format(e.response.json()['message']))
             else:
