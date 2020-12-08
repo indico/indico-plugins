@@ -36,6 +36,7 @@ class ZoomMeetingType(int, IndicoEnum):
 
 class UserLookupMode(unicode, RichEnum):
     __titles__ = {
+        'all_emails': _('All emails'),
         'email_domains': _('Email domains'),
         'authenticators': _('Authenticators'),
     }
@@ -44,6 +45,7 @@ class UserLookupMode(unicode, RichEnum):
     def title(self):
         return RichEnum.title.__get__(self, type(self))
 
+    all_emails = 'all_emails'
     email_domains = 'email_domains'
     authenticators = 'authenticators'
 
@@ -67,16 +69,19 @@ def _iter_user_emails(user):
     """
     from indico_vc_zoom.plugin import ZoomPlugin
     mode = ZoomPlugin.settings.get('user_lookup_mode')
-    if mode == UserLookupMode.email_domains:
-        domains = ZoomPlugin.settings.get('email_domains')
-        if not domains:
-            return
+    if mode in (UserLookupMode.all_emails, UserLookupMode.email_domains):
+        email_criterion = True
+        if mode == UserLookupMode.email_domains:
+            domains = ZoomPlugin.settings.get('email_domains')
+            if not domains:
+                return
+            email_criterion = db.or_(UserEmail.email.endswith('@{}'.format(domain)) for domain in domains)
         # get all matching e-mails, primary first
         query = UserEmail.query.filter(
             UserEmail.user == user,
             ~User.is_blocked,
             ~User.is_deleted,
-            db.or_(UserEmail.email.endswith('@{}'.format(domain)) for domain in domains)
+            email_criterion
         ).join(User).order_by(UserEmail.is_primary.desc())
         for entry in query:
             yield entry.email
