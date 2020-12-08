@@ -57,8 +57,8 @@ class VCRoomForm(VCRoomFormBase):
                                [HiddenUnless('host_choice', 'someone_else'), DataRequired()])
 
     password = StringField(_('Passcode'),
-                           [DataRequired(), IndicoRegexp(r'^\d{8,}$')],
-                           description=_('Meeting passcode (min. 8 digits)'))
+                           [DataRequired(), IndicoRegexp(r'^\d{8,10}$')],
+                           description=_('Meeting passcode (8-10 digits)'))
 
     password_visibility = IndicoRadioField(_('Passcode visibility'),
                                            description=_("Who should be able to know this meeting's passcode"),
