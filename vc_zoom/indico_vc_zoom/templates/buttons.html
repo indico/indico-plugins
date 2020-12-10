@@ -34,7 +34,7 @@
             {% if event_vc_room.event.type == 'conference' %}
                 <a class="i-button icon-ticket {{ extra_classes }}"
                    title="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
-                   href="{{ url_for('event_registration.display_regform_list', event) }}">
+                   href="{{ url_for('event_registration.display_regform_list', event_vc_room.event) }}">
                     {% trans %}Please register{% endtrans %}
                 </a>
             {% else %}
