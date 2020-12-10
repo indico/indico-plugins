@@ -18,7 +18,6 @@ def zoom_plugin(app):
     """Return a callable which lets you create dummy Zoom room occurrences."""
     plugin = ZoomPlugin(plugin_engine, app)
     plugin.settings.set('email_domains', 'megacorp.xyz')
-    plugin.settings.set('assistant_id', 'zoom.master@megacorp.xyz')
     return plugin
 
 
@@ -84,17 +83,11 @@ def zoom_api(create_user, mocker):
     api_get_meeting = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.get_meeting')
     api_get_meeting.return_value = api_create_meeting.return_value
 
-    api_get_assistants = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.get_assistants_for_user')
-    api_get_assistants.return_value = {
-        'assistants': [{'email': 'zoom.master@megacorp.xyz'}]
-    }
-
     return {
         'create_meeting': api_create_meeting,
         'get_meeting': api_get_meeting,
         'update_meeting': api_update_meeting,
-        'get_user': api_get_user,
-        'get_assistants': api_get_assistants
+        'get_user': api_get_user
     }
 
 
@@ -103,35 +96,9 @@ def test_room_creation(create_meeting, zoom_api):
     assert vc_room.data['url'] == 'https://example.com/kitties'
     assert vc_room.data['host'] == 'User:1'
     assert zoom_api['create_meeting'].called
-    assert zoom_api['get_assistants'].called
-
-
-def test_host_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api, request_context):
-    mocker.patch('indico_vc_zoom.plugin.find_enterprise_email', return_value='joe.bidon@megacorp.xyz')
-    notify_new_host = mocker.patch('indico_vc_zoom.plugin.notify_new_host')
-
-    create_user(2, email='joe.bidon@megacorp.xyz')
-    vc_room = create_meeting()
-
-    assert vc_room.data['host'] == 'User:1'
-    assert not vc_room.data['mute_participant_video']
-    assert zoom_api['create_meeting'].called
-    assert zoom_api['get_assistants'].called
-
-    vc_room.data['host'] = 'User:2'
-    vc_room.data['description'] = 'something else'
-    zoom_plugin.update_room(vc_room, vc_room.events[0].event)
-
-    assert notify_new_host.called
-    assert zoom_api['update_meeting'].call_args == (('12345abc', {
-        'schedule_for': 'joe.bidon@megacorp.xyz',
-        'agenda': 'something else'
-    }),)
 
 
 def test_password_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api):
-    mocker.patch('indico_vc_zoom.plugin.notify_new_host')
-
     create_user(2, email='joe.bidon@megacorp.xyz')
     vc_room = create_meeting()
     vc_room.data['password'] = '1337'

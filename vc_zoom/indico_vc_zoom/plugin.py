@@ -11,7 +11,6 @@ from flask import flash, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
-from werkzeug.exceptions import Forbidden, NotFound
 from wtforms.fields.core import BooleanField
 from wtforms.fields import TextAreaField
 from wtforms.fields.simple import StringField
@@ -35,7 +34,7 @@ from indico_vc_zoom.api import ZoomIndicoClient
 from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
-from indico_vc_zoom.notifications import notify_new_host, notify_host_start_url
+from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.util import (UserLookupMode, fetch_zoom_meeting, find_enterprise_email, gen_random_password,
                                  get_schedule_args, get_url_data_args, update_zoom_meeting, ZoomMeetingType)
 
@@ -43,7 +42,7 @@ from indico_vc_zoom.util import (UserLookupMode, fetch_zoom_meeting, find_enterp
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         ('API Credentials', ['api_key', 'api_secret', 'webhook_token']),
-        ('Zoom Account', ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain', 'assistant_id',
+        ('Zoom Account', ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
                           'allow_webinars']),
         ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                            'waiting_room']),
@@ -78,10 +77,6 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                     [HiddenUnless('user_lookup_mode', UserLookupMode.authenticators), DataRequired()],
                                     description=_('The domain name used together with the usernames from the Indico '
                                                   'identity provider'))
-
-    assistant_id = StringField(_('Assistant Zoom ID'), [DataRequired()],
-                               description=_('Account to be used as owner of all rooms. It will get "assistant" '
-                                             'privileges on all accounts for which it books rooms'))
 
     allow_webinars = BooleanField(_('Allow Webinars (Experimental)'),
                                   widget=SwitchWidget(),
@@ -133,7 +128,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
     default_settings = dict(VCPluginMixin.default_settings, **{
-        'assistant_id': '',
         'api_key': '',
         'api_secret': '',
         'webhook_token': '',
@@ -177,6 +171,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         )
 
         if existing_vc_room:
+            form.host_choice.render_kw = {'disabled': True}
+            form.host_user.render_kw = {'disabled': True}
             if self.settings.get('allow_webinars'):
                 # if we're editing a VC room, we will not allow the meeting type to be changed
                 form.meeting_type.render_kw = {'disabled': True}
@@ -258,20 +254,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         flag_modified(vc_room, 'data')
 
-    def _check_indico_is_assistant(self, user_id):
-        client = ZoomIndicoClient()
-        assistant_id = self.settings.get('assistant_id')
-
-        if user_id != assistant_id:
-            try:
-                assistants = {assist['email'] for assist in client.get_assistants_for_user(user_id)['assistants']}
-                if assistant_id not in assistants:
-                    client.add_assistant_to_user(user_id, assistant_id)
-            except HTTPError as e:
-                if e.response.status_code == 404:
-                    raise NotFound(_('No Zoom account found for this user'))
-                raise VCRoomError(_('Problem setting Zoom account assistants'))
-
     def create_room(self, vc_room, event):
         """Create a new Zoom room for an event, given a VC room.
 
@@ -291,8 +273,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         link_obj = vc_room_assoc.link_object
         is_webinar = vc_room.data.setdefault('meeting_type', 'regular') == 'webinar'
         scheduling_args = get_schedule_args(link_obj) if link_obj.start_dt else {}
-
-        self._check_indico_is_assistant(host_email)
 
         try:
             settings = {
@@ -330,9 +310,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             })
             kwargs.update(scheduling_args)
             if is_webinar:
-                meeting_obj = client.create_webinar(self.settings.get('assistant_id'), **kwargs)
+                meeting_obj = client.create_webinar(host_email, **kwargs)
             else:
-                meeting_obj = client.create_meeting(self.settings.get('assistant_id'), **kwargs)
+                meeting_obj = client.create_meeting(host_email, **kwargs)
         except HTTPError as e:
             self.logger.exception('Error creating Zoom Room: %s', e.response.content)
             raise VCRoomError(_('Could not create the room in Zoom. Please contact support if the error persists'))
@@ -354,33 +334,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
         zoom_meeting = fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
         changes = {}
-
-        host = principal_from_identifier(vc_room.data['host'])
-        host_id = zoom_meeting['host_id']
-
-        try:
-            host_data = client.get_user(host_id)
-        except HTTPError as e:
-            self.logger.exception("Error retrieving user '%s': %s", host_id, e.response.content)
-            raise VCRoomError(_("Can't get information about user. Please contact support if the error persists."))
-
-        # host changed
-        if host_data['email'] not in host.all_emails:
-            email = find_enterprise_email(host)
-
-            if not email:
-                raise Forbidden(_("This user doesn't seem to have an associated Zoom account"))
-
-            # When using authenticator mode for user lookups, the email address used on zoom
-            # may not be an email address the Indico user has, so we can only check if the host
-            # really changed after checking for the zoom account.
-            if host_data['email'] != email:
-                if is_webinar:
-                    changes.setdefault('settings', {})['alternative_hosts'] = email
-                else:
-                    changes['schedule_for'] = email
-                self._check_indico_is_assistant(email)
-                notify_new_host(session.user, vc_room)
 
         if vc_room.name != zoom_meeting['topic']:
             changes['topic'] = vc_room.name
