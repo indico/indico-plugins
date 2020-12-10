@@ -139,12 +139,6 @@ class UserComponent(BaseComponent):
     def delete(self, user_id, **kwargs):
         return self.session.delete('{}/users/{}'.format(self.base_uri, user_id), params=kwargs)
 
-    def add_assistant(self, user_id, **kwargs):
-        return self.session.post('{}/users/{}/assistants'.format(self.base_uri, user_id), json=kwargs)
-
-    def get_assistants(self, user_id, **kwargs):
-        return self.session.get('{}/users/{}/assistants'.format(self.base_uri, user_id), params=kwargs)
-
     def get(self, user_id, **kwargs):
         return self.session.get('{}/users/{}'.format(self.base_uri, user_id), params=kwargs)
 
@@ -232,9 +226,3 @@ class ZoomIndicoClient(object):
         if resp.status_code == 404 and silent:
             return None
         return _handle_response(resp)
-
-    def get_assistants_for_user(self, user_id):
-        return _handle_response(self.client.user.get_assistants(user_id))
-
-    def add_assistant_to_user(self, user_id, assistant_email):
-        return _handle_response(self.client.user.add_assistant(user_id, assistants=[{'email': assistant_email}]), 201)
