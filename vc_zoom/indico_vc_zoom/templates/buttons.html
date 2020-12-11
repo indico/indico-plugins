@@ -1,13 +1,15 @@
 {% macro render_make_me_owner(event, vc_room, event_vc_room, extra_classes='') %}
-    {% if session.user.identifier != vc_room.data['host'] and event.can_manage(session.user) %}
+    {% if session.user.identifier != vc_room.data['host']
+          and session.user.identifier not in vc_room.data['alternative_hosts']
+          and event.can_manage(session.user) %}
         <a class="i-button highlight arrow {{ extra_classes }}" data-toggle="dropdown"></a>
         <ul class="i-dropdown" data-level="level1">
             <li>
                 <a href="#"
-                   title="{% trans %}You will become the host of this Zoom meeting{% endtrans %}"
+                   title="{% trans %}You will become an alternative host of this Zoom meeting{% endtrans %}"
                    class="action-make-host"}}"
-                   data-href="{{ url_for_plugin('vc_zoom.make_me_host', event_vc_room) }}">
-                    {% trans %}Make me host{% endtrans %}
+                   data-href="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}">
+                    {% trans %}Make me alternative host{% endtrans %}
                 </a>
             </li>
         </ul>

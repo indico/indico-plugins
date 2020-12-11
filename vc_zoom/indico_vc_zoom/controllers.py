@@ -22,10 +22,14 @@ from indico.util.i18n import _
 from werkzeug.exceptions import Forbidden
 
 
-class RHRoomHost(RHVCSystemEventBase):
+class RHRoomAlternativeHost(RHVCSystemEventBase):
     def _process(self):
-        result = {}
-        self.vc_room.data['host'] = session.user.identifier
+        new_identifier = session.user.identifier
+        if new_identifier == self.vc_room.data['host'] or new_identifier in self.vc_room.data['alternative_hosts']:
+            flash(_("You were already an (alternative) host of this meeting"), 'warning')
+            return jsonify(success=False)
+
+        self.vc_room.data['alternative_hosts'].append(new_identifier)
         flag_modified(self.vc_room, 'data')
         try:
             self.plugin.update_room(self.vc_room, self.event)
@@ -33,9 +37,8 @@ class RHRoomHost(RHVCSystemEventBase):
             db.session.rollback()
             raise
         else:
-            flash(_("You are now the host of room '{room.name}'".format(room=self.vc_room)), 'success')
-            result['success'] = True
-        return jsonify(result)
+            flash(_("You are now an alternative host of room '{room.name}'".format(room=self.vc_room)), 'success')
+        return jsonify(success=True)
 
 
 class RHWebhook(RH):

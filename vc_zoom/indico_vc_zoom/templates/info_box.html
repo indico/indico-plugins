@@ -1,5 +1,6 @@
 {% from '_clipboard_input.html' import clipboard_input %}
 {% set host = vc_room.data.host %}
+{% set alt_hosts = vc_room.data.alternative_hosts %}
 <dl>
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
@@ -10,6 +11,18 @@
     {% if host %}
         <dt>{% trans %}Host{% endtrans %}</dt>
         <dd>{{ (host|decodeprincipal).full_name }}</dd>
+    {% endif %}
+    {% if alt_hosts %}
+        <dt>
+            {% trans count=alt_hosts|length -%}
+                Alternative host
+            {%- pluralize -%}
+                Alternative hosts
+            {%- endtrans %}
+        </dt>
+        <dd>
+            {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
+        </dd>
     {% endif %}
     {% if event_vc_room.data.password_visibility == 'everyone' or
         event_vc_room.event.can_manage(session.user) or
