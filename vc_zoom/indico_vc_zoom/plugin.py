@@ -36,7 +36,8 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.util import (UserLookupMode, fetch_zoom_meeting, find_enterprise_email, gen_random_password,
-                                 get_schedule_args, get_url_data_args, update_zoom_meeting, ZoomMeetingType)
+                                 get_alt_host_emails, get_schedule_args, get_url_data_args, process_alternative_hosts,
+                                 update_zoom_meeting, ZoomMeetingType)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -320,7 +321,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room.data.update({
             'zoom_id': unicode(meeting_obj['id']),
             'start_url': meeting_obj['start_url'],
-            'host': host.identifier
+            'host': host.identifier,
+            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', []))
         })
         vc_room.data.update(get_url_data_args(meeting_obj['join_url']))
         flag_modified(vc_room, 'data')
@@ -347,6 +349,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_meeting_settings = zoom_meeting['settings']
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
             changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
+
+        alternative_hosts = process_alternative_hosts(zoom_meeting_settings.get('alternative_hosts', ''))
+        if vc_room.data['alternative_hosts'] != alternative_hosts:
+            new_alt_host_emails = get_alt_host_emails(vc_room.data['alternative_hosts'])
+            changes.setdefault('settings', {})['alternative_hosts'] = ','.join(new_alt_host_emails)
 
         if not is_webinar:
             if vc_room.data['mute_audio'] != zoom_meeting_settings['mute_upon_entry']:
@@ -375,7 +382,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             # these options will be empty for webinars
             'mute_audio': zoom_meeting['settings'].get('mute_upon_entry'),
             'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
-            'waiting_room': zoom_meeting['settings'].get('waiting_room')
+            'waiting_room': zoom_meeting['settings'].get('waiting_room'),
+            'alternative_hosts': process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts'))
         })
         vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
         flag_modified(vc_room, 'data')
@@ -453,6 +461,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.identifier})
         ):
             room.data['host'] = target.identifier
+            flag_modified(room, 'data')
+        for room in VCRoom.query.filter(
+            VCRoom.type == self.service_name, VCRoom.data.contains({'alternative_hosts': [source.identifier]})
+        ):
+            room.data['alternative_hosts'].remove(source.identifier)
+            room.data['alternative_hosts'].append(target.identifier)
             flag_modified(room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):

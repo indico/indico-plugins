@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import random
+import re
 import string
 
 from requests.exceptions import HTTPError
@@ -15,10 +16,12 @@ from requests.exceptions import HTTPError
 from indico.core.db import db
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import User
+from indico.modules.users.util import get_user_by_email
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.struct.enum import IndicoEnum, RichEnum
+from indico.util.user import principal_from_identifier
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
@@ -62,7 +65,7 @@ def _iter_user_identifiers(user):
             yield identifier
 
 
-def _iter_user_emails(user):
+def iter_user_emails(user):
     """Yield all emails of a user that may work with zoom.
 
     :param user: the `User` in question
@@ -95,7 +98,7 @@ def _iter_user_emails(user):
 def find_enterprise_email(user):
     """Get the email address of a user that has a zoom account."""
     client = ZoomIndicoClient()
-    return next((email for email in _iter_user_emails(user) if client.get_user(email, silent=True)), None)
+    return next((email for email in iter_user_emails(user) if client.get_user(email, silent=True)), None)
 
 
 def gen_random_password():
@@ -169,3 +172,14 @@ def get_url_data_args(url):
         'url': url,
         'public_url': url.split('?')[0],
     }
+
+
+def process_alternative_hosts(emails):
+    """Convert a comma-concatenated list of alternative host e-mails into a list of identifiers."""
+    users = [get_user_by_email(email) for email in re.findall(r'[^,;]+', emails)]
+    return [u.identifier for u in users if u is not None]
+
+
+def get_alt_host_emails(identifiers):
+    """Convert a list of identities into a list of enterprise e-mails."""
+    return [find_enterprise_email(principal_from_identifier(ident)) for ident in identifiers]
