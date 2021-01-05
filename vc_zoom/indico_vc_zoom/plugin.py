@@ -222,7 +222,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 # the booking should now be linked to something else
                 new_schedule_args = get_schedule_args(room_assoc.link_object)
                 meeting = fetch_zoom_meeting(vc_room)
-                current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'}}
+                current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
 
                 # check whether the start time / duration of the scheduled meeting differs
                 if new_schedule_args != current_schedule_args:
