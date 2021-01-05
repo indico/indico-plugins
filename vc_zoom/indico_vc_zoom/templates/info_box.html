@@ -1,0 +1,40 @@
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set host = vc_room.data.host %}
+{% set alt_hosts = vc_room.data.alternative_hosts %}
+<dl>
+    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
+    <dd>{{ vc_room.data.zoom_id }}</dd>
+    {% if vc_room.data.description %}
+        <dt>{% trans %}Description{% endtrans %}</dt>
+        <dd>{{ vc_room.data.description }}</dd>
+    {% endif %}
+    {% if host %}
+        <dt>{% trans %}Host{% endtrans %}</dt>
+        <dd>{{ (host|decodeprincipal).full_name }}</dd>
+    {% endif %}
+    {% if alt_hosts %}
+        <dt>
+            {% trans count=alt_hosts|length -%}
+                Alternative host
+            {%- pluralize -%}
+                Alternative hosts
+            {%- endtrans %}
+        </dt>
+        <dd>
+            {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
+        </dd>
+    {% endif %}
+    {% if event_vc_room.data.password_visibility == 'everyone' or
+        event_vc_room.event.can_manage(session.user) or
+        (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+        (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user)) %}
+        <dt>{% trans %}Passcode{% endtrans %}</dt>
+        <dd>{{ vc_room.data.password }}</dd>
+    {% endif %}
+    {% if event_vc_room.data.show_autojoin %}
+        <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
+        <dd class="large-row">
+            {{ clipboard_input(vc_room.data.url, name="vc-room-url-%s"|format(event_vc_room.id)) }}
+        </dd>
+    {% endif %}
+</dl>

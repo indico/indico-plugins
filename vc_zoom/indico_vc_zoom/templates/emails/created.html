@@ -1,0 +1,20 @@
+{% extends 'vc/emails/created.html' %}
+
+{% block plugin_specific_info %}
+    <li>
+        <strong>Host</strong>:
+        <span>{{ (vc_room.data.host|decodeprincipal).full_name }}</span>
+    </li>
+    <li>
+        <strong>Zoom URL</strong>:
+        <a href="{{ vc_room.data.url }}">{{ vc_room.data.url }}</a>
+    </li>
+
+{% endblock %}
+
+{% block custom_footer %}
+    {% if plugin.settings.get('creation_email_footer') %}
+        <hr>
+        {{ plugin.settings.get('creation_email_footer') | sanitize_html }}
+    {% endif %}
+{% endblock %}

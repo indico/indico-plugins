@@ -1,0 +1,6 @@
+graft indico_vc_zoom/static
+graft indico_vc_zoom/migrations
+graft indico_vc_zoom/templates
+graft indico_vc_zoom/translations
+
+global-exclude *.pyc __pycache__ .keep

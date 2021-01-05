@@ -1,0 +1,53 @@
+{% from '_password.html' import password %}
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set host = vc_room.data.host %}
+{% set alt_hosts = vc_room.data.alternative_hosts %}
+<dl class="details-container">
+    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
+    <dd>{{ vc_room.data.zoom_id }}</dd>
+    {% if vc_room.data.description %}
+        <dt>{% trans %}Description{% endtrans %}</dt>
+        <dd>{{ vc_room.data.description }}</dd>
+    {% endif %}
+    <dt>{% trans %}Host{% endtrans %}</dt>
+    <dd>
+        {{ (host|decodeprincipal).full_name }}
+    </dd>
+    {% if alt_hosts %}
+        <dt>
+            {% trans count=alt_hosts|length -%}
+                Alternative host
+            {%- pluralize -%}
+                Alternative hosts
+            {%- endtrans %}
+        </dt>
+        <dd>
+            {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
+        </dd>
+    {% endif %}
+    <dt>{% trans %}Linked to{% endtrans %}</dt>
+    <dd>
+        {% set obj = event_vc_room.link_object %}
+        {% if obj is none %}
+            <em>(missing {{ event_vc_room.link_type.name }})</em>
+        {% elif event_vc_room.link_type.name == 'event' %}
+            {% trans %}the whole event{% endtrans %}
+        {% elif event_vc_room.link_type.name == 'contribution' %}
+            {% trans %}Contribution{% endtrans %}: {{ obj.title }}
+        {% elif event_vc_room.link_type.name == 'block' %}
+            {% trans %}Session{% endtrans %}: {{ obj.full_title }}
+        {% endif %}
+    </dd>
+    <dt>{% trans %}Passcode{% endtrans %}</dt>
+    <dd>{{ vc_room.data.password }}</dd>
+    <dt>{% trans %}Zoom URL{% endtrans %}</dt>
+    <dd>
+        {{ clipboard_input(vc_room.data.url, name="vc-room-url") }}
+    </dd>
+    <dt>{% trans %}Created on{% endtrans %}</dt>
+    <dd>{{ vc_room.created_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% if vc_room.modified_dt %}
+        <dt>{% trans %}Modified on{% endtrans %}</dt>
+        <dd>{{ vc_room.modified_dt | format_datetime(timezone=event.tzinfo) }}</dd>
+    {% endif %}
+</dl>

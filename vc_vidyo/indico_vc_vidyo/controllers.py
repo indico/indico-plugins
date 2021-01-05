@@ -1,5 +1,5 @@
 # This file is part of the Indico plugins.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
@@ -24,6 +24,6 @@ class RHVidyoRoomOwner(RHVCSystemEventBase):
             result['success'] = False
             db.session.rollback()
         else:
-            flash(_(f"You are now the owner of the room '{self.vc_room.name}'"), 'success')
+            flash(_("You are now the owner of the room '{room}'").format(room=self.vc_room.name), 'success')
             result['success'] = True
         return jsonify(result)

@@ -1,0 +1,20 @@
+{% extends 'emails/base.html' %}
+
+{% block subject -%}
+    [{{ plugin.friendly_name }}] Host URL - {{ vc_room.name }}
+{%- endblock %}
+
+{% block header -%}
+    <p>
+        <strong>ATTENTION:</strong>
+        You should not share this URL with anyone, since it will allow them to become meeting hosts!
+    </p>
+    <ul>
+        <li>
+            <strong>Host URL</strong>:
+            <a href="{{ vc_room.data.start_url }}">{{ vc_room.data.start_url }}</a>
+        </li>
+    </ul>
+
+    {% block custom_footer %}{% endblock %}
+{%- endblock %}
