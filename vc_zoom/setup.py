@@ -17,6 +17,6 @@ setup(
     version='3.0-dev',
     install_requires=[
         'indico>=3.0.dev0',
-        'PyJWT>=1.7.1,<2'
+        'PyJWT>=2.0.0,<3'
     ],
 )

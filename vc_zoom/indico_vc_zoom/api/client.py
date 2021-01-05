@@ -48,8 +48,7 @@ class BaseComponent:
     def token(self):
         header = {'alg': 'HS256', 'typ': 'JWT'}
         payload = {'iss': self.config['api_key'], 'exp': int(time.time() + 3600)}
-        token = jwt.encode(payload, self.config['api_secret'], algorithm='HS256', headers=header)
-        return token.decode('utf-8')
+        return jwt.encode(payload, self.config['api_secret'], algorithm='HS256', headers=header)
 
     @property
     def session(self):
