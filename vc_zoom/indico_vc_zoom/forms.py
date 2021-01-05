@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import session
 from flask_pluginengine import current_plugin
 from wtforms.fields.core import BooleanField, StringField
@@ -100,7 +98,7 @@ class VCRoomForm(VCRoomFormBase):
             for field_name in {'mute_audio', 'mute_participant_video', 'waiting_room'}:
                 inject_validators(self, field_name, [HiddenUnless('meeting_type', 'regular')])
 
-        super(VCRoomForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if not allow_webinars:
             del self.meeting_type

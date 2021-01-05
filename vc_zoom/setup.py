@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from setuptools import setup
 
@@ -15,9 +14,9 @@ from setuptools import setup
 # is in setup.cfg now
 setup(
     name='indico-plugin-vc-zoom',
-    version='2.3b1',
+    version='3.0-dev',
     install_requires=[
-        'indico>=2.3.2.dev0',
+        'indico>=3.0.dev0',
         'PyJWT>=1.7.1,<2'
     ],
 )

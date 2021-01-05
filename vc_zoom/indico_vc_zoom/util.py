@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import random
 import re
 import string
@@ -38,7 +36,7 @@ class ZoomMeetingType(int, IndicoEnum):
     recurring_webinar_fixed_time = 9
 
 
-class UserLookupMode(unicode, RichEnum):
+class UserLookupMode(str, RichEnum):
     __titles__ = {
         'all_emails': _('All emails'),
         'email_domains': _('Email domains'),
@@ -79,7 +77,7 @@ def iter_user_emails(user):
             domains = ZoomPlugin.settings.get('email_domains')
             if not domains:
                 return
-            email_criterion = db.or_(UserEmail.email.endswith('@{}'.format(domain)) for domain in domains)
+            email_criterion = db.or_(UserEmail.email.endswith(f'@{domain}') for domain in domains)
         # get all matching e-mails, primary first
         query = UserEmail.query.filter(
             UserEmail.user == user,
@@ -92,7 +90,7 @@ def iter_user_emails(user):
     elif mode == UserLookupMode.authenticators:
         domain = ZoomPlugin.settings.get('enterprise_domain')
         for username in _iter_user_identifiers(user):
-            yield '{}@{}'.format(username, domain)
+            yield f'{username}@{domain}'
 
 
 @memoize_request

@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import flash, jsonify, request, session
 from flask_pluginengine import current_plugin
 from sqlalchemy.orm.attributes import flag_modified

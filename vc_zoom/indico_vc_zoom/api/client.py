@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import time
 
 import jwt
@@ -28,7 +26,7 @@ def _handle_response(resp, expected_code=200, expects_json=True):
     try:
         resp.raise_for_status()
         if resp.status_code != expected_code:
-            raise HTTPError('Unexpected status code {}'.format(resp.status_code), response=resp)
+            raise HTTPError(f'Unexpected status code {resp.status_code}', response=resp)
     except HTTPError:
         from indico_vc_zoom.plugin import ZoomPlugin
         ZoomPlugin.logger.error('Error in API call to %s: %s', resp.url, resp.content)
@@ -40,7 +38,7 @@ class APIException(Exception):
     pass
 
 
-class BaseComponent(object):
+class BaseComponent:
     def __init__(self, base_uri, config, timeout):
         self.base_uri = base_uri
         self.config = config
@@ -58,7 +56,7 @@ class BaseComponent(object):
         session = Session()
         session.headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer {}'.format(self.token)
+            'Authorization': f'Bearer {self.token}'
         }
         return session
 
@@ -66,60 +64,60 @@ class BaseComponent(object):
 class MeetingComponent(BaseComponent):
     def list(self, user_id, **kwargs):
         return self.get(
-            '{}/users/{}/meetings'.format(self.base_uri, user_id), params=kwargs
+            f'{self.base_uri}/users/{user_id}/meetings', params=kwargs
         )
 
     def create(self, user_id, **kwargs):
         if kwargs.get('start_time'):
             kwargs['start_time'] = format_iso_dt(kwargs['start_time'])
         return self.session.post(
-            '{}/users/{}/meetings'.format(self.base_uri, user_id),
+            f'{self.base_uri}/users/{user_id}/meetings',
             json=kwargs
         )
 
     def get(self, meeting_id, **kwargs):
-        return self.session.get('{}/meetings/{}'.format(self.base_uri, meeting_id), json=kwargs)
+        return self.session.get(f'{self.base_uri}/meetings/{meeting_id}', json=kwargs)
 
     def update(self, meeting_id, **kwargs):
         if kwargs.get('start_time'):
             kwargs['start_time'] = format_iso_dt(kwargs['start_time'])
         return self.session.patch(
-            '{}/meetings/{}'.format(self.base_uri, meeting_id), json=kwargs
+            f'{self.base_uri}/meetings/{meeting_id}', json=kwargs
         )
 
     def delete(self, meeting_id, **kwargs):
         return self.session.delete(
-            '{}/meetings/{}'.format(self.base_uri, meeting_id), json=kwargs
+            f'{self.base_uri}/meetings/{meeting_id}', json=kwargs
         )
 
 
 class WebinarComponent(BaseComponent):
     def list(self, user_id, **kwargs):
         return self.get(
-            '{}/users/{}/webinars'.format(self.base_uri, user_id), params=kwargs
+            f'{self.base_uri}/users/{user_id}/webinars', params=kwargs
         )
 
     def create(self, user_id, **kwargs):
         if kwargs.get('start_time'):
             kwargs['start_time'] = format_iso_dt(kwargs['start_time'])
         return self.session.post(
-            '{}/users/{}/webinars'.format(self.base_uri, user_id),
+            f'{self.base_uri}/users/{user_id}/webinars',
             json=kwargs
         )
 
     def get(self, meeting_id, **kwargs):
-        return self.session.get('{}/webinars/{}'.format(self.base_uri, meeting_id), json=kwargs)
+        return self.session.get(f'{self.base_uri}/webinars/{meeting_id}', json=kwargs)
 
     def update(self, meeting_id, **kwargs):
         if kwargs.get('start_time'):
             kwargs['start_time'] = format_iso_dt(kwargs['start_time'])
         return self.session.patch(
-            '{}/webinars/{}'.format(self.base_uri, meeting_id), json=kwargs
+            f'{self.base_uri}/webinars/{meeting_id}', json=kwargs
         )
 
     def delete(self, meeting_id, **kwargs):
         return self.session.delete(
-            '{}/webinars/{}'.format(self.base_uri, meeting_id), json=kwargs
+            f'{self.base_uri}/webinars/{meeting_id}', json=kwargs
         )
 
 
@@ -128,22 +126,22 @@ class UserComponent(BaseComponent):
         return self.get('me')
 
     def list(self, **kwargs):
-        return self.session.get('{}/users'.format(self.base_uri), params=kwargs)
+        return self.session.get(f'{self.base_uri}/users', params=kwargs)
 
     def create(self, **kwargs):
-        return self.session.post('{}/users'.format(self.base_uri), params=kwargs)
+        return self.session.post(f'{self.base_uri}/users', params=kwargs)
 
     def update(self, user_id, **kwargs):
-        return self.session.patch('{}/users/{}'.format(self.base_uri, user_id), params=kwargs)
+        return self.session.patch(f'{self.base_uri}/users/{user_id}', params=kwargs)
 
     def delete(self, user_id, **kwargs):
-        return self.session.delete('{}/users/{}'.format(self.base_uri, user_id), params=kwargs)
+        return self.session.delete(f'{self.base_uri}/users/{user_id}', params=kwargs)
 
     def get(self, user_id, **kwargs):
-        return self.session.get('{}/users/{}'.format(self.base_uri, user_id), params=kwargs)
+        return self.session.get(f'{self.base_uri}/users/{user_id}', params=kwargs)
 
 
-class ZoomClient(object):
+class ZoomClient:
     """Zoom REST API Python Client."""
 
     BASE_URI = 'https://api.zoom.us/v2'
@@ -170,7 +168,7 @@ class ZoomClient(object):
         # Instantiate the components
         self.components = {
             key: component(base_uri=self.BASE_URI, config=config, timeout=timeout)
-            for key, component in self._components.viewitems()
+            for key, component in self._components.items()
         }
 
     @property
@@ -189,7 +187,7 @@ class ZoomClient(object):
         return self.components['webinar']
 
 
-class ZoomIndicoClient(object):
+class ZoomIndicoClient:
     def __init__(self):
         from indico_vc_zoom.plugin import ZoomPlugin
         self.client = ZoomClient(

@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
-
 import click
 from terminaltables import AsciiTable
 
@@ -31,7 +29,7 @@ def rooms(status=None):
         room_query = room_query.filter(VCRoom.status == VCRoomStatus.get(status))
 
     for room in room_query:
-        table_data.append([unicode(room.id), room.name, room.status.name, unicode(room.data['zoom_id'])])
+        table_data.append([str(room.id), room.name, room.status.name, str(room.data['zoom_id'])])
 
     table = AsciiTable(table_data)
     for col in (0, 3, 4):

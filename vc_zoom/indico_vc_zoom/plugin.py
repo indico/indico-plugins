@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import flash, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
@@ -147,7 +145,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     })
 
     def init(self):
-        super(ZoomPlugin, self).init()
+        super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._times_changed)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
@@ -165,7 +163,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Override the default room form creation mechanism."""
-        form = super(ZoomPlugin, self).create_form(
+        form = super().create_form(
             event,
             existing_vc_room=existing_vc_room,
             existing_event_vc_room=existing_event_vc_room
@@ -203,7 +201,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # in a new room, `meeting_type` comes in `data`, otherwise it's already in the VCRoom
         is_webinar = data.get('meeting_type', vc_room.data and vc_room.data.get('meeting_type')) == 'webinar'
 
-        super(ZoomPlugin, self).update_data_association(event, vc_room, room_assoc, data)
+        super().update_data_association(event, vc_room, room_assoc, data)
 
         if vc_room.data:
             # this is not a new room
@@ -232,7 +230,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         flag_modified(room_assoc, 'data')
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
-        super(ZoomPlugin, self).update_data_vc_room(vc_room, data)
+        super().update_data_vc_room(vc_room, data)
         fields = {'description', 'password'}
 
         # we may end up not getting a meeting_type from the form
@@ -319,7 +317,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             raise VCRoomError(_('Could not create the room in Zoom. Please contact support if the error persists'))
 
         vc_room.data.update({
-            'zoom_id': unicode(meeting_obj['id']),
+            'zoom_id': str(meeting_obj['id']),
             'start_url': meeting_obj['start_url'],
             'host': host.identifier,
             'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', ''))
@@ -412,7 +410,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room = old_event_vc_room.vc_room
         is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
         has_only_one_association = len({assoc.event_id for assoc in vc_room.events}) == 1
-        new_assoc = super(ZoomPlugin, self).clone_room(old_event_vc_room, link_object)
+        new_assoc = super().clone_room(old_event_vc_room, link_object)
 
         if has_only_one_association:
             update_zoom_meeting(vc_room.data['zoom_id'], {
@@ -431,7 +429,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return blueprint
 
     def get_vc_room_form_defaults(self, event):
-        defaults = super(ZoomPlugin, self).get_vc_room_form_defaults(event)
+        defaults = super().get_vc_room_form_defaults(event)
         defaults.update({
             'meeting_type': 'regular' if self.settings.get('allow_webinars') else None,
             'mute_audio': self.settings.get('mute_audio'),
@@ -445,18 +443,18 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return defaults
 
     def get_vc_room_attach_form_defaults(self, event):
-        defaults = super(ZoomPlugin, self).get_vc_room_attach_form_defaults(event)
+        defaults = super().get_vc_room_attach_form_defaults(event)
         defaults['password_visibility'] = 'logged_in'
         return defaults
 
     def can_manage_vc_room(self, user, room):
         return (
             user == principal_from_identifier(room.data['host']) or
-            super(ZoomPlugin, self).can_manage_vc_room(user, room)
+            super().can_manage_vc_room(user, room)
         )
 
     def _merge_users(self, target, source, **kwargs):
-        super(ZoomPlugin, self)._merge_users(target, source, **kwargs)
+        super()._merge_users(target, source, **kwargs)
         for room in VCRoom.query.filter(
             VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.identifier})
         ):
@@ -478,8 +476,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return render_plugin_template('room_labels.html', vc_room=vc_room)
 
     def _times_changed(self, sender, obj, **kwargs):
-        from indico.modules.events.models.events import Event
         from indico.modules.events.contributions.models.contributions import Contribution
+        from indico.modules.events.models.events import Event
         from indico.modules.events.sessions.models.blocks import SessionBlock
 
         if not hasattr(obj, 'vc_room_associations'):
