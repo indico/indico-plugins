@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import itertools
 import random
 import re
 import string
@@ -14,6 +15,7 @@ import string
 from requests.exceptions import HTTPError
 
 from indico.core.db import db
+from indico.modules.auth.models.identities import Identity
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import User
 from indico.modules.users.util import get_user_by_email
@@ -177,7 +179,23 @@ def get_url_data_args(url):
 
 def process_alternative_hosts(emails):
     """Convert a comma-concatenated list of alternative host e-mails into a list of identifiers."""
-    users = [get_user_by_email(email) for email in re.findall(r'[^,;]+', emails)]
+    from indico_vc_zoom.plugin import ZoomPlugin
+    mode = ZoomPlugin.settings.get('user_lookup_mode')
+    emails = re.findall(r'[^,;]+', emails)
+    if mode in (UserLookupMode.all_emails, UserLookupMode.email_domains):
+        users = {get_user_by_email(email) for email in emails}
+    elif mode == UserLookupMode.authenticators:
+        users = set()
+        domain = ZoomPlugin.settings.get('enterprise_domain')
+        usernames = {email.split('@')[0] for email in emails if email.endswith('@' + domain)}
+        providers = ZoomPlugin.settings.get('authenticators')
+        users = []
+        if providers and usernames:
+            criteria = db.or_(((Identity.provider == provider) & (Identity.identifier == username))
+                              for provider, username in itertools.product(providers, usernames))
+            users = [identity.user for identity in Identity.query.filter(criteria)]
+    else:
+        raise TypeError('invalid mode')
     return [u.identifier for u in users if u is not None]
 
 
