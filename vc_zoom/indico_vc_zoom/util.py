@@ -31,10 +31,11 @@ class ZoomMeetingType(int, IndicoEnum):
     instant_meeting = 1
     scheduled_meeting = 2
     recurring_meeting_no_time = 3
-    recurring_meeting_fixed_time = 4
+    recurring_meeting_fixed_time = 8
+    pmi_meeting = 4
     webinar = 5
     recurring_webinar_no_time = 6
-    recurring_meeting_fixed_time = 9
+    recurring_webinar_fixed_time = 9
 
 
 class UserLookupMode(unicode, RichEnum):
