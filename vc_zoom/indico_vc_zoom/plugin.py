@@ -322,7 +322,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'zoom_id': unicode(meeting_obj['id']),
             'start_url': meeting_obj['start_url'],
             'host': host.identifier,
-            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', []))
+            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', ''))
         })
         vc_room.data.update(get_url_data_args(meeting_obj['join_url']))
         flag_modified(vc_room, 'data')
