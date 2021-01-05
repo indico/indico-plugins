@@ -10,9 +10,9 @@ from __future__ import absolute_import, unicode_literals
 import time
 
 import jwt
+from pytz import utc
 from requests import Session
 from requests.exceptions import HTTPError
-from pytz import utc
 
 
 def format_iso_dt(d):

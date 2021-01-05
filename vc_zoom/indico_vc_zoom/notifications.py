@@ -7,9 +7,9 @@
 
 from __future__ import unicode_literals
 
-from indico.web.flask.templating import get_template_module
 from indico.core.notifications import make_email, send_email
 from indico.util.user import principal_from_identifier
+from indico.web.flask.templating import get_template_module
 
 
 def notify_host_start_url(vc_room):

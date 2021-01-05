@@ -12,21 +12,21 @@ from flask_pluginengine import current_plugin
 from sqlalchemy.orm.attributes import flag_modified
 from webargs import fields
 from webargs.flaskparser import use_kwargs
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.vc.controllers import RHVCSystemEventBase
 from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoom
-from indico.web.rh import RH
 from indico.util.i18n import _
-from werkzeug.exceptions import Forbidden
+from indico.web.rh import RH
 
 
 class RHRoomAlternativeHost(RHVCSystemEventBase):
     def _process(self):
         new_identifier = session.user.identifier
         if new_identifier == self.vc_room.data['host'] or new_identifier in self.vc_room.data['alternative_hosts']:
-            flash(_("You were already an (alternative) host of this meeting"), 'warning')
+            flash(_('You were already an (alternative) host of this meeting'), 'warning')
             return jsonify(success=False)
 
         self.vc_room.data['alternative_hosts'].append(new_identifier)

@@ -11,8 +11,8 @@ from flask import flash, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
-from wtforms.fields.core import BooleanField
 from wtforms.fields import TextAreaField
+from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -35,9 +35,9 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
-from indico_vc_zoom.util import (UserLookupMode, fetch_zoom_meeting, find_enterprise_email, gen_random_password,
-                                 get_alt_host_emails, get_schedule_args, get_url_data_args, process_alternative_hosts,
-                                 update_zoom_meeting, ZoomMeetingType)
+from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
+                                 gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
+                                 process_alternative_hosts, update_zoom_meeting)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
