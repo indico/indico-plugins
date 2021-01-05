@@ -23,19 +23,16 @@
 - Show "Make me host" button in the management area and in contributions/sessions as well
 - Warn the user if they delete a Zoom meeting linked to multiple events if they aren't the host
 - Change Zoom meeting to "recurring meeting" when cloning an event
+- Show detailed error when deleting a meeting fails
+- Do not allow passcodes that are too long for zoom
+- Remove the "Assistant Zoom ID" logic due to problems with Zoom's API rate limits (all meetings created were counted against the assistant's rate limit instead of the host's); this means the host can no longer be changed, but Indico instead provides an option to event managers to make themselves a co-host.
+- Fix an error when changing the linked object of a recurring Zoom room in Indico
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 
 ### 2.3b1
 
 - Initial beta release
-
-## Implementation details
-
-Rooms are created under the account of an *assistant user* which can be set using the **Assistant Zoom ID**
-configuration setting. This account will also be added automatically as an assistant to every meeting host.
-This is needed in order to allow for the host to be changed ([`scheduled_for`](https://marketplace.zoom.us/docs/api-reference/zoom-api/meetings/meetingcreate#request-body) property in the Zoom API). The *assistant user* owns every Zoom meeting, with the `scheduled_for` property being
-used to grant the required privileges to the desired hosts.
 
 ## Zoom App Configuration
 
@@ -57,9 +54,7 @@ Select the following "Event types":
 These are the most relevant configuration options:
 
  * **Notification email addresses** - Additional e-mails which will receive notifications
- * **E-mail domains** - Comma-separated list of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
- * **Asistant Zoom ID** - Zoom ID (or e-mail) of the account which shall be used as an assistant to all hosts and
-shall own all meetings
+ * **E-mail domains** - List of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
  * **Webhook token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
 
 
