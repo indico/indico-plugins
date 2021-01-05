@@ -37,7 +37,7 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
             db.session.rollback()
             raise
         else:
-            flash(_("You are now an alternative host of room '{room.name}'".format(room=self.vc_room)), 'success')
+            flash(_("You are now an alternative host of room '{room}'").format(room=self.vc_room.name), 'success')
         return jsonify(success=True)
 
 

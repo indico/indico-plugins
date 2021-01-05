@@ -26,6 +26,6 @@ class RHVidyoRoomOwner(RHVCSystemEventBase):
             result['success'] = False
             db.session.rollback()
         else:
-            flash(_("You are now the owner of the room '{room.name}'".format(room=self.vc_room)), 'success')
+            flash(_("You are now the owner of the room '{room}'").format(room=self.vc_room.name), 'success')
             result['success'] = True
         return jsonify(result)

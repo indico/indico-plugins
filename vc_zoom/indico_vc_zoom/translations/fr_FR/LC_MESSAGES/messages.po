@@ -5,15 +5,16 @@
 # 
 # Translators:
 # Thomas Baron <thomas.baron@cern.ch>, 2021
+# Adrian Mönnich, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-05 10:58+0100\n"
+"POT-Creation-Date: 2021-01-05 13:20+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
+"Last-Translator: Adrian Mönnich, 2021\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,8 +28,8 @@ msgid "You were already an (alternative) host of this meeting"
 msgstr "Vous étiez déjà un hôte (alternatif) de cette réunion"
 
 #: indico_vc_zoom/controllers.py:40
-msgid "You are now an alternative host of room '{room.name}'"
-msgstr "Vous êtes maintenant un hôte alternatif de la réunion '{room.name}'"
+msgid "You are now an alternative host of room '{room}'"
+msgstr "Vous êtes maintenant un hôte alternatif de la réunion '{room}'"
 
 #: indico_vc_zoom/forms.py:29 indico_vc_zoom/forms.py:63
 msgid "Passcode visibility"

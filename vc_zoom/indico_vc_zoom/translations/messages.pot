@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-05 10:58+0100\n"
+"POT-Creation-Date: 2021-01-05 13:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgid "You were already an (alternative) host of this meeting"
 msgstr ""
 
 #: indico_vc_zoom/controllers.py:40
-msgid "You are now an alternative host of room '{room.name}'"
+msgid "You are now an alternative host of room '{room}'"
 msgstr ""
 
 #: indico_vc_zoom/forms.py:29 indico_vc_zoom/forms.py:63
