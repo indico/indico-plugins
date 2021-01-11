@@ -221,13 +221,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 })
             elif room_assoc.link_object != old_link:
                 # the booking should now be linked to something else
-                new_schedule_args = get_schedule_args(room_assoc.link_object)
+                new_schedule_args = get_schedule_args(room_assoc.link_object) if room_assoc.link_object.start_dt else {}
                 meeting = fetch_zoom_meeting(vc_room)
                 current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
 
                 # check whether the start time / duration of the scheduled meeting differs
                 if new_schedule_args != current_schedule_args:
-                    update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                    if new_schedule_args:
+                        update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                    else:
+                        update_zoom_meeting(vc_room.data['zoom_id'], {
+                            'start_time': None,
+                            'duration': None,
+                            'type': (
+                                ZoomMeetingType.recurring_webinar_no_time
+                                if is_webinar
+                                else ZoomMeetingType.recurring_meeting_no_time
+                            )
+                        })
 
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
