@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-05 13:20+0100\n"
+"POT-Creation-Date: 2021-01-11 10:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -270,30 +270,34 @@ msgid ""
 "session block which were not automatically updated."
 msgstr ""
 
-#: indico_vc_zoom/util.py:42
+#: indico_vc_zoom/util.py:45
 msgid "All emails"
 msgstr ""
 
-#: indico_vc_zoom/util.py:43
+#: indico_vc_zoom/util.py:46
 msgid "Email domains"
 msgstr ""
 
-#: indico_vc_zoom/util.py:44
+#: indico_vc_zoom/util.py:47
 msgid "Authenticators"
 msgstr ""
 
-#: indico_vc_zoom/util.py:124
+#: indico_vc_zoom/util.py:127
 msgid "This room has been deleted from Zoom"
 msgstr ""
 
-#: indico_vc_zoom/util.py:128
+#: indico_vc_zoom/util.py:131
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
 msgstr ""
 
-#: indico_vc_zoom/util.py:147
+#: indico_vc_zoom/util.py:150
 msgid "Can't update meeting. Please contact support if the error persists."
+msgstr ""
+
+#: indico_vc_zoom/util.py:206
+msgid "Could not find Zoom user for alternative host"
 msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:9
