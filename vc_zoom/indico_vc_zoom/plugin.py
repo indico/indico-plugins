@@ -150,6 +150,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super(ZoomPlugin, self).init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._times_changed)
+        self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
@@ -499,3 +500,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return
 
             flash(message, 'warning')
+
+    def _event_metadata_postprocess(self, sender, event, data, user=None, **kwargs):
+        urls = []
+        for assoc in event.vc_room_associations:
+            if not assoc.show or assoc.vc_room.type != 'zoom':
+                continue
+            visibility = assoc.data.get('password_visibility', 'logged_in')
+            if (
+                visibility == 'everyone' or
+                (visibility == 'logged_in' and user is not None) or
+                (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
+                event.can_manage(user)
+            ):
+                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['url']))
+            elif visibility == 'no_one':
+                # XXX: Not sure if showing this is useful, but on the event page we show the join link
+                # with no passcode as well, so let's the logic identical here.
+                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['public_url']))
+
+        if urls:
+            return {'description': (data['description'] + '\n\n' + '\n'.join(urls)).strip()}
