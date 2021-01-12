@@ -199,4 +199,7 @@ def process_alternative_hosts(emails):
 
 def get_alt_host_emails(identifiers):
     """Convert a list of identities into a list of enterprise e-mails."""
-    return [find_enterprise_email(principal_from_identifier(ident)) for ident in identifiers]
+    emails = [find_enterprise_email(principal_from_identifier(ident)) for ident in identifiers]
+    if None in emails:
+        raise VCRoomError(_('Could not find Zoom user for alternative host'))
+    return emails

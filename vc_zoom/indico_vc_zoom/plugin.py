@@ -148,6 +148,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._times_changed)
+        self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
@@ -218,13 +219,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 })
             elif room_assoc.link_object != old_link:
                 # the booking should now be linked to something else
-                new_schedule_args = get_schedule_args(room_assoc.link_object)
+                new_schedule_args = get_schedule_args(room_assoc.link_object) if room_assoc.link_object.start_dt else {}
                 meeting = fetch_zoom_meeting(vc_room)
                 current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
 
                 # check whether the start time / duration of the scheduled meeting differs
                 if new_schedule_args != current_schedule_args:
-                    update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                    if new_schedule_args:
+                        update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                    else:
+                        update_zoom_meeting(vc_room.data['zoom_id'], {
+                            'start_time': None,
+                            'duration': None,
+                            'type': (
+                                ZoomMeetingType.recurring_webinar_no_time
+                                if is_webinar
+                                else ZoomMeetingType.recurring_meeting_no_time
+                            )
+                        })
 
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
@@ -497,3 +509,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return
 
             flash(message, 'warning')
+
+    def _event_metadata_postprocess(self, sender, event, data, user=None, **kwargs):
+        urls = []
+        for assoc in event.vc_room_associations:
+            if not assoc.show or assoc.vc_room.type != 'zoom':
+                continue
+            visibility = assoc.data.get('password_visibility', 'logged_in')
+            if (
+                visibility == 'everyone' or
+                (visibility == 'logged_in' and user is not None) or
+                (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
+                event.can_manage(user)
+            ):
+                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['url']))
+            elif visibility == 'no_one':
+                # XXX: Not sure if showing this is useful, but on the event page we show the join link
+                # with no passcode as well, so let's the logic identical here.
+                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['public_url']))
+
+        if urls:
+            return {'description': (data['description'] + '\n\n' + '\n'.join(urls)).strip()}
