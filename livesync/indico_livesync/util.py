@@ -63,8 +63,9 @@ def clean_old_entries():
     if not queue_entry_ttl:
         return
     expire_threshold = now_utc() - timedelta(days=queue_entry_ttl)
-    LiveSyncQueueEntry.find(LiveSyncQueueEntry.processed,
-                            LiveSyncQueueEntry.timestamp < expire_threshold).delete(synchronize_session='fetch')
+    query = LiveSyncQueueEntry.query.filter(LiveSyncQueueEntry.processed,
+                                            LiveSyncQueueEntry.timestamp < expire_threshold)
+    query.delete(synchronize_session='fetch')
 
 
 @memoize_request

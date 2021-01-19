@@ -18,7 +18,7 @@ from indico_livesync.util import clean_old_entries
 def scheduled_update():
     from indico_livesync.plugin import LiveSyncPlugin
     clean_old_entries()
-    for agent in LiveSyncAgent.find_all():
+    for agent in LiveSyncAgent.query.all():
         if agent.backend is None:
             LiveSyncPlugin.logger.warning('Skipping agent %s; backend not found', agent.name)
             continue

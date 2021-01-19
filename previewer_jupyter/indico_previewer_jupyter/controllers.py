@@ -25,7 +25,7 @@ class RHEventPreviewIPyNB(RH):
             raise Forbidden
 
     def _process_args(self):
-        self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
+        self.attachment = Attachment.query.filter_by(id=request.view_args['attachment_id'], is_deleted=False).one()
 
     def _process(self):
         config = Config()

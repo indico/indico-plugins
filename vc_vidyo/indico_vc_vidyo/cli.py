@@ -22,7 +22,7 @@ def cli():
 def rooms(status=None):
     """Lists all Vidyo rooms"""
 
-    room_query = VCRoom.find(type='vidyo')
+    room_query = VCRoom.query.filter_by(type='vidyo')
     table_data = [['ID', 'Name', 'Status', 'Vidyo ID', 'Extension']]
 
     if status:

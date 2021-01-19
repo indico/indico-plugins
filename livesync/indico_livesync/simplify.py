@@ -82,19 +82,19 @@ def _process_cascaded_category_contents(records):
 
     # Protection changes are handled differently, as there may not be the need to re-generate the record
     if category_prot_records:
-        for categ in Category.find(Category.id.in_(category_prot_records)):
+        for categ in Category.query.filter(Category.id.in_(category_prot_records)):
             cte = categ.get_protection_parent_cte()
             # Update only children that inherit
             inheriting_categ_children = (Event.query
                                          .join(cte, db.and_((Event.category_id == cte.c.id),
                                                             (cte.c.protection_parent == categ.id))))
-            inheriting_direct_children = Event.find((Event.category_id == categ.id) & Event.is_inheriting)
+            inheriting_direct_children = Event.query.filter((Event.category_id == categ.id) & Event.is_inheriting)
 
             changed_events.update(itertools.chain(inheriting_direct_children, inheriting_categ_children))
 
     # Add move operations and explicitly-passed event records
     if category_move_records:
-        changed_events.update(Event.find(Event.category_chain_overlaps(category_move_records)))
+        changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_move_records)))
 
     yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
@@ -119,14 +119,14 @@ def _process_cascaded_event_contents(records, additional_events=None):
     event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
 
     if event_records:
-        changed_events.update(Event.find(Event.id.in_(event_records)))
+        changed_events.update(Event.query.filter(Event.id.in_(event_records)))
 
     yield from changed_events
 
     # Sessions are added (explicitly changed only, since they don't need to be sent anywhere)
     if session_records:
-        changed_contributions.update(Contribution
-                                     .find(Contribution.session_id.in_(session_records), ~Contribution.is_deleted))
+        changed_contributions.update(Contribution.query
+                                     .filter(Contribution.session_id.in_(session_records), ~Contribution.is_deleted))
 
     # Contributions are added (implictly + explicitly changed)
     changed_event_ids = {ev.id for ev in changed_events}
@@ -134,7 +134,7 @@ def _process_cascaded_event_contents(records, additional_events=None):
     condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
     if contribution_records:
         condition = db.or_(condition, Contribution.id.in_(contribution_records))
-    contrib_query = Contribution.find(condition).options(joinedload('subcontributions'))
+    contrib_query = Contribution.query.filter(condition).options(joinedload('subcontributions'))
 
     for contribution in contrib_query:
         yield contribution
@@ -142,5 +142,5 @@ def _process_cascaded_event_contents(records, additional_events=None):
 
     # Same for subcontributions
     if subcontribution_records:
-        changed_subcontributions.update(SubContribution.find(SubContribution.id.in_(subcontribution_records)))
+        changed_subcontributions.update(SubContribution.query.filter(SubContribution.id.in_(subcontribution_records)))
     yield from changed_subcontributions

@@ -42,7 +42,7 @@ class MARCXMLGenerator:
         self.xml_generator.initXml()
         self.xml_generator.openTag('collection', [['xmlns', 'http://www.loc.gov/MARC21/slim']])
         # This is horrible. but refactoring all the code in the indico core would be just as bad.
-        admin = User.find_first(is_admin=True)
+        admin = User.query.filter_by(is_admin=True).first()
         self.output_generator = outputGenerator(admin, self.xml_generator)
 
     def safe_add_object(self, obj, deleted=False):

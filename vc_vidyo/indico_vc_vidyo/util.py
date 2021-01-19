@@ -33,7 +33,7 @@ def iter_user_identities(user):
 def get_user_from_identifier(settings, identifier):
     """Get an actual User object from an identifier"""
     providers = list(auth.strip() for auth in settings.get('authenticators').split(','))
-    identities = Identity.find_all(Identity.provider.in_(providers), Identity.identifier == identifier)
+    identities = Identity.query.filter(Identity.provider.in_(providers), Identity.identifier == identifier).all()
     if identities:
         return sorted(identities, key=lambda x: providers.index(x.provider))[0].user
     for provider in providers:
@@ -48,7 +48,7 @@ def get_user_from_identifier(settings, identifier):
         emails = {email.lower() for email in identity_info.data.getlist('email') if email}
         if not emails:
             continue
-        user = User.find_first(~User.is_deleted, User.all_emails.in_(list(emails)))
+        user = User.query.filter(~User.is_deleted, User.all_emails.in_(list(emails))).first()
         if user:
             return user
 

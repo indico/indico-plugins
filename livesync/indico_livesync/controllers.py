@@ -20,7 +20,7 @@ from indico_livesync.models.agents import LiveSyncAgent
 
 
 def extend_plugin_details():
-    agents = LiveSyncAgent.find().order_by(LiveSyncAgent.name, LiveSyncAgent.id).all()
+    agents = LiveSyncAgent.query.order_by(LiveSyncAgent.name, LiveSyncAgent.id).all()
     return render_plugin_template('plugin_details_extra.html', agents=agents, backends=current_plugin.backend_classes)
 
 

@@ -101,7 +101,7 @@ class PiwikPlugin(IndicoPlugin):
             params['event_id'] = request.view_args['confId']
             contrib_id = request.view_args.get('contrib_id')
             if contrib_id is not None and str(contrib_id).isdigit():
-                contribution = Contribution.find_first(event_id=params['event_id'], id=contrib_id)
+                contribution = Contribution.query.filter_by(event_id=params['event_id'], id=contrib_id).first()
                 if contribution:
                     cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                            else contribution.id)

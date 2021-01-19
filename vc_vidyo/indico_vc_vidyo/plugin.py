@@ -322,7 +322,7 @@ class VidyoPlugin(VCPluginMixin, IndicoPlugin):
 
     def _merge_users(self, target, source, **kwargs):
         super()._merge_users(target, source, **kwargs)
-        for ext in VidyoExtension.find(owned_by_user=source):
+        for ext in VidyoExtension.query.filter_by(owned_by_user=source):
             ext.owned_by_user = target
             flag_modified(ext.vc_room, 'data')
 

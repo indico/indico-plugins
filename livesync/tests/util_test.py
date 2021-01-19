@@ -24,13 +24,13 @@ def test_clean_old_entries(dummy_event, db, dummy_agent):
     db.session.flush()
     # Nothing deleted with the setting's default value
     clean_old_entries()
-    assert LiveSyncQueueEntry.find().count() == 20
+    assert LiveSyncQueueEntry.query.count() == 20
     # Nothing deleted when explicitly set to 0 (which is the default)
     LiveSyncPlugin.settings.set('queue_entry_ttl', 0)
     clean_old_entries()
-    assert LiveSyncQueueEntry.find().count() == 20
+    assert LiveSyncQueueEntry.query.count() == 20
     # Only the correct entries deleted, and no unprocessed ones
     LiveSyncPlugin.settings.set('queue_entry_ttl', 3)
     clean_old_entries()
-    assert LiveSyncQueueEntry.find(processed=False).count() == 10
-    assert LiveSyncQueueEntry.find(processed=True).count() == 3
+    assert LiveSyncQueueEntry.query.filter_by(processed=False).count() == 10
+    assert LiveSyncQueueEntry.query.filter_by(processed=True).count() == 3

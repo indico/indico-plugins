@@ -34,7 +34,7 @@ def find_old_vidyo_rooms(max_room_event_age):
                      .group_by(VCRoom.id))
 
     # non-deleted rooms with no recent associations
-    return VCRoom.find_all(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used))
+    return VCRoom.query.filter(VCRoom.status != VCRoomStatus.deleted, ~VCRoom.id.in_(recently_used)).all()
 
 
 def notify_owner(plugin, vc_room):

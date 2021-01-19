@@ -37,7 +37,7 @@ class RHPaypalIPN(RH):
 
     def _process_args(self):
         self.token = request.args['token']
-        self.registration = Registration.find_first(uuid=self.token)
+        self.registration = Registration.query.filter_by(uuid=self.token).first()
         if not self.registration:
             raise BadRequest
 

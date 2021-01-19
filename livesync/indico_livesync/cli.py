@@ -34,7 +34,7 @@ def available_backends():
 def agents():
     """Lists the currently active agents"""
     print('The following LiveSync agents are active:')
-    agent_list = LiveSyncAgent.find().order_by(LiveSyncAgent.backend_name, db.func.lower(LiveSyncAgent.name)).all()
+    agent_list = LiveSyncAgent.query.order_by(LiveSyncAgent.backend_name, db.func.lower(LiveSyncAgent.name)).all()
     table_data = [['ID', 'Name', 'Backend', 'Initial Export', 'Queue']]
     for agent in agent_list:
         initial = (cformat('%{green!}done%{reset}') if agent.initial_data_exported else
@@ -60,7 +60,7 @@ def agents():
 @click.option('--force', is_flag=True, help="Perform export even if it has already been done once.")
 def initial_export(agent_id, force):
     """Performs the initial data export for an agent"""
-    agent = LiveSyncAgent.find_first(id=agent_id)
+    agent = LiveSyncAgent.get(agent_id)
     if agent is None:
         print('No such agent')
         return
@@ -73,7 +73,7 @@ def initial_export(agent_id, force):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    agent.create_backend().run_initial_export(Event.find(is_deleted=False))
+    agent.create_backend().run_initial_export(Event.query.filter_by(is_deleted=False))
     agent.initial_data_exported = True
     db.session.commit()
 
@@ -84,9 +84,9 @@ def initial_export(agent_id, force):
 def run(agent_id, force=False):
     """Runs the livesync agent"""
     if agent_id is None:
-        agent_list = LiveSyncAgent.find_all()
+        agent_list = LiveSyncAgent.query.all()
     else:
-        agent = LiveSyncAgent.find_first(id=agent_id)
+        agent = LiveSyncAgent.get(agent_id)
         if agent is None:
             print('No such agent')
             return
