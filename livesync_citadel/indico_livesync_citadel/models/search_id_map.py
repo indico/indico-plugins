@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.util.date_time import now_utc
 from indico.util.struct.enum import IndicoEnum

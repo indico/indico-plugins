@@ -5,8 +5,6 @@ Revises:
 Create Date: 2019-10-10 13:37:57.440636
 """
 
-from __future__ import unicode_literals
-
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
