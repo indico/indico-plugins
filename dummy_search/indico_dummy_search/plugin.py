@@ -21,7 +21,7 @@ class DummySearchPlugin(IndicoPlugin):
         self.connect(signals.get_search_providers, self.get_search_providers)
 
     def get_search_providers(self, sender, **kwargs):
-        yield TestSearch
+        return TestSearch
 
 
 class TestSearch(IndicoSearchProvider):
