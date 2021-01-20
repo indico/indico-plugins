@@ -29,6 +29,7 @@
 - Fix an error when changing the linked object of a recurring Zoom room in Indico
 - Include Zoom join links in the event's ical export (note: only Zoom meetings with a public passcode are displayed unless you have at least Indico v2.3.3)
 - Skip deleted Zoom meetings when cloning events
+- Mark Zoom meetings as deleted when receiving the corresponding webhook event
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 

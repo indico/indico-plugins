@@ -17,7 +17,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.modules.vc.controllers import RHVCSystemEventBase
 from indico.modules.vc.exceptions import VCRoomError
-from indico.modules.vc.models.vc_rooms import VCRoom
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.util.i18n import _
 from indico.web.rh import RH
 
@@ -51,8 +51,8 @@ class RHWebhook(RH):
             raise Forbidden
 
     @use_kwargs({
-        'event': fields.String(),
-        'payload': fields.Dict()
+        'event': fields.String(required=True),
+        'payload': fields.Dict(required=True)
     })
     def _process(self, event, payload):
         meeting_id = payload['object']['id']
@@ -63,7 +63,10 @@ class RHWebhook(RH):
             current_plugin.logger.debug('Action for unhandled Zoom room: %s', meeting_id)
             return
 
-        if event in {'meeting.updated', 'webinar.updated', 'meeting.deleted', 'webinar.deleted'}:
+        if event in ('meeting.updated', 'webinar.updated'):
             current_plugin.refresh_room(vc_room, None)
+        elif event in ('meeting.deleted', 'webinar.deleted'):
+            current_plugin.logger.info('Zoom room deleted: %s', meeting_id)
+            vc_room.status = VCRoomStatus.deleted
         else:
             current_plugin.logger.warning('Unhandled Zoom webhook payload: %s', event)
