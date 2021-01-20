@@ -26,21 +26,6 @@ extras_require = {}
 
 
 setup(
-    name='indico-plugins',
-    version='3.0-dev',
-    description='A meta-package containing the official Indico plugins',
-    url='https://github.com/indico/indico-plugins',
-    license='MIT',
-    author='Indico Team',
-    author_email='indico-team@cern.ch',
-    zip_safe=False,
     install_requires=['indico>=3.0.dev0', *plugins_require],
-    python_requires='~=3.9',
     extras_require=extras_require,
-    classifiers=[
-        'Environment :: Plugins',
-        'Environment :: Web Environment',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.9',
-    ]
 )

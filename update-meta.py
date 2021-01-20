@@ -10,32 +10,31 @@ import os
 import re
 import sys
 from collections import defaultdict
+from pathlib import Path
 
 import click
 import yaml
 from packaging.version import Version
+from setuptools.config import read_configuration
 
 
-click.disable_unicode_literals_warning = True
 START_MARKER = '# BEGIN GENERATED REQUIREMENTS'
 END_MARKER = '# END GENERATED REQUIREMENTS'
 
 
 def _find_plugins():
-    subdirs = sorted(x for x in next(os.walk('.'))[1]
-                     if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.py')))
+    subdirs = sorted(Path(x) for x in next(os.walk('.'))[1]
+                     if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.cfg')))
     for subdir in subdirs:
-        path = os.path.join(subdir, 'setup.py')
-        with open(path) as f:
-            setup_py = f.read()
-        # try:
-        name = re.search(r'''name=(['"])(.+)\1''', setup_py)
-        version = re.search(r'''version=(['"])(.+)\1''', setup_py)
+        path = subdir / 'setup.cfg'
+        metadata = read_configuration(path)['metadata']
+        name = metadata['name']
+        version = metadata['version']
         if name is None or version is None:
             click.secho(f'Could not extract name/version from {path}', fg='red', bold=True)
             continue
-        minver = str(Version(version.group(2)))
-        yield name.group(2), minver
+        minver = str(Version(version))
+        yield name, minver
 
 
 def _get_config():
@@ -52,15 +51,13 @@ def _get_config():
 
 
 def _update_meta(data):
-    path = '_meta/setup.py'
-    with open(path) as f:
-        content = f.read()
+    path = Path('_meta/setup.py')
+    content = path.read_text()
     new_content = re.sub(r'(?<={}\n).*(?=\n{})'.format(re.escape(START_MARKER), re.escape(END_MARKER)), data, content,
                          flags=re.DOTALL)
     if content == new_content:
         return False
-    with open(path, 'w') as f:
-        f.write(new_content)
+    path.write_text(new_content)
     return True
 
 
