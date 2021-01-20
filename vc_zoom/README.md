@@ -28,6 +28,7 @@
 - Remove the "Assistant Zoom ID" logic due to problems with Zoom's API rate limits (all meetings created were counted against the assistant's rate limit instead of the host's); this means the host can no longer be changed, but Indico instead provides an option to event managers to make themselves a co-host.
 - Fix an error when changing the linked object of a recurring Zoom room in Indico
 - Include Zoom join links in the event's ical export (note: only Zoom meetings with a public passcode are displayed unless you have at least Indico v2.3.3)
+- Skip deleted Zoom meetings when cloning events
 
 **Breaking change:** The email domains are now stored as a list of strings instead of a comma-separated list. You need to update them in the plugin settings.
 

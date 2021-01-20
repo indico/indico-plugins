@@ -21,8 +21,8 @@ from indico.core.auth import multipass
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
-from indico.modules.vc.exceptions import VCRoomError
-from indico.modules.vc.models.vc_rooms import VCRoom
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
@@ -424,20 +424,31 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room = old_event_vc_room.vc_room
         is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
         has_only_one_association = len({assoc.event_id for assoc in vc_room.events}) == 1
-        new_assoc = super(ZoomPlugin, self).clone_room(old_event_vc_room, link_object)
 
         if has_only_one_association:
-            update_zoom_meeting(vc_room.data['zoom_id'], {
-                'start_time': None,
-                'duration': None,
-                'type': (
-                    ZoomMeetingType.recurring_webinar_no_time
-                    if is_webinar
-                    else ZoomMeetingType.recurring_meeting_no_time
-                )
-            })
-
-        return new_assoc
+            try:
+                update_zoom_meeting(vc_room.data['zoom_id'], {
+                    'start_time': None,
+                    'duration': None,
+                    'type': (
+                        ZoomMeetingType.recurring_webinar_no_time
+                        if is_webinar
+                        else ZoomMeetingType.recurring_meeting_no_time
+                    )
+                })
+            except VCRoomNotFoundError:
+                # this check is needed in order to avoid multiple flashes
+                if vc_room.status != VCRoomStatus.deleted:
+                    # mark room as deleted
+                    vc_room.status = VCRoomStatus.deleted
+                    flash(
+                        _('The room "{}" no longer exists in Zoom and was removed from the event').format(vc_room.name),
+                        'warning'
+                    )
+                # no need to create an association to a room marked as deleted
+                return None
+        # return the new association
+        return super(ZoomPlugin, self).clone_room(old_event_vc_room, link_object)
 
     def get_blueprints(self):
         return blueprint
