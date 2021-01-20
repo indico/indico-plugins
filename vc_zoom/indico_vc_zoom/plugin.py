@@ -18,6 +18,7 @@ from wtforms.validators import DataRequired, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -207,38 +208,41 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super(ZoomPlugin, self).update_data_association(event, vc_room, room_assoc, data)
 
         if vc_room.data:
-            # this is not a new room
-            if association_is_new:
-                # this means we are updating an existing meeting with a new vc_room-event association
-                update_zoom_meeting(vc_room.data['zoom_id'], {
-                    'start_time': None,
-                    'duration': None,
-                    'type': (
-                        ZoomMeetingType.recurring_webinar_no_time
-                        if is_webinar
-                        else ZoomMeetingType.recurring_meeting_no_time
-                    )
-                })
-            elif room_assoc.link_object != old_link:
-                # the booking should now be linked to something else
-                new_schedule_args = get_schedule_args(room_assoc.link_object) if room_assoc.link_object.start_dt else {}
-                meeting = fetch_zoom_meeting(vc_room)
-                current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
+            try:
+                # this is not a new room
+                if association_is_new:
+                    # this means we are updating an existing meeting with a new vc_room-event association
+                    update_zoom_meeting(vc_room.data['zoom_id'], {
+                        'start_time': None,
+                        'duration': None,
+                        'type': (
+                            ZoomMeetingType.recurring_webinar_no_time
+                            if is_webinar
+                            else ZoomMeetingType.recurring_meeting_no_time
+                        )
+                    })
+                elif room_assoc.link_object != old_link:
+                    # the booking should now be linked to something else
+                    new_schedule_args = get_schedule_args(room_assoc.link_object) if room_assoc.link_object.start_dt else {}
+                    meeting = fetch_zoom_meeting(vc_room)
+                    current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
 
-                # check whether the start time / duration of the scheduled meeting differs
-                if new_schedule_args != current_schedule_args:
-                    if new_schedule_args:
-                        update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
-                    else:
-                        update_zoom_meeting(vc_room.data['zoom_id'], {
-                            'start_time': None,
-                            'duration': None,
-                            'type': (
-                                ZoomMeetingType.recurring_webinar_no_time
-                                if is_webinar
-                                else ZoomMeetingType.recurring_meeting_no_time
-                            )
-                        })
+                    # check whether the start time / duration of the scheduled meeting differs
+                    if new_schedule_args != current_schedule_args:
+                        if new_schedule_args:
+                            update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                        else:
+                            update_zoom_meeting(vc_room.data['zoom_id'], {
+                                'start_time': None,
+                                'duration': None,
+                                'type': (
+                                    ZoomMeetingType.recurring_webinar_no_time
+                                    if is_webinar
+                                    else ZoomMeetingType.recurring_meeting_no_time
+                                )
+                            })
+            except VCRoomNotFoundError as exc:
+                raise UserValueError(unicode(exc))
 
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
