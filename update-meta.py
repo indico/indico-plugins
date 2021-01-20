@@ -51,7 +51,7 @@ def _get_config():
 
 
 def _update_meta(data):
-    path = Path('_meta/setup.py')
+    path = Path('_meta/setup.cfg')
     content = path.read_text()
     new_content = re.sub(r'(?<={}\n).*(?=\n{})'.format(re.escape(START_MARKER), re.escape(END_MARKER)), data, content,
                          flags=re.DOTALL)
@@ -85,20 +85,16 @@ def cli(nextver):
             plugins_require.append(pkgspec)
 
     output = []
-    if not plugins_require:
-        output.append('plugins_require = []')
-    else:
-        output.append('plugins_require = [')
-        for entry in plugins_require:
-            output.append('    {!r},'.format(str(entry)))
-        output.append(']')
-    if not extras_require:
-        output.append('extras_require = {}')
-    else:
-        output.append('extras_require = {')
+    for entry in plugins_require:
+        output.append(f'    {entry}')
+    if extras_require:
+        if output:
+            output.append('')
+        output.append('[options.extras_require]')
         for extra, pkgspecs in sorted(extras_require.items()):
-            output.append('    {!r}: {!r},'.format(extra, list(map(str, sorted(pkgspecs)))))
-        output.append('}')
+            output.append(f'{extra} =')
+            for pkg in sorted(pkgspecs):
+                output.append(f'    {pkg}')
 
     if _update_meta('\n'.join(output)):
         click.secho('Updated meta package', fg='green')
