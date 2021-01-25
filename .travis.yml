@@ -7,9 +7,8 @@ env:
   - PLUGIN=livesync
   - PLUGIN=payment_paypal
 before_install:
-  - pip install -U pip setuptools
-  - pip install wheel
-  - pip install -e git+https://github.com/indico/indico.git@${TRAVIS_BRANCH}#egg=indico
+  - pip install -U pip setuptools wheel
+  - pip install -e git+https://github.com/indico/indico.git@${TRAVIS_BRANCH}#egg=indico[dev]
 install:
   - cd "${TRAVIS_BUILD_DIR}/${PLUGIN}"
   - pip install -e .
