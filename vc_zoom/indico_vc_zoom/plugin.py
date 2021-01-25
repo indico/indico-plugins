@@ -529,6 +529,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _event_metadata_postprocess(self, sender, event, data, user=None, **kwargs):
         urls = []
+        if 'description' in kwargs.get('html_fields', ()):
+            linebreak = '<br>\n'
+            format_link = lambda name, url: '<a href="{url}">{name}: {url}</a>'.format(name=escape(name), url=url)
+        else:
+            linebreak = '\n'
+            format_link = lambda name, url: '{name}: {url}'.format(name=name, url=url)
+
         for assoc in event.vc_room_associations:
             if not assoc.show or assoc.vc_room.type != 'zoom':
                 continue
@@ -539,11 +546,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
                 event.can_manage(user)
             ):
-                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['url']))
+                urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['url']))
             elif visibility == 'no_one':
                 # XXX: Not sure if showing this is useful, but on the event page we show the join link
                 # with no passcode as well, so let's the logic identical here.
-                urls.append('{}: {}'.format(assoc.vc_room.name, assoc.vc_room.data['public_url']))
+                urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['public_url']))
 
         if urls:
-            return {'description': (data['description'] + '\n\n' + '\n'.join(urls)).strip()}
+            return {'description': (data['description'] + (linebreak * 2) + linebreak.join(urls)).strip()}
