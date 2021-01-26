@@ -9,7 +9,7 @@ const resolve = require('resolve');
 const yaml = require('js-yaml');
 
 // Returns the path to the Indico source package/repo
-const PATH_COMMAND = `python -c 'from flask.helpers import get_root_path; print get_root_path("indico")'`;
+const PATH_COMMAND = `python -c 'from flask.helpers import get_root_path; print(get_root_path("indico"))'`;
 
 let indicoBaseDir = null;
 const indicoPathFile = path.join(__dirname, '.indico_source');
