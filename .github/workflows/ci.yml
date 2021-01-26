@@ -5,12 +5,10 @@ on:
     branches:
       - master
       - 2.3-maintenance
-      - ci
   pull_request:
     branches:
       - master
       - 2.3-maintenance
-      - ci
 
 jobs:
   setup:
