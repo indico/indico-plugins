@@ -164,7 +164,7 @@ jobs:
           flake8 --format '%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
           echo '::remove-matcher owner=flake8::'
 
-  test-plugins:
+  test-plugin:
     needs: setup
     runs-on: ubuntu-20.04
 
