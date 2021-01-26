@@ -1,0 +1,14 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "headers",
+      "pattern": [
+        {
+          "regexp": "^((?:Missing|Incorrect) header) in (.+)$",
+          "message": 1,
+          "file": 2
+        }
+      ]
+    }
+  ]
+}
