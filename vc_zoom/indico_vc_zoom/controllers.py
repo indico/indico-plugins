@@ -13,8 +13,9 @@ from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.vc.controllers import RHVCSystemEventBase
-from indico.modules.vc.exceptions import VCRoomError
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.util.i18n import _
 from indico.web.rh import RH
@@ -31,6 +32,9 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
         flag_modified(self.vc_room, 'data')
         try:
             self.plugin.update_room(self.vc_room, self.event)
+        except VCRoomNotFoundError as exc:
+            db.session.rollback()
+            raise UserValueError(str(exc)) from exc
         except VCRoomError:
             db.session.rollback()
             raise

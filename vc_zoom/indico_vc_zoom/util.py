@@ -148,7 +148,7 @@ def update_zoom_meeting(zoom_id, changes, is_webinar=False):
 
         if e.response.json()['code'] == 3001:
             # "Meeting does not exist"
-            raise VCRoomNotFoundError(_("Room no longer exists in Zoom"))
+            raise VCRoomNotFoundError(_('Room no longer exists in Zoom'))
 
         raise VCRoomError(_("Can't update meeting. Please contact support if the error persists."))
 
