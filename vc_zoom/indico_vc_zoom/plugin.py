@@ -43,13 +43,13 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
-        ('API Credentials', ['api_key', 'api_secret', 'webhook_token']),
-        ('Zoom Account', ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                          'allow_webinars']),
-        ('Room Settings', ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
-                           'waiting_room']),
-        ('Notifications', ['creation_email_footer', 'send_host_url', 'notification_emails']),
-        ('Access', ['managers', 'acl'])
+        (_('API Credentials'), ['api_key', 'api_secret', 'webhook_token']),
+        (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
+                             'allow_webinars']),
+        (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
+                              'waiting_room']),
+        (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
+        (_('Access'), ['managers', 'acl'])
     ]
 
     api_key = StringField(_('API Key'), [DataRequired()])
