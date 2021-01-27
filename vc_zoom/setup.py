@@ -15,9 +15,9 @@ from setuptools import setup
 # is in setup.cfg now
 setup(
     name='indico-plugin-vc-zoom',
-    version='2.3b1',
+    version='2.3b2',
     install_requires=[
-        'indico>=2.3.2.dev0',
+        'indico>=2.3.3',
         'PyJWT>=1.7.1,<2'
     ],
 )
