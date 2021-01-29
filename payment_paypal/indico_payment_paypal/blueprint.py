@@ -10,8 +10,10 @@ from indico.core.plugins import IndicoPluginBlueprint
 from indico_payment_paypal.controllers import RHPaypalCancel, RHPaypalIPN, RHPaypalSuccess
 
 
-blueprint = IndicoPluginBlueprint('payment_paypal', __name__,
-                                  url_prefix='/event/<confId>/registrations/<int:reg_form_id>/payment/response/paypal')
+blueprint = IndicoPluginBlueprint(
+    'payment_paypal', __name__,
+    url_prefix='/event/<int:event_id>/registrations/<int:reg_form_id>/payment/response/paypal'
+)
 
 blueprint.add_url_rule('/cancel', 'cancel', RHPaypalCancel, methods=('GET', 'POST'))
 blueprint.add_url_rule('/success', 'success', RHPaypalSuccess, methods=('GET', 'POST'))

@@ -13,5 +13,5 @@ from indico_ursh.controllers import RHCustomShortURLPage, RHGetShortURL, RHShort
 blueprint = IndicoPluginBlueprint('ursh', 'indico_ursh')
 blueprint.add_url_rule('/ursh', 'get_short_url', RHGetShortURL, methods=('POST',))
 blueprint.add_url_rule('/url-shortener', 'shorten_url', RHShortURLPage)
-blueprint.add_url_rule('/event/<confId>/manage/short-url', 'shorten_event_url', RHCustomShortURLPage,
+blueprint.add_url_rule('/event/<int:event_id>/manage/short-url', 'shorten_event_url', RHCustomShortURLPage,
                        methods=('GET', 'POST'))

@@ -16,7 +16,7 @@ blueprint = IndicoPluginBlueprint('vc_zoom', 'indico_vc_zoom')
 # using any(zoom) instead of defaults since the event vc room locator
 # includes the service and normalization skips values provided in 'defaults'
 blueprint.add_url_rule(
-    '/event/<confId>/manage/videoconference/<any(zoom):service>/<int:event_vc_room_id>/make-me-alt-host',
+    '/event/<int:event_id>/manage/videoconference/<any(zoom):service>/<int:event_vc_room_id>/make-me-alt-host',
     'make_me_alt_host',
     RHRoomAlternativeHost,
     methods=('POST',)

@@ -15,5 +15,9 @@ blueprint = IndicoPluginBlueprint('vc_vidyo', 'indico_vc_vidyo')
 # Room management
 # using any(vidyo) instead of defaults since the event vc room locator
 # includes the service and normalization skips values provided in 'defaults'
-blueprint.add_url_rule('/event/<confId>/manage/videoconference/<any(vidyo):service>/<int:event_vc_room_id>/room-owner',
-                       'set_room_owner', RHVidyoRoomOwner, methods=('POST',))
+blueprint.add_url_rule(
+    '/event/<int:event_id>/manage/videoconference/<any(vidyo):service>/<int:event_vc_room_id>/room-owner',
+    'set_room_owner',
+    RHVidyoRoomOwner,
+    methods=('POST',)
+)

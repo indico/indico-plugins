@@ -95,10 +95,8 @@ class PiwikPlugin(IndicoPlugin):
         if not self.settings.get('enabled_for_events') or not site_id_events:
             return {}
         params = {'site_id_events': site_id_events}
-        if request.blueprint in ('event', 'events', 'contributions') and 'confId' in request.view_args:
-            if not str(request.view_args['confId']).isdigit():
-                return {}
-            params['event_id'] = request.view_args['confId']
+        if request.blueprint in ('event', 'events', 'contributions') and 'event_id' in request.view_args:
+            params['event_id'] = request.view_args['event_id']
             contrib_id = request.view_args.get('contrib_id')
             if contrib_id is not None and str(contrib_id).isdigit():
                 contribution = Contribution.query.filter_by(event_id=params['event_id'], id=contrib_id).first()
@@ -115,7 +113,7 @@ class PiwikPlugin(IndicoPlugin):
         return url.netloc + url.path
 
 
-blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<confId>/manage/statistics')
+blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<int:event_id>/manage/statistics')
 blueprint.add_url_rule('/', 'view', RHStatistics)
 blueprint.add_url_rule('/material', 'material', RHApiMaterial, methods=('GET', 'POST'))
 blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads, methods=('GET', 'POST'))

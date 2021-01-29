@@ -100,7 +100,7 @@ $(function() {
    */
   const get_api_params = function() {
     const params = {
-      confId: $('#confId').val(),
+      event_id: $('#eventId').val(),
       start_date: $('#statsFilterStartDate').val(),
       end_date: $('#statsFilterEndDate').val(),
     };

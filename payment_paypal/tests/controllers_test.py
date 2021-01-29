@@ -94,7 +94,7 @@ def test_ipn_process(mocker, fail):
     rh.registration.getTotal.return_value = 10.00
     payment_status = {'fail': 'Failed', 'refund': 'Refunded', 'status': 'Foobar'}.get(fail, 'Completed')
     amount = '-10.00' if fail == 'negative' else '10.00'
-    request.view_args = {'confId': rh.event.id}
+    request.view_args = {'event_id': rh.event.id}
     request.args = {'registrantId': '1'}
     request.form = {'payment_status': payment_status, 'txn_id': '12345', 'mc_gross': amount,
                     'mc_currency': 'EUR', 'business': 'foo@bar.com'}
