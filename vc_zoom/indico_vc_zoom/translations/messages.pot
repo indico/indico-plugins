@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-01-27 11:48+0100\n"
+"POT-Creation-Date: 2021-01-31 12:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -260,35 +260,35 @@ msgid ""
 "persists"
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:422
-msgid "Room didn't existing in Zoom anymore"
+#: indico_vc_zoom/plugin.py:423
+msgid "Room didn't exist in Zoom anymore"
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:425
+#: indico_vc_zoom/plugin.py:426
 msgid "Zoom Error: \"{}\""
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:428
+#: indico_vc_zoom/plugin.py:429
 msgid "Problem deleting room"
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:452
+#: indico_vc_zoom/plugin.py:453
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:520
+#: indico_vc_zoom/plugin.py:521
 msgid ""
 "There are one or more scheduled Zoom meetings associated with this event "
 "which were not automatically updated."
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:523
+#: indico_vc_zoom/plugin.py:524
 msgid ""
 "There are one or more scheduled Zoom meetings associated with the "
 "contribution \"{}\" which  were not automatically updated."
 msgstr ""
 
-#: indico_vc_zoom/plugin.py:526
+#: indico_vc_zoom/plugin.py:527
 msgid ""
 "There are one or more scheduled Zoom meetings associated with this "
 "session block which were not automatically updated."

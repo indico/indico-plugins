@@ -284,7 +284,7 @@ msgstr ""
 "підтримки якщо ця помилка залишатиметься."
 
 #: indico_vc_zoom/plugin.py:422
-msgid "Room didn't existing in Zoom anymore"
+msgid "Room didn't exist in Zoom anymore"
 msgstr "Кімнати більше не існує"
 
 #: indico_vc_zoom/plugin.py:425

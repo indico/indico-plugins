@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 2.3b3
+
+- Fix deleting Zoom meetings that were already deleted on the Zoom side when running outside a web request context (e.g. during scheduled deletion of events)
+
 ### 2.3b2
 
 - Improve logging when a Zoom API request fails

@@ -266,7 +266,7 @@ msgid ""
 msgstr "无法在 Zoom 中创建会议室。如果错误持续请联系技术支持"
 
 #: indico_vc_zoom/plugin.py:422
-msgid "Room didn't existing in Zoom anymore"
+msgid "Room didn't exist in Zoom anymore"
 msgstr "会议室在 Zoom 中不再存在"
 
 #: indico_vc_zoom/plugin.py:425
