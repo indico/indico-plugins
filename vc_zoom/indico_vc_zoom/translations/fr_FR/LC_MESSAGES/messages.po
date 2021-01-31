@@ -289,7 +289,7 @@ msgstr ""
 "l'erreur persiste"
 
 #: indico_vc_zoom/plugin.py:422
-msgid "Room didn't existing in Zoom anymore"
+msgid "Room didn't exist in Zoom anymore"
 msgstr "La réunion n'existait plus dans Zoom"
 
 #: indico_vc_zoom/plugin.py:425

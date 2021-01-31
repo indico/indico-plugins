@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import flash, session
+from flask import flash, has_request_context, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -417,7 +417,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         except HTTPError as e:
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
             if e.response.status_code == 404:
-                flash(_("Room didn't existing in Zoom anymore"), 'warning')
+                if has_request_context():
+                    flash(_("Room didn't exist in Zoom anymore"), 'warning')
             elif e.response.status_code == 400:
                 # some sort of operational error on Zoom's side, deserves a specific error message
                 raise VCRoomError(_('Zoom Error: "{}"').format(e.response.json()['message']))
