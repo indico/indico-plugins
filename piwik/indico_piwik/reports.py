@@ -10,7 +10,7 @@ from datetime import timedelta
 
 from sqlalchemy.orm import joinedload
 
-from indico.legacy.common.cache import GenericCache
+from indico.core.cache import make_scoped_cache
 from indico.modules.attachments.util import get_nested_attached_items
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
@@ -54,13 +54,13 @@ class ReportBase(Serializer):
         if not PiwikPlugin.settings.get('cache_enabled'):
             return cls(*args, **kwargs).to_serializable()
 
-        cache = GenericCache('Piwik.Report')
+        cache = make_scoped_cache('piwik-report')
         key = f'{cls.__name__}-{args}-{kwargs}'
 
         report = cache.get(key)
         if not report:
             report = cls(*args, **kwargs)
-            cache.set(key, report, PiwikPlugin.settings.get('cache_ttl'))
+            cache.set(key, report, timeout=PiwikPlugin.settings.get('cache_ttl'))
         return report.to_serializable()
 
     def _build_report(self):
