@@ -49,8 +49,6 @@ from indico.util.string import crc32
 from indico_storage_s3.storage import S3StorageBase
 
 
-click.disable_unicode_literals_warning = True
-
 SPECIAL_FILTERS = {
     StaticSite: {'state': StaticSiteState.success}
 }
