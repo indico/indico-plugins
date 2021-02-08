@@ -16,7 +16,7 @@ from indico.modules.events import Event
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 from indico.modules.vc.notifications import _send
 from indico.util.date_time import now_utc
-from indico.util.struct.iterables import committing_iterator
+from indico.util.iterables import committing_iterator
 
 from indico_vc_vidyo.api import APIException, RoomNotFoundAPIException
 

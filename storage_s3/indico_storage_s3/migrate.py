@@ -43,8 +43,8 @@ from indico.modules.files.models.files import File
 from indico.util.console import cformat
 from indico.util.date_time import format_human_timedelta
 from indico.util.fs import secure_filename
+from indico.util.iterables import committing_iterator
 from indico.util.string import crc32
-from indico.util.struct.iterables import committing_iterator
 
 from indico_storage_s3.storage import S3StorageBase
 

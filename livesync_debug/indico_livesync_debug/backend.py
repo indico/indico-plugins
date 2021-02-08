@@ -6,7 +6,7 @@
 # see the LICENSE file for more details.
 
 from indico.util.console import cformat
-from indico.util.struct.iterables import grouper
+from indico.util.iterables import grouper
 
 from indico_livesync import LiveSyncBackendBase, MARCXMLGenerator, SimpleChange, Uploader, process_records
 

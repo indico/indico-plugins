@@ -12,8 +12,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import obj_deref

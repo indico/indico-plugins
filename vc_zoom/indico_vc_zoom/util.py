@@ -20,7 +20,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.struct.enum import IndicoEnum, RichEnum
+from indico.util.enum import IndicoEnum, RichEnum
 from indico.util.user import principal_from_identifier
 
 from indico_vc_zoom import _

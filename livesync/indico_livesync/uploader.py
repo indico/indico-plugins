@@ -6,7 +6,7 @@
 # see the LICENSE file for more details.
 
 from indico.core.db import db
-from indico.util.struct.iterables import grouper
+from indico.util.iterables import grouper
 
 from indico_livesync.marcxml import MARCXMLGenerator
 from indico_livesync.simplify import process_records
