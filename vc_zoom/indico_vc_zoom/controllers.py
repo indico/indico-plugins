@@ -30,9 +30,10 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
             flash(_('You were already an (alternative) host of this meeting'), 'warning')
             return jsonify(success=False)
 
-        self.vc_room.data['alternative_hosts'].append(new_identifier)
-        flag_modified(self.vc_room, 'data')
         try:
+            self.plugin.refresh_room(self.vc_room, self.event)
+            self.vc_room.data['alternative_hosts'].append(new_identifier)
+            flag_modified(self.vc_room, 'data')
             self.plugin.update_room(self.vc_room, self.event)
         except VCRoomNotFoundError as exc:
             db.session.rollback()
