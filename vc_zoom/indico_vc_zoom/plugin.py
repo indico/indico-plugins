@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, has_request_context, session
+from flask import flash, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -168,6 +168,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Override the default room form creation mechanism."""
+
+        if existing_vc_room and request.method != 'POST':
+            try:
+                self.refresh_room(existing_vc_room, event)
+            except VCRoomNotFoundError as exc:
+                raise UserValueError(unicode(exc))
+            except VCRoomError:
+                # maybe a temporary issue - we just keep going and fail when saving in
+                # case it's something more persistent
+                pass
+
         form = super(ZoomPlugin, self).create_form(
             event,
             existing_vc_room=existing_vc_room,
