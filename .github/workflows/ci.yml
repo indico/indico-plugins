@@ -226,6 +226,9 @@ jobs:
           cd "${GITHUB_WORKSPACE}/${{ matrix.plugin }}"
           pip install -e .
 
+      - name: Install redis
+        run: sudo apt-get install redis-server
+
       - name: Setup database
         run: |
           export PGHOST=localhost
