@@ -17,6 +17,7 @@
 - Fix overwriting co-hosts added via the Zoom client when using "make me co-host" in Indico
 - Always refresh data from Zoom before editing via Indico to avoid saving with stale data
 - Add option to link to an external page with phone-in instructions
+- Fix showing the zoom join link in the info box
 
 ### 2.3b2
 

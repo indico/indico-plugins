@@ -2,6 +2,12 @@
 {% set host = vc_room.data.host %}
 {% set alt_hosts = vc_room.data.alternative_hosts %}
 {% set phone_link = settings.get('phone_link') %}
+{% set passcode_visible = (
+    event_vc_room.data.password_visibility == 'everyone' or
+    event_vc_room.event.can_manage(session.user) or
+    (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+    (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user))
+) %}
 <dl>
     <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
     <dd>{{ vc_room.data.zoom_id }}</dd>
@@ -25,18 +31,9 @@
             {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
         </dd>
     {% endif %}
-    {% if event_vc_room.data.password_visibility == 'everyone' or
-        event_vc_room.event.can_manage(session.user) or
-        (session.user and event_vc_room.data.password_visibility == 'logged_in') or
-        (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user)) %}
+    {% if passcode_visible %}
         <dt>{% trans %}Passcode{% endtrans %}</dt>
         <dd>{{ vc_room.data.password }}</dd>
-    {% endif %}
-    {% if event_vc_room.data.show_autojoin %}
-        <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
-        <dd class="large-row">
-            {{ clipboard_input(vc_room.data.url, name="vc-room-url-%s"|format(event_vc_room.id)) }}
-        </dd>
     {% endif %}
     {% if phone_link %}
         <dt>
@@ -48,4 +45,9 @@
             </a>
         </dd>
     {% endif %}
+    <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
+    <dd class="large-row">
+        {{ clipboard_input(vc_room.data.url if passcode_visible else vc_room.data.public_url,
+                           name="vc-room-url-%s"|format(event_vc_room.id)) }}
+    </dd>
 </dl>
