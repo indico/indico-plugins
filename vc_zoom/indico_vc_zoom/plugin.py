@@ -11,8 +11,9 @@ from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import TextAreaField
 from wtforms.fields.core import BooleanField
+from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, Optional, URL, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -43,7 +44,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['api_key', 'api_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                             'allow_webinars']),
+                             'allow_webinars', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                               'waiting_room']),
         (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
@@ -112,6 +113,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                  description=_('Whether to send an e-mail with the Host URL to the meeting host upon '
                                                'creation of a meeting'))
 
+    phone_link = URLField(_('Join via phone'), [Optional(), URL()],
+                          description=_('Link to the list of VidyoVoice phone numbers'))
+
     def validate_authenticators(self, field):
         invalid = set(field.data) - set(multipass.identity_providers)
         if invalid:
@@ -143,7 +147,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'join_before_host': True,
         'waiting_room': False,
         'creation_email_footer': None,
-        'send_host_url': False
+        'send_host_url': False,
+        'phone_link': '',
     })
 
     def init(self):
