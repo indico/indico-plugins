@@ -13,7 +13,7 @@ from wtforms.fields import TextAreaField
 from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, Optional, URL, ValidationError
+from wtforms.validators import URL, DataRequired, Optional, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
