@@ -7,7 +7,7 @@
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.util.date_time import now_utc
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
 
 
 class EntryType(int, IndicoEnum):
@@ -28,7 +28,7 @@ _column_for_types = {
 
 
 def _make_checks():
-    available_columns = set(_column_for_types.viewvalues())
+    available_columns = set(_column_for_types.values())
     for link_type in EntryType:
         required_col = _column_for_types[link_type]
         forbidden_cols = available_columns - {required_col}

@@ -9,6 +9,7 @@ from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import URL, DataRequired, Optional
 
+from indico.core import signals
 from indico.web.forms.base import IndicoForm
 
 from indico_livesync import LiveSyncPluginBase
@@ -18,7 +19,7 @@ from indico_livesync_citadel.blueprint import blueprint
 
 
 class LiveSyncCitadelSettingsForm(IndicoForm):
-    search_backend_url = URLField(_('Search backend URL'), [DataRequired(), URL()],
+    search_backend_url = URLField(_('Search backend URL'), [DataRequired(), URL(require_tld=False)],
                                   description=_('The URL of the search backend'))
     search_backend_token = StringField(_('Search backend token'), [DataRequired()],
                                        description=_('Authentication token for the search backend'))
@@ -41,5 +42,13 @@ class LiveSyncCitadelPlugin(LiveSyncPluginBase):
                         'tika_server': ''}
     backend_classes = {'livesync_citadel': LiveSyncCitadelBackend}
 
+    def init(self):
+        super().init()
+        self.connect(signals.get_search_providers, self.get_search_providers)
+
     def get_blueprints(self):
         return blueprint
+
+    def get_search_providers(self, sender, **kwargs):
+        from indico_livesync_citadel.search import CitadelProvider
+        return CitadelProvider

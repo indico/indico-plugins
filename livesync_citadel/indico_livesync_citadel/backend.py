@@ -5,10 +5,15 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import asyncio
+from concurrent.futures.thread import ThreadPoolExecutor
+
 import requests
+from flask import current_app
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 from werkzeug.urls import url_join
 
-from indico.core.db import db
 from indico.modules.attachments import Attachment
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
@@ -17,22 +22,24 @@ from indico.modules.events.notes.models.notes import EventNote
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
 from indico_livesync_citadel.models.search_id_map import EntryType, LiveSyncCitadelSearchAppIdMap
-from indico_livesync_citadel.schemas import (AttachmentSchema, ContributionSchema, EventNoteSchema, EventSchema,
-                                             SubContributionSchema)
+from indico_livesync_citadel.schemas import (EventRecordSchema, ContributionRecordSchema, AttachmentRecordSchema,
+                                             SubContributionRecordSchema, EventNoteRecordSchema)
 
 
 class LiveSyncCitadelUploader(Uploader):
+    UPLOAD_BATCH_SIZE = 100
+
     def __init__(self, *args, **kwargs):
         from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
 
-        super(LiveSyncCitadelUploader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.schemas = {
-            'event': EventSchema(),
-            'contribution': ContributionSchema(),
-            'subcontribution': SubContributionSchema(),
-            'attachment': AttachmentSchema(),
-            'note': EventNoteSchema()
+            'event': EventRecordSchema(),
+            'contribution': ContributionRecordSchema(),
+            'subcontribution': SubContributionRecordSchema(),
+            'attachment': AttachmentRecordSchema(),
+            'note': EventNoteRecordSchema()
         }
         self.search_app = LiveSyncCitadelPlugin.settings.get('search_backend_url')
         self.endpoint_url = url_join(self.search_app, 'api/records/')
@@ -64,10 +71,10 @@ class LiveSyncCitadelUploader(Uploader):
         else:
             raise ValueError('unknown object ref: {}'.format(obj))
 
-    def upload_jsondata(self, jsondata, change_type, obj_id, entry_type):
+    def upload_jsondata(self, session, jsondata, change_type, obj_id, entry_type):
         response = None
         if change_type & SimpleChange.created:
-            response = requests.post(self.endpoint_url, headers=self.headers, json=jsondata)
+            response = session.post(self.endpoint_url, json=jsondata)
         else:
             search_id = LiveSyncCitadelSearchAppIdMap.get_search_id(obj_id, entry_type)
             if not search_id:
@@ -75,10 +82,10 @@ class LiveSyncCitadelUploader(Uploader):
 
             if change_type & SimpleChange.updated:
                 url = url_join(self.search_app, 'api/record/{}'.format(search_id))
-                response = requests.put(url, headers=self.headers, json=jsondata)
+                response = session.put(url, json=jsondata)
             elif change_type & SimpleChange.deleted:
                 url = url_join(self.search_app, 'api/record/{}'.format(search_id))
-                response = requests.delete(url, headers=self.headers, json=jsondata)
+                response = session.delete(url, json=jsondata)
 
         if not response.ok:
             raise Exception('{} - {}'.format(response.status_code, response.text))
@@ -86,17 +93,41 @@ class LiveSyncCitadelUploader(Uploader):
             content = response.json()
             if content['metadata']['control_number']:
                 LiveSyncCitadelSearchAppIdMap.create(content['metadata']['control_number'], obj_id, entry_type)
-                db.session.commit()
             else:
                 raise Exception('Cannot create the search id mapping: {} - {}'
                                 .format(response.status_code, response.text))
 
     def upload_records(self, records, from_queue):
-        for entry in records:
+        session = requests.Session()
+        retry = Retry(
+            total=5,
+            read=5,
+            connect=5,
+            backoff_factor=1,
+            status_forcelist=(x for x in (408, 429, 444, 449, 500, 502, 503, 504, 509)),
+        )
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry))
+        session.headers = self.headers
+        loop = asyncio.get_event_loop()
+        executor = ThreadPoolExecutor()
+        tasks = []
+        for idx, entry in enumerate(records):
             change = records[entry] if from_queue else SimpleChange.created
             jsondata, entry_type = self.get_jsondata(entry)
-            if jsondata is not None:
-                self.upload_jsondata(jsondata, change, entry.id, entry_type)
+            if jsondata is None:
+                continue
+
+            def run(app, *args):
+                with app.app_context():
+                    self.upload_jsondata(*args)
+
+            tasks.append(loop.run_in_executor(
+                executor, run, current_app._get_current_object(), session, jsondata, change, entry.id, entry_type
+            ))
+            if len(tasks) >= LiveSyncCitadelUploader.UPLOAD_BATCH_SIZE or idx + 1 == len(records):
+                loop.run_until_complete(asyncio.gather(*tasks))
+                self.logger.info('Uploaded %d %s records', len(tasks), entry_type)
+                tasks = []
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
