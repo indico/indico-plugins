@@ -1,7 +1,0 @@
-{% extends 'vc/event_buttons.html' %}
-{% from 'vc_vidyo:buttons.html' import render_join_button, render_make_me_owner  %}
-
-{% block buttons %}
-    {{ render_join_button(vc_room, "i-button-small event-service-right-button join-button") }}
-    {{ render_make_me_owner(event, vc_room, event_vc_room, extra_classes="i-button-small") }}
-{% endblock %}
