@@ -8,14 +8,14 @@ import time
 
 import click
 from flask_pluginengine import current_plugin
-from sqlalchemy.orm import selectinload, undefer, joinedload, subqueryload, contains_eager
+from sqlalchemy.orm import contains_eager, joinedload, selectinload, subqueryload, undefer
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments import Attachment, AttachmentFolder
-from indico.modules.attachments.models.principals import AttachmentPrincipal, AttachmentFolderPrincipal
+from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
@@ -27,6 +27,7 @@ from indico.modules.events.notes.models.notes import EventNote, EventNoteRevisio
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.console import cformat
+
 from indico_livesync.models.agents import LiveSyncAgent
 
 
@@ -86,47 +87,49 @@ def initial_export(agent_id, force):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    pre_load = Category.query.all()
+    pre_load = Category.query.all()  # noqa: F841
     Category.allow_relationship_preloading = True
     Category.preload_relationships(Category.query, 'acl_entries')
     backend = agent.create_backend()
     events = query_events()
-    contributions = query_contributions()
-    attachments = query_attachments()
-    notes = query_notes()
-    backend.run_initial_export(yield_per(contributions, 5000), contributions.count())
     backend.run_initial_export(yield_per(events, 5000), events.count())
+    contributions = query_contributions()
+    backend.run_initial_export(yield_per(contributions, 5000), contributions.count())
+    attachments = query_attachments()
     backend.run_initial_export(yield_per(attachments, 5000), attachments.count())
+    notes = query_notes()
     backend.run_initial_export(yield_per(notes, 5000), notes.count())
     agent.initial_data_exported = True
     db.session.commit()
 
 
 def query_events():
-    return Event.query.filter_by(is_deleted=False).filter(Event.person_links.any()).options(
-        subqueryload(Event.acl_entries),
-        joinedload(Event.person_links),
-        joinedload('own_venue'),
-        joinedload('own_room'),
-        undefer('own_address'),
-        undefer('detailed_category_chain')
+    return (
+        Event.query.filter_by(is_deleted=False).options(
+            subqueryload(Event.acl_entries),
+            joinedload(Event.person_links),
+            joinedload(Event.own_venue),
+            joinedload(Event.own_room),
+            undefer(Event.own_address)
+        )
     )
 
 
 def query_contributions():
-    return Contribution.query.filter_by(is_deleted=False).options(
-        subqueryload(Contribution.acl_entries),
-        joinedload(Contribution.person_links),
-        joinedload(Contribution.event).undefer(Event.detailed_category_chain),
-        joinedload(Contribution.event).subqueryload(Event.acl_entries),
-        joinedload(Contribution.event).joinedload('own_venue'),
-        joinedload(Contribution.event).joinedload('own_room'),
-        joinedload(Contribution.session).subqueryload(Session.acl_entries),
-        joinedload('own_venue'),
-        joinedload('own_room'),
-        undefer('own_address'),
-        subqueryload(Contribution.session_block),
-        subqueryload(Contribution.timetable_entry)
+    return (
+        Contribution.query.filter_by(is_deleted=False).options(
+            subqueryload(Contribution.acl_entries),
+            joinedload(Contribution.person_links),
+            joinedload(Contribution.event).subqueryload(Event.acl_entries),
+            joinedload(Contribution.event).joinedload(Event.own_venue),
+            joinedload(Contribution.event).joinedload(Event.own_room),
+            joinedload(Contribution.session).subqueryload(Session.acl_entries),
+            joinedload(Contribution.own_venue),
+            joinedload(Contribution.own_room),
+            undefer(Contribution.own_address),
+            subqueryload(Contribution.session_block),
+            subqueryload(Contribution.timetable_entry)
+        )
     )
 
 
@@ -139,8 +142,8 @@ def query_attachments():
     session_event = db.aliased(Event)
 
     def _apply_acl_entry_strategy(rel, principal):
-        user_strategy = rel.joinedload('user').joinedload('_affiliation')
-        user_strategy.noload('*')
+        user_strategy = rel.joinedload('user')
+        user_strategy.raiseload('*')
         user_strategy.load_only('id')
         rel.joinedload('local_group').load_only('id')
         if principal.allow_networks:
@@ -153,79 +156,82 @@ def query_attachments():
             rel.joinedload('registration_form').load_only('id')
         return rel
 
-    attachment_strategy = _apply_acl_entry_strategy(selectinload('acl_entries'), AttachmentPrincipal)
-    folder_strategy = contains_eager('folder')
+    attachment_strategy = _apply_acl_entry_strategy(selectinload(Attachment.acl_entries), AttachmentPrincipal)
+    folder_strategy = contains_eager(Attachment.folder)
     folder_strategy.load_only('id', 'protection_mode', 'link_type', 'category_id', 'event_id', 'linked_event_id',
                               'contribution_id', 'subcontribution_id', 'session_id')
-    _apply_acl_entry_strategy(folder_strategy.selectinload('acl_entries'), AttachmentFolderPrincipal)
+    _apply_acl_entry_strategy(folder_strategy.selectinload(AttachmentFolder.acl_entries), AttachmentFolderPrincipal)
     # category
-    _apply_acl_entry_strategy(folder_strategy.contains_eager('category').selectinload('acl_entries'),
-                              CategoryPrincipal)
+    _apply_acl_entry_strategy(folder_strategy.contains_eager(AttachmentFolder.category)
+                              .selectinload(Category.acl_entries), CategoryPrincipal)
     # event
-    _apply_acl_entry_strategy(folder_strategy.contains_eager('linked_event').selectinload('acl_entries'),
-                              EventPrincipal)
+    _apply_acl_entry_strategy(folder_strategy.contains_eager(AttachmentFolder.linked_event)
+                              .selectinload(Event.acl_entries), EventPrincipal)
     # contribution
-    contrib_strategy = folder_strategy.contains_eager('contribution')
-    _apply_acl_entry_strategy(contrib_strategy.selectinload('acl_entries'), ContributionPrincipal)
-    _apply_acl_entry_strategy(
-        contrib_strategy.contains_eager(Contribution.event.of_type(contrib_event)).selectinload('acl_entries'),
-        EventPrincipal)
-    _apply_acl_entry_strategy(
-        contrib_strategy.contains_eager(Contribution.session.of_type(contrib_session)).selectinload('acl_entries'),
-        SessionPrincipal)
+    contrib_strategy = folder_strategy.contains_eager(AttachmentFolder.contribution)
+    _apply_acl_entry_strategy(contrib_strategy.selectinload(Contribution.acl_entries), ContributionPrincipal)
+    _apply_acl_entry_strategy(contrib_strategy.contains_eager(Contribution.event.of_type(contrib_event))
+                              .selectinload(contrib_event.acl_entries), EventPrincipal)
+    _apply_acl_entry_strategy(contrib_strategy.contains_eager(Contribution.session.of_type(contrib_session))
+                              .selectinload(contrib_session.acl_entries), SessionPrincipal)
     # subcontribution
-    subcontrib_strategy = folder_strategy.contains_eager('subcontribution')
+    subcontrib_strategy = folder_strategy.contains_eager(AttachmentFolder.subcontribution)
     subcontrib_contrib_strategy = subcontrib_strategy.contains_eager(
-        SubContribution.contribution.of_type(subcontrib_contrib))
-    _apply_acl_entry_strategy(subcontrib_contrib_strategy.selectinload('acl_entries'), ContributionPrincipal)
-    _apply_acl_entry_strategy(
-        subcontrib_contrib_strategy.contains_eager(subcontrib_contrib.event.of_type(subcontrib_event))
-        .selectinload('acl_entries'), EventPrincipal)
-    _apply_acl_entry_strategy(
-        subcontrib_contrib_strategy.contains_eager(subcontrib_contrib.session.of_type(subcontrib_session))
-        .selectinload('acl_entries'), SessionPrincipal)
+        SubContribution.contribution.of_type(subcontrib_contrib)
+    )
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .selectinload(subcontrib_contrib.acl_entries), ContributionPrincipal)
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .contains_eager(subcontrib_contrib.event.of_type(subcontrib_event))
+                              .selectinload(subcontrib_event.acl_entries), EventPrincipal)
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .contains_eager(subcontrib_contrib.session.of_type(subcontrib_session))
+                              .selectinload(subcontrib_session.acl_entries), SessionPrincipal)
     # session
-    session_strategy = folder_strategy.contains_eager('session')
-    session_strategy.contains_eager(Session.event.of_type(session_event)).selectinload('acl_entries')
-    _apply_acl_entry_strategy(session_strategy.selectinload('acl_entries'), SessionPrincipal)
+    session_strategy = folder_strategy.contains_eager(AttachmentFolder.session)
+    session_strategy.contains_eager(Session.event.of_type(session_event)).selectinload(session_event.acl_entries)
+    _apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
 
-    return Attachment.query\
-        .join(Attachment.folder)\
-        .options(folder_strategy, attachment_strategy)\
-        .outerjoin(AttachmentFolder.category)\
-        .outerjoin(AttachmentFolder.linked_event)\
-        .outerjoin(AttachmentFolder.contribution)\
-        .outerjoin(Contribution.event.of_type(contrib_event))\
-        .outerjoin(Contribution.session.of_type(contrib_session))\
-        .outerjoin(AttachmentFolder.subcontribution)\
-        .outerjoin(SubContribution.contribution.of_type(subcontrib_contrib))\
-        .outerjoin(subcontrib_contrib.event.of_type(subcontrib_event))\
-        .outerjoin(subcontrib_contrib.session.of_type(subcontrib_session))\
-        .outerjoin(AttachmentFolder.session)\
-        .outerjoin(Session.event.of_type(session_event))\
-        .filter(~Attachment.is_deleted, ~AttachmentFolder.is_deleted)\
-        .filter((AttachmentFolder.link_type != LinkType.category) | (~Category.is_deleted))\
-        .filter((AttachmentFolder.link_type != LinkType.event) | (~Event.is_deleted))\
+    return (
+        Attachment.query
+        .join(Attachment.folder)
+        .options(folder_strategy, attachment_strategy, joinedload(Attachment.user).joinedload('_affiliation'))
+        .outerjoin(AttachmentFolder.category)
+        .outerjoin(AttachmentFolder.linked_event)
+        .outerjoin(AttachmentFolder.contribution)
+        .outerjoin(Contribution.event.of_type(contrib_event))
+        .outerjoin(Contribution.session.of_type(contrib_session))
+        .outerjoin(AttachmentFolder.subcontribution)
+        .outerjoin(SubContribution.contribution.of_type(subcontrib_contrib))
+        .outerjoin(subcontrib_contrib.event.of_type(subcontrib_event))
+        .outerjoin(subcontrib_contrib.session.of_type(subcontrib_session))
+        .outerjoin(AttachmentFolder.session)
+        .outerjoin(Session.event.of_type(session_event))
+        .filter(~Attachment.is_deleted, ~AttachmentFolder.is_deleted)
+        .filter((AttachmentFolder.link_type != LinkType.category) | (~Category.is_deleted))
+        .filter((AttachmentFolder.link_type != LinkType.event) | (~Event.is_deleted))
         .filter((AttachmentFolder.link_type != LinkType.contribution) | (
-            ~Contribution.is_deleted & ~contrib_event.is_deleted))\
+            ~Contribution.is_deleted & ~contrib_event.is_deleted))
         .filter((AttachmentFolder.link_type != LinkType.subcontribution) | (
-            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))\
+            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
         .filter((AttachmentFolder.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
+    )
 
 
 def query_notes():
-    return EventNote.query.filter_by(is_deleted=False).options(
-        subqueryload(EventNote.revisions).raiseload(EventNoteRevision.user),
-        subqueryload(EventNote.current_revision).raiseload(EventNoteRevision.user),
-        selectinload(EventNote.event).undefer(Event.detailed_category_chain),
-        selectinload(EventNote.event).subqueryload(Event.acl_entries),
-        selectinload(EventNote.contribution).subqueryload(Contribution.acl_entries),
-        selectinload(EventNote.contribution).subqueryload(Contribution.session).subqueryload(Session.acl_entries),
-        selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
-        .subqueryload(Contribution.acl_entries),
-        selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
-        .subqueryload(Contribution.session).subqueryload(Session.acl_entries),
-        selectinload(EventNote.session).subqueryload(Session.acl_entries)
+    return (
+        EventNote.query.filter_by(is_deleted=False).options(
+            subqueryload(EventNote.revisions).raiseload(EventNoteRevision.user),
+            subqueryload(EventNote.current_revision).raiseload(EventNoteRevision.user),
+            selectinload(EventNote.event).subqueryload(Event.acl_entries),
+            selectinload(EventNote.contribution).subqueryload(Contribution.acl_entries),
+            selectinload(EventNote.contribution).subqueryload(Contribution.session).subqueryload(Session.acl_entries),
+            selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
+            .subqueryload(Contribution.acl_entries),
+            selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
+            .subqueryload(Contribution.session).subqueryload(Session.acl_entries),
+            selectinload(EventNote.session).subqueryload(Session.acl_entries)
+        )
     )
 
 
@@ -235,7 +241,7 @@ def yield_per(query, window_size=1000):
         t1 = time.time()
         chunk = query.slice(index, index + window_size).all()
         t2 = time.time()
-        print('Yield took', t2 - t1)
+        print(cformat('Yielding took: %{green!}{} seconds').format(t2 - t1))
         if not len(chunk):
             break
         for e in chunk:

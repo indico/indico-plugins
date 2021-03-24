@@ -36,8 +36,8 @@ def test_run_initial():
     mock_uploader = MagicMock()
     backend.uploader = lambda x: mock_uploader
     events = object()
-    backend.run_initial_export(events)
-    mock_uploader.run_initial.assert_called_with(events)
+    backend.run_initial_export(events, 1)
+    mock_uploader.run_initial.assert_called_with(events, 1)
 
 
 def test_run(mocker):
