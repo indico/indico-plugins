@@ -203,4 +203,3 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
             raise Exception('Unsupported object type {}'.format(obj_type))
 
         db.session.add(entry)
-        db.session.flush()

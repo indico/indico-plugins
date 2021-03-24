@@ -6,15 +6,19 @@
 # see the LICENSE file for more details.
 
 import asyncio
+import time
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import requests
 from flask import current_app
 from requests.adapters import HTTPAdapter
+from sqlalchemy import select
 from urllib3 import Retry
 from werkzeug.urls import url_join
 
+from indico.core.db import db
 from indico.modules.attachments import Attachment
+from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -27,19 +31,20 @@ from indico_livesync_citadel.schemas import (EventRecordSchema, ContributionReco
 
 
 class LiveSyncCitadelUploader(Uploader):
-    UPLOAD_BATCH_SIZE = 100
+    UPLOAD_BATCH_SIZE = 200
 
     def __init__(self, *args, **kwargs):
         from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
 
         super().__init__(*args, **kwargs)
 
+        self.categories = None
         self.schemas = {
-            'event': EventRecordSchema(),
-            'contribution': ContributionRecordSchema(),
-            'subcontribution': SubContributionRecordSchema(),
-            'attachment': AttachmentRecordSchema(),
-            'note': EventNoteRecordSchema()
+            'event': EventRecordSchema(context={'categories': self.categories}),
+            'contribution': ContributionRecordSchema(context={'categories': self.categories}),
+            'subcontribution': SubContributionRecordSchema(context={'categories': self.categories}),
+            'attachment': AttachmentRecordSchema(context={'categories': self.categories}),
+            'note': EventNoteRecordSchema(context={'categories': self.categories})
         }
         self.search_app = LiveSyncCitadelPlugin.settings.get('search_backend_url')
         self.endpoint_url = url_join(self.search_app, 'api/records/')
@@ -88,7 +93,7 @@ class LiveSyncCitadelUploader(Uploader):
                 response = session.delete(url, json=jsondata)
 
         if not response.ok:
-            raise Exception('{} - {}'.format(response.status_code, response.text))
+            raise Exception('{} - {} in record {}'.format(response.status_code, response.text, jsondata))
         elif change_type & SimpleChange.created:
             content = response.json()
             if content['metadata']['control_number']:
@@ -96,15 +101,22 @@ class LiveSyncCitadelUploader(Uploader):
             else:
                 raise Exception('Cannot create the search id mapping: {} - {}'
                                 .format(response.status_code, response.text))
+        response.close()
+
+    def run_initial(self, events, total=None):
+        cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
+        categories = db.session.execute(select([cte.c.id, cte.c.path])).fetchall()
+        self.categories = {}
+        for _id, path in categories:
+            self.categories[_id] = path
+
+        super().run_initial(events, total)
 
     def upload_records(self, records, from_queue):
         session = requests.Session()
         retry = Retry(
             total=5,
-            read=5,
-            connect=5,
-            backoff_factor=1,
-            status_forcelist=(x for x in (408, 429, 444, 449, 500, 502, 503, 504, 509)),
+            backoff_factor=30
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
@@ -119,15 +131,17 @@ class LiveSyncCitadelUploader(Uploader):
 
             def run(app, *args):
                 with app.app_context():
-                    self.upload_jsondata(*args)
+                    return self.upload_jsondata(*args)
 
             tasks.append(loop.run_in_executor(
                 executor, run, current_app._get_current_object(), session, jsondata, change, entry.id, entry_type
             ))
             if len(tasks) >= LiveSyncCitadelUploader.UPLOAD_BATCH_SIZE or idx + 1 == len(records):
                 loop.run_until_complete(asyncio.gather(*tasks))
+                db.session.flush()
                 self.logger.info('Uploaded %d %s records', len(tasks), entry_type)
                 tasks = []
+        session.close()
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):

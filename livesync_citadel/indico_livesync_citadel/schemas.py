@@ -23,7 +23,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.base import SearchTarget
 from indico.modules.search.schemas import EventSchema, AttachmentSchema, ContributionSchema, PersonSchema, \
-    EventNoteSchema, SubContributionSchema
+    EventNoteSchema, SubContributionSchema, CategorySchema
 from indico.web.flask.util import url_for
 
 
@@ -39,6 +39,18 @@ class ACLSchema(object):
     def _get_acl(self, obj):
         return _get_identifiers(obj.get_access_list())
 
+    def _get_attachment_acl(self, attachment):
+        linked_object = attachment.folder.object
+        manager_list = set(linked_object.get_manager_list(recursive=True))
+
+        if attachment.is_self_protected:
+            acl = {e for e in attachment.acl} | manager_list
+        elif attachment.is_inheriting and attachment.folder.is_self_protected:
+            acl = {e for e in attachment.folder.acl} | manager_list
+        else:
+            acl = linked_object.get_access_list()
+        return _get_identifiers(acl)
+
     def _get_object_acl(self, object):
         """Return the object ACLs.
 
@@ -53,7 +65,7 @@ class ACLSchema(object):
         elif isinstance(object, SubContribution):
             obj_acl = self._get_acl(object.contribution)
         elif isinstance(object, Attachment):
-            obj_acl = self._get_acl(object.folder.object)
+            obj_acl = _get_identifiers(self._get_attachment_acl(object))
         elif isinstance(object, EventNote):
             obj_acl = self._get_acl(object.object)
         else:
@@ -102,7 +114,7 @@ class _AttachmentDataSchema(AttachmentSchema):
     class Meta:
         fields = ('title', 'filename', 'user', 'content')
 
-    content = fields.Method('_get_attachment_content')
+    # content = fields.Method('_get_attachment_content')
 
     def _get_attachment_content(self, attachment):
         if attachment.type == AttachmentType.file:
@@ -118,7 +130,16 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda at: _AttachmentDataSchema().dump(at))
+    category_path = fields.Method('_get_category_path')
     url = mm.String(attribute='absolute_download_url')
+
+    def _get_category_path(self, attachment):
+        categories = self.context.get('categories', None)
+        if not attachment.folder.event:
+            return None
+        if categories:
+            return categories.get(attachment.folder.event.category_id)
+        return CategorySchema(many=True).dump(attachment.folder.event.detailed_category_chain)
 
 
 class ContributionRecordSchema(RecordSchema, ContributionSchema):
@@ -156,7 +177,7 @@ class _EventNoteDataSchema(EventNoteSchema):
 class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
     class Meta:
         non_indexable = ('note_id', 'type', 'event_id', 'contribution_id', 'subcontribution_id', 'category_path',
-                         'url', 'session_id', 'created_dt')
+                         'url', 'created_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda note: _EventNoteDataSchema().dump(note))
