@@ -30,16 +30,16 @@ class CitadelProvider(IndicoSearchProvider):
             'Authorization': 'Bearer {}'.format(self.token)
         }
 
-        # look for objects matching the `query` and schema, make sure the query is properly escaped
+        filter_query, ranges = format_filters(params)
+        # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
-        q = '{} +type:{}'.format(format_query(query), object_type.name)
-        _filters = {k: params[k] for k, v in filters.items() if k in params}
-        params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*', **_filters}
-        # filter by the objects that can be viewed by users/groups in the `access` argument
+        q = '{} {} +type:{}'.format(format_query(query), ranges, object_type.name)
+        search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*', **filter_query}
+        # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
-            params['access'] = ','.join(access)
+            search_params['access'] = ','.join(access)
 
-        resp = requests.get(self.records_url, params=params, headers=headers, verify=False)
+        resp = requests.get(self.records_url, params=search_params, headers=headers, verify=False)
         if not resp.ok:
             return 0, [], []
 
@@ -76,30 +76,61 @@ placeholders = {
     'person': '_data.persons.name',
     'affiliation': '_data.persons.affiliation',
     'type': '_data.type',
-    'venue': '_data.location.venue_name',  # TODO: multiple locations,
+    'venue': '_data.location.venue_name',  # TODO: multiple locations
     'keyword': '_data.keywords'
 }
 
-# TODO: potentially move this to Indico:
-# - restrict the filters we support
-# - provide i18n to them
+range_filters = {
+    'start_range': 'start_dt'
+}
+
+# TODO: potentially move this to Indico (and provide i18n)
 filters = {
     'affiliation': 'Affiliation',
     'person': 'Person',
     'type_format': 'Type',
     'venue': 'Location',
     'start_range': 'Start Date',
-    'created_range': 'Created Date',
-    'modified_range': 'Modified Date'
 }
 
 
 def format_query(query):
+    """Formats and splits the query into keywords and placeholders
+
+    https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
+
+    :param query: search query
+    :returns escaped query
+    """
     patt = r'({}):([^:"\s]+|".+")\s*'.format('|'.join(placeholders.keys()))
+    # Extract all placeholders
     p = ['+{}:{}'.format(placeholders[x.group(1)], x.group(2))
          for x in re.finditer(patt, query) if x.group(1) in placeholders]
+    # Escape keyword based arguments
     query = escape(re.sub(patt, '', query))
-    return '{} +{}'.format(' '.join(p), query).strip()
+    return '{} {}'.format(' '.join(p), query).strip()
+
+
+def format_filters(params):
+    """Extracts any special placeholder filter, such as ranges, from the query params
+
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
+
+    :param params: The filter query params
+    :returns: filters, extracted placeholders
+    """
+    _filters = {}
+    query = []
+    for k, v in params.items():
+        if k not in filters:
+            continue
+        if k in range_filters:
+            match = re.match(r'[[{].+ TO .+[]}]', v)
+            if match:
+                query.append('+{}:{}'.format(range_filters[k], v))
+            continue
+        _filters[k] = v
+    return _filters, ' '.join(query)
 
 
 def escape(query):
