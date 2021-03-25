@@ -116,7 +116,8 @@ class LiveSyncCitadelUploader(Uploader):
         session = requests.Session()
         retry = Retry(
             total=5,
-            backoff_factor=30
+            backoff_factor=30,
+            status_forcelist=[500, 502, 503, 504]
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
