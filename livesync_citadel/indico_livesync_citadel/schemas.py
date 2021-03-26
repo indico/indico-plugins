@@ -5,25 +5,20 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import itertools
-
 from flask import current_app
-from marshmallow import post_dump, post_load, EXCLUDE, pre_dump
+from marshmallow import post_dump
 from tika import parser
 from webargs import fields
 
-from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
-from indico.modules.search.base import SearchTarget
-from indico.modules.search.schemas import EventSchema, AttachmentSchema, ContributionSchema, PersonSchema, \
-    EventNoteSchema, SubContributionSchema, CategorySchema
+from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
+                                           EventSchema, SubContributionSchema)
 from indico.web.flask.util import url_for
 
 

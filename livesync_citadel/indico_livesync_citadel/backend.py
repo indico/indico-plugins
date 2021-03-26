@@ -6,7 +6,6 @@
 # see the LICENSE file for more details.
 
 import asyncio
-import time
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import requests
@@ -26,8 +25,8 @@ from indico.modules.events.notes.models.notes import EventNote
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
 from indico_livesync_citadel.models.search_id_map import EntryType, LiveSyncCitadelSearchAppIdMap
-from indico_livesync_citadel.schemas import (EventRecordSchema, ContributionRecordSchema, AttachmentRecordSchema,
-                                             SubContributionRecordSchema, EventNoteRecordSchema)
+from indico_livesync_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
+                                             EventRecordSchema, SubContributionRecordSchema)
 
 
 class LiveSyncCitadelUploader(Uploader):
