@@ -116,7 +116,8 @@ class LiveSyncCitadelUploader(Uploader):
         retry = Retry(
             total=5,
             backoff_factor=30,
-            status_forcelist=[500, 502, 503, 504]
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
@@ -138,7 +139,7 @@ class LiveSyncCitadelUploader(Uploader):
             ))
             if len(tasks) >= LiveSyncCitadelUploader.UPLOAD_BATCH_SIZE or idx + 1 == len(records):
                 loop.run_until_complete(asyncio.gather(*tasks))
-                db.session.flush()
+                db.session.commit()
                 self.logger.info('Uploaded %d %s records', len(tasks), entry_type)
                 tasks = []
         session.close()
