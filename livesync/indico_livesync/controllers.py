@@ -10,6 +10,7 @@ from flask_pluginengine import current_plugin, render_plugin_template
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.admin import RHAdminBase
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -21,7 +22,11 @@ from indico_livesync.models.agents import LiveSyncAgent
 
 def extend_plugin_details():
     agents = LiveSyncAgent.query.order_by(LiveSyncAgent.name, LiveSyncAgent.id).all()
-    return render_plugin_template('plugin_details_extra.html', agents=agents, backends=current_plugin.backend_classes)
+    used_backends = {a.backend_name for a in agents}
+    available_backends = {name: backend
+                          for name, backend in current_plugin.backend_classes.items()
+                          if not backend.unique or name not in used_backends}
+    return render_plugin_template('plugin_details_extra.html', agents=agents, backends=available_backends)
 
 
 class RHDeleteAgent(RHAdminBase):
@@ -45,6 +50,8 @@ class RHAddAgent(RHAdminBase):
             self.backend = current_plugin.backend_classes[self.backend_name]
         except KeyError:
             raise NotFound
+        if self.backend.unique and LiveSyncAgent.query.filter_by(backend_name=self.backend_name).has_rows():
+            raise UserValueError(_('This backend is already in use'))
 
     def _process(self):
         form = self.backend.form(obj=FormDefaults(name=self.backend.title))

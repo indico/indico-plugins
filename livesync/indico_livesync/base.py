@@ -41,6 +41,8 @@ class LiveSyncBackendBase:
     uploader = None
     #: the form used when creating/editing the agent
     form = AgentForm
+    #: whether only one agent with this backend is allowed
+    unique = False
 
     @classproperty
     @classmethod
