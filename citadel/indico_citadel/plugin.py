@@ -10,6 +10,7 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import URL, DataRequired, Optional
 
 from indico.core import signals
+from indico.core.plugins import PluginCategory
 from indico.web.forms.base import IndicoForm
 
 from indico_citadel import _
@@ -36,6 +37,7 @@ class CitadelPlugin(LiveSyncPluginBase):
     Provides the search/livesync integration with Citadel
     """
 
+    category = PluginCategory.search
     configurable = True
     settings_form = CitadelSettingsForm
     default_settings = {'search_backend_url': '', 'search_backend_token': '', 'search_owner_role': '',
