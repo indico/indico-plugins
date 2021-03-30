@@ -34,7 +34,7 @@ def _make_checks():
         forbidden_cols = available_columns - {required_col}
         criteria = [f'{required_col} IS NOT NULL']
         criteria += [f'{col} IS NULL' for col in sorted(forbidden_cols)]
-        condition = 'type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
+        condition = 'entry_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
         yield db.CheckConstraint(condition, f'valid_{link_type.name}_entry')
 
 
