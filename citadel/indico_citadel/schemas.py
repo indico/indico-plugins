@@ -7,7 +7,6 @@
 
 from flask import current_app
 from marshmallow import post_dump
-from tika import parser
 from webargs import fields
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -113,6 +112,9 @@ class _AttachmentDataSchema(AttachmentSchema):
 
     def _get_attachment_content(self, attachment):
         if attachment.type == AttachmentType.file:
+            # TODO: this can probably go away
+            from tika import parser
+
             from indico_citadel.plugin import CitadelPlugin
             return parser.from_file(attachment.absolute_download_url,
                                     CitadelPlugin.settings.get('tika_server'))['content']
