@@ -5,17 +5,11 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from unittest.mock import patch
-
 import pytest
 
 from indico_citadel.search import format_query
 
 
-@patch('indico_citadel.search.placeholders', {
-    'title': 'title',
-    'person': 'person'
-})
 @pytest.mark.parametrize('query,expected', [
     ('title:"my event" ola person:john ola some:yes ola',
      '+title:"my event" +person:john ola ola some\\:yes ola'),
@@ -25,5 +19,9 @@ from indico_citadel.search import format_query
     ('title:something hey', '+title:something hey'),
     ('hey title:something hey person:john', '+title:something +person:john hey hey')
 ])
-def test_query_placeholders(query, expected):
+def test_query_placeholders(mocker, query, expected):
+    mocker.patch('indico_citadel.search.placeholders', {
+        'title': 'title',
+        'person': 'person'
+    })
     assert format_query(query) == expected
