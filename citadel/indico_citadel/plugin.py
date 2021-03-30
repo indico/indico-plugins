@@ -7,11 +7,12 @@
 
 from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import URL, DataRequired, Optional
+from wtforms.validators import URL, DataRequired
 
 from indico.core import signals
 from indico.core.plugins import PluginCategory
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoPasswordField
 
 from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
@@ -20,15 +21,14 @@ from indico_livesync import LiveSyncPluginBase
 
 
 class CitadelSettingsForm(IndicoForm):
-    search_backend_url = URLField(_('Search backend URL'), [DataRequired(), URL(require_tld=False)],
-                                  description=_('The URL of the search backend'))
-    search_backend_token = StringField(_('Search backend token'), [DataRequired()],
-                                       description=_('Authentication token for the search backend'))
+    search_backend_url = URLField(_('Citadel URL'), [DataRequired(), URL(require_tld=False)],
+                                  description=_('The URL of the Citadel server'))
+    search_backend_token = IndicoPasswordField(_('Citadel API token'), [DataRequired()], toggle=True,
+                                               description=_('The authentication token to access Citadel'))
     search_owner_role = StringField(_('Search owner role'), [DataRequired()],
                                     description=_('The role set on every synced object. This allows the members '
                                                   'with that role to perform CRUD operations on the backend and '
                                                   'synced objects.'))
-    tika_server = URLField(_('Tika server URL'), [Optional(), URL()], description=_('The URL of the tika server'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):

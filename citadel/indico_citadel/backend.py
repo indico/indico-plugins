@@ -146,9 +146,9 @@ class LiveSyncCitadelUploader(Uploader):
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
-    """LiveSync Citadel
+    """Citadel
 
-    This backend uploads data to CERN-search.
+    This backend uploads data to Citadel.
     """
 
     uploader = LiveSyncCitadelUploader
