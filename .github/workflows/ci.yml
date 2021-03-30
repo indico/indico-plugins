@@ -192,6 +192,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - plugin: citadel
           - plugin: livesync
           - plugin: payment_paypal
           - plugin: vc_zoom
@@ -222,6 +223,11 @@ jobs:
         run: |
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install extra dependencies
+        if: matrix.plugin == 'citadel'
+        run: |
+          pip install -e "${GITHUB_WORKSPACE}/livesync/"
 
       - name: Install plugin
         run: |
