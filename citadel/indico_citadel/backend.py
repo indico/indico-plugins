@@ -152,3 +152,4 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     """
 
     uploader = LiveSyncCitadelUploader
+    unique = True
