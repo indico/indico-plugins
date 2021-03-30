@@ -27,7 +27,7 @@ def _get_identifiers(access_list):
                   or p.is_group)
 
 
-class ACLSchema(object):
+class ACLSchema:
     _access = fields.Method('_get_object_acl')
 
     def _get_acl(self, obj):
@@ -63,7 +63,7 @@ class ACLSchema(object):
         elif isinstance(object, EventNote):
             obj_acl = self._get_acl(object.object)
         else:
-            raise ValueError('unknown object {}'.format(object))
+            raise ValueError(f'unknown object {object}')
 
         acl = {
             'owner': [default_acl],

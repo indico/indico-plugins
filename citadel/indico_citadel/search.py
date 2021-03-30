@@ -27,7 +27,7 @@ class CitadelProvider(IndicoSearchProvider):
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
         headers = {
-            'Authorization': 'Bearer {}'.format(self.token)
+            'Authorization': f'Bearer {self.token}'
         }
 
         filter_query, ranges = format_filters(params)

@@ -32,10 +32,10 @@ def _make_checks():
     for link_type in EntryType:
         required_col = _column_for_types[link_type]
         forbidden_cols = available_columns - {required_col}
-        criteria = ['{} IS NOT NULL'.format(required_col)]
-        criteria += ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
+        criteria = [f'{required_col} IS NOT NULL']
+        criteria += [f'{col} IS NULL' for col in sorted(forbidden_cols)]
         condition = 'type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_entry'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_entry')
 
 
 class CitadelSearchAppIdMap(db.Model):
@@ -200,6 +200,6 @@ class CitadelSearchAppIdMap(db.Model):
         elif obj_type == EntryType.note:
             entry = cls(search_id=eid, entry_type=obj_type, note_id=oid)
         else:
-            raise Exception('Unsupported object type {}'.format(obj_type))
+            raise Exception(f'Unsupported object type {obj_type}')
 
         db.session.add(entry)

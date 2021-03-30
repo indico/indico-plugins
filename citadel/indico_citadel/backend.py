@@ -73,7 +73,7 @@ class LiveSyncCitadelUploader(Uploader):
             note_data['$schema'] = url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json')
             return note_data, EntryType.note
         else:
-            raise ValueError('unknown object ref: {}'.format(obj))
+            raise ValueError(f'unknown object ref: {obj}')
 
     def upload_jsondata(self, session, jsondata, change_type, obj_id, entry_type):
         response = None
@@ -85,14 +85,14 @@ class LiveSyncCitadelUploader(Uploader):
                 raise Exception('SearchMapId does not exist for the object')
 
             if change_type & SimpleChange.updated:
-                url = url_join(self.search_app, 'api/record/{}'.format(search_id))
+                url = url_join(self.search_app, f'api/record/{search_id}')
                 response = session.put(url, json=jsondata)
             elif change_type & SimpleChange.deleted:
-                url = url_join(self.search_app, 'api/record/{}'.format(search_id))
+                url = url_join(self.search_app, f'api/record/{search_id}')
                 response = session.delete(url, json=jsondata)
 
         if not response.ok:
-            raise Exception('{} - {} in record {}'.format(response.status_code, response.text, jsondata))
+            raise Exception(f'{response.status_code} - {response.text} in record {jsondata}')
         elif change_type & SimpleChange.created:
             content = response.json()
             if content['metadata']['control_number']:
