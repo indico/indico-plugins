@@ -38,9 +38,9 @@ def _make_checks():
         yield db.CheckConstraint(condition, 'valid_{}_entry'.format(link_type.name))
 
 
-class LiveSyncCitadelSearchAppIdMap(db.Model):
+class CitadelSearchAppIdMap(db.Model):
     __tablename__ = 'es_id_map'
-    __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_livesync_citadel'},)
+    __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_citadel'},)
 
     #: Entry ID
     id = db.Column(
@@ -112,7 +112,7 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
         'Event',
         lazy=True,
         backref=db.backref(
-            'livesync_citadel_es_entries',
+            'citadel_es_entries',
             cascade='all, delete-orphan',
             lazy=True
         )
@@ -122,7 +122,7 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
         'Contribution',
         lazy=False,
         backref=db.backref(
-            'livesync_citadel_es_entries',
+            'citadel_es_entries',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -132,7 +132,7 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
         'SubContribution',
         lazy=False,
         backref=db.backref(
-            'livesync_citadel_es_entries',
+            'citadel_es_entries',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -142,7 +142,7 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
         'Attachment',
         lazy=False,
         backref=db.backref(
-            'livesync_citadel_es_entries',
+            'citadel_es_entries',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -152,7 +152,7 @@ class LiveSyncCitadelSearchAppIdMap(db.Model):
         'EventNote',
         lazy=False,
         backref=db.backref(
-            'livesync_citadel_es_entries',
+            'citadel_es_entries',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )

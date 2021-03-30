@@ -17,23 +17,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: indico_livesync_citadel/plugin.py:23
+#: indico_citadel/plugin.py:23
 msgid "Search backend URL"
 msgstr ""
 
-#: indico_livesync_citadel/plugin.py:24
+#: indico_citadel/plugin.py:24
 msgid "Search backend token"
 msgstr ""
 
-#: indico_livesync_citadel/plugin.py:25
+#: indico_citadel/plugin.py:25
 msgid "Authentication token for the Search backend"
 msgstr ""
 
-#: indico_livesync_citadel/plugin.py:26
+#: indico_citadel/plugin.py:26
 msgid "Search owner role"
 msgstr ""
 
-#: indico_livesync_citadel/plugin.py:27
+#: indico_citadel/plugin.py:27
 msgid "Tika server URL"
 msgstr ""
-

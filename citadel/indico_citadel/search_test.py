@@ -9,10 +9,10 @@ from unittest.mock import patch
 
 import pytest
 
-from indico_livesync_citadel.search import format_query
+from indico_citadel.search import format_query
 
 
-@patch('indico_livesync_citadel.search.placeholders', {
+@patch('indico_citadel.search.placeholders', {
     'title': 'title',
     'person': 'person'
 })

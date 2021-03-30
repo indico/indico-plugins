@@ -11,7 +11,7 @@ from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 
-from indico_livesync_citadel.models.search_id_map import EntryType
+from indico_citadel.models.search_id_map import EntryType
 
 
 # revision identifiers, used by Alembic.
@@ -22,7 +22,7 @@ depends_on = None
 
 
 def upgrade():
-    op.execute(CreateSchema('plugin_livesync_citadel'))
+    op.execute(CreateSchema('plugin_citadel'))
     op.create_table('es_id_map',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('search_id', sa.Integer(), nullable=False),
@@ -39,9 +39,9 @@ def upgrade():
                     sa.ForeignKeyConstraint(['subcontrib_id'], ['events.subcontributions.id']),
                     sa.ForeignKeyConstraint(['attachment_id'], ['attachments.attachments.id']),
                     sa.ForeignKeyConstraint(['note_id'], ['events.notes.id']),
-                    schema='plugin_livesync_citadel')
+                    schema='plugin_citadel')
 
 
 def downgrade():
-    op.drop_table('es_id_map', schema='plugin_livesync_citadel')
-    op.execute(DropSchema('plugin_livesync_citadel'))
+    op.drop_table('es_id_map', schema='plugin_citadel')
+    op.execute(DropSchema('plugin_citadel'))

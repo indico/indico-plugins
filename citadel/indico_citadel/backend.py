@@ -23,17 +23,17 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 
+from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, EntryType
+from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
+                                    EventRecordSchema, SubContributionRecordSchema)
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
-from indico_livesync_citadel.models.search_id_map import EntryType, LiveSyncCitadelSearchAppIdMap
-from indico_livesync_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
-                                             EventRecordSchema, SubContributionRecordSchema)
 
 
 class LiveSyncCitadelUploader(Uploader):
     UPLOAD_BATCH_SIZE = 200
 
     def __init__(self, *args, **kwargs):
-        from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
+        from indico_citadel.plugin import CitadelPlugin
 
         super().__init__(*args, **kwargs)
 
@@ -45,10 +45,10 @@ class LiveSyncCitadelUploader(Uploader):
             'attachment': AttachmentRecordSchema(context={'categories': self.categories}),
             'note': EventNoteRecordSchema(context={'categories': self.categories})
         }
-        self.search_app = LiveSyncCitadelPlugin.settings.get('search_backend_url')
+        self.search_app = CitadelPlugin.settings.get('search_backend_url')
         self.endpoint_url = url_join(self.search_app, 'api/records/')
         self.headers = {
-            'Authorization': 'Bearer {}'.format(LiveSyncCitadelPlugin.settings.get('search_backend_token'))
+            'Authorization': 'Bearer {}'.format(CitadelPlugin.settings.get('search_backend_token'))
         }
 
     def get_jsondata(self, obj):
@@ -80,7 +80,7 @@ class LiveSyncCitadelUploader(Uploader):
         if change_type & SimpleChange.created:
             response = session.post(self.endpoint_url, json=jsondata)
         else:
-            search_id = LiveSyncCitadelSearchAppIdMap.get_search_id(obj_id, entry_type)
+            search_id = CitadelSearchAppIdMap.get_search_id(obj_id, entry_type)
             if not search_id:
                 raise Exception('SearchMapId does not exist for the object')
 
@@ -96,7 +96,7 @@ class LiveSyncCitadelUploader(Uploader):
         elif change_type & SimpleChange.created:
             content = response.json()
             if content['metadata']['control_number']:
-                LiveSyncCitadelSearchAppIdMap.create(content['metadata']['control_number'], obj_id, entry_type)
+                CitadelSearchAppIdMap.create(content['metadata']['control_number'], obj_id, entry_type)
             else:
                 raise Exception('Cannot create the search id mapping: {} - {}'
                                 .format(response.status_code, response.text))

@@ -8,4 +8,4 @@
 from indico.core.plugins import IndicoPluginBlueprint
 
 
-blueprint = IndicoPluginBlueprint('livesync_citadel', __name__)
+blueprint = IndicoPluginBlueprint('citadel', __name__)

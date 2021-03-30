@@ -12,13 +12,13 @@ from wtforms.validators import URL, DataRequired, Optional
 from indico.core import signals
 from indico.web.forms.base import IndicoForm
 
+from indico_citadel import _
+from indico_citadel.backend import LiveSyncCitadelBackend
+from indico_citadel.blueprint import blueprint
 from indico_livesync import LiveSyncPluginBase
-from indico_livesync_citadel import _
-from indico_livesync_citadel.backend import LiveSyncCitadelBackend
-from indico_livesync_citadel.blueprint import blueprint
 
 
-class LiveSyncCitadelSettingsForm(IndicoForm):
+class CitadelSettingsForm(IndicoForm):
     search_backend_url = URLField(_('Search backend URL'), [DataRequired(), URL(require_tld=False)],
                                   description=_('The URL of the search backend'))
     search_backend_token = StringField(_('Search backend token'), [DataRequired()],
@@ -30,17 +30,17 @@ class LiveSyncCitadelSettingsForm(IndicoForm):
     tika_server = URLField(_('Tika server URL'), [Optional(), URL()], description=_('The URL of the tika server'))
 
 
-class LiveSyncCitadelPlugin(LiveSyncPluginBase):
-    """LiveSync Citadel
+class CitadelPlugin(LiveSyncPluginBase):
+    """Citadel
 
-    Provides the agent for LiveSync Citadel
+    Provides the search/livesync integration with Citadel
     """
 
     configurable = True
-    settings_form = LiveSyncCitadelSettingsForm
+    settings_form = CitadelSettingsForm
     default_settings = {'search_backend_url': '', 'search_backend_token': '', 'search_owner_role': '',
                         'tika_server': ''}
-    backend_classes = {'livesync_citadel': LiveSyncCitadelBackend}
+    backend_classes = {'citadel': LiveSyncCitadelBackend}
 
     def init(self):
         super().init()
@@ -50,5 +50,5 @@ class LiveSyncCitadelPlugin(LiveSyncPluginBase):
         return blueprint
 
     def get_search_providers(self, sender, **kwargs):
-        from indico_livesync_citadel.search import CitadelProvider
+        from indico_citadel.search import CitadelProvider
         return CitadelProvider

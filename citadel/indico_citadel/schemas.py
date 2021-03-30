@@ -51,9 +51,9 @@ class ACLSchema(object):
 
         More information here https://cern-search.docs.cern.ch/usage/permissions/
         """
-        from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
+        from indico_citadel.plugin import CitadelPlugin
 
-        default_acl = LiveSyncCitadelPlugin.settings.get('search_owner_role')
+        default_acl = CitadelPlugin.settings.get('search_owner_role')
 
         if isinstance(object, (Event, Contribution)):
             obj_acl = self._get_acl(object)
@@ -113,9 +113,9 @@ class _AttachmentDataSchema(AttachmentSchema):
 
     def _get_attachment_content(self, attachment):
         if attachment.type == AttachmentType.file:
-            from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
+            from indico_citadel.plugin import CitadelPlugin
             return parser.from_file(attachment.absolute_download_url,
-                                    LiveSyncCitadelPlugin.settings.get('tika_server'))['content']
+                                    CitadelPlugin.settings.get('tika_server'))['content']
 
 
 class AttachmentRecordSchema(RecordSchema, AttachmentSchema):

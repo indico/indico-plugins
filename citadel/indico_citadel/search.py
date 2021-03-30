@@ -15,11 +15,11 @@ from indico.modules.search.base import IndicoSearchProvider, SearchTarget
 
 class CitadelProvider(IndicoSearchProvider):
     def __init__(self, *args, **kwargs):
-        from indico_livesync_citadel.plugin import LiveSyncCitadelPlugin
+        from indico_citadel.plugin import CitadelPlugin
 
         super().__init__(*args, **kwargs)
-        self.token = LiveSyncCitadelPlugin.settings.get('search_backend_token')
-        self.backend_url = LiveSyncCitadelPlugin.settings.get('search_backend_url')
+        self.token = CitadelPlugin.settings.get('search_backend_token')
+        self.backend_url = CitadelPlugin.settings.get('search_backend_url')
         self.records_url = url_join(self.backend_url, 'api/records/')
 
     def search(self, query, access, object_type=SearchTarget.event, page=1, params=None, highlight=True):

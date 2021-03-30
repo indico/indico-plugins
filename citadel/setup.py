@@ -9,7 +9,7 @@ from setuptools import find_packages, setup
 
 
 setup(
-    name='indico-plugin-livesync-citadel',
+    name='indico-plugin-citadel',
     version='1.0',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
@@ -24,7 +24,7 @@ setup(
         'tika>=1.24'
     ],
     entry_points={
-        'indico.plugins': {'livesync_citadel = indico_livesync_citadel.plugin:LiveSyncCitadelPlugin'}
+        'indico.plugins': {'citadel = indico_citadel.plugin:LiveSyncCitadelPlugin'}
     },
     classifiers=[
         'Environment :: Plugins',
