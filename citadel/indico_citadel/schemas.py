@@ -21,10 +21,15 @@ from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, Con
 from indico.web.flask.util import url_for
 
 
+PRINCIPAL_TYPES = {
+    PrincipalType.user,
+    PrincipalType.local_group, PrincipalType.multipass_group,
+    PrincipalType.event_role, PrincipalType.category_role,
+}
+
+
 def _get_identifiers(access_list):
-    return sorted(p.identifier for p in access_list if p.principal_type in
-                  (PrincipalType.user, PrincipalType.event_role, PrincipalType.category_role)
-                  or p.is_group)
+    return sorted(p.identifier for p in access_list if p.principal_type in PRINCIPAL_TYPES)
 
 
 class ACLSchema:
