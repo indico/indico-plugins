@@ -34,6 +34,14 @@ def _get_identifiers(access_list):
     return sorted(p.identifier for p in access_list if p.principal_type in PRINCIPAL_TYPES)
 
 
+def _get_category_chain(event, categories):
+    if not event:
+        return None
+    if categories:
+        return categories.get(event.category_id)
+    return CategorySchema(many=True).dump(event.detailed_category_chain)
+
+
 class ACLSchema:
     _access = fields.Method('_get_object_acl')
 
@@ -107,6 +115,7 @@ class EventRecordSchema(RecordSchema, EventSchema):
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda event: EventSchema(only=EventRecordSchema.Meta.indexable).dump(event))
+    category_path = fields.Function(lambda e, ctx: _get_category_chain(e, ctx.get('categories')))
     # By default, CERNs global indexing requires external URLs
     url = mm.String(attribute='external_url')
 
@@ -120,16 +129,8 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda at: AttachmentSchema(only=AttachmentRecordSchema.Meta.indexable).dump(at))
-    category_path = fields.Method('_get_category_path')
+    category_path = fields.Function(lambda a, ctx: _get_category_chain(a.folder.event, ctx.get('categories')))
     url = mm.String(attribute='absolute_download_url')
-
-    def _get_category_path(self, attachment):
-        categories = self.context.get('categories', None)
-        if not attachment.folder.event:
-            return None
-        if categories:
-            return categories.get(attachment.folder.event.category_id)
-        return CategorySchema(many=True).dump(attachment.folder.event.detailed_category_chain)
 
 
 class ContributionRecordSchema(RecordSchema, ContributionSchema):
@@ -143,6 +144,7 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
     _data = fields.Function(lambda contrib: ContributionSchema(
         only=ContributionRecordSchema.Meta.indexable
     ).dump(contrib))
+    category_path = fields.Function(lambda c, ctx: _get_category_chain(c.event, ctx.get('categories')))
     url = mm.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
 
 
@@ -156,6 +158,7 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
     _data = fields.Function(lambda subc: SubContributionSchema(
         only=SubContributionRecordSchema.Meta.indexable
     ).dump(subc))
+    category_path = fields.Function(lambda subc, ctx: _get_category_chain(subc.event, ctx.get('categories')))
     url = mm.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=True))
 
 
@@ -174,4 +177,5 @@ class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda note: _EventNoteDataSchema().dump(note))
+    category_path = fields.Function(lambda note, ctx: _get_category_chain(note.event, ctx.get('categories')))
     url = mm.Function(lambda note: url_for('event_notes.view', note, _external=True))
