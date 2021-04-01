@@ -111,32 +111,15 @@ class EventRecordSchema(RecordSchema, EventSchema):
     url = mm.String(attribute='external_url')
 
 
-class _AttachmentDataSchema(AttachmentSchema):
-    """Represents the subset of indexable attachment attributes"""
-
-    class Meta:
-        fields = ('title', 'filename', 'user', 'content')
-
-    # content = fields.Method('_get_attachment_content')
-
-    def _get_attachment_content(self, attachment):
-        if attachment.type == AttachmentType.file:
-            # TODO: this can probably go away
-            from tika import parser
-
-            from indico_citadel.plugin import CitadelPlugin
-            return parser.from_file(attachment.absolute_download_url,
-                                    CitadelPlugin.settings.get('tika_server'))['content']
-
-
 class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     class Meta:
         model = Attachment
+        indexable = ('title', 'filename', 'user')
         non_indexable = ('attachment_id', 'type', 'type_format', 'event_id', 'contribution_id', 'category_path',
                          'url', 'subcontribution_id', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
-    _data = fields.Function(lambda at: _AttachmentDataSchema().dump(at))
+    _data = fields.Function(lambda at: AttachmentSchema(only=AttachmentRecordSchema.Meta.indexable).dump(at))
     category_path = fields.Method('_get_category_path')
     url = mm.String(attribute='absolute_download_url')
 
