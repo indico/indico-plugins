@@ -23,7 +23,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, EntryType
+from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, EntryType, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
@@ -38,49 +38,46 @@ class LiveSyncCitadelUploader(Uploader):
         super().__init__(*args, **kwargs)
 
         self.categories = None
-        self.schemas = {
-            'event': EventRecordSchema(context={'categories': self.categories}),
-            'contribution': ContributionRecordSchema(context={'categories': self.categories}),
-            'subcontribution': SubContributionRecordSchema(context={'categories': self.categories}),
-            'attachment': AttachmentRecordSchema(context={'categories': self.categories}),
-            'note': EventNoteRecordSchema(context={'categories': self.categories})
-        }
         self.search_app = CitadelPlugin.settings.get('search_backend_url')
+        self.schemas = [
+            EventRecordSchema(context={
+                'categories': self.categories, 'schema': url_join(self.search_app, 'schemas/indico/events_v1.0.0.json')
+            }),
+            ContributionRecordSchema(context={
+                'categories': self.categories,
+                'schema': url_join(self.search_app, 'schemas/indico/contributions_v1.0.0.json')
+            }),
+            SubContributionRecordSchema(context={
+                'categories': self.categories,
+                'schema': url_join(self.search_app, 'schemas/indico/subcontributions_v1.0.0.json')
+            }),
+            AttachmentRecordSchema(context={
+                'categories': self.categories,
+                'schema': url_join(self.search_app, 'schemas/indico/attachments_v1.0.0.json')
+            }),
+            EventNoteRecordSchema(context={
+                'categories': self.categories, 'schema': url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json')
+            })
+        ]
         self.endpoint_url = url_join(self.search_app, 'api/records/')
         self.headers = {
             'Authorization': 'Bearer {}'.format(CitadelPlugin.settings.get('search_backend_token'))
         }
 
     def get_jsondata(self, obj):
-        if isinstance(obj, Event):
-            event_data = self.schemas['event'].dump(obj)
-            event_data['$schema'] = url_join(self.search_app, 'schemas/indico/events_v1.0.0.json')
-            return event_data, EntryType.event
-        elif isinstance(obj, Contribution):
-            contribution_data = self.schemas['contribution'].dump(obj)
-            contribution_data['$schema'] = url_join(self.search_app, 'schemas/indico/contributions_v1.0.0.json')
-            return contribution_data, EntryType.contribution
-        elif isinstance(obj, SubContribution):
-            subcontrib_data = self.schemas['subcontribution'].dump(obj)
-            subcontrib_data['$schema'] = url_join(self.search_app, 'schemas/indico/subcontributions_v1.0.0.json')
-            return subcontrib_data, EntryType.subcontribution
-        elif isinstance(obj, Attachment):
-            attachment_data = self.schemas['attachment'].dump(obj)
-            attachment_data['$schema'] = url_join(self.search_app, 'schemas/indico/attachments_v1.0.0.json')
-            return attachment_data, EntryType.attachment
-        elif isinstance(obj, EventNote):
-            note_data = self.schemas['note'].dump(obj)
-            note_data['$schema'] = url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json')
-            return note_data, EntryType.note
-        else:
-            raise ValueError(f'unknown object ref: {obj}')
+        for schema in self.schemas:
+            if isinstance(obj, schema.Meta.model):
+                return schema.dump(obj)
+        raise ValueError(f'unknown object ref: {obj}')
 
-    def upload_jsondata(self, session, jsondata, change_type, obj_id, entry_type):
+    def upload_jsondata(self, session, change_type, entry):
         response = None
+        jsondata = self.get_jsondata(entry)
+        entry_type = get_entry_type(entry)
         if change_type & SimpleChange.created:
             response = session.post(self.endpoint_url, json=jsondata)
         else:
-            search_id = CitadelSearchAppIdMap.get_search_id(obj_id, entry_type)
+            search_id = CitadelSearchAppIdMap.get_search_id(entry.id, entry_type)
             if not search_id:
                 raise Exception('SearchMapId does not exist for the object')
 
@@ -95,12 +92,23 @@ class LiveSyncCitadelUploader(Uploader):
             raise Exception(f'{response.status_code} - {response.text} in record {jsondata}')
         elif change_type & SimpleChange.created:
             content = response.json()
-            if content['metadata']['control_number']:
-                CitadelSearchAppIdMap.create(content['metadata']['control_number'], obj_id, entry_type)
+            control_number = content['metadata']['control_number']
+            if control_number:
+                CitadelSearchAppIdMap.create(control_number, entry.id, entry_type)
+                self.on_create(session, control_number, entry)
             else:
                 raise Exception('Cannot create the search id mapping: {} - {}'
                                 .format(response.status_code, response.text))
         response.close()
+
+    def on_create(self, session, control_number, entry):
+        if isinstance(entry, Attachment):
+            response = session.put(url_join(self.search_app, 'api/record/{}/files/{}'.format(
+                control_number, entry.file.filename
+            )), data=entry.file.open())
+            if response.ok:
+                # Mark citadel's attachment as uploaded
+                pass
 
     def run_initial(self, events, total=None):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
@@ -126,21 +134,18 @@ class LiveSyncCitadelUploader(Uploader):
         tasks = []
         for idx, entry in enumerate(records):
             change = records[entry] if from_queue else SimpleChange.created
-            jsondata, entry_type = self.get_jsondata(entry)
-            if jsondata is None:
-                continue
 
             def run(app, *args):
                 with app.app_context():
                     return self.upload_jsondata(*args)
 
             tasks.append(loop.run_in_executor(
-                executor, run, current_app._get_current_object(), session, jsondata, change, entry.id, entry_type
+                executor, run, current_app._get_current_object(), session, change, entry
             ))
             if len(tasks) >= LiveSyncCitadelUploader.UPLOAD_BATCH_SIZE or idx + 1 == len(records):
                 loop.run_until_complete(asyncio.gather(*tasks))
                 db.session.commit()
-                self.logger.info('Uploaded %d %s records', len(tasks), entry_type)
+                self.logger.info('Uploaded %d %s records', len(tasks))
                 tasks = []
         session.close()
 

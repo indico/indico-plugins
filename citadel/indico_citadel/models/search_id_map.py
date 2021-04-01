@@ -6,6 +6,11 @@
 # see the LICENSE file for more details.
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
+from indico.modules.attachments import Attachment
+from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.notes.models.notes import EventNote
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoEnum
 
@@ -18,6 +23,14 @@ class EntryType(int, IndicoEnum):
     note = 5
 
 
+_types_for_model = {
+    Event: EntryType.event,
+    Contribution: EntryType.contribution,
+    SubContribution: EntryType.subcontribution,
+    Attachment: EntryType.attachment,
+    EventNote: EntryType.note,
+}
+
 _column_for_types = {
     EntryType.event: 'event_id',
     EntryType.contribution: 'contrib_id',
@@ -25,6 +38,12 @@ _column_for_types = {
     EntryType.attachment: 'attachment_id',
     EntryType.note: 'note_id'
 }
+
+
+def get_entry_type(entry):
+    for model, entry_type in _types_for_model.items():
+        if isinstance(entry, model):
+            return entry_type
 
 
 def _make_checks():
@@ -167,16 +186,9 @@ class CitadelSearchAppIdMap(db.Model):
         """
 
         obj = cls.query.filter_by(entry_type=obj_type)
-        if obj_type == EntryType.event:
-            obj = obj.filter_by(event_id=oid)
-        elif obj_type == EntryType.contribution:
-            obj = obj.filter_by(contrib_id=oid)
-        elif obj_type == EntryType.subcontribution:
-            obj = obj.filter_by(subcontrib_id=oid)
-        elif obj_type == EntryType.attachment:
-            obj = obj.filter_by(attachment_id=oid)
-        elif obj_type == EntryType.note:
-            obj = obj.filter_by(note_id=oid)
+        attr = _column_for_types.get(obj_type)
+        if attr:
+            obj.filter_by(**{attr: oid})
 
         obj = obj.first()
         return obj.search_id if obj else None
@@ -189,17 +201,9 @@ class CitadelSearchAppIdMap(db.Model):
         :param oid: The id of the object
         :param obj_type: the EntryType of the object
         """
-        if obj_type == EntryType.event:
-            entry = cls(search_id=eid, entry_type=obj_type, event_id=oid)
-        elif obj_type == EntryType.contribution:
-            entry = cls(search_id=eid, entry_type=obj_type, contrib_id=oid)
-        elif obj_type == EntryType.subcontribution:
-            entry = cls(search_id=eid, entry_type=obj_type, subcontrib_id=oid)
-        elif obj_type == EntryType.attachment:
-            entry = cls(search_id=eid, entry_type=obj_type, attachment_id=oid)
-        elif obj_type == EntryType.note:
-            entry = cls(search_id=eid, entry_type=obj_type, note_id=oid)
-        else:
+        attr = _column_for_types.get(obj_type)
+        if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
+        entry = cls(search_id=eid, entry_type=EntryType.event, **{attr: oid})
 
         db.session.add(entry)

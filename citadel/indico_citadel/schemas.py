@@ -7,6 +7,7 @@
 
 from flask import current_app
 from marshmallow import post_dump
+from marshmallow_sqlalchemy import ModelSchema
 from webargs import fields
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -19,6 +20,7 @@ from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
                                            EventSchema, SubContributionSchema)
 from indico.web.flask.util import url_for
+from indico_livesync.models.queue import EntryType
 
 
 PRINCIPAL_TYPES = {
@@ -86,6 +88,7 @@ class RecordSchema(ACLSchema):
         fields = ('_data', '_access', 'site')
 
     site = fields.Function(lambda _: current_app.config.get('SERVER_NAME'))
+    schema = fields.Function(lambda _, ctx: ctx.get('schema'))
 
     @post_dump
     def remove_none_fields(self, data, **kwargs):
@@ -98,6 +101,7 @@ class RecordSchema(ACLSchema):
 
 class EventRecordSchema(RecordSchema, EventSchema):
     class Meta:
+        model = Event
         indexable = ('title', 'description', 'keywords', 'location', 'persons')
         non_indexable = ('type', 'type_format', 'event_id', 'url', 'category_path', 'start_dt', 'end_dt')
         fields = RecordSchema.Meta.fields + non_indexable
@@ -127,6 +131,7 @@ class _AttachmentDataSchema(AttachmentSchema):
 
 class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     class Meta:
+        model = Attachment
         non_indexable = ('attachment_id', 'type', 'type_format', 'event_id', 'contribution_id', 'category_path',
                          'url', 'subcontribution_id', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
@@ -146,6 +151,7 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
 
 class ContributionRecordSchema(RecordSchema, ContributionSchema):
     class Meta:
+        model = Contribution
         indexable = ('title', 'description', 'location', 'persons')
         non_indexable = ('contribution_id', 'type', 'type_format', 'event_id', 'url', 'category_path', 'start_dt',
                          'end_dt')
@@ -159,6 +165,7 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
 
 class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
     class Meta:
+        model = SubContribution
         indexable = ('title', 'description', 'persons', 'location')
         non_indexable = ('subcontribution_id', 'type', 'event_id', 'contribution_id', 'category_path', 'url')
         fields = RecordSchema.Meta.fields + non_indexable
@@ -178,6 +185,7 @@ class _EventNoteDataSchema(EventNoteSchema):
 
 class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
     class Meta:
+        model = EventNote
         non_indexable = ('note_id', 'type', 'event_id', 'contribution_id', 'subcontribution_id', 'category_path',
                          'url', 'created_dt')
         fields = RecordSchema.Meta.fields + non_indexable
