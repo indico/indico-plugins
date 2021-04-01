@@ -105,19 +105,24 @@ def initial_export(agent_id, force):
 
 def query_events():
     return (
-        Event.query.filter_by(is_deleted=False).options(
+        Event.query
+        .filter_by(is_deleted=False)
+        .options(
             subqueryload(Event.acl_entries),
             joinedload(Event.person_links),
             joinedload(Event.own_venue),
             joinedload(Event.own_room),
             undefer(Event.own_address)
         )
+        .order_by(Event.id)
     )
 
 
 def query_contributions():
     return (
-        Contribution.query.filter_by(is_deleted=False).options(
+        Contribution.query
+        .filter_by(is_deleted=False)
+        .options(
             subqueryload(Contribution.acl_entries),
             joinedload(Contribution.person_links),
             joinedload(Contribution.event).subqueryload(Event.acl_entries),
@@ -130,6 +135,7 @@ def query_contributions():
             subqueryload(Contribution.session_block),
             subqueryload(Contribution.timetable_entry)
         )
+        .order_by(Contribution.id)
     )
 
 
@@ -215,12 +221,15 @@ def query_attachments():
         .filter((AttachmentFolder.link_type != LinkType.subcontribution) | (
             ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
         .filter((AttachmentFolder.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
+        .order_by(Attachment.id)
     )
 
 
 def query_notes():
     return (
-        EventNote.query.filter_by(is_deleted=False).options(
+        EventNote.query
+        .filter_by(is_deleted=False)
+        .options(
             subqueryload(EventNote.revisions).raiseload(EventNoteRevision.user),
             subqueryload(EventNote.current_revision).raiseload(EventNoteRevision.user),
             selectinload(EventNote.event).subqueryload(Event.acl_entries),
@@ -232,6 +241,7 @@ def query_notes():
             .subqueryload(Contribution.session).subqueryload(Session.acl_entries),
             selectinload(EventNote.session).subqueryload(Session.acl_entries)
         )
+        .order_by(EventNote.id)
     )
 
 
