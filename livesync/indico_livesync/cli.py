@@ -8,7 +8,7 @@ import time
 
 import click
 from flask_pluginengine import current_plugin
-from sqlalchemy.orm import contains_eager, joinedload, load_only, selectinload, subqueryload
+from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload, selectinload, subqueryload
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
@@ -114,7 +114,7 @@ def query_events():
             selectinload(Event.acl_entries),
             selectinload(Event.person_links),
             joinedload(Event.own_venue),
-            joinedload(Event.own_room).raiseload('*'),
+            joinedload(Event.own_room).options(raiseload('*'), joinedload('location')),
         )
         .order_by(Event.id)
     )
@@ -123,20 +123,20 @@ def query_events():
 def query_contributions():
     event_strategy = contains_eager(Contribution.event)
     event_strategy.joinedload(Event.own_venue)
-    event_strategy.joinedload(Event.own_room).raiseload('*')
+    event_strategy.joinedload(Event.own_room).options(raiseload('*'), joinedload('location'))
     _apply_acl_entry_strategy(event_strategy.selectinload(Event.acl_entries), EventPrincipal)
 
     session_strategy = joinedload(Contribution.session)
     _apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
     session_strategy.joinedload(Session.own_venue)
-    session_strategy.joinedload(Session.own_room).raiseload('*')
+    session_strategy.joinedload(Session.own_room).options(raiseload('*'), joinedload('location'))
 
     session_block_strategy = joinedload(Contribution.session_block)
-    session_block_strategy.joinedload(Session.own_venue)
-    session_block_strategy.joinedload(Session.own_room).raiseload('*')
+    session_block_strategy.joinedload(SessionBlock.own_venue)
+    session_block_strategy.joinedload(SessionBlock.own_room).options(raiseload('*'), joinedload('location'))
     session_block_session_strategy = session_block_strategy.joinedload(SessionBlock.session)
     session_block_session_strategy.joinedload(Session.own_venue)
-    session_block_session_strategy.joinedload(Session.own_room).raiseload('*')
+    session_block_session_strategy.joinedload(Session.own_room).options(raiseload('*'), joinedload('location'))
 
     return (
         Contribution.query
@@ -147,8 +147,9 @@ def query_contributions():
             selectinload(Contribution.person_links),
             event_strategy,
             session_strategy,
+            session_block_strategy,
             joinedload(Contribution.own_venue),
-            joinedload(Contribution.own_room).raiseload('*'),
+            joinedload(Contribution.own_room).options(raiseload('*'), joinedload('location')),
             joinedload(Contribution.timetable_entry),
         )
         .order_by(Contribution.id)
@@ -251,7 +252,7 @@ def query_notes():
     session_event = db.aliased(Event)
 
     note_strategy = load_only('id', 'link_type', 'event_id', 'linked_event_id', 'contribution_id',
-                              'subcontribution_id', 'session_id')
+                              'subcontribution_id', 'session_id', 'html')
     # event
     _apply_acl_entry_strategy(note_strategy.contains_eager(EventNote.linked_event)
                               .selectinload(Event.acl_entries), EventPrincipal)
