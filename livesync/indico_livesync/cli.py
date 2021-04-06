@@ -8,7 +8,7 @@ import time
 
 import click
 from flask_pluginengine import current_plugin
-from sqlalchemy.orm import contains_eager, joinedload, selectinload, subqueryload, undefer
+from sqlalchemy.orm import contains_eager, joinedload, load_only, selectinload, subqueryload, undefer
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
@@ -87,9 +87,11 @@ def initial_export(agent_id, force):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    pre_load = Category.query.all()  # noqa: F841
     Category.allow_relationship_preloading = True
-    Category.preload_relationships(Category.query, 'acl_entries')
+    Category.preload_relationships(Category.query, 'acl_entries',
+                                   strategy=lambda rel: _apply_acl_entry_strategy(subqueryload(rel), CategoryPrincipal))
+    _category_cache = Category.query.all()  # noqa: F841
+
     backend = agent.create_backend()
     events = query_events()
     backend.run_initial_export(yield_per(events, 5000), events.count())
@@ -140,6 +142,22 @@ def query_contributions():
     )
 
 
+def _apply_acl_entry_strategy(rel, principal):
+    user_strategy = rel.joinedload('user')
+    user_strategy.raiseload('*')
+    user_strategy.load_only('id')
+    rel.joinedload('local_group').load_only('id')
+    if principal.allow_networks:
+        rel.joinedload('ip_network_group').load_only('id')
+    if principal.allow_category_roles:
+        rel.joinedload('category_role').load_only('id')
+    if principal.allow_event_roles:
+        rel.joinedload('event_role').load_only('id')
+    if principal.allow_registration_forms:
+        rel.joinedload('registration_form').load_only('id')
+    return rel
+
+
 def query_attachments():
     contrib_event = db.aliased(Event)
     contrib_session = db.aliased(Session)
@@ -147,21 +165,6 @@ def query_attachments():
     subcontrib_session = db.aliased(Session)
     subcontrib_event = db.aliased(Event)
     session_event = db.aliased(Event)
-
-    def _apply_acl_entry_strategy(rel, principal):
-        user_strategy = rel.joinedload('user')
-        user_strategy.raiseload('*')
-        user_strategy.load_only('id')
-        rel.joinedload('local_group').load_only('id')
-        if principal.allow_networks:
-            rel.joinedload('ip_network_group').load_only('id')
-        if principal.allow_category_roles:
-            rel.joinedload('category_role').load_only('id')
-        if principal.allow_event_roles:
-            rel.joinedload('event_role').load_only('id')
-        if principal.allow_registration_forms:
-            rel.joinedload('registration_form').load_only('id')
-        return rel
 
     attachment_strategy = _apply_acl_entry_strategy(selectinload(Attachment.acl_entries), AttachmentPrincipal)
     folder_strategy = contains_eager(Attachment.folder)
@@ -234,6 +237,36 @@ def query_notes():
     subcontrib_event = db.aliased(Event)
     session_event = db.aliased(Event)
 
+    note_strategy = load_only('id', 'link_type', 'event_id', 'linked_event_id', 'contribution_id',
+                              'subcontribution_id', 'session_id')
+    # event
+    _apply_acl_entry_strategy(note_strategy.contains_eager(EventNote.linked_event)
+                              .selectinload(Event.acl_entries), EventPrincipal)
+    # contribution
+    contrib_strategy = note_strategy.contains_eager(EventNote.contribution)
+    _apply_acl_entry_strategy(contrib_strategy.selectinload(Contribution.acl_entries), ContributionPrincipal)
+    _apply_acl_entry_strategy(contrib_strategy.contains_eager(Contribution.event.of_type(contrib_event))
+                              .selectinload(contrib_event.acl_entries), EventPrincipal)
+    _apply_acl_entry_strategy(contrib_strategy.contains_eager(Contribution.session.of_type(contrib_session))
+                              .selectinload(contrib_session.acl_entries), SessionPrincipal)
+    # subcontribution
+    subcontrib_strategy = note_strategy.contains_eager(EventNote.subcontribution)
+    subcontrib_contrib_strategy = subcontrib_strategy.contains_eager(
+        SubContribution.contribution.of_type(subcontrib_contrib)
+    )
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .selectinload(subcontrib_contrib.acl_entries), ContributionPrincipal)
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .contains_eager(subcontrib_contrib.event.of_type(subcontrib_event))
+                              .selectinload(subcontrib_event.acl_entries), EventPrincipal)
+    _apply_acl_entry_strategy(subcontrib_contrib_strategy
+                              .contains_eager(subcontrib_contrib.session.of_type(subcontrib_session))
+                              .selectinload(subcontrib_session.acl_entries), SessionPrincipal)
+    # session
+    session_strategy = note_strategy.contains_eager(EventNote.session)
+    session_strategy.contains_eager(Session.event.of_type(session_event)).selectinload(session_event.acl_entries)
+    _apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
+
     return (
         EventNote.query
         .outerjoin(EventNote.linked_event)
@@ -253,16 +286,8 @@ def query_notes():
             ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
         .filter((EventNote.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
         .options(
-            subqueryload(EventNote.revisions).raiseload(EventNoteRevision.user),
-            subqueryload(EventNote.current_revision).raiseload(EventNoteRevision.user),
-            selectinload(EventNote.event).subqueryload(Event.acl_entries),
-            selectinload(EventNote.contribution).subqueryload(Contribution.acl_entries),
-            selectinload(EventNote.contribution).subqueryload(Contribution.session).subqueryload(Session.acl_entries),
-            selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
-            .subqueryload(Contribution.acl_entries),
-            selectinload(EventNote.subcontribution).subqueryload(SubContribution.contribution)
-            .subqueryload(Contribution.session).subqueryload(Session.acl_entries),
-            selectinload(EventNote.session).subqueryload(Session.acl_entries)
+            note_strategy,
+            joinedload(EventNote.current_revision).raiseload(EventNoteRevision.user),
         )
         .order_by(EventNote.id)
     )
