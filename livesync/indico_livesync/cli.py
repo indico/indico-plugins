@@ -121,7 +121,8 @@ def query_events():
 def query_contributions():
     return (
         Contribution.query
-        .filter_by(is_deleted=False)
+        .join(Event)
+        .filter(~Contribution.is_deleted, ~Event.is_deleted)
         .options(
             subqueryload(Contribution.acl_entries),
             joinedload(Contribution.person_links),
@@ -226,9 +227,31 @@ def query_attachments():
 
 
 def query_notes():
+    contrib_event = db.aliased(Event)
+    contrib_session = db.aliased(Session)
+    subcontrib_contrib = db.aliased(Contribution)
+    subcontrib_session = db.aliased(Session)
+    subcontrib_event = db.aliased(Event)
+    session_event = db.aliased(Event)
+
     return (
         EventNote.query
-        .filter_by(is_deleted=False)
+        .outerjoin(EventNote.linked_event)
+        .outerjoin(EventNote.contribution)
+        .outerjoin(Contribution.event.of_type(contrib_event))
+        .outerjoin(Contribution.session.of_type(contrib_session))
+        .outerjoin(EventNote.subcontribution)
+        .outerjoin(SubContribution.contribution.of_type(subcontrib_contrib))
+        .outerjoin(subcontrib_contrib.event.of_type(subcontrib_event))
+        .outerjoin(subcontrib_contrib.session.of_type(subcontrib_session))
+        .outerjoin(EventNote.session)
+        .outerjoin(Session.event.of_type(session_event))
+        .filter(~EventNote.is_deleted)
+        .filter((EventNote.link_type != LinkType.event) | (~Event.is_deleted))
+        .filter((EventNote.link_type != LinkType.contribution) | (~Contribution.is_deleted & ~contrib_event.is_deleted))
+        .filter((EventNote.link_type != LinkType.subcontribution) | (
+            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
+        .filter((EventNote.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
         .options(
             subqueryload(EventNote.revisions).raiseload(EventNoteRevision.user),
             subqueryload(EventNote.current_revision).raiseload(EventNoteRevision.user),
