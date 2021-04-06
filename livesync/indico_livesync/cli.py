@@ -8,7 +8,7 @@ import time
 
 import click
 from flask_pluginengine import current_plugin
-from sqlalchemy.orm import contains_eager, joinedload, load_only, selectinload, subqueryload, undefer
+from sqlalchemy.orm import contains_eager, joinedload, load_only, selectinload, subqueryload
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
@@ -25,6 +25,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.notes.models.notes import EventNote, EventNoteRevision
 from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.console import cformat
 
@@ -110,33 +111,45 @@ def query_events():
         Event.query
         .filter_by(is_deleted=False)
         .options(
-            subqueryload(Event.acl_entries),
-            joinedload(Event.person_links),
+            selectinload(Event.acl_entries),
+            selectinload(Event.person_links),
             joinedload(Event.own_venue),
-            joinedload(Event.own_room),
-            undefer(Event.own_address)
+            joinedload(Event.own_room).raiseload('*'),
         )
         .order_by(Event.id)
     )
 
 
 def query_contributions():
+    event_strategy = contains_eager(Contribution.event)
+    event_strategy.joinedload(Event.own_venue)
+    event_strategy.joinedload(Event.own_room).raiseload('*')
+    _apply_acl_entry_strategy(event_strategy.selectinload(Event.acl_entries), EventPrincipal)
+
+    session_strategy = joinedload(Contribution.session)
+    _apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
+    session_strategy.joinedload(Session.own_venue)
+    session_strategy.joinedload(Session.own_room).raiseload('*')
+
+    session_block_strategy = joinedload(Contribution.session_block)
+    session_block_strategy.joinedload(Session.own_venue)
+    session_block_strategy.joinedload(Session.own_room).raiseload('*')
+    session_block_session_strategy = session_block_strategy.joinedload(SessionBlock.session)
+    session_block_session_strategy.joinedload(Session.own_venue)
+    session_block_session_strategy.joinedload(Session.own_room).raiseload('*')
+
     return (
         Contribution.query
         .join(Event)
         .filter(~Contribution.is_deleted, ~Event.is_deleted)
         .options(
-            subqueryload(Contribution.acl_entries),
-            joinedload(Contribution.person_links),
-            joinedload(Contribution.event).subqueryload(Event.acl_entries),
-            joinedload(Contribution.event).joinedload(Event.own_venue),
-            joinedload(Contribution.event).joinedload(Event.own_room),
-            joinedload(Contribution.session).subqueryload(Session.acl_entries),
+            selectinload(Contribution.acl_entries),
+            selectinload(Contribution.person_links),
+            event_strategy,
+            session_strategy,
             joinedload(Contribution.own_venue),
-            joinedload(Contribution.own_room),
-            undefer(Contribution.own_address),
-            subqueryload(Contribution.session_block),
-            subqueryload(Contribution.timetable_entry)
+            joinedload(Contribution.own_room).raiseload('*'),
+            joinedload(Contribution.timetable_entry),
         )
         .order_by(Contribution.id)
     )
