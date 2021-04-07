@@ -188,7 +188,7 @@ class CitadelSearchAppIdMap(db.Model):
         obj = cls.query.filter_by(entry_type=obj_type)
         attr = _column_for_types.get(obj_type)
         if attr:
-            obj.filter_by(**{attr: oid})
+            obj.filter_by(getattr(cls, attr) == oid)
 
         obj = obj.first()
         return obj.search_id if obj else None

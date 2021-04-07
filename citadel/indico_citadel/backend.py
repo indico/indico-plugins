@@ -5,24 +5,21 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import asyncio
-from concurrent.futures.thread import ThreadPoolExecutor
 from functools import cached_property
 
 import requests
-from flask import current_app
 from requests.adapters import HTTPAdapter
 from sqlalchemy import select
 from urllib3 import Retry
 from werkzeug.urls import url_join
 
 from indico.core.db import db
-from indico.modules.attachments import Attachment
 from indico.modules.categories import Category
 
 from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
+from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
 
 
@@ -69,18 +66,19 @@ class LiveSyncCitadelUploader(Uploader):
             })
         ]
 
-    def get_jsondata(self, obj):
+    def dump_record(self, obj):
         for schema in self.schemas:
             if isinstance(obj, schema.Meta.model):
                 return schema.dump(obj)
         raise ValueError(f'unknown object ref: {obj}')
 
-    def upload_jsondata(self, session, change_type, entry):
-        response = None
-        jsondata = self.get_jsondata(entry)
+    def upload_record(self, entry, entries, session, from_queue):
+        change_type = entries[entry] if from_queue else SimpleChange.created
+        json = self.dump_record(entry)
         entry_type = get_entry_type(entry)
+        response = None
         if change_type & SimpleChange.created:
-            response = session.post(self.endpoint_url, json=jsondata)
+            response = session.post(self.endpoint_url, json=json)
         else:
             search_id = CitadelSearchAppIdMap.get_search_id(entry.id, entry_type)
             if not search_id:
@@ -88,32 +86,22 @@ class LiveSyncCitadelUploader(Uploader):
 
             if change_type & SimpleChange.updated:
                 url = url_join(self.search_app, f'api/record/{search_id}')
-                response = session.put(url, json=jsondata)
+                response = session.put(url, json=json)
             elif change_type & SimpleChange.deleted:
                 url = url_join(self.search_app, f'api/record/{search_id}')
-                response = session.delete(url, json=jsondata)
+                response = session.delete(url, json=json)
 
         if not response.ok:
-            raise Exception(f'{response.status_code} - {response.text} in record {jsondata}')
+            raise Exception(f'{response.status_code} - {response.text} in record {json}')
         elif change_type & SimpleChange.created:
             content = response.json()
             control_number = content['metadata']['control_number']
             if control_number:
                 CitadelSearchAppIdMap.create(control_number, entry.id, entry_type)
-                self.on_create(session, control_number, entry)
             else:
                 raise Exception('Cannot create the search id mapping: {} - {}'
                                 .format(response.status_code, response.text))
         response.close()
-
-    def on_create(self, session, control_number, entry):
-        if isinstance(entry, Attachment):
-            response = session.put(url_join(self.search_app, 'api/record/{}/files/{}'.format(
-                control_number, entry.file.filename
-            )), data=entry.file.open())
-            if response.ok:
-                # Mark citadel's attachment as uploaded
-                pass
 
     def run_initial(self, events, total=None):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
@@ -130,25 +118,8 @@ class LiveSyncCitadelUploader(Uploader):
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
-        loop = asyncio.get_event_loop()
-        executor = ThreadPoolExecutor()
-        tasks = []
-        for idx, entry in enumerate(records):
-            change = records[entry] if from_queue else SimpleChange.created
-
-            def run(app, *args):
-                with app.app_context():
-                    return self.upload_jsondata(*args)
-
-            tasks.append(loop.run_in_executor(
-                executor, run, current_app._get_current_object(), session, change, entry
-            ))
-            if len(tasks) >= LiveSyncCitadelUploader.UPLOAD_BATCH_SIZE or idx + 1 == len(records):
-                loop.run_until_complete(asyncio.gather(*tasks))
-                db.session.commit()
-                self.logger.info('Uploaded %d %s records', len(tasks))
-                tasks = []
-        session.close()
+        uploader = parallelize(self.upload_record, entries=records)
+        uploader(session, from_queue)
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
