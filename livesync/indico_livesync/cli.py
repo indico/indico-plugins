@@ -147,6 +147,7 @@ def query_contributions():
             event_strategy,
             session_strategy,
             session_block_strategy,
+            joinedload(Contribution.type),
             joinedload(Contribution.own_venue),
             joinedload(Contribution.own_room).options(raiseload('*'), joinedload('location')),
             joinedload(Contribution.timetable_entry),
