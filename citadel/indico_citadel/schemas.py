@@ -35,8 +35,8 @@ def _get_identifiers(access_list):
 def _get_category_chain(event, categories):
     if not event:
         return None
-    if categories:
-        return categories.get(event.category_id)
+    if categories is not None:
+        return categories[event.category_id]
     return CategorySchema(many=True).dump(event.detailed_category_chain)
 
 
