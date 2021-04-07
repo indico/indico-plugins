@@ -7,13 +7,17 @@
 
 import click
 from flask_pluginengine import current_plugin
+from sqlalchemy.orm import subqueryload
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core.db import db
-from indico.modules.events.models.events import Event
+from indico.modules.categories import Category
+from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.util.console import cformat
 
+from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
+                                     query_notes)
 from indico_livesync.models.agents import LiveSyncAgent
 
 
@@ -73,7 +77,20 @@ def initial_export(agent_id, force):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    agent.create_backend().run_initial_export(Event.query.filter_by(is_deleted=False))
+    Category.allow_relationship_preloading = True
+    Category.preload_relationships(Category.query, 'acl_entries',
+                                   strategy=lambda rel: apply_acl_entry_strategy(subqueryload(rel), CategoryPrincipal))
+    _category_cache = Category.query.all()  # noqa: F841
+
+    backend = agent.create_backend()
+    events = query_events()
+    backend.run_initial_export(events.yield_per(5000), events.count())
+    contributions = query_contributions()
+    backend.run_initial_export(contributions.yield_per(5000), contributions.count())
+    attachments = query_attachments()
+    backend.run_initial_export(attachments.yield_per(5000), attachments.count())
+    notes = query_notes()
+    backend.run_initial_export(notes.yield_per(5000), notes.count())
     agent.initial_data_exported = True
     db.session.commit()
 

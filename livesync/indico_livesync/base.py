@@ -88,15 +88,16 @@ class LiveSyncBackendBase:
         uploader.run(records)
         self.update_last_run()
 
-    def run_initial_export(self, events):
+    def run_initial_export(self, events, total=None):
         """Runs the initial export.
 
         This process is expected to take a very long time.
 
-        :param events: iterable of all events in this indico instance
+        :param events: iterable of all records in this indico instance
+        :param total: (optional) the total of records to be exported
         """
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         uploader = self.uploader(self)
-        uploader.run_initial(events)
+        uploader.run_initial(events, total)
