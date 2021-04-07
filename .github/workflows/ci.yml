@@ -5,10 +5,12 @@ on:
     branches:
       - master
       - 2.3-maintenance
+      - search
   pull_request:
     branches:
       - master
       - 2.3-maintenance
+      - search
 
 jobs:
   setup:
