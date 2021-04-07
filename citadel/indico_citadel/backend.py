@@ -7,6 +7,7 @@
 
 import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
+from functools import cached_property
 
 import requests
 from flask import current_app
@@ -39,9 +40,20 @@ class LiveSyncCitadelUploader(Uploader):
 
         self.categories = None
         self.search_app = CitadelPlugin.settings.get('search_backend_url')
-        self.schemas = [
+        self.endpoint_url = url_join(self.search_app, 'api/records/')
+        self.headers = {
+            'Authorization': 'Bearer {}'.format(CitadelPlugin.settings.get('search_backend_token'))
+        }
+
+    @cached_property
+    def schemas(self):
+        # this is a property because `self.categories` is only set to the cached data during an initial
+        # export, and if we create the schemas earlier the context won't get the new data. and using the
+        # property is cleaner than mutating `self.categories` after having passed it to the schemas...
+        return [
             EventRecordSchema(context={
-                'categories': self.categories, 'schema': url_join(self.search_app, 'schemas/indico/events_v1.0.0.json')
+                'categories': self.categories,
+                'schema': url_join(self.search_app, 'schemas/indico/events_v1.0.0.json')
             }),
             ContributionRecordSchema(context={
                 'categories': self.categories,
@@ -56,13 +68,10 @@ class LiveSyncCitadelUploader(Uploader):
                 'schema': url_join(self.search_app, 'schemas/indico/attachments_v1.0.0.json')
             }),
             EventNoteRecordSchema(context={
-                'categories': self.categories, 'schema': url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json')
+                'categories': self.categories,
+                'schema': url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json')
             })
         ]
-        self.endpoint_url = url_join(self.search_app, 'api/records/')
-        self.headers = {
-            'Authorization': 'Bearer {}'.format(CitadelPlugin.settings.get('search_backend_token'))
-        }
 
     def get_jsondata(self, obj):
         for schema in self.schemas:
@@ -112,11 +121,7 @@ class LiveSyncCitadelUploader(Uploader):
 
     def run_initial(self, events, total=None):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
-        categories = db.session.execute(select([cte.c.id, cte.c.path])).fetchall()
-        self.categories = {}
-        for _id, path in categories:
-            self.categories[_id] = path
-
+        self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
         super().run_initial(events, total)
 
     def upload_records(self, records, from_queue):
