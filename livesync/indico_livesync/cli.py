@@ -232,13 +232,26 @@ def query_attachments():
         .outerjoin(AttachmentFolder.session)
         .outerjoin(Session.event.of_type(session_event))
         .filter(~Attachment.is_deleted, ~AttachmentFolder.is_deleted)
-        .filter((AttachmentFolder.link_type != LinkType.category) | (~Category.is_deleted))
-        .filter((AttachmentFolder.link_type != LinkType.event) | (~Event.is_deleted))
-        .filter((AttachmentFolder.link_type != LinkType.contribution) | (
-            ~Contribution.is_deleted & ~contrib_event.is_deleted))
-        .filter((AttachmentFolder.link_type != LinkType.subcontribution) | (
-            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
-        .filter((AttachmentFolder.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
+        .filter(db.or_(
+            AttachmentFolder.link_type != LinkType.category,
+            ~Category.is_deleted
+        ))
+        .filter(db.or_(
+            AttachmentFolder.link_type != LinkType.event,
+            ~Event.is_deleted
+        ))
+        .filter(db.or_(
+            AttachmentFolder.link_type != LinkType.contribution,
+            ~Contribution.is_deleted & ~contrib_event.is_deleted
+        ))
+        .filter(db.or_(
+            AttachmentFolder.link_type != LinkType.subcontribution,
+            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted
+        ))
+        .filter(db.or_(
+            AttachmentFolder.link_type != LinkType.session,
+            ~Session.is_deleted & ~session_event.is_deleted
+        ))
         .order_by(Attachment.id)
     )
 
@@ -294,11 +307,22 @@ def query_notes():
         .outerjoin(EventNote.session)
         .outerjoin(Session.event.of_type(session_event))
         .filter(~EventNote.is_deleted)
-        .filter((EventNote.link_type != LinkType.event) | (~Event.is_deleted))
-        .filter((EventNote.link_type != LinkType.contribution) | (~Contribution.is_deleted & ~contrib_event.is_deleted))
-        .filter((EventNote.link_type != LinkType.subcontribution) | (
-            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted))
-        .filter((EventNote.link_type != LinkType.session) | (~Session.is_deleted & ~session_event.is_deleted))
+        .filter(db.or_(
+            EventNote.link_type != LinkType.event,
+            ~Event.is_deleted
+        ))
+        .filter(db.or_(
+            EventNote.link_type != LinkType.contribution,
+            ~Contribution.is_deleted & ~contrib_event.is_deleted
+        ))
+        .filter(db.or_(
+            EventNote.link_type != LinkType.subcontribution,
+            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted
+        ))
+        .filter(db.or_(
+            EventNote.link_type != LinkType.session,
+            ~Session.is_deleted & ~session_event.is_deleted
+        ))
         .options(
             note_strategy,
             joinedload(EventNote.current_revision).raiseload(EventNoteRevision.user),
