@@ -72,7 +72,7 @@ class ACLSchema:
         elif isinstance(object, SubContribution):
             obj_acl = self._get_acl(object.contribution)
         elif isinstance(object, Attachment):
-            obj_acl = _get_identifiers(self._get_attachment_acl(object))
+            obj_acl = self._get_attachment_acl(object)
         elif isinstance(object, EventNote):
             obj_acl = self._get_acl(object.object)
         else:
