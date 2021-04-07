@@ -110,7 +110,7 @@ def query_events():
         Event.query
         .filter_by(is_deleted=False)
         .options(
-            selectinload(Event.acl_entries),
+            _apply_acl_entry_strategy(selectinload(Event.acl_entries), EventPrincipal),
             selectinload(Event.person_links),
             joinedload(Event.own_venue),
             joinedload(Event.own_room).options(raiseload('*'), joinedload('location')),
