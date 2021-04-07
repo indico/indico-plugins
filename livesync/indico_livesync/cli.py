@@ -185,9 +185,6 @@ def query_attachments():
     folder_strategy.load_only('id', 'protection_mode', 'link_type', 'category_id', 'event_id', 'linked_event_id',
                               'contribution_id', 'subcontribution_id', 'session_id')
     _apply_acl_entry_strategy(folder_strategy.selectinload(AttachmentFolder.acl_entries), AttachmentFolderPrincipal)
-    # category
-    _apply_acl_entry_strategy(folder_strategy.contains_eager(AttachmentFolder.category)
-                              .selectinload(Category.acl_entries), CategoryPrincipal)
     # event
     _apply_acl_entry_strategy(folder_strategy.contains_eager(AttachmentFolder.linked_event)
                               .selectinload(Event.acl_entries), EventPrincipal)
@@ -220,7 +217,6 @@ def query_attachments():
         Attachment.query
         .join(Attachment.folder)
         .options(folder_strategy, attachment_strategy, joinedload(Attachment.user).joinedload('_affiliation'))
-        .outerjoin(AttachmentFolder.category)
         .outerjoin(AttachmentFolder.linked_event)
         .outerjoin(AttachmentFolder.contribution)
         .outerjoin(Contribution.event.of_type(contrib_event))
@@ -232,10 +228,7 @@ def query_attachments():
         .outerjoin(AttachmentFolder.session)
         .outerjoin(Session.event.of_type(session_event))
         .filter(~Attachment.is_deleted, ~AttachmentFolder.is_deleted)
-        .filter(db.or_(
-            AttachmentFolder.link_type != LinkType.category,
-            ~Category.is_deleted
-        ))
+        .filter(AttachmentFolder.link_type != LinkType.category)
         .filter(db.or_(
             AttachmentFolder.link_type != LinkType.event,
             ~Event.is_deleted
