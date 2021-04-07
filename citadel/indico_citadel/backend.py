@@ -19,12 +19,8 @@ from werkzeug.urls import url_join
 from indico.core.db import db
 from indico.modules.attachments import Attachment
 from indico.modules.categories import Category
-from indico.modules.events import Event
-from indico.modules.events.contributions import Contribution
-from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.notes.models.notes import EventNote
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, EntryType, get_entry_type
+from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader

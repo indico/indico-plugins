@@ -7,12 +7,11 @@
 
 from flask import current_app
 from marshmallow import post_dump
-from marshmallow_sqlalchemy import ModelSchema
 from webargs import fields
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.marshmallow import mm
-from indico.modules.attachments.models.attachments import Attachment, AttachmentType
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -20,7 +19,6 @@ from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
                                            EventSchema, SubContributionSchema)
 from indico.web.flask.util import url_for
-from indico_livesync.models.queue import EntryType
 
 
 PRINCIPAL_TYPES = {
