@@ -4,7 +4,6 @@
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
-import time
 
 import click
 from flask_pluginengine import current_plugin
@@ -95,13 +94,13 @@ def initial_export(agent_id, force):
 
     backend = agent.create_backend()
     events = query_events()
-    backend.run_initial_export(yield_per(events, 5000), events.count())
+    backend.run_initial_export(events.yield_per(5000), events.count())
     contributions = query_contributions()
-    backend.run_initial_export(yield_per(contributions, 5000), contributions.count())
+    backend.run_initial_export(contributions.yield_per(5000), contributions.count())
     attachments = query_attachments()
-    backend.run_initial_export(yield_per(attachments, 5000), attachments.count())
+    backend.run_initial_export(attachments.yield_per(5000), attachments.count())
     notes = query_notes()
-    backend.run_initial_export(yield_per(notes, 5000), notes.count())
+    backend.run_initial_export(notes.yield_per(5000), notes.count())
     agent.initial_data_exported = True
     db.session.commit()
 
@@ -305,20 +304,6 @@ def query_notes():
         )
         .order_by(EventNote.id)
     )
-
-
-def yield_per(query, window_size=1000):
-    index = 0
-    while True:
-        t1 = time.time()
-        chunk = query.slice(index, index + window_size).all()
-        t2 = time.time()
-        print(cformat('Yielding took: %{green!}{} seconds').format(t2 - t1))
-        if not len(chunk):
-            break
-        for e in chunk:
-            yield e
-        index += window_size
 
 
 @cli.command()

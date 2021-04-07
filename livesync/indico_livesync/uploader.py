@@ -5,8 +5,12 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from operator import attrgetter
+
 from indico.core.db import db
+from indico.util.console import verbose_iterator
 from indico.util.iterables import grouper
+from indico.util.string import str_to_ascii
 
 from indico_livesync.marcxml import MARCXMLGenerator
 from indico_livesync.simplify import process_records
@@ -50,12 +54,11 @@ class Uploader:
         :param events: an iterable containing events
         :param total: (optional) the total of records to be exported
         """
-        self_name = type(self).__name__
-        for i, batch in enumerate(grouper(events, self.INITIAL_BATCH_SIZE, skip_missing=True), 1):
-            self.logger.debug('%s processing initial batch %d', self_name, i)
-            if total:
-                print('progress', round(i * self.INITIAL_BATCH_SIZE / total * 100, 2))
-                self.logger.debug('progress: "%.2f"%%', i * self.INITIAL_BATCH_SIZE / total * 100)
+        if total is not None:
+            events = verbose_iterator(events, total, attrgetter('id'),
+                                      lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                      print_total_time=True)
+        for batch in grouper(events, self.INITIAL_BATCH_SIZE, skip_missing=True):
             self.upload_records(batch, from_queue=False)
 
     def upload_records(self, records, from_queue):
