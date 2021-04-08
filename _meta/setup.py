@@ -20,9 +20,10 @@ plugins_require = [
     'indico-plugin-previewer-code>=1.0,<2.4.dev0',
     'indico-plugin-previewer-jupyter>=1.0,<2.4.dev0',
     'indico-plugin-search>=2.3,<2.4.dev0',
-    'indico-plugin-storage-s3>=2.3,<2.4.dev0',
+    'indico-plugin-storage-s3>=2.3.2,<2.4.dev0',
     'indico-plugin-ursh>=2.3,<2.4.dev0',
-    'indico-plugin-vc-vidyo>=2.3,<2.4.dev0',
+    'indico-plugin-vc-vidyo>=2.3.1,<2.4.dev0',
+    'indico-plugin-vc-zoom>=2.3,<2.4.dev0',
 ]
 extras_require = {
     'importer': ['indico-plugin-importer-invenio>=2.2,<2.4.dev0', 'indico-plugin-importer>=2.2,<2.4.dev0'],
@@ -32,7 +33,7 @@ extras_require = {
 
 setup(
     name='indico-plugins',
-    version='2.3',
+    version='2.3.1',
     description='A meta-package containing the official Indico plugins',
     url='https://github.com/indico/indico-plugins',
     license='MIT',
