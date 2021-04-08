@@ -11,8 +11,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.modules.events.management.controllers import RHManageEventBase
 
-from indico_piwik.reports import (ReportCountries, ReportDevices, ReportDownloads, ReportGeneral, ReportMaterial,
-                                  ReportVisitsPerDay)
+from indico_piwik.reports import ReportCountries, ReportDevices, ReportGeneral, ReportVisitsPerDay
 from indico_piwik.views import WPStatistics
 
 
@@ -58,15 +57,6 @@ class RHApiEventBase(RHApiBase):
         self._report_params['contrib_id'] = request.args.get('contrib_id')
 
 
-class RHApiDownloads(RHApiEventBase):
-    def _process_args(self):
-        RHApiEventBase._process_args(self)
-        self._report_params['download_url'] = request.args['download_url']
-
-    def _process(self):
-        return jsonify(ReportDownloads.get(**self._report_params))
-
-
 class RHApiEventVisitsPerDay(RHApiEventBase):
     def _process(self):
         return jsonify(ReportVisitsPerDay.get(**self._report_params))
@@ -80,8 +70,3 @@ class RHApiEventGraphCountries(RHApiEventBase):
 class RHApiEventGraphDevices(RHApiEventBase):
     def _process(self):
         return jsonify(ReportDevices.get(**self._report_params))
-
-
-class RHApiMaterial(RHApiEventBase):
-    def _process(self):
-        return jsonify(ReportMaterial.get(**self._report_params))

@@ -5,14 +5,12 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-import 'jqtree';
 import 'jquery';
 import './main.css';
 import 'indico/jquery/compat/jqplot';
 
 $(function() {
   const $t = $T.domain('piwik');
-  const treeDOMTarget = '#materialTree';
 
   /**
    * Clears the DOM element for the graph and then initiates a jqPlot render
@@ -76,26 +74,6 @@ $(function() {
   };
 
   /**
-   * Draw a customized jqTree
-   */
-  const draw_jqTree = function(treeData) {
-    $(treeDOMTarget).tree({
-      data: treeData,
-      autoOpen: 0,
-      saveState: true,
-      onCanSelectNode(node) {
-        // Leaf node (material) can be selected
-        return node.children.length === 0;
-      },
-      onCreateLi(node, $li) {
-        if (node.id !== undefined) {
-          $li.find('.title').addClass('selectableNode');
-        }
-      },
-    });
-  };
-
-  /**
    * Get base values for API requests
    */
   const get_api_params = function() {
@@ -144,56 +122,6 @@ $(function() {
     }
 
     return output;
-  };
-
-  /**
-   * Load material downloads data via AJAX and draw its graph
-   */
-  const load_material_graph = function(uri, replot) {
-    replot = typeof replot !== 'undefined' ? replot : false;
-    const DOMTarget = 'materialDownloadChart';
-    const graph_params = get_api_params();
-    graph_params.download_url = uri;
-
-    $.ajax({
-      url: build_url(PiwikPlugin.urls.data_downloads, graph_params),
-      type: 'POST',
-      dataType: 'json',
-      success(data) {
-        if (handleAjaxError(data)) {
-          return;
-        }
-        const materialHits = [
-          get_jqplot_array_values(data.metrics.downloads.individual, 'total'),
-          get_jqplot_array_values(data.metrics.downloads.individual, 'unique'),
-        ];
-        draw_jqplot_graph(materialHits, DOMTarget, replot);
-        $('#materialTotalDownloads').html(data.metrics.downloads.cumulative.total);
-      },
-    });
-  };
-
-  /**
-   * Load the material files data and draw its jqTree
-   */
-  const load_material_tree = function() {
-    $(treeDOMTarget).html(progressIndicator(true, true).dom);
-
-    $.ajax({
-      url: build_url(PiwikPlugin.urls.material, get_api_params()),
-      type: 'POST',
-      dataType: 'json',
-      success(data) {
-        if (handleAjaxError(data)) {
-          return;
-        }
-        if (data.material.tree !== null) {
-          draw_jqTree(data.material.tree);
-        } else {
-          $(treeDOMTarget).html($t.gettext('No material found'));
-        }
-      },
-    });
   };
 
   /**
@@ -273,13 +201,6 @@ $(function() {
       window.location.href = url;
     });
 
-    // Event handler for clicking 'selectable' elements from the jqTree.
-    $(treeDOMTarget).bind('tree.click', function(event) {
-      $('#materialTitle').html(event.node.name);
-      $('#materialDownloadChart').html(progressIndicator(true, true).dom);
-      load_material_graph(event.node.id, true);
-    });
-
     // jQuery UI Dialog if no data is received via AJAX (timeout)
     $('#dialogNoGraphData').dialog({
       modal: true,
@@ -294,7 +215,6 @@ $(function() {
 
     load_graphs();
     load_visits_graph();
-    load_material_tree();
   };
 
   init();

@@ -116,54 +116,6 @@ div#statsGenerated {
   padding-top: 10px;
 }
 
-div#materialTree {
-  display: block;
-  width: 190px;
-  height: 80%;
-  overflow: auto;
-  float: left;
-  padding: 15px 10px 10px 10px;
-}
-
-div#materialContainer {
-  display: block;
-  width: 510px;
-  float: left;
-  padding-left: 10px;
-  height: 90%;
-}
-
-/* jqTree Formatting */
-
-div#materialTree ul {
-  margin: 0;
-  padding: 0 0 0 10px;
-  line-height: 1.5em;
-}
-
-div#marginTree ul ul {
-  padding-left: 5px;
-}
-
-span.selectableNode {
-  color: #0b63a5 !important;
-  font-size: 0.9em;
-  display: block;
-  width: auto;
-  border-bottom: 1px solid #efefef;
-}
-
-ul.tree .title {
-  color: #444;
-}
-
-/* jqPlot Formatting */
-
-div#materialDownloadChart {
-  width: auto;
-  height: 250px;
-}
-
 div#visitorChart {
   margin-left: 15px;
   width: 95%;

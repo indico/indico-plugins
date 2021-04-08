@@ -179,34 +179,6 @@
 
         </div>
 
-        <div class="statsRow">
-
-            <!-- File Downloads -->
-            <div class="statsWidget full edge">
-                <div class="statsWidgetTitle">
-                    {% trans %}Material Downloads{% endtrans %}
-                </div>
-                <div class="statsWidgetContent">
-                    <div id="materialTree"></div>
-                    <div id="materialContainer">
-                        <div id="materialHeader" class="statsTableDivider">
-                            {% trans %}Downloads for{% endtrans %}:
-                            <span id="materialTitle">
-                                &mdash;
-                            </span>
-                            ({% trans %}Total{% endtrans %}: <span id="materialTotalDownloads">0</span>)
-                        </div>
-                        <div id="materialInfo">
-                            <div id="materialDownloadChart">
-                                {% trans %}No material selected{% endtrans %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
         <div id="statsGenerated">
             {% trans dt=report.timestamp | format_datetime('long') -%}
                 This report was generated at: {{ dt }}

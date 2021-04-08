@@ -12,15 +12,13 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, IndicoPluginBlueprint, plugin_url_rule_to_js, url_for_plugin
-from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.events.contributions import Contribution
 from indico.web.menu import SideMenuItem
 
 from indico_piwik import _
-from indico_piwik.controllers import (RHApiDownloads, RHApiEventGraphCountries, RHApiEventGraphDevices,
-                                      RHApiEventVisitsPerDay, RHApiMaterial, RHStatistics)
+from indico_piwik.controllers import (RHApiEventGraphCountries, RHApiEventGraphDevices, RHApiEventVisitsPerDay,
+                                      RHStatistics)
 from indico_piwik.forms import SettingsForm
-from indico_piwik.queries.tracking import track_download_request
 
 
 class PiwikPlugin(IndicoPlugin):
@@ -36,7 +34,6 @@ class PiwikPlugin(IndicoPlugin):
     default_settings = {
         'enabled': False,
         'enabled_for_events': True,
-        'enabled_for_downloads': True,
         'cache_enabled': True,
         'server_url': '//127.0.0.1/piwik/',
         'server_api_url': '//127.0.0.1/piwik/',
@@ -50,7 +47,6 @@ class PiwikPlugin(IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.menu.items, self.add_sidemenu_item, sender='event-management-sidemenu')
-        self.connect(signals.attachments.attachment_accessed, self.track_download)
         self.template_hook('html-head', self.inject_tracking)
 
     def inject_tracking(self, **kwargs):
@@ -73,22 +69,9 @@ class PiwikPlugin(IndicoPlugin):
         return blueprint
 
     def get_vars_js(self):
-        return {'urls': {'material': plugin_url_rule_to_js('piwik.material'),
-                         'data_downloads': plugin_url_rule_to_js('piwik.data_downloads'),
-                         'data_visits': plugin_url_rule_to_js('piwik.data_visits'),
+        return {'urls': {'data_visits': plugin_url_rule_to_js('piwik.data_visits'),
                          'graph_countries': plugin_url_rule_to_js('piwik.graph_countries'),
                          'graph_devices': plugin_url_rule_to_js('piwik.graph_devices')}}
-
-    def track_download(self, attachment, from_preview, **kwargs):
-        if from_preview or not self.settings.get('enabled_for_downloads'):
-            return
-        if attachment.type == AttachmentType.link:
-            resource_url = attachment.link_url
-            resource_title = f'Link - {attachment.title}'
-        else:
-            resource_url = request.base_url
-            resource_title = f'Download - {attachment.title}'
-        track_download_request.delay(resource_url, resource_title)
 
     def _get_event_tracking_params(self):
         site_id_events = PiwikPlugin.settings.get('site_id_events')
@@ -115,8 +98,6 @@ class PiwikPlugin(IndicoPlugin):
 
 blueprint = IndicoPluginBlueprint('piwik', __name__, url_prefix='/event/<int:event_id>/manage/statistics')
 blueprint.add_url_rule('/', 'view', RHStatistics)
-blueprint.add_url_rule('/material', 'material', RHApiMaterial, methods=('GET', 'POST'))
-blueprint.add_url_rule('/data/downloads', 'data_downloads', RHApiDownloads, methods=('GET', 'POST'))
 blueprint.add_url_rule('/data/visits', 'data_visits', RHApiEventVisitsPerDay, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/countries', 'graph_countries', RHApiEventGraphCountries, methods=('GET', 'POST'))
 blueprint.add_url_rule('/graph/devices', 'graph_devices', RHApiEventGraphDevices, methods=('GET', 'POST'))

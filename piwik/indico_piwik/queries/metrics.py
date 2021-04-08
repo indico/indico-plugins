@@ -6,7 +6,6 @@
 # see the LICENSE file for more details.
 
 from operator import itemgetter
-from urllib.parse import quote
 
 from indico_piwik.queries.base import PiwikQueryReportEventBase
 from indico_piwik.queries.utils import get_json_from_remote_server, reduce_json, stringify_seconds
@@ -28,43 +27,6 @@ class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
         if reduced:
             return int(reduce_json(result)) if result else 0
         return result if result else {}
-
-
-class PiwikQueryReportEventMetricDownloads(PiwikQueryReportEventMetricBase):
-    def call(self, download_url, **query_params):
-        return super().call(method='Actions.getDownload', downloadUrl=quote(download_url), **query_params)
-
-    def get_result(self, download_url):
-        result = get_json_from_remote_server(self.call, download_url=download_url, segmentation_enabled=False)
-        return {'cumulative': self._get_cumulative_results(result),
-                'individual': self._get_per_day_results(result)}
-
-    def _get_per_day_results(self, results):
-        hits_calendar = {}
-
-        for date, hits in results.items():
-            day_hits = {'total': 0, 'unique': 0}
-            if hits:
-                for metrics in hits:
-                    day_hits['total'] += metrics['nb_hits']
-                    day_hits['unique'] += metrics['nb_uniq_visitors']
-            hits_calendar[date] = day_hits
-
-        return hits_calendar
-
-    def _get_cumulative_results(self, results):
-        """
-        Returns a dictionary of {'total': x, 'unique': y} for the
-        date range.
-        """
-        hits = {'total': 0, 'unique': 0}
-
-        day_hits = list(hits[0] for hits in results.values() if hits)
-        for metrics in day_hits:
-            hits['total'] += metrics['nb_hits']
-            hits['unique'] += metrics['nb_uniq_visitors']
-
-        return hits
 
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):

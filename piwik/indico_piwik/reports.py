@@ -11,15 +11,13 @@ from datetime import timedelta
 from sqlalchemy.orm import joinedload
 
 from indico.core.cache import make_scoped_cache
-from indico.modules.attachments.util import get_nested_attached_items
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time, now_utc, utc_to_server
 from indico.util.serializer import Serializer
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
-from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricDownloads,
-                                          PiwikQueryReportEventMetricPeakDateAndVisitors,
+from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricPeakDateAndVisitors,
                                           PiwikQueryReportEventMetricReferrers, PiwikQueryReportEventMetricUniqueVisits,
                                           PiwikQueryReportEventMetricVisitDuration, PiwikQueryReportEventMetricVisits)
 
@@ -92,13 +90,6 @@ class ReportDevices(ReportBase):
         self.graphs = {'devices': PiwikQueryReportEventGraphDevices(**self.params).get_result()}
 
 
-class ReportDownloads(ReportBase):
-    __public__ = ['metrics']
-
-    def _build_report(self, download_url):
-        self.metrics = {'downloads': PiwikQueryReportEventMetricDownloads(**self.params).get_result(download_url)}
-
-
 class ReportGeneral(ReportBase):
     __public__ = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
 
@@ -130,34 +121,6 @@ class ReportGeneral(ReportBase):
                    else contribution.id)
             key = f'{contribution.event_id}t{cid}'
             self.contributions[key] = '{} ({})'.format(contribution.title, format_time(contribution.start_dt))
-
-
-class ReportMaterial(ReportBase):
-    __public__ = ['material']
-
-    def _build_report(self):
-        event = Event.get_or_404(self.params['event_id'], is_deleted=False)
-        new_material = get_nested_attached_items(event)
-        self.material = {'tree': [self._format_data(new_material)]}
-
-    def _format_data(self, raw_node):
-        if 'object' not in raw_node:
-            return None
-        node = {'label': raw_node['object'].title,
-                'children': []}
-        if 'files' in raw_node:
-            node['children'] += self._format_data_files(raw_node['files'])
-        if 'folders' in raw_node:
-            for folder in raw_node['folders']:
-                node['children'] += [{'label': folder.title, 'children': self._format_data_files(folder.attachments)}]
-        if 'children' in raw_node:
-            node['children'] += [self._format_data(child) for child in raw_node['children']]
-        if not node['children']:
-            return None
-        return node
-
-    def _format_data_files(self, files):
-        return [{'id': f.absolute_download_url, 'label': f.title} for f in files]
 
 
 class ReportVisitsPerDay(ReportBase):

@@ -17,7 +17,6 @@ from indico_piwik import _
 class SettingsForm(IndicoForm):
     enabled = BooleanField(_("Track global visits"), widget=SwitchWidget())
     enabled_for_events = BooleanField(_("Track events"), widget=SwitchWidget())
-    enabled_for_downloads = BooleanField(_("Track downloads"), widget=SwitchWidget())
     cache_enabled = BooleanField(_("Cache results"), widget=SwitchWidget())
     server_url = StringField(_("Piwik server URL"))
     server_api_url = StringField(_("Piwik API server URL"),
