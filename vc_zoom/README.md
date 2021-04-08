@@ -11,7 +11,7 @@
 
 ## Changelog
 
-### 2.3b3
+### 2.3
 
 - Fix deleting Zoom meetings that were already deleted on the Zoom side when running outside a web request context (e.g. during scheduled deletion of events)
 - Fix overwriting co-hosts added via the Zoom client when using "make me co-host" in Indico
