@@ -5,12 +5,13 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import re
 from operator import attrgetter
 
 from indico.core.db import db
 from indico.util.console import verbose_iterator
 from indico.util.iterables import grouper
-from indico.util.string import str_to_ascii
+from indico.util.string import strip_control_chars
 
 from indico_livesync.simplify import process_records
 
@@ -56,7 +57,7 @@ class Uploader:
         """
         if progress:
             records = verbose_iterator(records, total, attrgetter('id'),
-                                       lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                       lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
                                        print_total_time=True)
         for batch in grouper(records, self.INITIAL_BATCH_SIZE, skip_missing=True):
             self.upload_records(batch, from_queue=False)
