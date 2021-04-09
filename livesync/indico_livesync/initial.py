@@ -119,7 +119,7 @@ def query_subcontributions():
         .join(Contribution.event.of_type(contrib_event))
         .outerjoin(Contribution.session.of_type(contrib_session))
         .outerjoin(Contribution.session_block.of_type(contrib_block))
-        .filter(~SubContribution.is_deleted & ~Contribution.is_deleted & ~contrib_event.is_deleted)
+        .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted)
         .options(
             selectinload(SubContribution.person_links),
             contrib_strategy,
