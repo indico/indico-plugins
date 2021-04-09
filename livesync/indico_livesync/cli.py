@@ -7,17 +7,12 @@
 
 import click
 from flask_pluginengine import current_plugin
-from sqlalchemy.orm import subqueryload
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core.db import db
-from indico.modules.categories import Category
-from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.util.console import cformat
 
-from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
-                                     query_notes)
 from indico_livesync.models.agents import LiveSyncAgent
 
 

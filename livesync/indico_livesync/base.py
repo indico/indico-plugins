@@ -15,8 +15,8 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
 from indico_livesync.forms import AgentForm
-from indico_livesync.initial import query_events, query_contributions, query_attachments, query_notes, \
-    apply_acl_entry_strategy, query_subcontributions
+from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
+                                     query_notes, query_subcontributions)
 from indico_livesync.models.queue import LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
@@ -112,9 +112,11 @@ class LiveSyncBackendBase:
         _category_cache = Category.query.all()  # noqa: F841
 
         events = query_events()
-        uploader.run_initial(events.yield_per(500), events.count())
+        uploader.run_initial(events.yield_per(5000), events.count())
         contributions = query_contributions()
         uploader.run_initial(contributions.yield_per(5000), contributions.count())
+        subcontributions = query_subcontributions()
+        uploader.run_initial(subcontributions.yield_per(5000), subcontributions.count())
         attachments = query_attachments()
         uploader.run_initial(attachments.yield_per(5000), attachments.count())
         notes = query_notes()
