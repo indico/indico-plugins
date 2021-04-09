@@ -48,16 +48,15 @@ class Uploader:
             self.processed_records(batch)
         self.logger.info('%s finished', self_name)
 
-    def run_initial(self, records, total=None):
+    def run_initial(self, records, total):
         """Runs the initial batch upload
 
         :param records: an iterable containing records
-        :param total: (optional) the total of records to be exported
+        :param total: the total of records to be exported
         """
-        if total is not None:
-            records = verbose_iterator(records, total, attrgetter('id'),
-                                       lambda obj: str_to_ascii(getattr(obj, 'title', '')),
-                                       print_total_time=True)
+        records = verbose_iterator(records, total, attrgetter('id'),
+                                   lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                   print_total_time=True)
         for batch in grouper(records, self.INITIAL_BATCH_SIZE, skip_missing=True):
             self.upload_records(batch, from_queue=False)
 
