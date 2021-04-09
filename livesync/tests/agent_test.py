@@ -30,16 +30,6 @@ def test_title_description():
     assert NonDescriptiveAgent.description == 'no description available'
 
 
-def test_run_initial():
-    """Test if run_initial_export calls the uploader properly"""
-    backend = DummyBackend(MagicMock())
-    mock_uploader = MagicMock()
-    backend.uploader = lambda x: mock_uploader
-    events = object()
-    backend.run_initial_export(events, 1)
-    mock_uploader.run_initial.assert_called_with(events, 1)
-
-
 def test_run(mocker):
     """Test if run calls the fetcher/uploader properly"""
     mocker.patch.object(DummyBackend, 'fetch_records')
