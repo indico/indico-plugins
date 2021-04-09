@@ -6,12 +6,17 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine import depends, trim_docstring
+from sqlalchemy.orm import subqueryload
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
+from indico.modules.categories import Category
+from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
 from indico_livesync.forms import AgentForm
+from indico_livesync.initial import query_events, query_contributions, query_attachments, query_notes, \
+    apply_acl_entry_strategy, query_subcontributions
 from indico_livesync.models.queue import LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
@@ -90,16 +95,27 @@ class LiveSyncBackendBase:
         uploader.run(records)
         self.update_last_run()
 
-    def run_initial_export(self, events, total=None):
+    def run_initial_export(self):
         """Runs the initial export.
 
         This process is expected to take a very long time.
-
-        :param events: iterable of all records in this indico instance
-        :param total: (optional) the total of records to be exported
         """
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         uploader = self.uploader(self)
-        uploader.run_initial(events, total)
+
+        Category.allow_relationship_preloading = True
+        Category.preload_relationships(Category.query, 'acl_entries',
+                                       strategy=lambda rel: apply_acl_entry_strategy(subqueryload(rel),
+                                                                                     CategoryPrincipal))
+        _category_cache = Category.query.all()  # noqa: F841
+
+        events = query_events()
+        uploader.run_initial(events.yield_per(500), events.count())
+        contributions = query_contributions()
+        uploader.run_initial(contributions.yield_per(5000), contributions.count())
+        attachments = query_attachments()
+        uploader.run_initial(attachments.yield_per(5000), attachments.count())
+        notes = query_notes()
+        uploader.run_initial(notes.yield_per(5000), notes.count())
