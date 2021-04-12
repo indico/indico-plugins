@@ -91,10 +91,9 @@ class ACLSchema:
 
 class RecordSchema(ACLSchema):
     class Meta:
-        fields = ('_data', '_access', 'site')
+        fields = ('_data', '_access', 'schema')
 
-    site = fields.Function(lambda _: current_app.config.get('SERVER_NAME'))
-    schema = fields.Function(lambda _, ctx: ctx.get('schema'))
+    schema = fields.Function(lambda _, ctx: ctx.get('schema'), data_key='$schema')
 
     @post_dump
     def remove_none_fields(self, data, **kwargs):
@@ -103,6 +102,12 @@ class RecordSchema(ACLSchema):
             key: value for key, value in data.items()
             if value is not None
         }
+
+    @post_dump
+    def site(self, data, **kwargs):
+        if data['_data']:
+            data['_data']['site'] = current_app.config.get('SERVER_NAME')
+        return data
 
 
 class EventRecordSchema(RecordSchema, EventSchema):

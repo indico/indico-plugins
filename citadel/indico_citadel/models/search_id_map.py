@@ -5,7 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
+from indico.core.db import db
+from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.modules.attachments import Attachment
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
@@ -177,6 +178,11 @@ class CitadelSearchAppIdMap(db.Model):
         )
     )
 
+    file = db.Column(
+        db.Integer,
+        nullable=True,
+    )
+
     @classmethod
     def get_search_id(cls, oid, obj_type):
         """Get the search_id for a given object type and id.
@@ -204,6 +210,7 @@ class CitadelSearchAppIdMap(db.Model):
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
-        entry = cls(search_id=eid, entry_type=EntryType.event, **{attr: oid})
+        entry = cls(search_id=eid, entry_type=obj_type, **{attr: oid})
 
         db.session.add(entry)
+        db.session.commit()

@@ -14,13 +14,17 @@ from urllib3 import Retry
 from werkzeug.urls import url_join
 
 from indico.core.db import db
+from indico.modules.attachments import Attachment
+from indico.modules.attachments.models.attachments import AttachmentFile
 from indico.modules.categories import Category
+from indico.util.iterables import grouper
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
+from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type, EntryType
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
+from indico_livesync.initial import query_attachments
 
 
 class LiveSyncCitadelUploader(Uploader):
@@ -103,6 +107,19 @@ class LiveSyncCitadelUploader(Uploader):
                                 .format(response.status_code, response.text))
         response.close()
 
+    def upload_file(self, entry, entries, session):
+        record = CitadelSearchAppIdMap.query.filter(
+            CitadelSearchAppIdMap.entry_type == EntryType.attachment,
+            CitadelSearchAppIdMap.attachment_id == entry.attachment_id
+        ).first()
+        if record and not record.file:
+            response = session.put(url_join(self.search_app, 'api/record/{}/files/{}'.format(
+                record.search_id, entry.filename
+            )), data=entry.open(), verify=False)
+            if response.ok:
+                record.file = entry.id
+                db.session.commit()
+
     def run_initial(self, events, total=None):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
@@ -121,6 +138,19 @@ class LiveSyncCitadelUploader(Uploader):
         uploader = parallelize(self.upload_record, entries=records)
         uploader(session, from_queue)
 
+    def upload_files(self, files):
+        session = requests.Session()
+        retry = Retry(
+            total=5,
+            backoff_factor=30,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=frozenset(['PUT'])
+        )
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry))
+        session.headers = self.headers
+        uploader = parallelize(self.upload_file, entries=files, batch_size=100)
+        uploader(session)
+
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
     """Citadel
@@ -130,3 +160,9 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
 
     uploader = LiveSyncCitadelUploader
     unique = True
+
+    def run_export_files(self):
+        attachments = AttachmentFile.query.filter(AttachmentFile.size <= 10 << 20)
+        uploader = self.uploader(self)
+        for batch in grouper(attachments.yield_per(10000), 100, skip_missing=True):
+            uploader.upload_files(batch)
