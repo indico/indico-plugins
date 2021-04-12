@@ -89,6 +89,48 @@ def query_contributions():
     )
 
 
+def query_subcontributions():
+    contrib_event = db.aliased(Event)
+    contrib_session = db.aliased(Session)
+    contrib_block = db.aliased(SessionBlock)
+
+    contrib_strategy = contains_eager(SubContribution.contribution)
+    contrib_strategy.joinedload(Contribution.own_venue)
+    contrib_strategy.joinedload(Contribution.own_room).options(raiseload('*'), joinedload('location'))
+    apply_acl_entry_strategy(contrib_strategy.selectinload(Contribution.acl_entries), ContributionPrincipal)
+
+    event_strategy = contrib_strategy.contains_eager(Contribution.event.of_type(contrib_event))
+    event_strategy.joinedload(contrib_event.own_venue)
+    event_strategy.joinedload(contrib_event.own_room).options(raiseload('*'), joinedload('location'))
+    apply_acl_entry_strategy(event_strategy.selectinload(contrib_event.acl_entries), EventPrincipal)
+
+    session_strategy = contrib_strategy.contains_eager(Contribution.session.of_type(contrib_session))
+    apply_acl_entry_strategy(session_strategy.selectinload(contrib_session.acl_entries), SessionPrincipal)
+    session_strategy.joinedload(contrib_session.own_venue)
+    session_strategy.joinedload(contrib_session.own_room).options(raiseload('*'), joinedload('location'))
+
+    session_block_strategy = contrib_strategy.contains_eager(Contribution.session_block.of_type(contrib_block))
+    session_block_strategy.joinedload(contrib_block.own_venue)
+    session_block_strategy.joinedload(contrib_block.own_room).options(raiseload('*'), joinedload('location'))
+
+    return (
+        SubContribution.query
+        .join(Contribution)
+        .join(Contribution.event.of_type(contrib_event))
+        .outerjoin(Contribution.session.of_type(contrib_session))
+        .outerjoin(Contribution.session_block.of_type(contrib_block))
+        .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted)
+        .options(
+            selectinload(SubContribution.person_links),
+            contrib_strategy,
+            event_strategy,
+            session_strategy,
+            session_block_strategy
+        )
+        .order_by(SubContribution.id)
+    )
+
+
 def query_attachments():
     contrib_event = db.aliased(Event)
     contrib_session = db.aliased(Session)

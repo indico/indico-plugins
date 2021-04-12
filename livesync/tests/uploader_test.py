@@ -52,7 +52,7 @@ def test_run_initial(mocker):
     uploader = RecordingUploader(MagicMock())
     uploader.INITIAL_BATCH_SIZE = 3
     records = tuple(Mock(spec=Event, id=evt_id) for evt_id in range(4))
-    uploader.run_initial(records)
+    uploader.run_initial(records, 4, False)
     # We expect two batches, with the second one being smaller (i.e. no None padding, just the events)
     batches = set(records[:3]), set(records[3:])
     assert uploader.all_uploaded == [(batches[0], False), (batches[1], False)]
@@ -131,7 +131,7 @@ def test_marcxml_run(mocker, db, dummy_event, dummy_agent):
     assert not mxg.objects_to_xml.called
     assert uploader.upload_xml.called
     mxg.reset_mock()
-    uploader.run_initial([1])
+    uploader.run_initial([1], 1, False)
     assert not mxg.records_to_xml.called
     assert mxg.objects_to_xml.called
     assert uploader.upload_xml.called
@@ -142,5 +142,5 @@ def test_marcxml_empty_result(mocker):
     mocker.patch('indico_livesync.uploader.MARCXMLGenerator.objects_to_xml', return_value=None)
     mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
     uploader = MARCXMLUploader(MagicMock())
-    uploader.run_initial([1])
+    uploader.run_initial([1], 1, False)
     assert not uploader.upload_xml.called
