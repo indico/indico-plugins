@@ -5,10 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import current_app
 from marshmallow import post_dump
 from webargs import fields
 
+from indico.core.config import config
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.marshmallow import mm
 from indico.modules.attachments.models.attachments import Attachment
@@ -106,7 +106,7 @@ class RecordSchema(ACLSchema):
     @post_dump
     def site(self, data, **kwargs):
         if data['_data']:
-            data['_data']['site'] = current_app.config.get('SERVER_NAME')
+            data['_data']['site'] = config.BASE_URL
         return data
 
 

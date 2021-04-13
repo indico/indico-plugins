@@ -1,7 +1,15 @@
+# This file is part of the Indico plugins.
+# Copyright (C) 2002 - 2021 CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
 import click
 
 from indico.cli.core import cli_group
 from indico.util.console import cformat
+
 from indico_citadel.backend import LiveSyncCitadelBackend
 from indico_livesync.models.agents import LiveSyncAgent
 
@@ -14,7 +22,9 @@ def cli():
 @cli.command()
 @click.argument('agent_id', type=int)
 @click.option('--force', is_flag=True, help="Upload even if it has already been done once.")
-def upload(agent_id, force):
+@click.option('--batch', type=int, help="The amount of records yielded per upload batch.")
+def upload(agent_id, batch, force):
+    """Upload the citadel specific attachment files for context extraction"""
     agent = LiveSyncAgent.get(agent_id)
     if agent is None:
         print('No such agent')
@@ -23,4 +33,4 @@ def upload(agent_id, force):
         print(cformat('Cannot run agent %{red!}{}%{reset} (backend invalid or not found)').format(agent.name))
         return
     backend = agent.create_backend()
-    backend.run_export_files()
+    backend.run_export_files(batch, force)

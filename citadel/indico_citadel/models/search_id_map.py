@@ -6,7 +6,7 @@
 # see the LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.attachments import Attachment
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
@@ -128,6 +128,14 @@ class CitadelSearchAppIdMap(db.Model):
         nullable=True
     )
 
+    #: ID of the search entry file
+    attachment_file_id = db.Column(
+        db.Integer,
+        db.ForeignKey('attachments.files.id'),
+        index=True,
+        nullable=True,
+    )
+
     event = db.relationship(
         'Event',
         lazy=True,
@@ -178,9 +186,14 @@ class CitadelSearchAppIdMap(db.Model):
         )
     )
 
-    file = db.Column(
-        db.Integer,
-        nullable=True,
+    attachment_file = db.relationship(
+        'AttachmentFile',
+        lazy=False,
+        backref=db.backref(
+            'citadel_es_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
     )
 
     @classmethod

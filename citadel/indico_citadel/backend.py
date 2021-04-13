@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 from functools import cached_property
+from operator import attrgetter
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -17,19 +18,17 @@ from indico.core.db import db
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.attachments import AttachmentFile
 from indico.modules.categories import Category
-from indico.util.iterables import grouper
+from indico.util.console import verbose_iterator
+from indico.util.string import str_to_ascii
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type, EntryType
+from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
-from indico_livesync.initial import query_attachments
 
 
 class LiveSyncCitadelUploader(Uploader):
-    UPLOAD_BATCH_SIZE = 200
-
     def __init__(self, *args, **kwargs):
         from indico_citadel.plugin import CitadelPlugin
 
@@ -108,17 +107,17 @@ class LiveSyncCitadelUploader(Uploader):
         response.close()
 
     def upload_file(self, entry, entries, session):
-        record = CitadelSearchAppIdMap.query.filter(
-            CitadelSearchAppIdMap.entry_type == EntryType.attachment,
-            CitadelSearchAppIdMap.attachment_id == entry.attachment_id
-        ).first()
-        if record and not record.file:
-            response = session.put(url_join(self.search_app, 'api/record/{}/files/{}'.format(
-                record.search_id, entry.filename
-            )), data=entry.open(), verify=False)
-            if response.ok:
-                record.file = entry.id
-                db.session.commit()
+        with entry.attachment.file.open() as file:
+            response = session.put(
+                url_join(self.search_app, f'api/record/{entry.search_id}/files/{entry.attachment.file.filename}'),
+                data=file
+            )
+        if response.ok:
+            entry.attachment_file_id = entry.attachment.file.id
+            db.session.merge(entry)
+            db.session.commit()
+        else:
+            self.logger.error('Failed uploading attachment %d', entry.attachment.id)
 
     def run_initial(self, events, total=None):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
@@ -161,8 +160,20 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     uploader = LiveSyncCitadelUploader
     unique = True
 
-    def run_export_files(self):
-        attachments = AttachmentFile.query.filter(AttachmentFile.size <= 10 << 20)
+    def run_export_files(self, batch=1000, force=False):
+        from indico_citadel.plugin import CitadelPlugin
+
+        attachments = (
+            CitadelSearchAppIdMap.query
+            .join(Attachment)
+            .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
+            .filter(AttachmentFile.size <= 10 * 1024 * 1024)
+            .filter(AttachmentFile.extension.in_(CitadelPlugin.settings.get('file_extensions')))
+        )
+        if not force:
+            attachments = attachments.filter(CitadelSearchAppIdMap.attachment_file_id.is_(None))
         uploader = self.uploader(self)
-        for batch in grouper(attachments.yield_per(10000), 100, skip_missing=True):
-            uploader.upload_files(batch)
+        attachments = verbose_iterator(attachments.yield_per(batch), attachments.count(),
+                                       attrgetter('id'), lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                       print_total_time=True)
+        uploader.upload_files(list(attachments))

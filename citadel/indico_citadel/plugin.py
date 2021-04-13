@@ -12,7 +12,7 @@ from wtforms.validators import URL, DataRequired
 from indico.core import signals
 from indico.core.plugins import PluginCategory
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPasswordField
+from indico.web.forms.fields import IndicoPasswordField, TextListField
 
 from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
@@ -30,6 +30,8 @@ class CitadelSettingsForm(IndicoForm):
                                     description=_('The role set on every synced object. This allows the members '
                                                   'with that role to perform CRUD operations on the backend and '
                                                   'synced objects.'))
+    file_extensions = TextListField(_('File extensions'),
+                                    description=_('The subset of file extensions that will be selected for indexing'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -41,8 +43,16 @@ class CitadelPlugin(LiveSyncPluginBase):
     category = PluginCategory.search
     configurable = True
     settings_form = CitadelSettingsForm
-    default_settings = {'search_backend_url': '', 'search_backend_token': '', 'search_owner_role': '',
-                        'tika_server': ''}
+    default_settings = {
+        'search_backend_url': '',
+        'search_backend_token': '',
+        'search_owner_role': '',
+        'tika_server': '',
+        'file_extensions': (
+            'key', 'odp', 'pps', 'ppt', 'pptx', 'ods', 'xls', 'xlsm', 'xlsx', 'doc', 'docx', 'odt', 'pdf', 'rtf',
+            'tex', 'txt', 'wdp'
+        )
+    }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
 
     def init(self):
