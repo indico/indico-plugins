@@ -120,7 +120,7 @@ class ReportGeneral(ReportBase):
             cid = (contribution.legacy_mapping.legacy_contribution_id if contribution.legacy_mapping
                    else contribution.id)
             key = f'{contribution.event_id}t{cid}'
-            self.contributions[key] = '{} ({})'.format(contribution.title, format_time(contribution.start_dt))
+            self.contributions[key] = f'{contribution.title} ({format_time(contribution.start_dt)})'
 
 
 class ReportVisitsPerDay(ReportBase):

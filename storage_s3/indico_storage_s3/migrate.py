@@ -187,11 +187,11 @@ class S3Importer:
         match = _new_path_re.match(obj.storage_file_id)
         if match:
             # already in the current format
-            assert obj.storage_file_id == new_storage_path.replace('-0-', '-{}-'.format(match.group(2)))
+            assert obj.storage_file_id == new_storage_path.replace('-0-', f'-{match.group(2)}-')
             return obj.storage_file_id, new_filename
         else:
             match = _new_path_re.match(new_storage_path)
-            return '{}{}{}'.format(match.group(1), crc32(obj.storage_file_id), match.group(3)), new_filename
+            return f'{match.group(1)}{crc32(obj.storage_file_id)}{match.group(3)}', new_filename
 
     def queue_for_rclone(self, obj, bucket, key):
         # XXX: we assume the file is local so the context manager doesn't create a
@@ -447,7 +447,7 @@ def copy(source_backend_names, bucket_names, static_bucket_name, s3_endpoint, s3
         raise click.UsageError('All but the last bucket name need to contain criteria')
     matches = [(re.match(r'^(<|>|==|<=|>=)\s*(\d{4}):(.+)$', name), backend) for name, backend in bucket_names[:-1]]
     if not all(x[0] for x in matches):
-        raise click.UsageError("Could not parse '{}'".format(bucket_names[matches.index(None)]))
+        raise click.UsageError(f"Could not parse '{bucket_names[matches.index(None)]}'")
     criteria = [(match.groups(), backend) for match, backend in matches]
     # Build and compile a function to get the bucket/backend name to avoid
     # processing the criteria for every single file (can be millions for large
@@ -456,11 +456,11 @@ def copy(source_backend_names, bucket_names, static_bucket_name, s3_endpoint, s3
     if criteria:
         for i, ((op, value, bucket), backend) in enumerate(criteria):
             code.append('    {}if dt.year {} {}:'.format('el' if i else '', op, value))
-            code.append('        bucket, backend = {!r}'.format((bucket, backend)))
+            code.append(f'        bucket, backend = {(bucket, backend)!r}')
         code.append('    else:')
-        code.append('        bucket, backend = {!r}'.format(bucket_names[-1]))
+        code.append(f'        bucket, backend = {bucket_names[-1]!r}')
     else:
-        code.append('    bucket, backend = {!r}'.format(bucket_names[-1]))
+        code.append(f'    bucket, backend = {bucket_names[-1]!r}')
     code.append('    bucket = bucket.replace("<year>", dt.strftime("%Y"))')
     code.append('    bucket = bucket.replace("<month>", dt.strftime("%m"))')
     code.append('    bucket = bucket.replace("<week>", dt.strftime("%W"))')

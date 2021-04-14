@@ -53,12 +53,12 @@ class PiwikRequest:
         for key, value in query_params.items():
             if isinstance(value, list):
                 value = ','.join(value)
-            query += '{}={}&'.format(str(key), str(value))
+            query += f'{key}={value}&'
         return query[:-1]
 
     def get_query_url(self, **query_params):
         """Return the url for a Piwik API query"""
-        return '{}?{}'.format(self.api_url, self.get_query(query_params))
+        return f'{self.api_url}?{self.get_query(query_params)}'
 
     def _perform_call(self, query_url, default_response=None, timeout=10):
         """Returns the raw results from the API"""

@@ -193,7 +193,7 @@ class S3Storage(S3StorageBase):
             raise StorageError('Bucket name cannot be longer than 63 chars')
 
     def __repr__(self):
-        return '<{}: {}>'.format(type(self).__name__, self.bucket_name)
+        return f'<{type(self).__name__}: {self.bucket_name}>'
 
     def _get_current_bucket_name(self):
         return self.bucket_name
@@ -225,7 +225,7 @@ class DynamicS3Storage(S3StorageBase):
         self._check_bucket_secret()
 
     def __repr__(self):
-        return '<{}: {}>'.format(type(self).__name__, self.bucket_name_template)
+        return f'<{type(self).__name__}: {self.bucket_name_template}>'
 
     def _check_bucket_secret(self):
         if not self.bucket_secret:

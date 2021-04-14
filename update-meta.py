@@ -53,7 +53,7 @@ def _get_config():
 def _update_meta(data):
     path = Path('_meta/setup.cfg')
     content = path.read_text()
-    new_content = re.sub(r'(?<={}\n).*(?=\n{})'.format(re.escape(START_MARKER), re.escape(END_MARKER)), data, content,
+    new_content = re.sub(fr'(?<={re.escape(START_MARKER)}\n).*(?=\n{re.escape(END_MARKER)})', data, content,
                          flags=re.DOTALL)
     if content == new_content:
         return False

@@ -58,7 +58,7 @@ class MARCXMLGenerator:
             xg = XMLGen(init=False)
             xg.openTag('record')
             xg.openTag('datafield', [['tag', '970'], ['ind1', ' '], ['ind2', ' ']])
-            xg.writeTag('subfield', 'INDICO.{}'.format(compound_id(obj)), [['code', 'a']])
+            xg.writeTag('subfield', f'INDICO.{compound_id(obj)}', [['code', 'a']])
             xg.closeTag('datafield')
             xg.openTag('datafield', [['tag', '980'], ['ind1', ' '], ['ind2', ' ']])
             xg.writeTag('subfield', 'DELETED', [['code', 'c']])

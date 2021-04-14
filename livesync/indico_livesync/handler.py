@@ -87,7 +87,7 @@ def _created(obj, **kwargs):
     elif isinstance(obj, SubContribution):
         parent = obj.contribution
     else:
-        raise TypeError('Unexpected object: {}'.format(type(obj).__name__))
+        raise TypeError(f'Unexpected object: {type(obj).__name__}')
     if parent:
         _register_change(parent, ChangeType.data_changed)
     _register_change(obj, ChangeType.created)

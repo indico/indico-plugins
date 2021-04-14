@@ -35,7 +35,7 @@ class PiwikQueryReportEventGraphBase(PiwikQueryReportEventBase):
         if png.startswith(b'GD extension must be loaded'):
             current_plugin.logger.warning('Piwik server answered on ImageGraph.get: %s', png)
             return
-        return 'data:image/png;base64,{}'.format(b64encode(png).decode())
+        return f'data:image/png;base64,{b64encode(png).decode()}'
 
 
 class PiwikQueryReportEventGraphCountries(PiwikQueryReportEventGraphBase):
