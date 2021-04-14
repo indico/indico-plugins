@@ -4,22 +4,23 @@
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
-
+import re
 from functools import cached_property
 from operator import attrgetter
 
 import requests
 from requests.adapters import HTTPAdapter
 from sqlalchemy import select
+from sqlalchemy.orm import contains_eager
 from urllib3 import Retry
 from werkzeug.urls import url_join
 
 from indico.core.db import db
 from indico.modules.attachments import Attachment
-from indico.modules.attachments.models.attachments import AttachmentFile
+from indico.modules.attachments.models.attachments import AttachmentFile, AttachmentType
 from indico.modules.categories import Category
 from indico.util.console import verbose_iterator
-from indico.util.string import str_to_ascii
+from indico.util.string import strip_control_chars
 
 from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
@@ -166,14 +167,15 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         attachments = (
             CitadelSearchAppIdMap.query
             .join(Attachment)
-            .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
+            .join(AttachmentFile, Attachment.type == AttachmentType.file & Attachment.file_id == AttachmentFile.id)
             .filter(AttachmentFile.size <= 10 * 1024 * 1024)
             .filter(AttachmentFile.extension.in_(CitadelPlugin.settings.get('file_extensions')))
+            .options(contains_eager(CitadelSearchAppIdMap.attachment).contains_eager(Attachment.file))
         )
         if not force:
             attachments = attachments.filter(CitadelSearchAppIdMap.attachment_file_id.is_(None))
         uploader = self.uploader(self)
-        attachments = verbose_iterator(attachments.yield_per(batch), attachments.count(),
-                                       attrgetter('id'), lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+        attachments = verbose_iterator(attachments.yield_per(batch), attachments.count(), attrgetter('id'),
+                                       lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
                                        print_total_time=True)
         uploader.upload_files(list(attachments))

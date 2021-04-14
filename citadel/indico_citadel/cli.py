@@ -10,7 +10,6 @@ import click
 from indico.cli.core import cli_group
 from indico.util.console import cformat
 
-from indico_citadel.backend import LiveSyncCitadelBackend
 from indico_livesync.models.agents import LiveSyncAgent
 
 
@@ -20,16 +19,15 @@ def cli():
 
 
 @cli.command()
-@click.argument('agent_id', type=int)
 @click.option('--force', is_flag=True, help="Upload even if it has already been done once.")
 @click.option('--batch', type=int, help="The amount of records yielded per upload batch.")
 def upload(agent_id, batch, force):
     """Upload the citadel specific attachment files for context extraction"""
-    agent = LiveSyncAgent.get(agent_id)
+    agent = LiveSyncAgent.query.find(LiveSyncAgent.backend_name == 'citadel').first()
     if agent is None:
         print('No such agent')
         return
-    if agent.backend is None or agent.backend is not LiveSyncCitadelBackend:
+    if agent.backend is None:
         print(cformat('Cannot run agent %{red!}{}%{reset} (backend invalid or not found)').format(agent.name))
         return
     backend = agent.create_backend()
