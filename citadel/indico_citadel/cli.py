@@ -21,9 +21,9 @@ def cli():
 @cli.command()
 @click.option('--force', is_flag=True, help="Upload even if it has already been done once.")
 @click.option('--batch', type=int, help="The amount of records yielded per upload batch.")
-def upload(agent_id, batch, force):
+def upload(batch, force):
     """Upload the citadel specific attachment files for context extraction"""
-    agent = LiveSyncAgent.query.find(LiveSyncAgent.backend_name == 'citadel').first()
+    agent = LiveSyncAgent.query.filter(LiveSyncAgent.backend_name == 'citadel').first()
     if agent is None:
         print('No such agent')
         return

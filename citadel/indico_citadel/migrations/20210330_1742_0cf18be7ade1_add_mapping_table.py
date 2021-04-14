@@ -42,6 +42,7 @@ def upgrade():
         sa.Column('subcontrib_id', sa.Integer(), nullable=True, index=True),
         sa.Column('attachment_id', sa.Integer(), nullable=True, index=True),
         sa.Column('note_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('attachment_file_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint('entry_type != 1 OR (event_id IS NOT NULL AND attachment_id IS NULL AND contrib_id IS NULL AND note_id IS NULL AND subcontrib_id IS NULL)', name='valid_event_entry'),
         sa.CheckConstraint('entry_type != 2 OR (contrib_id IS NOT NULL AND attachment_id IS NULL AND event_id IS NULL AND note_id IS NULL AND subcontrib_id IS NULL)', name='valid_contribution_entry'),
         sa.CheckConstraint('entry_type != 3 OR (subcontrib_id IS NOT NULL AND attachment_id IS NULL AND contrib_id IS NULL AND event_id IS NULL AND note_id IS NULL)', name='valid_subcontribution_entry'),
@@ -52,6 +53,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['note_id'], ['events.notes.id']),
         sa.ForeignKeyConstraint(['subcontrib_id'], ['events.subcontributions.id']),
+        sa.ForeignKeyConstraint(['attachment_file_id'], ['attachments.files.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='plugin_citadel'
     )

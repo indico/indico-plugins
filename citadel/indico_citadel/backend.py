@@ -167,9 +167,10 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         attachments = (
             CitadelSearchAppIdMap.query
             .join(Attachment)
-            .join(AttachmentFile, Attachment.type == AttachmentType.file & Attachment.file_id == AttachmentFile.id)
+            .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
+            .filter(Attachment.type == AttachmentType.file)
             .filter(AttachmentFile.size <= 10 * 1024 * 1024)
-            .filter(AttachmentFile.extension.in_(CitadelPlugin.settings.get('file_extensions')))
+            .filter(AttachmentFile.extension.in_([s.lower() for s in CitadelPlugin.settings.get('file_extensions')]))
             .options(contains_eager(CitadelSearchAppIdMap.attachment).contains_eager(Attachment.file))
         )
         if not force:
