@@ -16,7 +16,6 @@ from indico.web.forms.fields import IndicoPasswordField, TextListField
 
 from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
-from indico_citadel.blueprint import blueprint
 from indico_citadel.cli import cli
 from indico_livesync import LiveSyncPluginBase
 
@@ -47,7 +46,6 @@ class CitadelPlugin(LiveSyncPluginBase):
         'search_backend_url': '',
         'search_backend_token': '',
         'search_owner_role': '',
-        'tika_server': '',
         'file_extensions': (
             'key', 'odp', 'pps', 'ppt', 'pptx', 'ods', 'xls', 'xlsm', 'xlsx', 'doc', 'docx', 'odt', 'pdf', 'rtf',
             'tex', 'txt', 'wdp'
@@ -59,9 +57,6 @@ class CitadelPlugin(LiveSyncPluginBase):
         super().init()
         self.connect(signals.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-
-    def get_blueprints(self):
-        return blueprint
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider

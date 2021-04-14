@@ -203,13 +203,12 @@ class CitadelSearchAppIdMap(db.Model):
         :param oid: The id of the object
         :param obj_type: the EntryType of the object
         """
-
-        obj = cls.query.filter_by(entry_type=obj_type)
+        query = cls.query.filter_by(entry_type=obj_type)
         attr = _column_for_types.get(obj_type)
-        if attr:
-            obj.filter_by(getattr(cls, attr) == oid)
+        if not attr:
+            raise Exception(f'Unsupported object type {obj_type}')
 
-        obj = obj.first()
+        obj = query.filter(getattr(cls, attr) == oid).first()
         return obj.search_id if obj else None
 
     @classmethod

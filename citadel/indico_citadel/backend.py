@@ -4,6 +4,7 @@
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
+
 import re
 from functools import cached_property
 from operator import attrgetter
@@ -85,7 +86,7 @@ class LiveSyncCitadelUploader(Uploader):
             response = session.post(self.endpoint_url, json=json)
         else:
             search_id = CitadelSearchAppIdMap.get_search_id(entry.id, entry_type)
-            if not search_id:
+            if search_id is None:
                 raise Exception('SearchMapId does not exist for the object')
 
             if change_type & SimpleChange.updated:
@@ -99,18 +100,13 @@ class LiveSyncCitadelUploader(Uploader):
             raise Exception(f'{response.status_code} - {response.text} in record {json}')
         elif change_type & SimpleChange.created:
             content = response.json()
-            control_number = content['metadata']['control_number']
-            if control_number:
-                CitadelSearchAppIdMap.create(control_number, entry.id, entry_type)
-            else:
-                raise Exception('Cannot create the search id mapping: {} - {}'
-                                .format(response.status_code, response.text))
+            CitadelSearchAppIdMap.create(content['metadata']['control_number'], entry.id, entry_type)
         response.close()
 
     def upload_file(self, entry, entries, session):
         with entry.attachment.file.open() as file:
             response = session.put(
-                url_join(self.search_app, f'api/record/{entry.search_id}/files/{entry.attachment.file.filename}'),
+                url_join(self.search_app, f'api/record/{entry.search_id}/files/attachment'),
                 data=file
             )
         if response.ok:
@@ -118,9 +114,9 @@ class LiveSyncCitadelUploader(Uploader):
             db.session.merge(entry)
             db.session.commit()
         else:
-            self.logger.error('Failed uploading attachment %d', entry.attachment.id)
+            self.logger.error('Failed uploading attachment %d: %s', entry.attachment.id, response.text)
 
-    def run_initial(self, events, total=None):
+    def run_initial(self, events, total):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
         super().run_initial(events, total)
@@ -170,7 +166,9 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
             .filter(Attachment.type == AttachmentType.file)
             .filter(AttachmentFile.size <= 10 * 1024 * 1024)
-            .filter(AttachmentFile.extension.in_([s.lower() for s in CitadelPlugin.settings.get('file_extensions')]))
+            .filter(db.func.lower(AttachmentFile.extension).in_(
+                [s.lower() for s in CitadelPlugin.settings.get('file_extensions')]
+            ))
             .options(contains_eager(CitadelSearchAppIdMap.attachment).contains_eager(Attachment.file))
         )
         if not force:
@@ -179,4 +177,4 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         attachments = verbose_iterator(attachments.yield_per(batch), attachments.count(), attrgetter('id'),
                                        lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
                                        print_total_time=True)
-        uploader.upload_files(list(attachments))
+        uploader.upload_files(attachments)

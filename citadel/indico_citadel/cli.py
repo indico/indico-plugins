@@ -8,7 +8,6 @@
 import click
 
 from indico.cli.core import cli_group
-from indico.util.console import cformat
 
 from indico_livesync.models.agents import LiveSyncAgent
 
@@ -25,10 +24,7 @@ def upload(batch, force):
     """Upload the citadel specific attachment files for context extraction"""
     agent = LiveSyncAgent.query.filter(LiveSyncAgent.backend_name == 'citadel').first()
     if agent is None:
-        print('No such agent')
-        return
-    if agent.backend is None:
-        print(cformat('Cannot run agent %{red!}{}%{reset} (backend invalid or not found)').format(agent.name))
+        print('No citadel livesync agent found')
         return
     backend = agent.create_backend()
     backend.run_export_files(batch, force)

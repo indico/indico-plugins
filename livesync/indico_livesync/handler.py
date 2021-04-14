@@ -81,14 +81,12 @@ def _moved(obj, old_parent, **kwargs):
 
 
 def _created(obj, **kwargs):
-    if isinstance(obj, Event):
+    if isinstance(obj, (Event, EventNote)):
         parent = None
     elif isinstance(obj, Contribution):
         parent = obj.event
     elif isinstance(obj, SubContribution):
         parent = obj.contribution
-    elif isinstance(obj, EventNote):
-        parent = obj.event if isinstance(obj.object, Session) else obj.object
     else:
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
     if parent:

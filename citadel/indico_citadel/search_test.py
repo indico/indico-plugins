@@ -17,7 +17,8 @@ from indico_citadel.search import format_query
     ('hello', 'hello'),
     ('hey title:something', '+title:something hey'),
     ('title:something hey', '+title:something hey'),
-    ('hey title:something hey person:john', '+title:something +person:john hey hey')
+    ('hey title:something hey person:john', '+title:something +person:john hey hey'),
+    ('<*\\^()', '\\<\\*\\\\\\^\\(\\)'),
 ])
 def test_query_placeholders(mocker, query, expected):
     mocker.patch('indico_citadel.search.placeholders', {

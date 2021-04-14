@@ -23,6 +23,8 @@ class CitadelProvider(IndicoSearchProvider):
         self.records_url = url_join(self.backend_url, 'api/records/')
 
     def search(self, query, access, object_type=SearchTarget.event, page=1, params=None, highlight=True):
+        from indico_citadel.plugin import CitadelPlugin
+
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
@@ -33,15 +35,16 @@ class CitadelProvider(IndicoSearchProvider):
         filter_query, ranges = format_filters(params)
         # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
-        q = '{} {} +type:{}'.format(format_query(query), ranges, object_type.name)
+        q = f'{format_query(query)} {ranges} +type:{object_type.name}'
         search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*', **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
             search_params['access'] = ','.join(access)
 
-        resp = requests.get(self.records_url, params=search_params, headers=headers, verify=False)
+        resp = requests.get(self.records_url, params=search_params, headers=headers)
         if not resp.ok:
-            return 0, [], []
+            CitadelPlugin.logger.error(f'Failed contacting the search service: {resp.status_code} {resp.text}')
+            raise Exception('Failed contacting the search service')
 
         resp = resp.json()
         _aggregations, hits = resp['aggregations'], resp['hits']
@@ -54,7 +57,7 @@ class CitadelProvider(IndicoSearchProvider):
                 'buckets': value['buckets']
             }
             for key, value in _aggregations.items()
-            if len(key) and key in filters
+            if key in filters
         ]
         # The citadel service stores every indexable/queryable attribute in a _data
         # This extraction should ensure Indico is abstracted from that complexity
@@ -63,7 +66,7 @@ class CitadelProvider(IndicoSearchProvider):
                 **o['metadata'].pop('_data'),
                 **o['metadata'],
                 'highlight': {
-                    re.sub(r'^_data\.', '', key): value for key, value in o['highlight'].items()
+                    key.removeprefix('_data.'): value for key, value in o['highlight'].items()
                 }
             }
             for o in _objects
@@ -95,7 +98,7 @@ filters = {
 
 
 def format_query(query):
-    """Formats and splits the query into keywords and placeholders
+    """Format and split the query into keywords and placeholders.
 
     https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
 
@@ -112,7 +115,7 @@ def format_query(query):
 
 
 def format_filters(params):
-    """Extracts any special placeholder filter, such as ranges, from the query params
+    """Extract any special placeholder filter, such as ranges, from the query params.
 
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
 
@@ -134,6 +137,6 @@ def format_filters(params):
 
 
 def escape(query):
-    """Prepend all special ElasticSearch characters with a slash"""
-    patt = r'([\+\-\=\>\<!\(\)\{\}\[\]\^"~\*\?:\\/]|&&|\|\|)'
+    """Prepend all special ElasticSearch characters with a backslash."""
+    patt = r'([+\-=><!(){}[\]\^"~*?:\\\/]|&&|\|\|)'
     return re.sub(patt, r'\\\1', query)
