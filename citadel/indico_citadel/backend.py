@@ -81,15 +81,14 @@ class LiveSyncCitadelUploader(Uploader):
                 return schema.dump(obj)
         raise ValueError(f'unknown object ref: {obj}')
 
-    def upload_record(self, entry, entries, session, from_queue):
-        change_type = entries[entry] if from_queue else SimpleChange.created
-        json = self.dump_record(entry)
-        entry_type = get_entry_type(entry)
+    def upload_record(self, entry, session, from_queue):
+        change_type = None if from_queue else SimpleChange.created  # TODO handle `from_queue`
+        entry_type, entry_id, json = entry
         response = None
         if change_type & SimpleChange.created:
             response = session.post(self.endpoint_url, json=json)
         else:
-            search_id = CitadelSearchAppIdMap.get_search_id(entry.id, entry_type)
+            search_id = CitadelSearchAppIdMap.get_search_id(entry_id, entry_type)
             if search_id is None:
                 raise Exception('SearchMapId does not exist for the object')
 
@@ -104,10 +103,10 @@ class LiveSyncCitadelUploader(Uploader):
             raise Exception(f'{response.status_code} - {response.text} in record {json}')
         elif change_type & SimpleChange.created:
             content = response.json()
-            CitadelSearchAppIdMap.create(content['metadata']['control_number'], entry.id, entry_type)
+            CitadelSearchAppIdMap.create(content['metadata']['control_number'], entry_id, entry_type)
         response.close()
 
-    def upload_file(self, entry, entries, session):
+    def upload_file(self, entry, session):
         with entry.attachment.file.open() as file:
             response = session.put(
                 url_join(self.search_app, f'api/record/{entry.search_id}/files/attachment'),
@@ -135,7 +134,8 @@ class LiveSyncCitadelUploader(Uploader):
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
-        uploader = parallelize(self.upload_record, entries=records)
+        dumped_records = ((get_entry_type(rec), rec.id, self.dump_record(rec)) for rec in records)
+        uploader = parallelize(self.upload_record, entries=dumped_records)
         uploader(session, from_queue)
 
     def upload_files(self, files):
