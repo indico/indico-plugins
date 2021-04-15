@@ -81,9 +81,8 @@ class LiveSyncCitadelUploader(Uploader):
                 return schema.dump(obj)
         raise ValueError(f'unknown object ref: {obj}')
 
-    def upload_record(self, entry, session, from_queue):
-        change_type = None if from_queue else SimpleChange.created  # TODO handle `from_queue`
-        entry_type, entry_id, json = entry
+    def upload_record(self, entry, session):
+        entry_type, entry_id, json, change_type = entry
         response = None
         if change_type & SimpleChange.created:
             response = session.post(self.endpoint_url, json=json)
@@ -134,9 +133,12 @@ class LiveSyncCitadelUploader(Uploader):
         )
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
-        dumped_records = ((get_entry_type(rec), rec.id, self.dump_record(rec)) for rec in records)
+        dumped_records = (
+            (get_entry_type(rec), rec.id, self.dump_record(rec), records[rec] if from_queue else SimpleChange.created)
+            for rec in records
+        )
         uploader = parallelize(self.upload_record, entries=dumped_records)
-        uploader(session, from_queue)
+        uploader(session)
 
     def upload_files(self, files):
         session = requests.Session()
