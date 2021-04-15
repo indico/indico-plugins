@@ -5,13 +5,12 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import re
 from operator import attrgetter
 
 from indico.core.db import db
 from indico.util.console import verbose_iterator
 from indico.util.iterables import grouper
-from indico.util.string import strip_control_chars
+from indico.util.string import str_to_ascii
 
 from indico_livesync.simplify import process_records
 
@@ -21,8 +20,6 @@ class Uploader:
 
     #: Number of queue entries to process at a time
     BATCH_SIZE = 100
-    #: Number of events to process at a time during initial export
-    INITIAL_BATCH_SIZE = 500
 
     def __init__(self, backend):
         self.backend = backend
@@ -48,26 +45,22 @@ class Uploader:
             self.processed_records(batch)
         self.logger.info('%s finished', self_name)
 
-    def run_initial(self, records, total, progress=True):
+    def run_initial(self, records, total):
         """Runs the initial batch upload
 
         :param records: an iterable containing records
         :param total: the total of records to be exported
-        :param progress: enable verbose progress mode
         """
-        if progress:
-            records = verbose_iterator(records, total, attrgetter('id'),
-                                       lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
-                                       print_total_time=True)
-        for batch in grouper(records, self.INITIAL_BATCH_SIZE, skip_missing=True):
-            self.upload_records(batch, from_queue=False)
+        records = verbose_iterator(records, total, attrgetter('id'),
+                                   lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                   print_total_time=True)
+        self.upload_records(records, from_queue=False)
 
     def upload_records(self, records, from_queue):
         """Executed for a batch of up to `BATCH_SIZE` records
 
-        :param records: records to upload (queue entries or events)
+        :param records: an iterator of records to upload (or queue entries)
         :param from_queue: if `records` contains queue entries.
-                           expect events if it is False.
         """
         raise NotImplementedError  # pragma: no cover
 
