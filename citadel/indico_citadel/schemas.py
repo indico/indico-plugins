@@ -63,9 +63,7 @@ class ACLSchema:
 
         More information here https://cern-search.docs.cern.ch/usage/permissions/
         """
-        from indico_citadel.plugin import CitadelPlugin
-
-        default_acl = CitadelPlugin.settings.get('search_owner_role')
+        default_acl = self.context['search_owner_role']
 
         if isinstance(object, (Event, Contribution)):
             obj_acl = self._get_acl(object)
