@@ -4,7 +4,7 @@
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
-
+import math
 import re
 
 import requests
@@ -71,7 +71,7 @@ class CitadelProvider(IndicoSearchProvider):
             }
             for o in _objects
         ]
-        return total, objects, aggregations
+        return total, min(math.ceil(total / self.RESULTS_PER_PAGE), 1000), objects, aggregations
 
 
 placeholders = {
