@@ -11,14 +11,13 @@ from indico.util.i18n import make_bound_gettext
 
 _ = make_bound_gettext('livesync')
 __all__ = ('LiveSyncPluginBase', 'LiveSyncBackendBase', 'AgentForm', 'SimpleChange', 'process_records',
-           'MARCXMLGenerator', 'Uploader', 'MARCXMLUploader')
+           'Uploader')
 
 
 from .base import LiveSyncBackendBase, LiveSyncPluginBase  # noqa: E402
 from .forms import AgentForm  # noqa: E402
-from .marcxml import MARCXMLGenerator  # noqa: E402
 from .simplify import SimpleChange, process_records  # noqa: E402
-from .uploader import MARCXMLUploader, Uploader  # noqa: E402
+from .uploader import Uploader  # noqa: E402
 
 
 @signals.import_tasks.connect

@@ -11,7 +11,7 @@ from indico.modules.events import Event
 
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 from indico_livesync.simplify import SimpleChange
-from indico_livesync.uploader import MARCXMLUploader, Uploader
+from indico_livesync.uploader import Uploader
 
 
 class RecordingUploader(Uploader):
@@ -112,35 +112,3 @@ def test_run_failing(mocker, db, create_event, dummy_agent):
     assert not any(record.processed for record in records[3:])
     # Only the first uccessful batch should have triggered a commit
     assert db_mock.session.commit.call_count == 1
-
-
-def test_marcxml_run(mocker, db, dummy_event, dummy_agent):
-    """Text if the MARCXML uploader uses the correct function"""
-    mocker.patch('indico_livesync.uploader.db')
-    mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
-    mxg = mocker.patch('indico_livesync.uploader.MARCXMLGenerator')
-
-    entry = LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event,
-                               agent=dummy_agent)
-    db.session.add(entry)
-    db.session.flush()
-
-    uploader = MARCXMLUploader(MagicMock())
-    uploader.run([entry])
-    assert mxg.records_to_xml.called
-    assert not mxg.objects_to_xml.called
-    assert uploader.upload_xml.called
-    mxg.reset_mock()
-    uploader.run_initial([1], 1, False)
-    assert not mxg.records_to_xml.called
-    assert mxg.objects_to_xml.called
-    assert uploader.upload_xml.called
-
-
-def test_marcxml_empty_result(mocker):
-    """Test if the MARCXML uploader doesn't upload empty records"""
-    mocker.patch('indico_livesync.uploader.MARCXMLGenerator.objects_to_xml', return_value=None)
-    mocker.patch.object(MARCXMLUploader, 'upload_xml', autospec=True)
-    uploader = MARCXMLUploader(MagicMock())
-    uploader.run_initial([1], 1, False)
-    assert not uploader.upload_xml.called

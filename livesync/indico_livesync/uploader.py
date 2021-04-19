@@ -12,7 +12,6 @@ from indico.util.console import verbose_iterator
 from indico.util.iterables import grouper
 from indico.util.string import str_to_ascii
 
-from indico_livesync.marcxml import MARCXMLGenerator
 from indico_livesync.simplify import process_records
 
 
@@ -80,14 +79,3 @@ class Uploader:
             self.logger.debug('Marking as processed: %s', record)
             record.processed = True
         db.session.commit()
-
-
-class MARCXMLUploader(Uploader):
-    def upload_records(self, records, from_queue):
-        xml = MARCXMLGenerator.records_to_xml(records) if from_queue else MARCXMLGenerator.objects_to_xml(records)
-        if xml is not None:
-            self.upload_xml(xml)
-
-    def upload_xml(self, xml):
-        """Receives MARCXML strings to be uploaded"""
-        raise NotImplementedError  # pragma: no cover
