@@ -8,7 +8,7 @@
 from indico.util.console import cformat
 from indico.util.iterables import grouper
 
-from indico_livesync import LiveSyncBackendBase, MARCXMLGenerator, SimpleChange, Uploader, process_records
+from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader, process_records
 
 
 def _change_str(change):
@@ -40,7 +40,7 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
             self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj))
 
         self._print()
-        self._print(cformat('%{white!}Resulting MarcXML:%{reset}'))
+        self._print(cformat('%{white!}Resulting records:%{reset}'))
         uploader = DebugUploader(self)
         uploader.run(records)
         self.update_last_run()
@@ -51,8 +51,9 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
         for i, batch in enumerate(grouper(events, 10, skip_missing=True), 1):
             print()
             print(cformat('%{white!}Batch {}:%{reset}').format(i))
-            print(MARCXMLGenerator.objects_to_xml(event for event in batch if event is not None))
-            print()
+            for event in batch:
+                if event is not None:
+                    print(event)
 
 
 class DebugUploader(Uploader):
@@ -65,5 +66,5 @@ class DebugUploader(Uploader):
     def upload_records(self, records, from_queue):
         self.n += 1
         self.backend._print(cformat('%{white!}Batch {}:%{reset}').format(self.n))
-        xml = MARCXMLGenerator.records_to_xml(records) if from_queue else MARCXMLGenerator.objects_to_xml(records)
-        self.backend._print(xml if xml else '(no changes)')
+        for record in records:
+            self.backend._print(repr(record))
