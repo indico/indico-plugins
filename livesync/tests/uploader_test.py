@@ -49,13 +49,11 @@ class FailingUploader(RecordingUploader):
 def test_run_initial(mocker):
     """Test the initial upload"""
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
+    mocker.patch('indico_livesync.uploader.verbose_iterator', new=lambda it, *a, **kw: it)
     uploader = RecordingUploader(MagicMock())
-    uploader.INITIAL_BATCH_SIZE = 3
     records = tuple(Mock(spec=Event, id=evt_id) for evt_id in range(4))
-    uploader.run_initial(records, 4, False)
-    # We expect two batches, with the second one being smaller (i.e. no None padding, just the events)
-    batches = set(records[:3]), set(records[3:])
-    assert uploader.all_uploaded == [(batches[0], False), (batches[1], False)]
+    uploader.run_initial(records, 4)
+    assert uploader.all_uploaded == [(set(records), False)]
     # During an initial export there are no records to mark as processed
     assert not uploader.processed_records.called
 

@@ -95,7 +95,7 @@ class LiveSyncBackendBase:
         uploader.run(records)
         self.update_last_run()
 
-    def run_initial_export(self):
+    def run_initial_export(self, batch_size=5000):
         """Runs the initial export.
 
         This process is expected to take a very long time.
@@ -112,12 +112,12 @@ class LiveSyncBackendBase:
         _category_cache = Category.query.all()  # noqa: F841
 
         events = query_events()
-        uploader.run_initial(events.yield_per(5000), events.count())
+        uploader.run_initial(events.yield_per(batch_size), events.count())
         contributions = query_contributions()
-        uploader.run_initial(contributions.yield_per(5000), contributions.count())
+        uploader.run_initial(contributions.yield_per(batch_size), contributions.count())
         subcontributions = query_subcontributions()
-        uploader.run_initial(subcontributions.yield_per(5000), subcontributions.count())
+        uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
         attachments = query_attachments()
-        uploader.run_initial(attachments.yield_per(5000), attachments.count())
+        uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
         notes = query_notes()
-        uploader.run_initial(notes.yield_per(5000), notes.count())
+        uploader.run_initial(notes.yield_per(batch_size), notes.count())
