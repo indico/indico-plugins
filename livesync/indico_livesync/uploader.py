@@ -52,7 +52,7 @@ class Uploader:
         :param total: the total of records to be exported
         """
         records = verbose_iterator(records, total, attrgetter('id'),
-                                   lambda obj: str_to_ascii(getattr(obj, 'title', '')),
+                                   lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
                                    print_total_time=True)
         self.upload_records(records, from_queue=False)
 
