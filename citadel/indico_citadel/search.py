@@ -51,15 +51,14 @@ class CitadelProvider(IndicoSearchProvider):
         _aggregations, hits = resp['aggregations'], resp['hits']
         total, _objects = hits['total'], hits['hits']
 
-        aggregations = [
-            {
-                'key': key,
+        aggregations = {
+            key: {
                 'label': filters[key],
                 'buckets': value['buckets']
             }
             for key, value in _aggregations.items()
             if key in filters
-        ]
+        }
         # The citadel service stores every indexable/queryable attribute in a _data
         # This extraction should ensure Indico is abstracted from that complexity
         objects = [
