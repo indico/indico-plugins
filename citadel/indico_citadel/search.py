@@ -12,6 +12,7 @@ from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget
+
 from indico_citadel.util import format_filters, format_query
 
 

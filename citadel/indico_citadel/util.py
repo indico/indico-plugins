@@ -46,11 +46,13 @@ def format_query(query, placeholders):
     """
     patt = r'({}):([^:"\s]+|".+")\s*'.format('|'.join(placeholders.keys()))
     # Extract all placeholders
-    p = ['+{}:{}'.format(placeholders[x.group(1)], x.group(2))
+    p = [f'+{placeholders[x.group(1)]}:{x.group(2)}'
          for x in re.finditer(patt, query) if x.group(1) in placeholders]
     # Escape keyword based arguments
-    query = escape(re.sub(patt, '', query))
-    return '{} {}'.format(' '.join(p), query).strip()
+    query = escape(re.sub(patt, '', query)).strip()
+    if query:
+        p.append(f'+({query})')
+    return ' '.join(p)
 
 
 def format_filters(params, filters, range_filters):
@@ -71,7 +73,7 @@ def format_filters(params, filters, range_filters):
         if k in range_filters:
             match = re.match(r'[[{].+ TO .+[]}]', v)
             if match:
-                query.append('+{}:{}'.format(range_filters[k], v))
+                query.append(f'+{range_filters[k]}:{v}')
             continue
         _filters[k] = v
     return _filters, ' '.join(query)
