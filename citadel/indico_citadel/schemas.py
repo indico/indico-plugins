@@ -112,7 +112,7 @@ class EventRecordSchema(RecordSchema, EventSchema):
     class Meta:
         model = Event
         indexable = ('title', 'description', 'keywords', 'location', 'persons')
-        non_indexable = ('type', 'type_format', 'event_id', 'url', 'category_path', 'start_dt', 'end_dt')
+        non_indexable = ('type', 'type_format', 'event_id', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda event: EventSchema(only=EventRecordSchema.Meta.indexable).dump(event))
@@ -125,8 +125,8 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     class Meta:
         model = Attachment
         indexable = ('title', 'filename', 'user')
-        non_indexable = ('attachment_id', 'type', 'type_format', 'event_id', 'contribution_id', 'category_path',
-                         'url', 'subcontribution_id', 'modified_dt')
+        non_indexable = ('attachment_id', 'type', 'type_format', 'event_id', 'contribution_id', 'category_id',
+                         'category_path', 'url', 'subcontribution_id', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda at: AttachmentSchema(only=AttachmentRecordSchema.Meta.indexable).dump(at))
@@ -138,8 +138,8 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
     class Meta:
         model = Contribution
         indexable = ('title', 'description', 'location', 'persons')
-        non_indexable = ('contribution_id', 'type', 'type_format', 'event_id', 'url', 'category_path', 'start_dt',
-                         'end_dt')
+        non_indexable = ('contribution_id', 'type', 'type_format', 'event_id', 'url', 'category_id', 'category_path',
+                         'start_dt', 'end_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda contrib: ContributionSchema(
@@ -153,7 +153,8 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
     class Meta:
         model = SubContribution
         indexable = ('title', 'description', 'persons', 'location')
-        non_indexable = ('subcontribution_id', 'type', 'event_id', 'contribution_id', 'category_path', 'url')
+        non_indexable = ('subcontribution_id', 'type', 'event_id', 'contribution_id', 'category_id', 'category_path',
+                         'url')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda subc: SubContributionSchema(
@@ -173,8 +174,8 @@ class _EventNoteDataSchema(EventNoteSchema):
 class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
     class Meta:
         model = EventNote
-        non_indexable = ('note_id', 'type', 'event_id', 'contribution_id', 'subcontribution_id', 'category_path',
-                         'url', 'created_dt')
+        non_indexable = ('note_id', 'type', 'event_id', 'contribution_id', 'subcontribution_id', 'category_id',
+                         'category_path', 'url', 'created_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda note: _EventNoteDataSchema().dump(note))
