@@ -9,6 +9,7 @@ import math
 import re
 
 import requests
+from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget
@@ -24,8 +25,6 @@ class CitadelProvider(IndicoSearchProvider):
         self.records_url = url_join(self.backend_url, 'api/records/')
 
     def search(self, query, access, object_type=SearchTarget.event, page=1, params=None, highlight=True):
-        from indico_citadel.plugin import CitadelPlugin
-
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
@@ -42,9 +41,10 @@ class CitadelProvider(IndicoSearchProvider):
         if access:
             search_params['access'] = ','.join(access)
 
-        resp = requests.get(self.records_url, params=search_params, headers=headers)
-        if not resp.ok:
-            CitadelPlugin.logger.error(f'Failed contacting the search service: {resp.status_code} {resp.text}')
+        try:
+            resp = requests.get(self.records_url, params=search_params, headers=headers)
+            resp.raise_for_status()
+        except RequestException:
             raise Exception('Failed contacting the search service')
 
         resp = resp.json()
