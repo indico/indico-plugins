@@ -6,13 +6,13 @@
 # see the LICENSE file for more details.
 
 import math
-import re
 
 import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget
+from indico_citadel.util import format_filters, format_query
 
 
 class CitadelProvider(IndicoSearchProvider):
@@ -32,10 +32,10 @@ class CitadelProvider(IndicoSearchProvider):
             'Authorization': f'Bearer {self.token}'
         }
 
-        filter_query, ranges = format_filters(params)
+        filter_query, ranges = format_filters(params, filters, range_filters)
         # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
-        q = f'{format_query(query)} {ranges} +type:{object_type.name}'
+        q = f'{format_query(query, placeholders)} {ranges} +type:{object_type.name}'
         search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*', **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
@@ -95,48 +95,3 @@ filters = {
     'venue': 'Location',
     'start_range': 'Start Date',
 }
-
-
-def format_query(query):
-    """Format and split the query into keywords and placeholders.
-
-    https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
-
-    :param query: search query
-    :returns escaped query
-    """
-    patt = r'({}):([^:"\s]+|".+")\s*'.format('|'.join(placeholders.keys()))
-    # Extract all placeholders
-    p = ['+{}:{}'.format(placeholders[x.group(1)], x.group(2))
-         for x in re.finditer(patt, query) if x.group(1) in placeholders]
-    # Escape keyword based arguments
-    query = escape(re.sub(patt, '', query))
-    return '{} {}'.format(' '.join(p), query).strip()
-
-
-def format_filters(params):
-    """Extract any special placeholder filter, such as ranges, from the query params.
-
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_ranges
-
-    :param params: The filter query params
-    :returns: filters, extracted placeholders
-    """
-    _filters = {}
-    query = []
-    for k, v in params.items():
-        if k not in filters:
-            continue
-        if k in range_filters:
-            match = re.match(r'[[{].+ TO .+[]}]', v)
-            if match:
-                query.append('+{}:{}'.format(range_filters[k], v))
-            continue
-        _filters[k] = v
-    return _filters, ' '.join(query)
-
-
-def escape(query):
-    """Prepend all special ElasticSearch characters with a backslash."""
-    patt = r'([+\-=><!(){}[\]\^"~*?:\\\/]|&&|\|\|)'
-    return re.sub(patt, r'\\\1', query)
