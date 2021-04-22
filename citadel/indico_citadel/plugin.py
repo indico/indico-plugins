@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from wtforms.fields.core import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import URL, DataRequired
 
@@ -25,10 +24,6 @@ class CitadelSettingsForm(IndicoForm):
                                   description=_('The URL of the Citadel server'))
     search_backend_token = IndicoPasswordField(_('Citadel API token'), [DataRequired()], toggle=True,
                                                description=_('The authentication token to access Citadel'))
-    search_owner_role = StringField(_('Search owner role'), [DataRequired()],
-                                    description=_('The role set on every synced object. This allows the members '
-                                                  'with that role to perform CRUD operations on the backend and '
-                                                  'synced objects.'))
     file_extensions = TextListField(_('File extensions'),
                                     description=_('The subset of file extensions that will be selected for indexing'))
 
@@ -45,7 +40,6 @@ class CitadelPlugin(LiveSyncPluginBase):
     default_settings = {
         'search_backend_url': '',
         'search_backend_token': '',
-        'search_owner_role': '',
         'file_extensions': (
             'key', 'odp', 'pps', 'ppt', 'pptx', 'ods', 'xls', 'xlsm', 'xlsx', 'doc', 'docx', 'odt', 'pdf', 'rtf',
             'tex', 'txt', 'wdp'

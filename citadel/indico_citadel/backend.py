@@ -36,7 +36,6 @@ class LiveSyncCitadelUploader(Uploader):
 
         self.categories = None
         self.search_app = self.backend.plugin.settings.get('search_backend_url')
-        self.search_owner_role = self.backend.plugin.settings.get('search_owner_role')
         self.endpoint_url = url_join(self.search_app, 'api/records/')
         self.headers = {
             'Authorization': 'Bearer {}'.format(self.backend.plugin.settings.get('search_backend_token'))
@@ -51,27 +50,22 @@ class LiveSyncCitadelUploader(Uploader):
             EventRecordSchema(context={
                 'categories': self.categories,
                 'schema': url_join(self.search_app, 'schemas/indico/events_v1.0.0.json'),
-                'search_owner_role': self.search_owner_role,
             }),
             ContributionRecordSchema(context={
                 'categories': self.categories,
                 'schema': url_join(self.search_app, 'schemas/indico/contributions_v1.0.0.json'),
-                'search_owner_role': self.search_owner_role,
             }),
             SubContributionRecordSchema(context={
                 'categories': self.categories,
                 'schema': url_join(self.search_app, 'schemas/indico/subcontributions_v1.0.0.json'),
-                'search_owner_role': self.search_owner_role,
             }),
             AttachmentRecordSchema(context={
                 'categories': self.categories,
                 'schema': url_join(self.search_app, 'schemas/indico/attachments_v1.0.0.json'),
-                'search_owner_role': self.search_owner_role,
             }),
             EventNoteRecordSchema(context={
                 'categories': self.categories,
                 'schema': url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json'),
-                'search_owner_role': self.search_owner_role,
             })
         ]
 

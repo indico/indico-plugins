@@ -63,7 +63,7 @@ class ACLSchema:
 
         More information here https://cern-search.docs.cern.ch/usage/permissions/
         """
-        default_acl = self.context['search_owner_role']
+        default_acl = 'IndicoAdmin'
 
         if isinstance(object, (Event, Contribution)):
             obj_acl = self._get_acl(object)
