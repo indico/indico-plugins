@@ -154,7 +154,7 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
         model = SubContribution
         indexable = ('title', 'description', 'persons', 'location')
         non_indexable = ('subcontribution_id', 'type', 'event_id', 'contribution_id', 'category_id', 'category_path',
-                         'url')
+                         'url', 'start_dt', 'end_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda subc: SubContributionSchema(
