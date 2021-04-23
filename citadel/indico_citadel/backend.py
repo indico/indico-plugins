@@ -90,7 +90,7 @@ class LiveSyncCitadelUploader(Uploader):
                 response = session.put(url, json=json)
             elif change_type & SimpleChange.deleted:
                 url = url_join(self.search_app, f'api/record/{search_id}')
-                response = session.delete(url, json=json)
+                response = session.delete(url)
 
         if not response.ok:
             raise Exception(f'{response.status_code} - {response.text} in record {json}')
@@ -128,8 +128,11 @@ class LiveSyncCitadelUploader(Uploader):
         session.mount(self.search_app, HTTPAdapter(max_retries=retry))
         session.headers = self.headers
         dumped_records = (
-            (get_entry_type(rec), rec.id, self.dump_record(rec), records[rec] if from_queue else SimpleChange.created)
-            for rec in records
+            (
+                get_entry_type(rec), rec.id,
+                self.dump_record(rec) if not (from_queue and records[rec] & SimpleChange.deleted) else None,
+                records[rec] if from_queue else SimpleChange.created
+            ) for rec in records
         )
 
         if self.verbose:
