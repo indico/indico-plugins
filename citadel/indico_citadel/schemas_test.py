@@ -25,7 +25,7 @@ pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
 def test_dump_event(db, dummy_user, dummy_event):
     from .schemas import EventRecordSchema
 
-    schema = EventRecordSchema(context={'search_owner_role': 'IndicoAdmin', 'schema': 'test-events'})
+    schema = EventRecordSchema(context={'schema': 'test-events'})
     dummy_event.description = 'A dummy event'
     dummy_event.keywords = ['foo', 'bar']
     person = EventPerson.create_from_user(dummy_user, dummy_event)
@@ -79,7 +79,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
 
     db.session.flush()
     category_id = dummy_contribution.event.category_id
-    schema = ContributionRecordSchema(context={'search_owner_role': 'IndicoAdmin', 'schema': 'test-contribs'})
+    schema = ContributionRecordSchema(context={'schema': 'test-contribs'})
     assert schema.dump(dummy_contribution) == {
         '$schema': 'test-contribs',
         '_access': {
@@ -128,7 +128,7 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
 
     db.session.flush()
     category_id = dummy_contribution.event.category_id
-    schema = SubContributionRecordSchema(context={'search_owner_role': 'IndicoAdmin', 'schema': 'test-subcontribs'})
+    schema = SubContributionRecordSchema(context={'schema': 'test-subcontribs'})
     assert schema.dump(subcontribution) == {
         '$schema': 'test-subcontribs',
         '_access': {
@@ -169,7 +169,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
     db.session.flush()
 
     category_id = dummy_contribution.event.category_id
-    schema = AttachmentRecordSchema(context={'search_owner_role': 'IndicoAdmin', 'schema': 'test-attachment'})
+    schema = AttachmentRecordSchema(context={'schema': 'test-attachment'})
     assert schema.dump(attachment) == {
         '$schema': 'test-attachment',
         '_access': {
@@ -227,7 +227,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
     note.create_revision(RenderMode.html, 'this is a dummy note', dummy_user)
     db.session.flush()
     category_id = dummy_event.category_id
-    schema = EventNoteSchema(context={'search_owner_role': 'IndicoAdmin', 'schema': 'test-notes'})
+    schema = EventNoteSchema(context={'schema': 'test-notes'})
     assert schema.dump(note) == {
         'category_id': category_id,
         'category_path': [
