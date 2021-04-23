@@ -9,8 +9,13 @@ from flask_pluginengine import depends, trim_docstring
 from sqlalchemy.orm import subqueryload
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.events import Event
+from indico.modules.events.notes.models.notes import EventNote
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
@@ -95,7 +100,7 @@ class LiveSyncBackendBase:
         uploader.run(records)
         self.update_last_run()
 
-    def run_initial_export(self, batch_size=5000):
+    def run_initial_export(self, batch_size=5000, force=False):
         """Runs the initial export.
 
         This process is expected to take a very long time.
@@ -112,12 +117,26 @@ class LiveSyncBackendBase:
         _category_cache = Category.query.all()  # noqa: F841
 
         events = query_events()
+        if not force:
+            events = events.filter(~Event.citadel_es_entries.any())
         uploader.run_initial(events.yield_per(batch_size), events.count())
+
         contributions = query_contributions()
+        if not force:
+            contributions = contributions.filter(~Contribution.citadel_es_entries.any())
         uploader.run_initial(contributions.yield_per(batch_size), contributions.count())
+
         subcontributions = query_subcontributions()
+        if not force:
+            subcontributions = subcontributions.filter(~SubContribution.citadel_es_entries.any())
         uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
+
         attachments = query_attachments()
+        if not force:
+            attachments = attachments.filter(~Attachment.citadel_es_entries.any())
         uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
+
         notes = query_notes()
+        if not force:
+            notes = notes.filter(~EventNote.citadel_es_entries.any())
         uploader.run_initial(notes.yield_per(batch_size), notes.count())
