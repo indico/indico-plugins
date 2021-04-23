@@ -78,6 +78,10 @@ class LiveSyncCitadelUploader(Uploader):
     def upload_record(self, entry, session):
         entry_type, entry_id, json, change_type = entry
         response = None
+        if (change_type & SimpleChange.created) and (change_type & SimpleChange.deleted):
+            # nothing to do here...
+            return
+
         if change_type & SimpleChange.created:
             response = session.post(self.endpoint_url, json=json)
         else:
