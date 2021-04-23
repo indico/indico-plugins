@@ -146,7 +146,7 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
         model = Contribution
         indexable = ('title', 'description', 'location', 'persons')
         non_indexable = ('contribution_id', 'type', 'type_format', 'event_id', 'url', 'category_id', 'category_path',
-                         'start_dt', 'end_dt')
+                         'start_dt', 'end_dt', 'duration')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda contrib: ContributionSchema(
@@ -161,7 +161,7 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
         model = SubContribution
         indexable = ('title', 'description', 'persons', 'location')
         non_indexable = ('subcontribution_id', 'type', 'event_id', 'contribution_id', 'category_id', 'category_path',
-                         'url', 'start_dt', 'end_dt')
+                         'url', 'start_dt', 'end_dt', 'duration')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda subc: SubContributionSchema(
