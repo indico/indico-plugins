@@ -165,7 +165,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             .join(Attachment)
             .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
             .filter(Attachment.type == AttachmentType.file)
-            .filter(AttachmentFile.size <= 10 * 1024 * 1024)
+            .filter(AttachmentFile.size > 0, AttachmentFile.size <= 10 * 1024 * 1024)
             .filter(db.func.lower(AttachmentFile.extension).in_(
                 [s.lower() for s in CitadelPlugin.settings.get('file_extensions')]
             ))
