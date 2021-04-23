@@ -111,7 +111,7 @@ def _timetable_changed(entry, **kwargs):
 
 
 def _category_protection_changed(sender, obj, mode, old_mode, **kwargs):
-    parent_mode = obj.protection_parent.effective_protection_mode
+    parent_mode = obj.protection_parent.effective_protection_mode if obj.protection_parent else None
     if ((old_mode == ProtectionMode.inheriting and parent_mode == mode) or
             (old_mode == parent_mode and mode == ProtectionMode.inheriting)):
         return
