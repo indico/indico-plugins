@@ -58,7 +58,7 @@ def agents():
 @click.argument('agent_id', type=int)
 @click.option('--force', is_flag=True, help="Perform export even if it has already been done once.")
 @click.option('--batch', type=int, default=5000, help="The amount of records yielded per export batch.",
-              show_default=True)
+              show_default=True, metavar='N')
 def initial_export(agent_id, batch, force):
     """Performs the initial data export for an agent"""
     agent = LiveSyncAgent.get(agent_id)
@@ -75,7 +75,7 @@ def initial_export(agent_id, batch, force):
         return
 
     backend = agent.create_backend()
-    backend.run_initial_export(batch)
+    backend.run_initial_export(batch, force)
     agent.initial_data_exported = True
     db.session.commit()
 
