@@ -44,6 +44,14 @@ class ACLSchema:
     _access = fields.Method('_get_object_acl')
 
     def _get_acl(self, obj):
+        if isinstance(obj, SubContribution):
+            obj = obj.contribution
+
+        if obj.is_public or not obj.is_protected:
+            # is_public is a cheaper check, while is_protected climbs up the chain
+            # until the first non-inheriting protection parent, so we can short-circuit
+            # the check
+            return None
         return _get_identifiers(obj.get_access_list())
 
     def _get_attachment_acl(self, attachment):
@@ -51,12 +59,11 @@ class ACLSchema:
         manager_list = set(linked_object.get_manager_list(recursive=True))
 
         if attachment.is_self_protected:
-            acl = {e for e in attachment.acl} | manager_list
+            return _get_identifiers({e for e in attachment.acl} | manager_list)
         elif attachment.is_inheriting and attachment.folder.is_self_protected:
-            acl = {e for e in attachment.folder.acl} | manager_list
+            return _get_identifiers({e for e in attachment.folder.acl} | manager_list)
         else:
-            acl = linked_object.get_access_list()
-        return _get_identifiers(acl)
+            return self._get_acl(linked_object)
 
     def _get_object_acl(self, object):
         """Return the object ACLs.
@@ -81,7 +88,7 @@ class ACLSchema:
             'update': [default_acl],
             'delete': [default_acl]
         }
-        if obj_acl:
+        if obj_acl is not None:
             acl['read'] = [default_acl] + obj_acl
 
         return acl
