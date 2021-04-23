@@ -97,6 +97,7 @@ def query_subcontributions():
     contrib_strategy = contains_eager(SubContribution.contribution)
     contrib_strategy.joinedload(Contribution.own_venue)
     contrib_strategy.joinedload(Contribution.own_room).options(raiseload('*'), joinedload('location'))
+    contrib_strategy.joinedload(Contribution.timetable_entry)
     apply_acl_entry_strategy(contrib_strategy.selectinload(Contribution.acl_entries), ContributionPrincipal)
 
     event_strategy = contrib_strategy.contains_eager(Contribution.event.of_type(contrib_event))
