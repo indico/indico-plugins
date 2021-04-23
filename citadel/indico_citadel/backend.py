@@ -146,8 +146,11 @@ class LiveSyncCitadelUploader(Uploader):
             formatter = Terminal256Formatter(style='native')
 
             def _print_json(data):
-                print()
-                print(highlight(pformat(data[2]), lexer, formatter))
+                print()  # verbose_iterator doesn't end its line
+                changes = ', '.join(x.name for x in SimpleChange if data[3] & x)
+                print(f'{changes}: {data[0].name} {data[1]}')
+                if data[2] is not None:
+                    print(highlight(pformat(data[2]), lexer, formatter))
                 return data
 
             dumped_records = (_print_json(x) for x in dumped_records)
