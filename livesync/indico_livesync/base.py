@@ -117,26 +117,19 @@ class LiveSyncBackendBase:
         _category_cache = Category.query.all()  # noqa: F841
 
         events = query_events()
-        if not force:
-            events = events.filter(~Event.citadel_es_entries.any())
-        uploader.run_initial(events.yield_per(batch_size), events.count())
-
         contributions = query_contributions()
-        if not force:
-            contributions = contributions.filter(~Contribution.citadel_es_entries.any())
-        uploader.run_initial(contributions.yield_per(batch_size), contributions.count())
-
         subcontributions = query_subcontributions()
-        if not force:
-            subcontributions = subcontributions.filter(~SubContribution.citadel_es_entries.any())
-        uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
-
         attachments = query_attachments()
-        if not force:
-            attachments = attachments.filter(~Attachment.citadel_es_entries.any())
-        uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
-
         notes = query_notes()
         if not force:
+            events = events.filter(~Event.citadel_es_entries.any())
+            contributions = contributions.filter(~Contribution.citadel_es_entries.any())
+            subcontributions = subcontributions.filter(~SubContribution.citadel_es_entries.any())
+            attachments = attachments.filter(~Attachment.citadel_es_entries.any())
             notes = notes.filter(~EventNote.citadel_es_entries.any())
+
+        uploader.run_initial(events.yield_per(batch_size), events.count())
+        uploader.run_initial(contributions.yield_per(batch_size), contributions.count())
+        uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
+        uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
         uploader.run_initial(notes.yield_per(batch_size), notes.count())
