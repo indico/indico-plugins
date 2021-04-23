@@ -131,6 +131,24 @@ class LiveSyncCitadelUploader(Uploader):
             (get_entry_type(rec), rec.id, self.dump_record(rec), records[rec] if from_queue else SimpleChange.created)
             for rec in records
         )
+
+        if self.verbose:
+            from pprint import pformat
+
+            from pygments import highlight
+            from pygments.formatters.terminal256 import Terminal256Formatter
+            from pygments.lexers.agile import Python3Lexer
+
+            lexer = Python3Lexer()
+            formatter = Terminal256Formatter(style='native')
+
+            def _print_json(data):
+                print()
+                print(highlight(pformat(data[2]), lexer, formatter))
+                return data
+
+            dumped_records = (_print_json(x) for x in dumped_records)
+
         uploader = parallelize(self.upload_record, entries=dumped_records)
         uploader(session)
 

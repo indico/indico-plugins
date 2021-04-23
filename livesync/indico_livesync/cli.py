@@ -56,10 +56,11 @@ def agents():
 
 @cli.command()
 @click.argument('agent_id', type=int)
-@click.option('--force', is_flag=True, help="Perform export even if it has already been done once.")
+@click.option('--force', '-f', is_flag=True, help="Perform export even if it has already been done once.")
+@click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
 @click.option('--batch', type=int, default=5000, help="The amount of records yielded per export batch.",
               show_default=True, metavar='N')
-def initial_export(agent_id, batch, force):
+def initial_export(agent_id, batch, force, verbose):
     """Performs the initial data export for an agent"""
     agent = LiveSyncAgent.get(agent_id)
     if agent is None:
@@ -75,15 +76,16 @@ def initial_export(agent_id, batch, force):
         return
 
     backend = agent.create_backend()
-    backend.run_initial_export(batch, force)
+    backend.run_initial_export(batch, force, verbose)
     agent.initial_data_exported = True
     db.session.commit()
 
 
 @cli.command()
 @click.argument('agent_id', type=int, required=False)
-@click.option('--force', is_flag=True, help="Run even if initial export was not done")
-def run(agent_id, force=False):
+@click.option('--force', '-f', is_flag=True, help="Run even if initial export was not done")
+@click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
+def run(agent_id, force, verbose):
     """Runs the livesync agent"""
     if agent_id is None:
         agent_list = LiveSyncAgent.query.all()
@@ -103,7 +105,7 @@ def run(agent_id, force=False):
             continue
         print(cformat('Running agent: %{white!}{}%{reset}').format(agent.name))
         try:
-            agent.create_backend().run()
+            agent.create_backend().run(verbose)
             db.session.commit()
         except Exception:
             db.session.rollback()

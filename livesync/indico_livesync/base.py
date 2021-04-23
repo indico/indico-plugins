@@ -89,18 +89,18 @@ class LiveSyncBackendBase:
         """
         self.agent.last_run = now_utc()
 
-    def run(self):
+    def run(self, verbose=False):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         records = self.fetch_records()
-        uploader = self.uploader(self)
+        uploader = self.uploader(self, verbose=verbose)
         LiveSyncPlugin.logger.info('Uploading %d records', len(records))
         uploader.run(records)
         self.update_last_run()
 
-    def run_initial_export(self, batch_size=5000, force=False):
+    def run_initial_export(self, batch_size=5000, force=False, verbose=False):
         """Runs the initial export.
 
         This process is expected to take a very long time.
@@ -108,7 +108,7 @@ class LiveSyncBackendBase:
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        uploader = self.uploader(self)
+        uploader = self.uploader(self, verbose=verbose)
 
         Category.allow_relationship_preloading = True
         Category.preload_relationships(Category.query, 'acl_entries',

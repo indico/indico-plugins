@@ -22,8 +22,9 @@ class Uploader:
     #: Number of queue entries to process at a time
     BATCH_SIZE = 100
 
-    def __init__(self, backend):
+    def __init__(self, backend, verbose=False):
         self.backend = backend
+        self.verbose = verbose
         self.logger = backend.plugin.logger
 
     def run(self, records):
