@@ -35,7 +35,7 @@ def test_run(mocker):
     mocker.patch.object(DummyBackend, 'fetch_records')
     backend = DummyBackend(MagicMock())
     mock_uploader = MagicMock()
-    backend.uploader = lambda x: mock_uploader
+    backend.uploader = lambda *x, **kw: mock_uploader
     backend.run()
     assert backend.fetch_records.called
     assert mock_uploader.run.called
