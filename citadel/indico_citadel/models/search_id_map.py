@@ -147,59 +147,59 @@ class CitadelSearchAppIdMap(db.Model):
         'Event',
         lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
+            'citadel_id_mapping',
+            uselist=False,
             lazy=True
         )
     )
 
     contribution = db.relationship(
         'Contribution',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
+            'citadel_id_mapping',
+            uselist=False,
+            lazy=True
         )
     )
 
     subcontribution = db.relationship(
         'SubContribution',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
+            'citadel_id_mapping',
+            uselist=False,
+            lazy=True
         )
     )
 
     attachment = db.relationship(
         'Attachment',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
+            'citadel_id_mapping',
+            uselist=False,
+            lazy=True
         )
     )
 
     note = db.relationship(
         'EventNote',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
+            'citadel_id_mapping',
+            uselist=False,
+            lazy=True
         )
     )
 
     attachment_file = db.relationship(
         'AttachmentFile',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
-            'citadel_es_entries',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
+            'citadel_id_mapping',
+            uselist=False,
+            lazy=True
         )
     )
 
@@ -210,13 +210,11 @@ class CitadelSearchAppIdMap(db.Model):
         :param oid: The id of the object
         :param obj_type: the EntryType of the object
         """
-        query = cls.query.filter_by(entry_type=obj_type)
+        query = db.session.query(cls.search_id).filter_by(entry_type=obj_type)
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
-
-        obj = query.filter(getattr(cls, attr) == oid).first()
-        return obj.search_id if obj else None
+        return query.filter(getattr(cls, attr) == oid).scalar()
 
     @classmethod
     def create(cls, eid, oid, obj_type):

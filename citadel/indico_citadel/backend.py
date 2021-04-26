@@ -230,7 +230,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     def get_initial_query(self, model_cls, force):
         query = super().get_initial_query(model_cls, force)
         if not force:
-            query = query.filter(~model_cls.citadel_es_entries.any())
+            query = query.filter(~model_cls.citadel_id_mapping.has())
         return query
 
     def run_export_files(self, batch=1000, force=False):
