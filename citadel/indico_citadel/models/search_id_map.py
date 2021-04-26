@@ -73,7 +73,8 @@ class CitadelSearchAppIdMap(db.Model):
     search_id = db.Column(
         db.Integer,
         nullable=False,
-        index=True
+        index=True,
+        unique=True
     )
 
     timestamp = db.Column(
@@ -93,7 +94,8 @@ class CitadelSearchAppIdMap(db.Model):
         db.Integer,
         db.ForeignKey('events.events.id'),
         index=True,
-        nullable=True
+        nullable=True,
+        unique=True
     )
 
     #: ID of the search entry contribution
@@ -101,7 +103,8 @@ class CitadelSearchAppIdMap(db.Model):
         db.Integer,
         db.ForeignKey('events.contributions.id'),
         index=True,
-        nullable=True
+        nullable=True,
+        unique=True
     )
 
     #: ID of the search entry subcontribution
@@ -109,7 +112,8 @@ class CitadelSearchAppIdMap(db.Model):
         db.Integer,
         db.ForeignKey('events.subcontributions.id'),
         index=True,
-        nullable=True
+        nullable=True,
+        unique=True
     )
 
     #: ID of the search entry attachment
@@ -117,7 +121,8 @@ class CitadelSearchAppIdMap(db.Model):
         db.Integer,
         db.ForeignKey('attachments.attachments.id'),
         index=True,
-        nullable=True
+        nullable=True,
+        unique=True
     )
 
     #: ID of the search entry note
@@ -125,7 +130,8 @@ class CitadelSearchAppIdMap(db.Model):
         db.Integer,
         db.ForeignKey('events.notes.id'),
         index=True,
-        nullable=True
+        nullable=True,
+        unique=True
     )
 
     #: ID of the search entry file
@@ -134,6 +140,7 @@ class CitadelSearchAppIdMap(db.Model):
         db.ForeignKey('attachments.files.id'),
         index=True,
         nullable=True,
+        unique=True
     )
 
     event = db.relationship(
