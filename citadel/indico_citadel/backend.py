@@ -11,7 +11,9 @@ from operator import attrgetter
 
 import requests
 from requests.adapters import HTTPAdapter
+from requests.exceptions import RequestException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import contains_eager
 from urllib3 import Retry
 from werkzeug.urls import url_join
@@ -75,46 +77,86 @@ class LiveSyncCitadelUploader(Uploader):
                 return schema.dump(obj)
         raise ValueError(f'unknown object ref: {obj}')
 
+    def _citadel_create(self, session, object_type, object_id, data):
+        try:
+            resp = session.post(self.endpoint_url, json=data)
+            resp.raise_for_status()
+        except RequestException as exc:
+            if resp := exc.response:
+                raise Exception(f'Could not create record on citadel: {resp.status_code}; {resp.text}; {data}')
+            raise Exception(f'Could not create record on citadel: {exc}; {data}')
+        response_data = resp.json()
+        new_citadel_id = response_data['metadata']['control_number']
+        try:
+            CitadelSearchAppIdMap.create(new_citadel_id, object_id, object_type)
+        except IntegrityError:
+            # if we already have a mapping entry, delete the newly created record and
+            # update the existing one in case something changed in the meantime
+            self.logger.error(f'{object_type.name.title()} %d already in citadel; deleting+updating', object_id)
+            db.session.rollback()
+            self._citadel_delete(session, new_citadel_id, delete_mapping=False)
+            existing_citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            assert existing_citadel_id is not None
+            self._citadel_update(session, existing_citadel_id, data)
+        resp.close()
+
+    def _citadel_update(self, session, citadel_id, data):
+        try:
+            resp = session.put(url_join(self.search_app, f'api/record/{citadel_id}'), json=data)
+            resp.raise_for_status()
+            resp.close()
+        except RequestException as exc:
+            if resp := exc.response:
+                raise Exception(f'Could not update record {citadel_id} on citadel: '
+                                f'{resp.status_code}; {resp.text}; {data}')
+            raise Exception(f'Could not update record {citadel_id} on citadel: {exc}; {data}')
+
+    def _citadel_delete(self, session, citadel_id, *, delete_mapping):
+        try:
+            resp = session.delete(url_join(self.search_app, f'api/record/{citadel_id}'))
+            resp.raise_for_status()
+            resp.close()
+        except RequestException as exc:
+            if resp := exc.response:
+                raise Exception(f'Could not delete record {citadel_id} from citadel: {resp.status_code}; {resp.text}')
+            raise Exception(f'Could not delete record {citadel_id} from citadel: {exc}')
+        if delete_mapping:
+            CitadelSearchAppIdMap.query.filter_by(search_id=citadel_id).delete()
+            db.session.commit()
+
     def upload_record(self, entry, session):
-        entry_type, entry_id, json, change_type = entry
-        response = None
+        object_type, object_id, data, change_type = entry
+
         if (change_type & SimpleChange.created) and (change_type & SimpleChange.deleted):
             # nothing to do here...
             return
 
         if change_type & SimpleChange.created:
-            response = session.post(self.endpoint_url, json=json)
-        else:
-            search_id = CitadelSearchAppIdMap.get_search_id(entry_id, entry_type)
-            if search_id is None:
-                raise Exception('SearchMapId does not exist for the object')
-
-            if change_type & SimpleChange.updated:
-                url = url_join(self.search_app, f'api/record/{search_id}')
-                response = session.put(url, json=json)
-            elif change_type & SimpleChange.deleted:
-                url = url_join(self.search_app, f'api/record/{search_id}')
-                response = session.delete(url)
-
-        if not response.ok:
-            raise Exception(f'{response.status_code} - {response.text} in record {json}')
-        elif change_type & SimpleChange.created:
-            content = response.json()
-            CitadelSearchAppIdMap.create(content['metadata']['control_number'], entry_id, entry_type)
-        response.close()
+            self._citadel_create(session, object_type, object_id, data)
+        elif change_type & SimpleChange.updated:
+            citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            if citadel_id is None:
+                raise Exception(f'Cannot update {object_type} {object_id}: No citadel ID found')
+            self._citadel_update(session, citadel_id, data)
+        elif change_type & SimpleChange.deleted:
+            citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            if citadel_id is None:
+                raise Exception(f'Cannot delete {object_type} {object_id}: No citadel ID found')
+            self._citadel_delete(session, citadel_id, delete_mapping=True)
 
     def upload_file(self, entry, session):
         with entry.attachment.file.open() as file:
-            response = session.put(
+            resp = session.put(
                 url_join(self.search_app, f'api/record/{entry.search_id}/files/attachment'),
                 data=file
             )
-        if response.ok:
+        if resp.ok:
             entry.attachment_file_id = entry.attachment.file.id
             db.session.merge(entry)
             db.session.commit()
         else:
-            self.logger.error('Failed uploading attachment %d: %s', entry.attachment.id, response.text)
+            self.logger.error('Failed uploading attachment %d: [%d] %s',
+                              entry.attachment.id, resp.status_code, resp.text)
 
     def run_initial(self, events, total):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
