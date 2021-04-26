@@ -204,30 +204,29 @@ class CitadelSearchAppIdMap(db.Model):
     )
 
     @classmethod
-    def get_search_id(cls, oid, obj_type):
+    def get_search_id(cls, obj_type, obj_id):
         """Get the search_id for a given object type and id.
 
-        :param oid: The id of the object
-        :param obj_type: the EntryType of the object
+        :param obj_type: The EntryType of the object
+        :param obj_id: The id of the object
         """
         query = db.session.query(cls.search_id).filter_by(entry_type=obj_type)
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
-        return query.filter(getattr(cls, attr) == oid).scalar()
+        return query.filter(getattr(cls, attr) == obj_id).scalar()
 
     @classmethod
-    def create(cls, eid, oid, obj_type):
+    def create(cls, obj_type, obj_id, search_id):
         """Create a new mapping.
 
-        :param eid: The search_id to map the oid to
-        :param oid: The id of the object
-        :param obj_type: the EntryType of the object
+        :param obj_type: The EntryType of the object
+        :param obj_id: The id of the object
+        :param search_id: The citadel entry ID
         """
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
-        entry = cls(search_id=eid, entry_type=obj_type, **{attr: oid})
-
+        entry = cls(search_id=search_id, entry_type=obj_type, **{attr: obj_id})
         db.session.add(entry)
         db.session.commit()

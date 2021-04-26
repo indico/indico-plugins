@@ -88,14 +88,14 @@ class LiveSyncCitadelUploader(Uploader):
         response_data = resp.json()
         new_citadel_id = response_data['metadata']['control_number']
         try:
-            CitadelSearchAppIdMap.create(new_citadel_id, object_id, object_type)
+            CitadelSearchAppIdMap.create(object_type, object_id, new_citadel_id)
         except IntegrityError:
             # if we already have a mapping entry, delete the newly created record and
             # update the existing one in case something changed in the meantime
             self.logger.error(f'{object_type.name.title()} %d already in citadel; deleting+updating', object_id)
             db.session.rollback()
             self._citadel_delete(session, new_citadel_id, delete_mapping=False)
-            existing_citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            existing_citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
             assert existing_citadel_id is not None
             self._citadel_update(session, existing_citadel_id, data)
         resp.close()
@@ -134,12 +134,12 @@ class LiveSyncCitadelUploader(Uploader):
         if change_type & SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
         elif change_type & SimpleChange.updated:
-            citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
             if citadel_id is None:
                 raise Exception(f'Cannot update {object_type} {object_id}: No citadel ID found')
             self._citadel_update(session, citadel_id, data)
         elif change_type & SimpleChange.deleted:
-            citadel_id = CitadelSearchAppIdMap.get_search_id(object_id, object_type)
+            citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
             if citadel_id is None:
                 raise Exception(f'Cannot delete {object_type} {object_id}: No citadel ID found')
             self._citadel_delete(session, citadel_id, delete_mapping=True)
