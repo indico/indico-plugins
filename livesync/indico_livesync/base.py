@@ -100,6 +100,24 @@ class LiveSyncBackendBase:
         uploader.run(records)
         self.update_last_run()
 
+    def get_initial_query(self, model_cls, force):
+        """Get the initial export query for a given model.
+
+        Supported models are `Event`, `Contribution`, `SubContribution`,
+        `Attachment` and `EventNote`.
+
+        :param model_cls: The model class to query
+        :param force: Whether the initial export was started with ``--force``
+        """
+        fn = {
+            Event: query_events,
+            Contribution: query_contributions,
+            SubContribution: query_subcontributions,
+            Attachment: query_attachments,
+            EventNote: query_notes,
+        }[model_cls]
+        return fn()
+
     def run_initial_export(self, batch_size=5000, force=False, verbose=False):
         """Runs the initial export.
 
@@ -116,17 +134,11 @@ class LiveSyncBackendBase:
                                                                                      CategoryPrincipal))
         _category_cache = Category.query.all()  # noqa: F841
 
-        events = query_events()
-        contributions = query_contributions()
-        subcontributions = query_subcontributions()
-        attachments = query_attachments()
-        notes = query_notes()
-        if not force:
-            events = events.filter(~Event.citadel_es_entries.any())
-            contributions = contributions.filter(~Contribution.citadel_es_entries.any())
-            subcontributions = subcontributions.filter(~SubContribution.citadel_es_entries.any())
-            attachments = attachments.filter(~Attachment.citadel_es_entries.any())
-            notes = notes.filter(~EventNote.citadel_es_entries.any())
+        events = self.get_initial_query(Event, force)
+        contributions = self.get_initial_query(Contribution, force)
+        subcontributions = self.get_initial_query(SubContribution, force)
+        attachments = self.get_initial_query(Attachment, force)
+        notes = self.get_initial_query(EventNote, force)
 
         uploader.run_initial(events.yield_per(batch_size), events.count())
         uploader.run_initial(contributions.yield_per(batch_size), contributions.count())

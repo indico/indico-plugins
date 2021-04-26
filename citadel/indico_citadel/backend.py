@@ -185,6 +185,12 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     uploader = LiveSyncCitadelUploader
     unique = True
 
+    def get_initial_query(self, model_cls, force):
+        query = super().get_initial_query(model_cls, force)
+        if not force:
+            query = query.filter(~model_cls.citadel_es_entries.any())
+        return query
+
     def run_export_files(self, batch=1000, force=False):
         from indico_citadel.plugin import CitadelPlugin
 
