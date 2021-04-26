@@ -52,6 +52,11 @@ def process_records(records):
         elif record.change == ChangeType.data_changed:
             assert record.type != EntryType.category
             changes[record.object] |= SimpleChange.updated
+            # subcontributions have their parent's time information, so we need to
+            # cascade contribution updates to them
+            if record.type == EntryType.contribution:
+                for subcontrib in record.object.subcontributions:
+                    changes[subcontrib] |= SimpleChange.updated
 
     for obj in _process_cascaded_category_contents(cascaded_update_records):
         changes[obj] |= SimpleChange.updated

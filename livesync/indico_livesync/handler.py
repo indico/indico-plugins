@@ -43,6 +43,7 @@ def connect_signals(plugin):
     plugin.connect(signals.event.subcontribution_updated, _updated)
     # event times
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Event)
+    plugin.connect(signals.event.times_changed, _event_times_changed, sender=Contribution)
     # timetable
     plugin.connect(signals.event.timetable_entry_created, _timetable_changed)
     plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
