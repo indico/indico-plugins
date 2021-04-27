@@ -53,7 +53,9 @@ class Uploader:
         :param total: the total of records to be exported
         """
         records = verbose_iterator(
-            ((k, SimpleChange.created) for k in records), total, lambda entry: entry[0].id,
+            ((rec, SimpleChange.created) for rec in records),
+            total,
+            lambda entry: entry[0].id,
             lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
             print_total_time=True
         )
