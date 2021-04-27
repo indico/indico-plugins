@@ -32,6 +32,9 @@ from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
 
 
+MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
+
+
 class LiveSyncCitadelUploader(Uploader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -229,6 +232,13 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             query = query.filter(~model_cls.citadel_id_mapping.has())
         return query
 
+    def process_queue(self, uploader):
+        super().process_queue(uploader)
+        uploader_name = type(uploader).__name__
+        self.logger.info(f'{uploader_name} starting file upload')
+        total = self.run_export_files(verbose=False)
+        self.logger.info(f'{uploader_name} finished uploading %d files', total)
+
     def run_initial_export(self, batch_size, force, verbose):
         rv = super().run_initial_export(batch_size, force, verbose)
 
@@ -239,7 +249,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
 
         return rv
 
-    def run_export_files(self, batch=1000, force=False):
+    def run_export_files(self, batch=1000, force=False, verbose=True):
         from indico_citadel.plugin import CitadelPlugin
 
         attachments = (
@@ -247,7 +257,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             .join(Attachment)
             .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
             .filter(Attachment.type == AttachmentType.file)
-            .filter(AttachmentFile.size > 0, AttachmentFile.size <= 10 * 1024 * 1024)
+            .filter(AttachmentFile.size > 0, AttachmentFile.size <= MAX_ATTACHMENT_SIZE)
             .filter(db.func.lower(AttachmentFile.extension).in_(
                 [s.lower() for s in CitadelPlugin.settings.get('file_extensions')]
             ))
@@ -256,7 +266,11 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         if not force:
             attachments = attachments.filter(CitadelSearchAppIdMap.attachment_file_id.is_(None))
         uploader = self.uploader(self)
-        attachments = verbose_iterator(attachments.yield_per(batch), attachments.count(), attrgetter('id'),
-                                       lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
-                                       print_total_time=True)
+        attachments = attachments.yield_per(batch)
+        total = attachments.count()
+        if verbose:
+            attachments = verbose_iterator(attachments, total, attrgetter('id'),
+                                           lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
+                                           print_total_time=True)
         uploader.upload_files(attachments)
+        return total

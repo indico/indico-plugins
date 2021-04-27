@@ -89,15 +89,19 @@ class LiveSyncBackendBase:
         """
         self.agent.last_run = now_utc()
 
+    def process_queue(self, uploader):
+        """Process queued entries during an export run."""
+        records = self.fetch_records()
+        LiveSyncPlugin.logger.info(f'Uploading %d records via {self.uploader.__name__}', len(records))
+        uploader.run(records)
+
     def run(self, verbose=False):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        records = self.fetch_records()
         uploader = self.uploader(self, verbose=verbose)
-        LiveSyncPlugin.logger.info('Uploading %d records', len(records))
-        uploader.run(records)
+        self.process_queue(uploader)
         self.update_last_run()
 
     def get_initial_query(self, model_cls, force):
