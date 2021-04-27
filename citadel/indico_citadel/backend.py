@@ -127,10 +127,6 @@ class LiveSyncCitadelUploader(Uploader):
     def upload_record(self, entry, session):
         object_type, object_id, data, change_type = entry
 
-        if (change_type & SimpleChange.created) and (change_type & SimpleChange.deleted):
-            # nothing to do here...
-            return
-
         if change_type & SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
         elif change_type & SimpleChange.updated:

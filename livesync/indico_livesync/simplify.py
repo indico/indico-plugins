@@ -28,6 +28,9 @@ class SimpleChange(int, IndicoEnum):
     updated = 4
 
 
+CREATED_DELETED = SimpleChange.created | SimpleChange.deleted
+
+
 def process_records(records):
     """Converts queue entries into object changes.
 
@@ -35,6 +38,7 @@ def process_records(records):
     :return: a dict mapping object references to `SimpleChange` bitsets
     """
     changes = defaultdict(int)
+    cascaded_create_records = set()
     cascaded_update_records = set()
     cascaded_delete_records = set()
 
@@ -45,7 +49,7 @@ def process_records(records):
             continue
         if record.change == ChangeType.created:
             assert record.type != EntryType.category
-            changes[record.object] |= SimpleChange.created
+            cascaded_create_records.add(record)
         elif record.change == ChangeType.deleted:
             assert record.type != EntryType.category
             cascaded_delete_records.add(record)
@@ -65,6 +69,14 @@ def process_records(records):
 
     for obj in _process_cascaded_event_contents(cascaded_delete_records):
         changes[obj] |= SimpleChange.deleted
+
+    for obj in _process_cascaded_event_contents(cascaded_create_records):
+        changes[obj] |= SimpleChange.created
+
+    created_and_deleted = {obj for obj, flags in changes.items() if (flags & CREATED_DELETED) == CREATED_DELETED}
+    for obj in created_and_deleted:
+        # discard any change where the object was both created and deleted
+        del changes[obj]
 
     return changes
 
@@ -148,30 +160,33 @@ def _process_cascaded_event_contents(records, additional_events=None):
     # Contributions are added (implictly + explicitly changed)
     changed_event_ids = {ev.id for ev in changed_events}
 
-    condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
-    if contribution_records:
-        condition = db.or_(condition, Contribution.id.in_(contribution_records))
-    changed_contributions.update(Contribution.query.filter(condition).options(joinedload('subcontributions')))
+    if changed_event_ids or contribution_records:
+        condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
+        if contribution_records:
+            condition = db.or_(condition, Contribution.id.in_(contribution_records))
+        changed_contributions.update(Contribution.query.filter(condition).options(joinedload('subcontributions')))
 
     for contribution in changed_contributions:
         yield contribution
         changed_subcontributions.update(contribution.subcontributions)
 
-    changed_attachments.update(
-        Attachment.query.filter(
-            Attachment.folder.has(AttachmentFolder.contribution_id.in_(c.id for c in changed_contributions))
+    if changed_contributions:
+        changed_attachments.update(
+            Attachment.query.filter(
+                Attachment.folder.has(AttachmentFolder.contribution_id.in_(c.id for c in changed_contributions))
+            )
         )
-    )
 
     # Same for subcontributions
     if subcontribution_records:
         changed_subcontributions.update(SubContribution.query.filter(SubContribution.id.in_(subcontribution_records)))
 
-    changed_attachments.update(
-        Attachment.query.filter(
-            Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(sc.id for sc in changed_subcontributions))
+    if changed_subcontributions:
+        changed_attachments.update(
+            Attachment.query.filter(
+                Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(sc.id for sc in changed_subcontributions))
+            )
         )
-    )
 
     yield from changed_subcontributions
     yield from changed_attachments

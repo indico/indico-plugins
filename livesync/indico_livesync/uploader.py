@@ -32,19 +32,17 @@ class Uploader:
         :param records: an iterable containing queue entries
         """
         self_name = type(self).__name__
-        for i, batch in enumerate(grouper(records, self.BATCH_SIZE, skip_missing=True), 1):
-            self.logger.info('%s processing batch %d', self_name, i)
-            try:
-                for j, proc_batch in enumerate(grouper(
-                        process_records(batch).items(), self.BATCH_SIZE, skip_missing=True), 1):
-                    self.logger.info('%s uploading chunk #%d (batch %d)', self_name, j, i)
-                    self.upload_records(proc_batch)
-            except Exception:
-                self.logger.exception('%s could not upload batch', self_name)
-                return
-            self.logger.info('%s finished batch %d', self_name, i)
-            self.processed_records(batch)
-        self.logger.info('%s finished', self_name)
+        simplified = process_records(records).items()
+        chunks = list(grouper(simplified, self.BATCH_SIZE, skip_missing=True))
+        try:
+            for i, batch in enumerate(chunks, 1):
+                self.logger.info(f'{self_name} uploading chunk %d/%d', i, len(chunks))
+                self.upload_records(batch)
+        except Exception:
+            self.logger.exception(f'{self_name} could not upload batch')
+            return
+        self.processed_records(records)
+        self.logger.info(f'{self_name} finished (%d total changes from %d records)', len(simplified), len(records))
 
     def run_initial(self, records, total):
         """Runs the initial batch upload

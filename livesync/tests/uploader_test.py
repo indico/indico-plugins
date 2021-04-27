@@ -5,12 +5,11 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from unittest.mock import MagicMock, Mock
-
-from indico.modules.events import Event
+from operator import attrgetter
+from unittest.mock import MagicMock
 
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
-from indico_livesync.simplify import SimpleChange
+from indico_livesync.simplify import SimpleChange, _process_cascaded_event_contents
 from indico_livesync.uploader import Uploader
 
 
@@ -47,14 +46,18 @@ def test_run_initial(mocker):
     mocker.patch.object(Uploader, 'processed_records', autospec=True)
     mocker.patch('indico_livesync.uploader.verbose_iterator', new=lambda it, *a, **kw: it)
     uploader = RecordingUploader(MagicMock())
-    records = tuple(Mock(spec=Event, id=evt_id) for evt_id in range(4))
+    records = tuple(MagicMock(id=evt_id) for evt_id in range(4))
     uploader.run_initial(records, 4)
     assert uploader.all_uploaded == [[(record, SimpleChange.created) for record in records]]
     # During an initial export there are no records to mark as processed
     assert not uploader.processed_records.called
 
 
-def test_run(mocker, db, create_event, dummy_agent):
+def _sorted_process_cascaded_event_contents(records, additional_events=None):
+    return sorted(_process_cascaded_event_contents(records, additional_events), key=attrgetter('id'))
+
+
+def test_run(mocker, monkeypatch, db, create_event, dummy_agent):
     """Test uploading queued data"""
     uploader = RecordingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
@@ -68,18 +71,22 @@ def test_run(mocker, db, create_event, dummy_agent):
     db.session.flush()
 
     db_mock = mocker.patch('indico_livesync.uploader.db')
+    monkeypatch.setattr('indico_livesync.simplify._process_cascaded_event_contents',
+                        _sorted_process_cascaded_event_contents)
 
     uploader.run(records)
 
     objs = [(record.object, int(SimpleChange.created)) for record in records]
     assert uploader.all_uploaded == [objs[:3], objs[3:]]
+    assert len(uploader.all_uploaded[0]) == 3
+    assert len(uploader.all_uploaded[1]) == 1
     # All records should be marked as processed
     assert all(record.processed for record in records)
-    # Marking records as processed is committed immediately
-    assert db_mock.session.commit.call_count == 2
+    # After the queue run the changes should be committed
+    assert db_mock.session.commit.call_count == 1
 
 
-def test_run_failing(mocker, db, create_event, dummy_agent):
+def test_run_failing(mocker, monkeypatch, db, create_event, dummy_agent):
     """Test a failing queue run"""
     uploader = FailingUploader(MagicMock())
     uploader.BATCH_SIZE = 3
@@ -94,14 +101,15 @@ def test_run_failing(mocker, db, create_event, dummy_agent):
     db.session.flush()
 
     db_mock = mocker.patch('indico_livesync.uploader.db')
+    monkeypatch.setattr('indico_livesync.simplify._process_cascaded_event_contents',
+                        _sorted_process_cascaded_event_contents)
 
     uploader.run(records)
     objs = [(record.object, int(SimpleChange.created)) for record in records]
     assert uploader.logger.exception.called
     # No uploads should happen after a failed batch
     assert uploader._uploaded == [objs[:3], objs[3:6]]
-    # Only successful records should be marked as processed
-    assert all(record.processed for record in records[:3])
-    assert not any(record.processed for record in records[3:])
-    # Only the first successful batch should have triggered a commit
-    assert db_mock.session.commit.call_count == 1
+    # No records should be marked as processed
+    assert not any(record.processed for record in records)
+    # And nothing should have been committed
+    db_mock.session.commit.assert_not_called()

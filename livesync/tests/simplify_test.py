@@ -10,7 +10,7 @@ import pytest
 from indico.testing.util import bool_matrix
 
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
-from indico_livesync.simplify import SimpleChange, process_records
+from indico_livesync.simplify import CREATED_DELETED, SimpleChange, process_records
 
 
 class Dummy:
@@ -89,6 +89,9 @@ def test_process_records_simplify(changes, mocker, db, create_event, dummy_agent
         if changes[i][2]:
             queue.append(LiveSyncQueueEntry(change=ChangeType.deleted, agent=dummy_agent, **ref))
             expected[i] |= SimpleChange.deleted
+        # created+deleted items are discarded
+        if expected[i] & CREATED_DELETED == CREATED_DELETED:
+            expected[i] = 0
 
     db.session.flush()
 
