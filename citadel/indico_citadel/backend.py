@@ -136,12 +136,12 @@ class LiveSyncCitadelUploader(Uploader):
         elif change_type & SimpleChange.updated:
             citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
             if citadel_id is None:
-                raise Exception(f'Cannot update {object_type} {object_id}: No citadel ID found')
+                raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
             self._citadel_update(session, citadel_id, data)
         elif change_type & SimpleChange.deleted:
             citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
             if citadel_id is None:
-                raise Exception(f'Cannot delete {object_type} {object_id}: No citadel ID found')
+                raise Exception(f'Cannot delete {object_type.name} {object_id}: No citadel ID found')
             self._citadel_delete(session, citadel_id, delete_mapping=True)
 
     def upload_file(self, entry, session):
