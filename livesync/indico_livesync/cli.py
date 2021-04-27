@@ -76,9 +76,9 @@ def initial_export(agent_id, batch, force, verbose):
         return
 
     backend = agent.create_backend()
-    backend.run_initial_export(batch, force, verbose)
-    agent.initial_data_exported = True
-    db.session.commit()
+    if backend.run_initial_export(batch, force, verbose):
+        agent.initial_data_exported = True
+        db.session.commit()
 
 
 @cli.command()

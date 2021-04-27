@@ -22,7 +22,7 @@ from indico.core.db import db
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.attachments import AttachmentFile, AttachmentType
 from indico.modules.categories import Category
-from indico.util.console import verbose_iterator
+from indico.util.console import cformat, verbose_iterator
 from indico.util.string import strip_control_chars
 
 from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
@@ -228,6 +228,16 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         if not force:
             query = query.filter(~model_cls.citadel_id_mapping.has())
         return query
+
+    def run_initial_export(self, batch_size, force, verbose):
+        rv = super().run_initial_export(batch_size, force, verbose)
+
+        if self.get_initial_query(Attachment, force=True).has_rows():
+            print('You need to export attachment contents as well')
+            print(cformat('To do so, run %{yellow!}indico citadel upload%{reset}'))
+            return False
+
+        return rv
 
     def run_export_files(self, batch=1000, force=False):
         from indico_citadel.plugin import CitadelPlugin
