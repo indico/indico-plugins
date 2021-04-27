@@ -9,6 +9,7 @@ from datetime import timedelta
 
 from werkzeug.datastructures import ImmutableDict
 
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -34,6 +35,8 @@ def obj_ref(obj):
         ref = {'type': EntryType.subcontribution, 'subcontrib_id': obj.id}
     elif isinstance(obj, EventNote):
         ref = {'type': EntryType.note, 'note_id': obj.id}
+    elif isinstance(obj, Attachment):
+        ref = {'type': EntryType.attachment, 'attachment_id': obj.id}
     else:
         raise ValueError(f'Unexpected object: {obj.__class__.__name__}')
     return ImmutableDict(ref)
@@ -55,6 +58,8 @@ def obj_deref(ref):
         return SubContribution.get_or_404(ref['subcontrib_id'])
     elif ref['type'] == EntryType.note:
         return EventNote.get_or_404(ref['note_id'])
+    elif ref['type'] == EntryType.attachment:
+        return Attachment.get_or_404(ref['attachment_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
@@ -77,15 +82,3 @@ def get_excluded_categories():
     """Get excluded category IDs."""
     from indico_livesync.plugin import LiveSyncPlugin
     return {int(x['id']) for x in LiveSyncPlugin.settings.get('excluded_categories')}
-
-
-def compound_id(obj):
-    """Generate a hierarchical compound ID, separated by dots."""
-    if isinstance(obj, (Category, Session)):
-        raise TypeError('Compound IDs are not supported for this entry type')
-    elif isinstance(obj, Event):
-        return str(obj.id)
-    elif isinstance(obj, Contribution):
-        return f'{obj.event_id}.{obj.id}'
-    elif isinstance(obj, SubContribution):
-        return f'{obj.contribution.event_id}.{obj.contribution_id}.{obj.id}'

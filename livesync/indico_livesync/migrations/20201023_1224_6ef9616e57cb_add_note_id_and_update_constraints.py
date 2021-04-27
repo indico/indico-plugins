@@ -38,6 +38,8 @@ def upgrade():
 
 
 def downgrade():
+    op.execute('DELETE FROM plugin_livesync.queues WHERE type = 6')
+
     op.drop_constraint('ck_queues_valid_enum_type', 'queues', schema='plugin_livesync')
     op.drop_constraint('ck_queues_valid_category_entry', 'queues', schema='plugin_livesync')
     op.drop_constraint('ck_queues_valid_event_entry', 'queues', schema='plugin_livesync')

@@ -11,6 +11,8 @@ from collections import defaultdict
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -117,14 +119,24 @@ def _process_cascaded_event_contents(records, additional_events=None):
     changed_events = additional_events or set()
     changed_contributions = set()
     changed_subcontributions = set()
+    changed_attachments = set()
 
+    attachment_records = {rec.attachment_id for rec in records if rec.type == EntryType.attachment}
     session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
     contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
     subcontribution_records = {rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution}
     event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
 
+    if attachment_records:
+        changed_attachments.update(Attachment.query.filter(Attachment.id.in_(attachment_records)))
+
     if event_records:
         changed_events.update(Event.query.filter(Event.id.in_(event_records)))
+        changed_attachments.update(
+            Attachment.query.filter(
+                Attachment.folder.has(AttachmentFolder.linked_event_id.in_(event_records))
+            )
+        )
 
     yield from changed_events
 
@@ -139,13 +151,27 @@ def _process_cascaded_event_contents(records, additional_events=None):
     condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
     if contribution_records:
         condition = db.or_(condition, Contribution.id.in_(contribution_records))
-    contrib_query = Contribution.query.filter(condition).options(joinedload('subcontributions'))
+    changed_contributions.update(Contribution.query.filter(condition).options(joinedload('subcontributions')))
 
-    for contribution in contrib_query:
+    for contribution in changed_contributions:
         yield contribution
         changed_subcontributions.update(contribution.subcontributions)
+
+    changed_attachments.update(
+        Attachment.query.filter(
+            Attachment.folder.has(AttachmentFolder.contribution_id.in_(c.id for c in changed_contributions))
+        )
+    )
 
     # Same for subcontributions
     if subcontribution_records:
         changed_subcontributions.update(SubContribution.query.filter(SubContribution.id.in_(subcontribution_records)))
+
+    changed_attachments.update(
+        Attachment.query.filter(
+            Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(sc.id for sc in changed_subcontributions))
+        )
+    )
+
     yield from changed_subcontributions
+    yield from changed_attachments

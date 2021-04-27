@@ -31,7 +31,7 @@ def queue_entry_dummy_object(monkeypatch):
 ))
 @pytest.mark.usefixtures('queue_entry_dummy_object')
 def test_process_records_category_ignored(mocker, change, invalid):
-    """Test if categories are only kepy for certain changes"""
+    """Test if categories are only kept for certain changes."""
     cascade = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
     cascade.return_value = [object()]
     records = [LiveSyncQueueEntry(change=change, type=EntryType.category)]
