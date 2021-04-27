@@ -6,14 +6,13 @@
 # see the LICENSE file for more details.
 
 import re
-from operator import attrgetter
 
 from indico.core.db import db
 from indico.util.console import verbose_iterator
 from indico.util.iterables import grouper
 from indico.util.string import strip_control_chars
 
-from indico_livesync.simplify import process_records
+from indico_livesync.simplify import SimpleChange, process_records
 
 
 class Uploader:
@@ -39,7 +38,7 @@ class Uploader:
                 for j, proc_batch in enumerate(grouper(
                         process_records(batch).items(), self.BATCH_SIZE, skip_missing=True), 1):
                     self.logger.info('%s uploading chunk #%d (batch %d)', self_name, j, i)
-                    self.upload_records({k: v for k, v in proc_batch}, from_queue=True)
+                    self.upload_records(proc_batch)
             except Exception:
                 self.logger.exception('%s could not upload batch', self_name)
                 return
@@ -53,16 +52,17 @@ class Uploader:
         :param records: an iterable containing records
         :param total: the total of records to be exported
         """
-        records = verbose_iterator(records, total, attrgetter('id'),
-                                   lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
-                                   print_total_time=True)
-        self.upload_records(records, from_queue=False)
+        records = verbose_iterator(
+            ((k, SimpleChange.created) for k in records), total, lambda entry: entry[0].id,
+            lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
+            print_total_time=True
+        )
+        self.upload_records(records)
 
-    def upload_records(self, records, from_queue):
+    def upload_records(self, records):
         """Executed for a batch of up to `BATCH_SIZE` records
 
         :param records: an iterator of records to upload (or queue entries)
-        :param from_queue: if `records` contains queue entries.
         """
         raise NotImplementedError  # pragma: no cover
 

@@ -21,12 +21,8 @@ class RecordingUploader(Uploader):
         self._uploaded = []
         self.logger = MagicMock()
 
-    def upload_records(self, records, from_queue):
-        if from_queue:
-            recs = set(records.items())
-            self._uploaded.append((recs, from_queue))
-        else:
-            self._uploaded.append((set(records), from_queue))
+    def upload_records(self, records):
+        self._uploaded.append(list(records))
 
     @property
     def all_uploaded(self):
@@ -39,8 +35,8 @@ class FailingUploader(RecordingUploader):
         super().__init__(*args, **kwargs)
         self._n = 0
 
-    def upload_records(self, records, from_queue):
-        super().upload_records(records, from_queue)
+    def upload_records(self, records):
+        super().upload_records(records)
         self._n += 1
         if self._n == 2:
             raise Exception('All your data are belong to us!')
@@ -53,7 +49,7 @@ def test_run_initial(mocker):
     uploader = RecordingUploader(MagicMock())
     records = tuple(Mock(spec=Event, id=evt_id) for evt_id in range(4))
     uploader.run_initial(records, 4)
-    assert uploader.all_uploaded == [(set(records), False)]
+    assert uploader.all_uploaded == [[(record, SimpleChange.created) for record in records]]
     # During an initial export there are no records to mark as processed
     assert not uploader.processed_records.called
 
@@ -75,9 +71,8 @@ def test_run(mocker, db, create_event, dummy_agent):
 
     uploader.run(records)
 
-    objs = tuple((record.object, int(SimpleChange.created)) for record in records)
-    batches = set(objs[:3]), set(objs[3:])
-    assert uploader.all_uploaded == [(batches[0], True), (batches[1], True)]
+    objs = [(record.object, int(SimpleChange.created)) for record in records]
+    assert uploader.all_uploaded == [objs[:3], objs[3:]]
     # All records should be marked as processed
     assert all(record.processed for record in records)
     # Marking records as processed is committed immediately
@@ -101,12 +96,12 @@ def test_run_failing(mocker, db, create_event, dummy_agent):
     db_mock = mocker.patch('indico_livesync.uploader.db')
 
     uploader.run(records)
-    objs = tuple((record.object, int(SimpleChange.created)) for record in records)
+    objs = [(record.object, int(SimpleChange.created)) for record in records]
     assert uploader.logger.exception.called
     # No uploads should happen after a failed batch
-    assert uploader._uploaded == [(set(objs[:3]), True), (set(objs[3:6]), True)]
+    assert uploader._uploaded == [objs[:3], objs[3:6]]
     # Only successful records should be marked as processed
     assert all(record.processed for record in records[:3])
     assert not any(record.processed for record in records[3:])
-    # Only the first uccessful batch should have triggered a commit
+    # Only the first successful batch should have triggered a commit
     assert db_mock.session.commit.call_count == 1

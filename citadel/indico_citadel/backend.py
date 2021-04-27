@@ -163,7 +163,7 @@ class LiveSyncCitadelUploader(Uploader):
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
         super().run_initial(events, total)
 
-    def upload_records(self, records, from_queue):
+    def upload_records(self, records):
         session = requests.Session()
         retry = Retry(
             total=5,
@@ -176,9 +176,9 @@ class LiveSyncCitadelUploader(Uploader):
         dumped_records = (
             (
                 get_entry_type(rec), rec.id,
-                self.dump_record(rec) if not (from_queue and records[rec] & SimpleChange.deleted) else None,
-                records[rec] if from_queue else SimpleChange.created
-            ) for rec in records
+                self.dump_record(rec) if not change_type & SimpleChange.deleted else None,
+                change_type
+            ) for rec, change_type in records
         )
 
         if self.verbose:
