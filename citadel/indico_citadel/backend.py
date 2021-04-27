@@ -279,7 +279,8 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             .options(contains_eager(CitadelSearchAppIdMap.attachment).contains_eager(Attachment.file))
         )
         if not force:
-            attachments = attachments.filter(CitadelSearchAppIdMap.attachment_file_id.is_(None))
+            attachments = attachments.filter(db.or_(CitadelSearchAppIdMap.attachment_file_id.is_(None),
+                                                    CitadelSearchAppIdMap.attachment_file_id != Attachment.file_id))
         uploader = self.uploader(self)
         attachments = attachments.yield_per(batch)
         total = attachments.count()
