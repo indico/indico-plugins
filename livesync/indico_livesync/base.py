@@ -141,7 +141,7 @@ class LiveSyncBackendBase:
         }[model_cls]
         return fn()
 
-    def run_initial_export(self, batch_size=5000, force=False, verbose=False):
+    def run_initial_export(self, batch_size, force=False, verbose=False):
         """Runs the initial export.
 
         This process is expected to take a very long time.

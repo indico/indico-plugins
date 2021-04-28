@@ -258,7 +258,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         total = self.run_export_files(verbose=False)
         self.plugin.logger.info(f'{uploader_name} finished uploading %d files', total)
 
-    def run_initial_export(self, batch_size, force, verbose):
+    def run_initial_export(self, batch_size, force=False, verbose=False):
         super().run_initial_export(batch_size, force, verbose)
         print('Initial export finished')
 
