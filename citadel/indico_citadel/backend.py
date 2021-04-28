@@ -8,8 +8,12 @@
 import re
 from functools import cached_property
 from operator import attrgetter
+from pprint import pformat
 
 import requests
+from pygments import highlight
+from pygments.formatters.terminal256 import Terminal256Formatter
+from pygments.lexers.agile import Python3Lexer
 from requests.adapters import HTTPAdapter
 from requests.exceptions import RequestException
 from sqlalchemy import select
@@ -31,6 +35,22 @@ from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSc
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
+
+
+lexer = Python3Lexer()
+formatter = Terminal256Formatter(style='native')
+
+
+def _format_change_str(change):
+    return ','.join(flag.name for flag in SimpleChange if change & flag)
+
+
+def _print_record(record):
+    obj_type, obj_id, data, changes = record
+    print(f'{_format_change_str(changes)}: {obj_type.name} {obj_id}')
+    if data is not None:
+        print(highlight(pformat(data), lexer, formatter))
+    return record
 
 
 class LiveSyncCitadelUploader(Uploader):
@@ -179,24 +199,7 @@ class LiveSyncCitadelUploader(Uploader):
         )
 
         if self.verbose:
-            from pprint import pformat
-
-            from pygments import highlight
-            from pygments.formatters.terminal256 import Terminal256Formatter
-            from pygments.lexers.agile import Python3Lexer
-
-            lexer = Python3Lexer()
-            formatter = Terminal256Formatter(style='native')
-
-            def _print_json(data):
-                print()  # verbose_iterator doesn't end its line
-                changes = ', '.join(x.name for x in SimpleChange if data[3] & x)
-                print(f'{changes}: {data[0].name} {data[1]}')
-                if data[2] is not None:
-                    print(highlight(pformat(data[2]), lexer, formatter))
-                return data
-
-            dumped_records = (_print_json(x) for x in dumped_records)
+            dumped_records = (_print_record(x) for x in dumped_records)
 
         uploader = parallelize(self.upload_record, entries=dumped_records)
         uploader(session)
