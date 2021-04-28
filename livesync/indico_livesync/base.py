@@ -75,11 +75,21 @@ class LiveSyncBackendBase:
         """
         self.agent = agent
 
+    def is_configured(self):
+        """Check whether the backend is properly configured.
+
+        If this returns False, running the initial export or queue
+        will not be possible.
+        """
+        return True
+
     def check_queue_status(self):
         """Return whether queue runs are allowed (or why not).
 
         :return: ``allowed, reason`` tuple; the reason is None if runs are allowed.
         """
+        if not self.is_configured():
+            return False, 'not configured'
         if self.agent.initial_data_exported:
             return True, None
         return False, 'initial export not performed'

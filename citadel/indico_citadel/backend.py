@@ -232,6 +232,9 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             return False, 'file upload pending'
         return True, None
 
+    def is_configured(self):
+        return bool(self.plugin.settings.get('search_backend_url') and self.plugin.settings.get('search_backend_token'))
+
     def set_initial_file_upload_state(self, state):
         if self.agent.settings['file_upload_done'] == state:
             return

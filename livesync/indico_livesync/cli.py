@@ -71,16 +71,23 @@ def initial_export(agent_id, batch, force, verbose):
     if agent is None:
         print('No such agent')
         return
+
     if agent.backend is None:
         print(cformat('Cannot run agent %{red!}{}%{reset} (backend not found)').format(agent.name))
         return
+
     print(cformat('Selected agent: %{white!}{}%{reset} ({})').format(agent.name, agent.backend.title))
+
+    backend = agent.create_backend()
+    if not backend.is_configured():
+        print(cformat('Agent %{red!}{}%{reset} is not properly configured').format(agent.name))
+        return
+
     if agent.initial_data_exported and not force:
         print('The initial export has already been performed for this agent.')
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    backend = agent.create_backend()
     backend.run_initial_export(batch, force, verbose)
     agent.initial_data_exported = True
     db.session.commit()

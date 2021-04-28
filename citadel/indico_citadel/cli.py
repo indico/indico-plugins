@@ -39,7 +39,12 @@ def upload(batch, force, max_size):
         print('It looks like you did not export any data to Citadel yet.')
         print(cformat('To do so, run %{yellow!}indico livesync initial-export {}%{reset}').format(agent.id))
         return
+
     backend = agent.create_backend()
+    if not backend.is_configured():
+        print('Citadel is not properly configured.')
+        return
+
     backend.run_export_files(batch, force, max_size=max_size)
     backend.set_initial_file_upload_state(True)
     db.session.commit()
@@ -56,6 +61,11 @@ def reset():
         print('It looks like you did not export any data to Citadel yet, so there is nothing to reset')
         return
 
+    backend = agent.create_backend()
+    if not backend.is_configured():
+        print('Citadel is not properly configured.')
+        return
+
     print(cformat('%{yellow!}!!! %{red!}DANGER %{yellow!}!!!%{reset}'))
     print(cformat('%{yellow!}This command should only be used if the data on citadel has been deleted%{reset}'))
     print(cformat('%{yellow!}and you want to re-export everything.%{reset}'))
@@ -70,7 +80,7 @@ def reset():
         print('')
     print('Resetting initial data export & file upload state...')
     agent.initial_data_exported = False
-    agent.create_backend().set_initial_file_upload_state(False)
+    backend.set_initial_file_upload_state(False)
     print('Emptying queue...')
     agent.queue.delete()
     print('Deleting Citadel ID mappings...')
