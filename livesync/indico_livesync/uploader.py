@@ -54,7 +54,7 @@ class Uploader:
             ((rec, SimpleChange.created) for rec in records),
             total,
             lambda entry: entry[0].id,
-            lambda obj: re.sub(r'\s+', ' ', strip_control_chars(getattr(obj, 'title', ''))),
+            lambda entry: re.sub(r'\s+', ' ', strip_control_chars(getattr(entry[0], 'title', ''))),
             print_total_time=True
         )
         self.upload_records(records)
