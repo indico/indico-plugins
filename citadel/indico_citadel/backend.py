@@ -33,9 +33,6 @@ from indico_citadel.util import parallelize
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader
 
 
-MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
-
-
 class LiveSyncCitadelUploader(Uploader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -236,6 +233,8 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         return True, None
 
     def set_initial_file_upload_state(self, state):
+        if self.agent.settings['file_upload_done'] == state:
+            return
         self.plugin.logger.info('Initial file upload flag set to %s', state)
         self.agent.settings['file_upload_done'] = state
         flag_modified(self.agent, 'settings')
@@ -264,15 +263,18 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             # no files -> mark file upload as done so queue runs are possible
             self.set_initial_file_upload_state(True)
 
-    def run_export_files(self, batch=1000, force=False, verbose=True):
+    def run_export_files(self, batch=1000, force=False, max_size=None, verbose=True):
         from indico_citadel.plugin import CitadelPlugin
+
+        if max_size is None:
+            max_size = CitadelPlugin.settings.get('max_file_size')
 
         attachments = (
             CitadelSearchAppIdMap.query
             .join(Attachment)
             .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
             .filter(Attachment.type == AttachmentType.file)
-            .filter(AttachmentFile.size > 0, AttachmentFile.size <= MAX_ATTACHMENT_SIZE)
+            .filter(AttachmentFile.size > 0, AttachmentFile.size <= max_size * 1024 * 1024)
             .filter(db.func.lower(AttachmentFile.extension).in_(
                 [s.lower() for s in CitadelPlugin.settings.get('file_extensions')]
             ))

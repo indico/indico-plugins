@@ -25,9 +25,11 @@ def cli():
 
 @cli.command()
 @click.option('--force', is_flag=True, help="Upload even if it has already been done once.")
-@click.option('--batch', type=int, default=1000, help="The amount of records yielded per upload batch.",
-              show_default=True, metavar='N')
-def upload(batch, force):
+@click.option('--batch', type=int, default=1000, show_default=True, metavar='N',
+              help="The amount of records yielded per upload batch.")
+@click.option('--max-size', type=int, metavar='SIZE',
+              help="The max size (in MB) of files to upload. Defaults to the size from the plugin settings.")
+def upload(batch, force, max_size):
     """Upload file contents for full text search."""
     agent = LiveSyncAgent.query.filter(LiveSyncAgent.backend_name == 'citadel').first()
     if agent is None:
@@ -38,7 +40,7 @@ def upload(batch, force):
         print(cformat('To do so, run %{yellow!}indico livesync initial-export {}%{reset}').format(agent.id))
         return
     backend = agent.create_backend()
-    backend.run_export_files(batch, force)
+    backend.run_export_files(batch, force, max_size=max_size)
     backend.set_initial_file_upload_state(True)
     db.session.commit()
 

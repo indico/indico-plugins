@@ -5,8 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from wtforms.fields.html5 import URLField
-from wtforms.validators import URL, DataRequired
+from wtforms.fields.html5 import IntegerField, URLField
+from wtforms.validators import URL, DataRequired, NumberRange
 
 from indico.core import signals
 from indico.core.plugins import PluginCategory
@@ -25,7 +25,14 @@ class CitadelSettingsForm(IndicoForm):
     search_backend_token = IndicoPasswordField(_('Citadel API token'), [DataRequired()], toggle=True,
                                                description=_('The authentication token to access Citadel'))
     file_extensions = TextListField(_('File extensions'),
-                                    description=_('The subset of file extensions that will be selected for indexing'))
+                                    description=_('File extensions to upload for full-text search'))
+    max_file_size = IntegerField(_('Max. file size'),
+                                 [DataRequired(), NumberRange(min=1)],
+                                 description=_('Maximum size (in MB) to upload for full-text search. Note that '
+                                               'increasing this after the initial export will upload all files '
+                                               'for indexing that have not been uploaded before during the next queue '
+                                               'run, which may take a long time on larger instances. You may want '
+                                               'to run a manual upload for the new file size first!'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -40,10 +47,11 @@ class CitadelPlugin(LiveSyncPluginBase):
     default_settings = {
         'search_backend_url': '',
         'search_backend_token': '',
-        'file_extensions': (
+        'file_extensions': [
             'key', 'odp', 'pps', 'ppt', 'pptx', 'ods', 'xls', 'xlsm', 'xlsx', 'doc', 'docx', 'odt', 'pdf', 'rtf',
             'tex', 'txt', 'wdp'
-        )
+        ],
+        'max_file_size': 10,
     }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
 
