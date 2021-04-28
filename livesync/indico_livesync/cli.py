@@ -34,18 +34,23 @@ def agents():
     """Lists the currently active agents"""
     print('The following LiveSync agents are active:')
     agent_list = LiveSyncAgent.query.order_by(LiveSyncAgent.backend_name, db.func.lower(LiveSyncAgent.name)).all()
-    table_data = [['ID', 'Name', 'Backend', 'Initial Export', 'Queue']]
+    table_data = [['ID', 'Name', 'Backend', 'Queue', 'Status']]
     for agent in agent_list:
-        initial = (cformat('%{green!}done%{reset}') if agent.initial_data_exported else
-                   cformat('%{yellow!}pending%{reset}'))
         if agent.backend is None:
             backend_title = cformat('%{red!}invalid backend ({})%{reset}').format(agent.backend_name)
+            queue_status = 'n/a'
         else:
             backend_title = agent.backend.title
-        table_data.append([str(agent.id), agent.name, backend_title, initial,
-                           str(agent.queue.filter_by(processed=False).count())])
+            backend = agent.create_backend()
+            queue_allowed, reason = backend.check_queue_status()
+            if queue_allowed:
+                queue_status = cformat('%{green!}ready%{reset}')
+            else:
+                queue_status = cformat('%{yellow!}{}%{reset}').format(reason)
+        table_data.append([str(agent.id), agent.name, backend_title,
+                           str(agent.queue.filter_by(processed=False).count()), queue_status])
     table = AsciiTable(table_data)
-    table.justify_columns[4] = 'right'
+    table.justify_columns[3] = 'right'
     print(table.table)
     if not all(a.initial_data_exported for a in agent_list):
         print()
@@ -76,9 +81,9 @@ def initial_export(agent_id, batch, force, verbose):
         return
 
     backend = agent.create_backend()
-    if backend.run_initial_export(batch, force, verbose):
-        agent.initial_data_exported = True
-        db.session.commit()
+    backend.run_initial_export(batch, force, verbose)
+    agent.initial_data_exported = True
+    db.session.commit()
 
 
 @cli.command()
@@ -100,12 +105,14 @@ def run(agent_id, force, verbose):
         if agent.backend is None:
             print(cformat('Skipping agent: %{red!}{}%{reset} (backend not found)').format(agent.name))
             continue
-        if not agent.initial_data_exported and not force:
-            print(cformat('Skipping agent: %{red!}{}%{reset} (initial export not performed)').format(agent.name))
+        backend = agent.create_backend()
+        queue_allowed, reason = backend.check_queue_status()
+        if not queue_allowed and not force:
+            print(cformat('Skipping agent: %{red!}{}%{reset} ({})').format(agent.name, reason))
             continue
         print(cformat('Running agent: %{white!}{}%{reset}').format(agent.name))
         try:
-            agent.create_backend().run(verbose)
+            backend.run(verbose)
             db.session.commit()
         except Exception:
             db.session.rollback()

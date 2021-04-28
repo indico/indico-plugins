@@ -75,6 +75,15 @@ class LiveSyncBackendBase:
         """
         self.agent = agent
 
+    def check_queue_status(self):
+        """Return whether queue runs are allowed (or why not).
+
+        :return: ``allowed, reason`` tuple; the reason is None if runs are allowed.
+        """
+        if self.agent.initial_data_exported:
+            return True, None
+        return False, 'initial export not performed'
+
     def fetch_records(self, count=None):
         query = (self.agent.queue
                  .filter_by(processed=False)
@@ -126,11 +135,6 @@ class LiveSyncBackendBase:
         """Runs the initial export.
 
         This process is expected to take a very long time.
-
-        If this method returns True, the agent will be marked as having
-        successfully completed its initial upload.  In case additional
-        steps are required, backends may override this method and change
-        the return value to avoid this.
         """
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
@@ -154,4 +158,3 @@ class LiveSyncBackendBase:
         uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
         uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
         uploader.run_initial(notes.yield_per(batch_size), notes.count())
-        return True

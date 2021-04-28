@@ -15,6 +15,7 @@ from requests.exceptions import RequestException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm.attributes import flag_modified
 from urllib3 import Retry
 from werkzeug.urls import url_join
 
@@ -226,6 +227,19 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     uploader = LiveSyncCitadelUploader
     unique = True
 
+    def check_queue_status(self):
+        allowed, reason = super().check_queue_status()
+        if not allowed:
+            return False, reason
+        if not self.agent.settings.get('file_upload_done'):
+            return False, 'file upload pending'
+        return True, None
+
+    def set_initial_file_upload_state(self, state):
+        self.plugin.logger.info('Initial file upload flag set to %s', state)
+        self.agent.settings['file_upload_done'] = state
+        flag_modified(self.agent, 'settings')
+
     def get_initial_query(self, model_cls, force):
         query = super().get_initial_query(model_cls, force)
         if not force:
@@ -235,19 +249,20 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     def process_queue(self, uploader):
         super().process_queue(uploader)
         uploader_name = type(uploader).__name__
-        self.logger.info(f'{uploader_name} starting file upload')
+        self.plugin.logger.info(f'{uploader_name} starting file upload')
         total = self.run_export_files(verbose=False)
-        self.logger.info(f'{uploader_name} finished uploading %d files', total)
+        self.plugin.logger.info(f'{uploader_name} finished uploading %d files', total)
 
     def run_initial_export(self, batch_size, force, verbose):
-        rv = super().run_initial_export(batch_size, force, verbose)
+        super().run_initial_export(batch_size, force, verbose)
+        print('Initial export finished')
 
         if self.get_initial_query(Attachment, force=True).has_rows():
             print('You need to export attachment contents as well')
             print(cformat('To do so, run %{yellow!}indico citadel upload%{reset}'))
-            return False
-
-        return rv
+        else:
+            # no files -> mark file upload as done so queue runs are possible
+            self.set_initial_file_upload_state(True)
 
     def run_export_files(self, batch=1000, force=False, verbose=True):
         from indico_citadel.plugin import CitadelPlugin

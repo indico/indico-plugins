@@ -26,8 +26,8 @@
                     <th>{% trans %}Name{% endtrans %}</th>
                     <th>{% trans %}Backend{% endtrans %}</th>
                     <th>{% trans %}Last Run{% endtrans %}</th>
-                    <th class="small-column">{% trans %}Initial Export{% endtrans %}</th>
                     <th class="small-column">{% trans %}Queue{% endtrans %}</th>
+                    <th>{% trans %}Status{% endtrans %}</th>
                     <th class="action-column">{% trans %}Actions{% endtrans %}</th>
                 </tr>
             </thead>
@@ -50,14 +50,19 @@
                                 {% trans %}Never{% endtrans %}
                             {%- endif -%}
                         </td>
+                        <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
                         <td>
-                            {% if agent.initial_data_exported %}
-                                {% trans %}Done{% endtrans %}
+                            {% if agent.backend %}
+                                {% set queue_ready, reason = agent.create_backend().check_queue_status() %}
+                                {% if queue_ready %}
+                                    {% trans %}Ready{% endtrans %}
+                                {% else %}
+                                    <strong>{{ reason }}</strong>
+                                {% endif %}
                             {% else %}
-                                <strong>{% trans %}Pending{% endtrans %}</strong>
+                                {% trans %}n/a{% endtrans %}
                             {% endif %}
                         </td>
-                        <td class="text-right">{{ agent.queue.filter_by(processed=false).count() }}</td>
                         <td>
                             <a href="#" class="action-icon icon-remove"
                                data-href="{{ url_for_plugin('livesync.delete_agent', agent) }}"

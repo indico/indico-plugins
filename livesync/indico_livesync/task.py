@@ -22,9 +22,11 @@ def scheduled_update():
         if agent.backend is None:
             LiveSyncPlugin.logger.warning('Skipping agent %s; backend not found', agent.name)
             continue
-        if not agent.initial_data_exported:
-            LiveSyncPlugin.logger.warning('Skipping agent %s; initial export not performed yet', agent.name)
+        backend = agent.create_backend()
+        queue_allowed, reason = backend.check_queue_status()
+        if not queue_allowed:
+            LiveSyncPlugin.logger.warning('Skipping agent %s; queue runs disabled: %s', agent.name, reason)
             continue
         LiveSyncPlugin.logger.info('Running agent %s', agent.name)
-        agent.create_backend().run()
+        backend.run()
         db.session.commit()
