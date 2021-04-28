@@ -11,7 +11,7 @@ import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
-from indico.modules.search.base import IndicoSearchProvider, SearchTarget
+from indico.modules.search.base import IndicoSearchProvider
 
 from indico_citadel.util import format_filters, format_query
 
@@ -25,7 +25,7 @@ class CitadelProvider(IndicoSearchProvider):
         self.backend_url = CitadelPlugin.settings.get('search_backend_url')
         self.records_url = url_join(self.backend_url, 'api/records/')
 
-    def search(self, query, access, object_type=SearchTarget.event, page=1, params=None, highlight=True):
+    def search(self, query, access, page=1, object_types=(), **params):
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
@@ -38,7 +38,7 @@ class CitadelProvider(IndicoSearchProvider):
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
         q = f'{format_query(query, placeholders)} {ranges}'
         search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*',
-                         'type': object_type.name, **filter_query}
+                         'type': [x.name for x in object_types], **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
             search_params['access'] = ','.join(access)
