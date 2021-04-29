@@ -44,7 +44,7 @@ def query_events():
         .filter_by(is_deleted=False)
         .options(
             apply_acl_entry_strategy(selectinload(Event.acl_entries), EventPrincipal),
-            selectinload(Event.person_links),
+            selectinload(Event.person_links).joinedload('person').joinedload('user').load_only('is_system'),
             joinedload(Event.own_venue),
             joinedload(Event.own_room).options(raiseload('*'), joinedload('location')),
         )
@@ -76,7 +76,7 @@ def query_contributions():
         .filter(~Contribution.is_deleted, ~Event.is_deleted)
         .options(
             selectinload(Contribution.acl_entries),
-            selectinload(Contribution.person_links),
+            selectinload(Contribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
             event_strategy,
             session_strategy,
             session_block_strategy,
@@ -122,7 +122,7 @@ def query_subcontributions():
         .outerjoin(Contribution.session_block.of_type(contrib_block))
         .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted)
         .options(
-            selectinload(SubContribution.person_links),
+            selectinload(SubContribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
             contrib_strategy,
             event_strategy,
             session_strategy,
