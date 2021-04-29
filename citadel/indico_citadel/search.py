@@ -13,6 +13,7 @@ from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider
 
+from indico_citadel import _
 from indico_citadel.util import format_filters, format_query
 
 
@@ -36,7 +37,7 @@ class CitadelProvider(IndicoSearchProvider):
         filter_query, ranges = format_filters(params, filters, range_filters)
         # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
-        q = f'{format_query(query, placeholders)} {ranges}'
+        q = f'{format_query(query, {k: field for k, (field, _) in placeholders.items()})} {ranges}'
         search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*',
                          'type': [x.name for x in object_types], **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
@@ -75,14 +76,17 @@ class CitadelProvider(IndicoSearchProvider):
         ]
         return total, min(math.ceil(total / self.RESULTS_PER_PAGE), 1000), objects, aggregations
 
+    def get_placeholders(self):
+        return [{'key': key, 'label': label} for key, (_, label) in placeholders.items()]
+
 
 placeholders = {
-    'title': '_data.title',
-    'person': '_data.persons.name',
-    'affiliation': '_data.persons.affiliation',
-    'type': '_data.type',
-    'venue': '_data.location.venue_name',  # TODO: multiple locations
-    'keyword': '_data.keywords'
+    'title': ('_data.title', _('An entry title (such as: event, contribution, attachment, event_note)')),
+    'person': ('_data.persons.name', _("A speaker, author or event chair's name")),
+    'affiliation': ('_data.persons.affiliation', _("A speaker, author or event chair's affiliation")),
+    'type': ('_data.type', _('An entry type (such as: conference, meeting, link, file)')),
+    'venue': ('_data.location.venue_name', _("The event's venue name")),  # TODO: multiple locations
+    'keyword': ('_data.keywords', _('A keyword associated with an event'))
 }
 
 range_filters = {
