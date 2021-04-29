@@ -61,28 +61,20 @@ class CitadelIdMap(db.Model):
     __tablename__ = 'id_map'
     __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_citadel'},)
 
-    #: Entry ID
     id = db.Column(
         db.Integer,
-        autoincrement=True,
         primary_key=True
     )
-
-    #: ID of the document on Citadel
     citadel_id = db.Column(
         db.Integer,
         nullable=False,
         index=True,
         unique=True
     )
-
-    #: The type of the search entry object
     entry_type = db.Column(
         PyIntEnum(EntryType),
         nullable=False
     )
-
-    #: ID of the search entry event
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
@@ -90,8 +82,6 @@ class CitadelIdMap(db.Model):
         nullable=True,
         unique=True
     )
-
-    #: ID of the search entry contribution
     contrib_id = db.Column(
         db.Integer,
         db.ForeignKey('events.contributions.id'),
@@ -99,8 +89,6 @@ class CitadelIdMap(db.Model):
         nullable=True,
         unique=True
     )
-
-    #: ID of the search entry subcontribution
     subcontrib_id = db.Column(
         db.Integer,
         db.ForeignKey('events.subcontributions.id'),
@@ -108,8 +96,6 @@ class CitadelIdMap(db.Model):
         nullable=True,
         unique=True
     )
-
-    #: ID of the search entry attachment
     attachment_id = db.Column(
         db.Integer,
         db.ForeignKey('attachments.attachments.id'),
@@ -117,8 +103,6 @@ class CitadelIdMap(db.Model):
         nullable=True,
         unique=True
     )
-
-    #: ID of the search entry note
     note_id = db.Column(
         db.Integer,
         db.ForeignKey('events.notes.id'),
@@ -126,8 +110,6 @@ class CitadelIdMap(db.Model):
         nullable=True,
         unique=True
     )
-
-    #: ID of the search entry file
     attachment_file_id = db.Column(
         db.Integer,
         db.ForeignKey('attachments.files.id'),
@@ -145,7 +127,6 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
-
     contribution = db.relationship(
         'Contribution',
         lazy=True,
@@ -155,7 +136,6 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
-
     subcontribution = db.relationship(
         'SubContribution',
         lazy=True,
@@ -165,7 +145,6 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
-
     attachment = db.relationship(
         'Attachment',
         lazy=True,
@@ -175,7 +154,6 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
-
     note = db.relationship(
         'EventNote',
         lazy=True,
@@ -185,7 +163,6 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
-
     attachment_file = db.relationship(
         'AttachmentFile',
         lazy=True,
