@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
-from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum
 
 
 # revision identifiers, used by Alembic.
@@ -35,7 +35,6 @@ def upgrade():
         'id_map',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('citadel_id', sa.Integer(), nullable=False, index=True, unique=True),
-        sa.Column('timestamp', UTCDateTime, nullable=False),
         sa.Column('entry_type', PyIntEnum(_EntryType), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=True, index=True, unique=True),
         sa.Column('contrib_id', sa.Integer(), nullable=True, index=True, unique=True),

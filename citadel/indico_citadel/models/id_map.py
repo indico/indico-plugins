@@ -6,13 +6,12 @@
 # see the LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.attachments import Attachment
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
-from indico.util.date_time import now_utc
 from indico.util.enum import IndicoEnum
 
 
@@ -75,12 +74,6 @@ class CitadelIdMap(db.Model):
         nullable=False,
         index=True,
         unique=True
-    )
-
-    timestamp = db.Column(
-        UTCDateTime,
-        nullable=False,
-        default=now_utc
     )
 
     #: The type of the search entry object
