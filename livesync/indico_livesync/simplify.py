@@ -17,6 +17,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
+from indico.modules.events.notes.models.notes import EventNote
 from indico.util.enum import IndicoEnum
 
 from indico_livesync.models.queue import ChangeType, EntryType
@@ -132,7 +133,9 @@ def _process_cascaded_event_contents(records, additional_events=None):
     changed_contributions = set()
     changed_subcontributions = set()
     changed_attachments = set()
+    changed_notes = set()
 
+    note_records = {rec.note_id for rec in records if rec.type == EntryType.note}
     attachment_records = {rec.attachment_id for rec in records if rec.type == EntryType.attachment}
     session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
     contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
@@ -142,6 +145,9 @@ def _process_cascaded_event_contents(records, additional_events=None):
     if attachment_records:
         changed_attachments.update(Attachment.query.filter(Attachment.id.in_(attachment_records)))
 
+    if note_records:
+        changed_notes.update(EventNote.query.filter(EventNote.id.in_(note_records)))
+
     if event_records:
         changed_events.update(Event.query.filter(Event.id.in_(event_records)))
         changed_attachments.update(
@@ -149,6 +155,7 @@ def _process_cascaded_event_contents(records, additional_events=None):
                 Attachment.folder.has(AttachmentFolder.linked_event_id.in_(event_records))
             )
         )
+        changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(event_records)))
 
     yield from changed_events
 
@@ -171,22 +178,27 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_subcontributions.update(contribution.subcontributions)
 
     if changed_contributions:
+        changed_contribution_ids = {c.id for c in changed_contributions}
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.contribution_id.in_(c.id for c in changed_contributions))
+                Attachment.folder.has(AttachmentFolder.contribution_id.in_(changed_contribution_ids))
             )
         )
+        changed_notes.update(EventNote.query.filter(EventNote.contribution_id.in_(changed_contribution_ids)))
 
     # Same for subcontributions
     if subcontribution_records:
         changed_subcontributions.update(SubContribution.query.filter(SubContribution.id.in_(subcontribution_records)))
 
     if changed_subcontributions:
+        changed_subcontribution_ids = {sc.id for sc in changed_subcontributions}
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(sc.id for sc in changed_subcontributions))
+                Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(changed_subcontribution_ids))
             )
         )
+        changed_notes.update(EventNote.query.filter(EventNote.subcontribution_id.in_(changed_subcontribution_ids)))
 
     yield from changed_subcontributions
     yield from changed_attachments
+    yield from changed_notes
