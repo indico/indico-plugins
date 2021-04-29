@@ -30,7 +30,7 @@ from indico.modules.categories import Category
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import strip_control_chars
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap, get_entry_type
+from indico_citadel.models.id_map import CitadelIdMap, get_entry_type
 from indico_citadel.schemas import (AttachmentRecordSchema, ContributionRecordSchema, EventNoteRecordSchema,
                                     EventRecordSchema, SubContributionRecordSchema)
 from indico_citadel.util import parallelize
@@ -110,14 +110,14 @@ class LiveSyncCitadelUploader(Uploader):
         response_data = resp.json()
         new_citadel_id = response_data['metadata']['control_number']
         try:
-            CitadelSearchAppIdMap.create(object_type, object_id, new_citadel_id)
+            CitadelIdMap.create(object_type, object_id, new_citadel_id)
         except IntegrityError:
             # if we already have a mapping entry, delete the newly created record and
             # update the existing one in case something changed in the meantime
             self.logger.error(f'{object_type.name.title()} %d already in citadel; deleting+updating', object_id)
             db.session.rollback()
             self._citadel_delete(session, new_citadel_id, delete_mapping=False)
-            existing_citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
+            existing_citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
             assert existing_citadel_id is not None
             self._citadel_update(session, existing_citadel_id, data)
         resp.close()
@@ -143,7 +143,7 @@ class LiveSyncCitadelUploader(Uploader):
                 raise Exception(f'Could not delete record {citadel_id} from citadel: {resp.status_code}; {resp.text}')
             raise Exception(f'Could not delete record {citadel_id} from citadel: {exc}')
         if delete_mapping:
-            CitadelSearchAppIdMap.query.filter_by(search_id=citadel_id).delete()
+            CitadelIdMap.query.filter_by(citadel_id=citadel_id).delete()
             db.session.commit()
 
     def upload_record(self, entry, session):
@@ -152,12 +152,12 @@ class LiveSyncCitadelUploader(Uploader):
         if change_type & SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
         elif change_type & SimpleChange.updated:
-            citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
+            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
             if citadel_id is None:
                 raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
             self._citadel_update(session, citadel_id, data)
         elif change_type & SimpleChange.deleted:
-            citadel_id = CitadelSearchAppIdMap.get_search_id(object_type, object_id)
+            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
             if citadel_id is None:
                 raise Exception(f'Cannot delete {object_type.name} {object_id}: No citadel ID found')
             self._citadel_delete(session, citadel_id, delete_mapping=True)
@@ -165,7 +165,7 @@ class LiveSyncCitadelUploader(Uploader):
     def upload_file(self, entry, session):
         with entry.attachment.file.open() as file:
             resp = session.put(
-                url_join(self.search_app, f'api/record/{entry.search_id}/files/attachment'),
+                url_join(self.search_app, f'api/record/{entry.citadel_id}/files/attachment'),
                 data=file
             )
         if resp.ok:
@@ -278,7 +278,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             max_size = CitadelPlugin.settings.get('max_file_size')
 
         attachments = (
-            CitadelSearchAppIdMap.query
+            CitadelIdMap.query
             .join(Attachment)
             .join(AttachmentFile, Attachment.file_id == AttachmentFile.id)
             .filter(Attachment.type == AttachmentType.file)
@@ -286,11 +286,11 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             .filter(db.func.lower(AttachmentFile.extension).in_(
                 [s.lower() for s in CitadelPlugin.settings.get('file_extensions')]
             ))
-            .options(contains_eager(CitadelSearchAppIdMap.attachment).contains_eager(Attachment.file))
+            .options(contains_eager(CitadelIdMap.attachment).contains_eager(Attachment.file))
         )
         if not force:
-            attachments = attachments.filter(db.or_(CitadelSearchAppIdMap.attachment_file_id.is_(None),
-                                                    CitadelSearchAppIdMap.attachment_file_id != Attachment.file_id))
+            attachments = attachments.filter(db.or_(CitadelIdMap.attachment_file_id.is_(None),
+                                                    CitadelIdMap.attachment_file_id != Attachment.file_id))
         uploader = self.uploader(self)
         attachments = attachments.yield_per(batch)
         total = attachments.count()
@@ -307,11 +307,11 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             return False, reason
         if not self.is_configured():
             return False, 'Citadel is not properly configured.'
-        if not CitadelSearchAppIdMap.query.has_rows():
+        if not CitadelIdMap.query.has_rows():
             return False, 'It looks like you did not export any data to Citadel yet so there is nothing to reset.'
         return True, None
 
     def reset(self):
         super().reset()
         self.set_initial_file_upload_state(False)
-        CitadelSearchAppIdMap.query.delete()
+        CitadelIdMap.query.delete()

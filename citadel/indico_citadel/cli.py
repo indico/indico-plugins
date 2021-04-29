@@ -11,7 +11,7 @@ from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.util.console import cformat
 
-from indico_citadel.models.search_id_map import CitadelSearchAppIdMap
+from indico_citadel.models.id_map import CitadelIdMap
 from indico_livesync.models.agents import LiveSyncAgent
 
 
@@ -32,7 +32,7 @@ def upload(batch, force, max_size):
     if agent is None:
         print('No citadel livesync agent found')
         return
-    if not CitadelSearchAppIdMap.query.has_rows():
+    if not CitadelIdMap.query.has_rows():
         print('It looks like you did not export any data to Citadel yet.')
         print(cformat('To do so, run %{yellow!}indico livesync initial-export {}%{reset}').format(agent.id))
         return

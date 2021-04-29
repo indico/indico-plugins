@@ -32,9 +32,9 @@ class _EntryType(int, Enum):
 def upgrade():
     op.execute(CreateSchema('plugin_citadel'))
     op.create_table(
-        'es_id_map',
+        'id_map',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('search_id', sa.Integer(), nullable=False, index=True, unique=True),
+        sa.Column('citadel_id', sa.Integer(), nullable=False, index=True, unique=True),
         sa.Column('timestamp', UTCDateTime, nullable=False),
         sa.Column('entry_type', PyIntEnum(_EntryType), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=True, index=True, unique=True),
@@ -60,5 +60,5 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table('es_id_map', schema='plugin_citadel')
+    op.drop_table('id_map', schema='plugin_citadel')
     op.execute(DropSchema('plugin_citadel'))

@@ -58,8 +58,8 @@ def _make_checks():
         yield db.CheckConstraint(condition, f'valid_{link_type.name}_entry')
 
 
-class CitadelSearchAppIdMap(db.Model):
-    __tablename__ = 'es_id_map'
+class CitadelIdMap(db.Model):
+    __tablename__ = 'id_map'
     __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_citadel'},)
 
     #: Entry ID
@@ -69,8 +69,8 @@ class CitadelSearchAppIdMap(db.Model):
         primary_key=True
     )
 
-    #: ID of the document in the backend this entry belongs to
-    search_id = db.Column(
+    #: ID of the document on Citadel
+    citadel_id = db.Column(
         db.Integer,
         nullable=False,
         index=True,
@@ -204,29 +204,29 @@ class CitadelSearchAppIdMap(db.Model):
     )
 
     @classmethod
-    def get_search_id(cls, obj_type, obj_id):
-        """Get the search_id for a given object type and id.
+    def get_citadel_id(cls, obj_type, obj_id):
+        """Get the citadel_id for a given object type and id.
 
         :param obj_type: The EntryType of the object
         :param obj_id: The id of the object
         """
-        query = db.session.query(cls.search_id).filter_by(entry_type=obj_type)
+        query = db.session.query(cls.citadel_id).filter_by(entry_type=obj_type)
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
         return query.filter(getattr(cls, attr) == obj_id).scalar()
 
     @classmethod
-    def create(cls, obj_type, obj_id, search_id):
+    def create(cls, obj_type, obj_id, citadel_id):
         """Create a new mapping.
 
         :param obj_type: The EntryType of the object
         :param obj_id: The id of the object
-        :param search_id: The citadel entry ID
+        :param citadel_id: The citadel entry ID
         """
         attr = _column_for_types.get(obj_type)
         if not attr:
             raise Exception(f'Unsupported object type {obj_type}')
-        entry = cls(search_id=search_id, entry_type=obj_type, **{attr: obj_id})
+        entry = cls(citadel_id=citadel_id, entry_type=obj_type, **{attr: obj_id})
         db.session.add(entry)
         db.session.commit()
