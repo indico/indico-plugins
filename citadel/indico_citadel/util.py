@@ -83,3 +83,15 @@ def escape(query):
     """Prepend all special ElasticSearch characters with a backslash."""
     patt = r'([+\-=><!(){}[\]\^"~*?:\\\/]|&&|\|\|)'
     return re.sub(patt, r'\\\1', query)
+
+
+def remove_none_entries(obj):
+    """Remove dict entries that are ``None``.
+
+    This is cascaded in case of nested dicts/collections.
+    """
+    if isinstance(obj, dict):
+        return {k: remove_none_entries(v) for k, v in obj.items() if v is not None}
+    elif isinstance(obj, (list, tuple, set)):
+        return type(obj)(map(remove_none_entries, obj))
+    return obj

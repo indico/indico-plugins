@@ -20,6 +20,8 @@ from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, Con
                                            EventSchema, SubContributionSchema)
 from indico.web.flask.util import url_for
 
+from indico_citadel.util import remove_none_entries
+
 
 PRINCIPAL_TYPES = {
     PrincipalType.user,
@@ -102,11 +104,8 @@ class RecordSchema(ACLSchema):
 
     @post_dump
     def remove_none_fields(self, data, **kwargs):
-        """Remove fields that are None to avoid jsonschema validation errors."""
-        return {
-            key: value for key, value in data.items()
-            if value is not None
-        }
+        """Remove fields that are None to avoid json schema validation errors."""
+        return remove_none_entries(data)
 
     @post_dump
     def site(self, data, **kwargs):

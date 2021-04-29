@@ -31,7 +31,9 @@ def test_dump_event(db, dummy_user, dummy_event):
     dummy_event.description = 'A dummy event'
     dummy_event.keywords = ['foo', 'bar']
     person = EventPerson.create_from_user(dummy_user, dummy_event)
+    person2 = EventPerson(event=dummy_event, first_name='Admin', last_name='Saurus', affiliation='Indico')
     dummy_event.person_links.append(EventPersonLink(person=person))
+    dummy_event.person_links.append(EventPersonLink(person=person2))
     db.session.flush()
     category_id = dummy_event.category_id
     assert schema.dump(dummy_event) == {
@@ -45,7 +47,8 @@ def test_dump_event(db, dummy_user, dummy_event):
             'description': 'A dummy event',
             'keywords': ['foo', 'bar'],
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
-            'persons': [{'affiliation': '', 'name': 'Guinea Pig'}],
+            'persons': [{'name': 'Guinea Pig'},
+                        {'affiliation': 'Indico', 'name': 'Admin Saurus'}],
             'site': 'http://localhost',
             'title': 'dummy#0'
         },
@@ -92,7 +95,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
         '_data': {
             'description': 'A dummy contribution',
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
-            'persons': [{'affiliation': '', 'name': 'Guinea Pig'}],
+            'persons': [{'name': 'Guinea Pig'}],
             'site': 'http://localhost',
             'title': 'Dummy Contribution',
         },
@@ -142,7 +145,7 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
         '_data': {
             'description': 'A dummy subcontribution',
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
-            'persons': [{'affiliation': '', 'name': 'Guinea Pig'}],
+            'persons': [{'name': 'Guinea Pig'}],
             'site': 'http://localhost',
             'title': 'Dummy Subcontribution',
         },
@@ -185,7 +188,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
             'filename': 'dummy_file.txt',
             'site': 'http://localhost',
             'title': 'Dummy Attachment',
-            'user': {'affiliation': None, 'name': 'Guinea Pig'},
+            'user': {'name': 'Guinea Pig'},
         },
         'attachment_id': attachment.id,
         'category_id': category_id,

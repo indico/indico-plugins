@@ -7,10 +7,10 @@
 
 import pytest
 
-from indico_citadel.util import format_query
+from indico_citadel.util import format_query, remove_none_entries
 
 
-@pytest.mark.parametrize('query,expected', [
+@pytest.mark.parametrize(('query', 'expected'), [
     ('title:"my event" ola person:john ola some:yes ola',
      '+title:"my event" +person:john +(ola ola some\\:yes ola)'),
     ('title:"my title:something"', '+title:"my title:something"'),
@@ -23,3 +23,14 @@ from indico_citadel.util import format_query
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person'}
     assert format_query(query, placeholders) == expected
+
+
+@pytest.mark.parametrize(('val', 'expected'), [
+    ({'a': 0, 'b': None, 'c': {'c1': None, 'c2': 0, 'c3': {'c3a': None}}},
+     {'a': 0, 'c': {'c2': 0, 'c3': {}}}),
+    ({'a': 0, 'b': [None, {'b1': None, 'b2': 'test'}]},
+     {'a': 0, 'b': [None, {'b2': 'test'}]}),
+    (None, None),
+])
+def test_remove_none_entries(val, expected):
+    assert remove_none_entries(val) == expected
