@@ -226,7 +226,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
         subcontribution = SubContribution(contribution=dummy_contribution, title='Dummy Subcontribution',
                                           duration=timedelta(minutes=10))
         db.session.flush()
-        contribution_id = None
+        contribution_id = subcontribution.contribution_id
         subcontribution_id = subcontribution.id
         note = EventNote(object=subcontribution)
         url = f'/event/0/contributions/{dummy_contribution.id}/subcontributions/{subcontribution_id}/note/'

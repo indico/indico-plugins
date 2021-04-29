@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import math
-
 import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
@@ -14,6 +12,7 @@ from werkzeug.urls import url_join
 from indico.modules.search.base import IndicoSearchProvider, SearchPlaceholder
 
 from indico_citadel import _
+from indico_citadel.result_schemas import CitadelResultSchema
 from indico_citadel.util import format_filters, format_query
 
 
@@ -50,31 +49,8 @@ class CitadelProvider(IndicoSearchProvider):
         except RequestException:
             raise Exception('Failed contacting the search service')
 
-        resp = resp.json()
-        _aggregations, hits = resp['aggregations'], resp['hits']
-        total, _objects = hits['total'], hits['hits']
-
-        aggregations = {
-            key: {
-                'label': filters[key],
-                'buckets': value['buckets']
-            }
-            for key, value in _aggregations.items()
-            if key in filters
-        }
-        # The citadel service stores every indexable/queryable attribute in a _data
-        # This extraction should ensure Indico is abstracted from that complexity
-        objects = [
-            {
-                **o['metadata'].pop('_data'),
-                **o['metadata'],
-                'highlight': {
-                    key.removeprefix('_data.'): value for key, value in o['highlight'].items()
-                }
-            }
-            for o in _objects
-        ]
-        return total, min(math.ceil(total / self.RESULTS_PER_PAGE), 1000), objects, aggregations
+        data = resp.json()
+        return CitadelResultSchema(context={'results_per_page': self.RESULTS_PER_PAGE}).load(data)
 
     def get_placeholders(self):
         return [SearchPlaceholder(key, label) for key, (_, label) in placeholders.items()]
