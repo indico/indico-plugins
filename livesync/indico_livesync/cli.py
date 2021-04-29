@@ -5,11 +5,14 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import time
+
 import click
 from flask_pluginengine import current_plugin
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
+from indico.core.config import config
 from indico.core.db import db
 from indico.util.console import cformat
 
@@ -124,3 +127,48 @@ def run(agent_id, force, verbose):
         except Exception:
             db.session.rollback()
             raise
+
+
+@cli.command()
+@click.argument('agent_id', type=int)
+def reset(agent_id):
+    """Performs the initial data export for an agent"""
+    agent = LiveSyncAgent.get(agent_id)
+    if agent is None:
+        print('No such agent')
+        return
+
+    if agent.backend is None:
+        print(cformat('Cannot run agent %{red!}{}%{reset} (backend not found)').format(agent.name))
+        return
+
+    backend = agent.create_backend()
+    reset_allowed, message = backend.check_reset_status()
+
+    if not reset_allowed:
+        print(f'Resetting is not possible: {message}')
+        return
+
+    print(cformat('Selected agent: %{white!}{}%{reset} ({})').format(agent.name, backend.title))
+    print(cformat('%{yellow!}!!! %{red!}DANGER %{yellow!}!!!%{reset}'))
+    if backend.reset_deletes_indexed_data:
+        print(cformat('%{yellow!}This command will delete all indexed data on this backend.%{reset}')
+              .format(backend.title))
+    else:
+        print(cformat('%{yellow!}This command should only be used if the data on this backend '
+                      'has been deleted.%{reset}')
+              .format(backend.title))
+    print(cformat('%{yellow!}After resetting you need to perform a new initial export.%{reset}'))
+    click.confirm(click.style('Do you really want to perform the reset?', fg='red', bold=True),
+                  default=False, abort=True)
+    if not config.DEBUG:
+        click.confirm(click.style('Are you absolutely sure?', fg='red', bold=True), default=False, abort=True)
+        for i in range(5):
+            print(cformat('\rResetting in %{white!}{}%{reset}s (CTRL+C to abort)').format(5 - i), end='')
+            time.sleep(1)
+        print('')
+
+    backend.reset()
+    db.session.commit()
+    print(cformat('Reset complete; run %{green!}indico livesync initial-export {}%{reset} for a new export')
+          .format(agent.id))

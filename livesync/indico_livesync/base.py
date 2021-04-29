@@ -53,6 +53,9 @@ class LiveSyncBackendBase:
     form = AgentForm
     #: whether only one agent with this backend is allowed
     unique = False
+    #: whether a reset can delete data on whatever backend is used as well or the user
+    #: needs to do it themself after doing a reset
+    reset_deletes_indexed_data = False
 
     @classproperty
     @classmethod
@@ -168,3 +171,27 @@ class LiveSyncBackendBase:
         uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
         uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
         uploader.run_initial(notes.yield_per(batch_size), notes.count())
+
+    def check_reset_status(self):
+        """Return whether a reset is allowed (or why not).
+
+        When resetting is not allowed, the message indicates why this is the case.
+
+        :return: ``allowed, reason`` tuple; the reason is None if resetting is allowed.
+        """
+        if not self.agent.queue.has_rows() and not self.agent.initial_data_exported:
+            return False, 'There is nothing to reset'
+        return True, None
+
+    def reset(self):
+        """Perform a full reset of all data related to the backend.
+
+        This deletes all queued changes, resets the initial export state back
+        to pending and do any other backend-specific tasks that may be required.
+
+        It is not necessary to delete the actual search indexes (which are possibly
+        on a remote service), but if your backend has the ability to do it you may
+        want to do it and display a message to the user indicating this.
+        """
+        self.agent.initial_data_exported = False
+        self.agent.queue.delete()

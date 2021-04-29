@@ -47,6 +47,7 @@ def _format_change_str(change):
 
 def _print_record(record):
     obj_type, obj_id, data, changes = record
+    print()  # verbose_iterator during initial exports doesn't end its line
     print(f'{_format_change_str(changes)}: {obj_type.name} {obj_id}')
     if data is not None:
         print(highlight(pformat(data), lexer, formatter))
@@ -226,6 +227,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
 
     uploader = LiveSyncCitadelUploader
     unique = True
+    reset_deletes_indexed_data = False
 
     def check_queue_status(self):
         allowed, reason = super().check_queue_status()
@@ -298,3 +300,18 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
                                            print_total_time=True)
         uploader.upload_files(attachments)
         return total
+
+    def check_reset_status(self):
+        allowed, reason = super().check_reset_status()
+        if not allowed:
+            return False, reason
+        if not self.is_configured():
+            return False, 'Citadel is not properly configured.'
+        if not CitadelSearchAppIdMap.query.has_rows():
+            return False, 'It looks like you did not export any data to Citadel yet so there is nothing to reset.'
+        return True, None
+
+    def reset(self):
+        super().reset()
+        self.set_initial_file_upload_state(False)
+        CitadelSearchAppIdMap.query.delete()
