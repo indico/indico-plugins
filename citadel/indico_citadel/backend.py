@@ -111,6 +111,7 @@ class LiveSyncCitadelUploader(Uploader):
         new_citadel_id = response_data['metadata']['control_number']
         try:
             CitadelIdMap.create(object_type, object_id, new_citadel_id)
+            db.session.commit()
         except IntegrityError:
             # if we already have a mapping entry, delete the newly created record and
             # update the existing one in case something changed in the meantime

@@ -199,4 +199,3 @@ class CitadelIdMap(db.Model):
             raise Exception(f'Unsupported object type {obj_type}')
         entry = cls(citadel_id=citadel_id, entry_type=obj_type, **{attr: obj_id})
         db.session.add(entry)
-        db.session.commit()
