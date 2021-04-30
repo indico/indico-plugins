@@ -11,7 +11,7 @@ import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
-from indico.modules.search.base import IndicoSearchProvider
+from indico.modules.search.base import IndicoSearchProvider, SearchPlaceholder
 
 from indico_citadel import _
 from indico_citadel.util import format_filters, format_query
@@ -77,7 +77,7 @@ class CitadelProvider(IndicoSearchProvider):
         return total, min(math.ceil(total / self.RESULTS_PER_PAGE), 1000), objects, aggregations
 
     def get_placeholders(self):
-        return [{'key': key, 'label': label} for key, (_, label) in placeholders.items()]
+        return [SearchPlaceholder(key, label) for key, (_, label) in placeholders.items()]
 
 
 placeholders = {
