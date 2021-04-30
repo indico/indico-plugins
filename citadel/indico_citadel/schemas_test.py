@@ -198,6 +198,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
         ],
         'contribution_id': dummy_contribution.id,
         'event_id': 0,
+        'folder_id': folder.id,
         'modified_dt': attachment.modified_dt.isoformat(),
         'type': 'attachment',
         'type_format': 'file',
@@ -210,45 +211,55 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
 
 @pytest.mark.parametrize('link_type', ('event', 'contrib', 'subcontrib'))
 def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_type):
-    from .schemas import EventNoteSchema
+    from .schemas import EventNoteRecordSchema
 
     if link_type == 'event':
-        contribution_id = None
-        subcontribution_id = None
+        ids = {}
         note = EventNote(object=dummy_event)
         url = '/event/0/note/'
     elif link_type == 'contrib':
-        contribution_id = dummy_contribution.id
-        subcontribution_id = None
+        ids = {'contribution_id': dummy_contribution.id}
         note = EventNote(object=dummy_contribution)
-        url = f'/event/0/contributions/{contribution_id}/note/'
+        url = f'/event/0/contributions/{dummy_contribution.id}/note/'
     elif link_type == 'subcontrib':
         subcontribution = SubContribution(contribution=dummy_contribution, title='Dummy Subcontribution',
                                           duration=timedelta(minutes=10))
         db.session.flush()
-        contribution_id = subcontribution.contribution_id
-        subcontribution_id = subcontribution.id
+        ids = {
+            'contribution_id': subcontribution.contribution_id,
+            'subcontribution_id': subcontribution.id,
+        }
         note = EventNote(object=subcontribution)
-        url = f'/event/0/contributions/{dummy_contribution.id}/subcontributions/{subcontribution_id}/note/'
+        url = f'/event/0/contributions/{dummy_contribution.id}/subcontributions/{subcontribution.id}/note/'
 
     note.create_revision(RenderMode.html, 'this is a dummy note', dummy_user)
     db.session.flush()
     category_id = dummy_event.category_id
-    schema = EventNoteSchema(context={'schema': 'test-notes'})
+    schema = EventNoteRecordSchema(context={'schema': 'test-notes'})
     assert schema.dump(note) == {
+        '$schema': 'test-notes',
+        '_access': {
+            'delete': ['IndicoAdmin'],
+            'owner': ['IndicoAdmin'],
+            'update': ['IndicoAdmin'],
+        },
+        '_data': {
+            'content': 'this is a dummy note',
+            'site': 'http://localhost',
+            'title': f'{note.object.title} - Notes/Minutes',
+            'user': {'name': 'Guinea Pig'}
+        },
         'category_id': category_id,
         'category_path': [
             {'id': 0, 'title': 'Home', 'url': '/'},
             {'id': category_id, 'title': 'dummy', 'url': f'/category/{category_id}/'},
         ],
-        'content': 'this is a dummy note',
-        'contribution_id': contribution_id,
-        'created_dt': note.current_revision.created_dt.isoformat(),
+        'modified_dt': note.current_revision.created_dt.isoformat(),
         'event_id': 0,
         'note_id': note.id,
-        'subcontribution_id': subcontribution_id,
         'type': 'event_note',
-        'url': url,
+        'url': f'http://localhost{url}',
+        **ids
     }
 
 

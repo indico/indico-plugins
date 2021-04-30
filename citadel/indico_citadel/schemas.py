@@ -131,8 +131,8 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     class Meta:
         model = Attachment
         indexable = ('title', 'filename', 'user')
-        non_indexable = ('attachment_id', 'type', 'type_format', 'event_id', 'contribution_id', 'category_id',
-                         'category_path', 'url', 'subcontribution_id', 'modified_dt')
+        non_indexable = ('attachment_id', 'folder_id', 'type', 'type_format', 'event_id', 'contribution_id',
+                         'category_id', 'category_path', 'url', 'subcontribution_id', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda at: AttachmentSchema(only=AttachmentRecordSchema.Meta.indexable).dump(at))
@@ -172,7 +172,7 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
 
 class _EventNoteDataSchema(EventNoteSchema):
     class Meta:
-        fields = ('title', 'content')
+        fields = ('title', 'content', 'user')
 
     title = mm.Function(lambda note: f'{note.object.title} - Notes/Minutes')
 
@@ -181,7 +181,7 @@ class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
     class Meta:
         model = EventNote
         non_indexable = ('note_id', 'type', 'event_id', 'contribution_id', 'subcontribution_id', 'category_id',
-                         'category_path', 'url', 'created_dt')
+                         'category_path', 'url', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda note: _EventNoteDataSchema().dump(note))

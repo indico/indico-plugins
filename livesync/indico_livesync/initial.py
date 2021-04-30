@@ -278,7 +278,7 @@ def query_notes():
         ))
         .options(
             note_strategy,
-            joinedload(EventNote.current_revision).raiseload(EventNoteRevision.user),
+            joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user).joinedload('_affiliation'),
         )
         .order_by(EventNote.id)
     )
