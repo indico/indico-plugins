@@ -108,8 +108,9 @@ class LiveSyncCitadelUploader(Uploader):
                 raise Exception(f'Could not create record on citadel: {resp.status_code}; {resp.text}; {data}')
             raise Exception(f'Could not create record on citadel: {exc}; {data}')
         response_data = resp.json()
-        new_citadel_id = response_data['metadata']['control_number']
+        new_citadel_id = int(response_data['metadata']['control_number'])
         try:
+            self.logger.debug('Created mapping for %s %d -> citadel id %d', object_type.name, object_id, new_citadel_id)
             CitadelIdMap.create(object_type, object_id, new_citadel_id)
             db.session.commit()
         except IntegrityError:
@@ -185,12 +186,12 @@ class LiveSyncCitadelUploader(Uploader):
     def upload_records(self, records):
         session = requests.Session()
         retry = Retry(
-            total=5,
+            total=10,
             backoff_factor=3,
             status_forcelist=[502, 503, 504],
             allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
         )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry))
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=200))
         session.headers = self.headers
         dumped_records = (
             (
@@ -209,12 +210,12 @@ class LiveSyncCitadelUploader(Uploader):
     def upload_files(self, files):
         session = requests.Session()
         retry = Retry(
-            total=5,
+            total=10,
             backoff_factor=3,
             status_forcelist=[502, 503, 504],
             allowed_methods=frozenset(['PUT'])
         )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry))
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=100))
         session.headers = self.headers
         uploader = parallelize(self.upload_file, entries=files, batch_size=100)
         uploader(session)
@@ -242,7 +243,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         return bool(self.plugin.settings.get('search_backend_url') and self.plugin.settings.get('search_backend_token'))
 
     def set_initial_file_upload_state(self, state):
-        if self.agent.settings['file_upload_done'] == state:
+        if self.agent.settings.get('file_upload_done') == state:
             return
         self.plugin.logger.info('Initial file upload flag set to %s', state)
         self.agent.settings['file_upload_done'] = state
@@ -303,12 +304,13 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         return total
 
     def check_reset_status(self):
-        allowed, reason = super().check_reset_status()
-        if not allowed:
-            return False, reason
         if not self.is_configured():
             return False, 'Citadel is not properly configured.'
-        if not CitadelIdMap.query.has_rows():
+        if (
+            not CitadelIdMap.query.has_rows() and
+            not self.agent.queue.has_rows() and
+            not self.agent.initial_data_exported
+        ):
             return False, 'It looks like you did not export any data to Citadel yet so there is nothing to reset.'
         return True, None
 
