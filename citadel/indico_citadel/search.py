@@ -64,10 +64,10 @@ placeholders = {
     'person': ('_data.persons.name', _("A speaker, author or event chair's name")),
     'affiliation': ('_data.persons.affiliation', _("A speaker, author or event chair's affiliation")),
     'type': ('_data.type', _('An entry type (such as: conference, meeting, link, file)')),
-    'venue': ('_data.location.venue_name', _("The entry's venue name")),
-    'room': ('_data.location.room_name', _("The entry's room name")),
-    'address': ('_data.location.address', _("The entry's address")),
-    'file': ('_data.filename', _("An attachment's file name")),
+    'venue': ('_data.location.venue_name', _("Name of the venue")),
+    'room': ('_data.location.room_name', _("Name of the room")),
+    'address': ('_data.location.address', _("Address of the venue")),
+    'file': ('_data.filename', _("Name of the attached file")),
     'keyword': ('_data.keywords', _('A keyword associated with an event'))
 }
 
@@ -80,6 +80,6 @@ filters = {
     'person': _('Person'),
     'type_format': _('Type'),
     'venue': _('Location'),
-    'start_range': _('Start Date'),
+    'start_range': _('Date'),
     'category': _('Category')
 }
