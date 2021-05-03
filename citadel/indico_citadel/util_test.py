@@ -18,10 +18,11 @@ from indico_citadel.util import format_query, remove_none_entries
     ('hey title:something', '+title:something +(hey)'),
     ('title:something hey', '+title:something +(hey)'),
     ('hey title:something hey person:john', '+title:something +person:john +(hey hey)'),
-    ('<*\\^()', '+(\\<\\*\\\\\\^\\(\\))'),
+    ('<*\\^()', '+(\\<*\\\\\\^\\(\\))'),
+    ('file:*.pdf', '+file:*.pdf')
 ])
 def test_query_placeholders(query, expected):
-    placeholders = {'title': 'title', 'person': 'person'}
+    placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
     assert format_query(query, placeholders) == expected
 
 

@@ -9,7 +9,7 @@ import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
-from indico.modules.search.base import IndicoSearchProvider, SearchPlaceholder
+from indico.modules.search.base import IndicoSearchProvider, SearchFilter
 
 from indico_citadel import _
 from indico_citadel.result_schemas import CitadelResultSchema
@@ -53,7 +53,10 @@ class CitadelProvider(IndicoSearchProvider):
         return CitadelResultSchema(context={'results_per_page': self.RESULTS_PER_PAGE}).load(data)
 
     def get_placeholders(self):
-        return [SearchPlaceholder(key, label) for key, (_, label) in placeholders.items()]
+        return [SearchFilter(key, label) for key, (_, label) in placeholders.items()]
+
+    def get_filters(self):
+        return [SearchFilter(key, label) for key, label in filters.items()]
 
 
 placeholders = {
@@ -61,7 +64,10 @@ placeholders = {
     'person': ('_data.persons.name', _("A speaker, author or event chair's name")),
     'affiliation': ('_data.persons.affiliation', _("A speaker, author or event chair's affiliation")),
     'type': ('_data.type', _('An entry type (such as: conference, meeting, link, file)')),
-    'venue': ('_data.location.venue_name', _("The event's venue name")),  # TODO: multiple locations
+    'venue': ('_data.location.venue_name', _("Name of the venue")),
+    'room': ('_data.location.room_name', _("Name of the room")),
+    'address': ('_data.location.address', _("Address of the venue")),
+    'file': ('_data.filename', _("Name of the attached file")),
     'keyword': ('_data.keywords', _('A keyword associated with an event'))
 }
 
@@ -69,11 +75,11 @@ range_filters = {
     'start_range': 'start_dt'
 }
 
-# TODO: potentially move this to Indico (and provide i18n)
 filters = {
-    'affiliation': 'Affiliation',
-    'person': 'Person',
-    'type_format': 'Type',
-    'venue': 'Location',
-    'start_range': 'Start Date',
+    'affiliation': _('Affiliation'),
+    'person': _('Person'),
+    'type_format': _('Type'),
+    'venue': _('Location'),
+    'start_range': _('Date'),
+    'category': _('Category')
 }
