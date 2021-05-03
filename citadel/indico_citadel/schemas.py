@@ -16,11 +16,12 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
-from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
-                                           EventSchema, SubContributionSchema)
+from indico.modules.search.schemas import EventSchema
 from indico.web.flask.util import url_for
 
 from indico_citadel.util import remove_none_entries
+from indico_livesync.export_schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
+                                            SubContributionSchema)
 
 
 PRINCIPAL_TYPES = {
