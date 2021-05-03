@@ -18,7 +18,7 @@ from indico_citadel.util import format_query, remove_none_entries
     ('hey title:something', '+title:something +(hey)'),
     ('title:something hey', '+title:something +(hey)'),
     ('hey title:something hey person:john', '+title:something +person:john +(hey hey)'),
-    ('<*\\^()', '+(\\<\\*\\\\\\^\\(\\))'),
+    ('<*\\^()', '+(\\<*\\\\\\^\\(\\))'),
 ])
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person'}
