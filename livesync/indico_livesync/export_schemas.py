@@ -31,14 +31,14 @@ class CategorySchema(mm.SQLAlchemyAutoSchema):
 class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Attachment
-        fields = ('attachment_id', 'folder_id', 'type', 'type_format', 'title', 'filename', 'event_id',
+        fields = ('attachment_id', 'folder_id', 'type', 'attachment_type', 'title', 'filename', 'event_id',
                   'contribution_id', 'subcontribution_id', 'user', 'url', 'category_id', 'category_path',
                   'modified_dt')
 
     attachment_id = fields.Int(attribute='id')
     folder_id = fields.Int(attribute='folder_id')
     type = fields.Constant(SearchTarget.attachment.name)
-    type_format = fields.String(attribute='type.name')
+    attachment_type = fields.String(attribute='type.name')
     filename = fields.String(attribute='file.filename')
     event_id = fields.Int(attribute='folder.event.id')
     contribution_id = fields.Method('_contribution_id')
@@ -59,12 +59,12 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('contribution_id', 'type', 'type_format', 'event_id', 'title', 'description', 'location',
+        fields = ('contribution_id', 'type', 'contribution_type', 'event_id', 'title', 'description', 'location',
                   'persons', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt', 'duration')
 
     contribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.contribution.name)
-    type_format = fields.String(attribute='type.name')
+    contribution_type = fields.String(attribute='type.name')
     location = fields.Function(lambda contrib: LocationSchema().dump(contrib))
     persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int(attribute='event.category_id')

@@ -119,7 +119,7 @@ class EventRecordSchema(RecordSchema, EventSchema):
     class Meta:
         model = Event
         indexable = ('title', 'description', 'keywords', 'location', 'persons')
-        non_indexable = ('type', 'type_format', 'event_id', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
+        non_indexable = ('type', 'event_type', 'event_id', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda event: EventSchema(only=EventRecordSchema.Meta.indexable).dump(event))
@@ -127,12 +127,17 @@ class EventRecordSchema(RecordSchema, EventSchema):
     # By default, CERNs global indexing requires external URLs
     url = mm.String(attribute='external_url')
 
+    @post_dump
+    def _translate_keys(self, data, **kwargs):
+        data['type_format'] = data.pop('event_type')
+        return data
+
 
 class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     class Meta:
         model = Attachment
         indexable = ('title', 'filename', 'user')
-        non_indexable = ('attachment_id', 'folder_id', 'type', 'type_format', 'event_id', 'contribution_id',
+        non_indexable = ('attachment_id', 'folder_id', 'type', 'attachment_type', 'event_id', 'contribution_id',
                          'category_id', 'category_path', 'url', 'subcontribution_id', 'modified_dt')
         fields = RecordSchema.Meta.fields + non_indexable
 
@@ -140,13 +145,18 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     category_path = fields.Function(lambda a, ctx: _get_category_chain(a.folder.event, ctx.get('categories')))
     url = mm.String(attribute='absolute_download_url')
 
+    @post_dump
+    def _translate_keys(self, data, **kwargs):
+        data['type_format'] = data.pop('attachment_type')
+        return data
+
 
 class ContributionRecordSchema(RecordSchema, ContributionSchema):
     class Meta:
         model = Contribution
         indexable = ('title', 'description', 'location', 'persons')
-        non_indexable = ('contribution_id', 'type', 'type_format', 'event_id', 'url', 'category_id', 'category_path',
-                         'start_dt', 'end_dt', 'duration')
+        non_indexable = ('contribution_id', 'type', 'contribution_type', 'event_id', 'url', 'category_id',
+                         'category_path', 'start_dt', 'end_dt', 'duration')
         fields = RecordSchema.Meta.fields + non_indexable
 
     _data = fields.Function(lambda contrib: ContributionSchema(
@@ -154,6 +164,12 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
     ).dump(contrib))
     category_path = fields.Function(lambda c, ctx: _get_category_chain(c.event, ctx.get('categories')))
     url = mm.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
+
+    @post_dump
+    def _translate_keys(self, data, **kwargs):
+        if contribution_type := data.pop('contribution_type', None):
+            data['type_format'] = contribution_type
+        return data
 
 
 class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
