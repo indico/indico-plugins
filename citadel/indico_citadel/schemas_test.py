@@ -28,7 +28,7 @@ def test_dump_event(db, dummy_user, dummy_event):
     from .schemas import EventRecordSchema
 
     schema = EventRecordSchema(context={'schema': 'test-events'})
-    dummy_event.description = 'A dummy event'
+    dummy_event.description = 'A dummy <strong>event</strong>'
     dummy_event.keywords = ['foo', 'bar']
     person = EventPerson.create_from_user(dummy_user, dummy_event)
     person2 = EventPerson(event=dummy_event, first_name='Admin', last_name='Saurus', affiliation='Indico')
@@ -72,7 +72,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
 
     person = EventPerson.create_from_user(dummy_user, dummy_event)
     dummy_contribution.person_links.append(ContributionPersonLink(person=person))
-    dummy_contribution.description = 'A dummy contribution'
+    dummy_contribution.description = 'A dummy <strong>contribution</strong>'
 
     extra = {}
     if scheduled:
@@ -126,11 +126,11 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
         }
 
     subcontribution = SubContribution(contribution=dummy_contribution, title='Dummy Subcontribution',
-                                      description='', duration=timedelta(minutes=10))
+                                      description='A dummy <strong>subcontribution</strong>',
+                                      duration=timedelta(minutes=10))
 
     person = EventPerson.create_from_user(dummy_user, dummy_event)
     subcontribution.person_links.append(SubContributionPersonLink(person=person))
-    subcontribution.description = 'A dummy subcontribution'
 
     db.session.flush()
     category_id = dummy_contribution.event.category_id
@@ -232,7 +232,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
         note = EventNote(object=subcontribution)
         url = f'/event/0/contributions/{dummy_contribution.id}/subcontributions/{subcontribution.id}/note/'
 
-    note.create_revision(RenderMode.html, 'this is a dummy note', dummy_user)
+    note.create_revision(RenderMode.html, 'this is a dummy <strong>note</strong>', dummy_user)
     db.session.flush()
     category_id = dummy_event.category_id
     schema = EventNoteRecordSchema(context={'schema': 'test-notes'})

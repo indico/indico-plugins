@@ -17,6 +17,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.schemas import EventSchema
+from indico.util.string import strip_tags
 from indico.web.flask.util import url_for
 
 from indico_citadel.util import remove_none_entries
@@ -128,8 +129,10 @@ class EventRecordSchema(RecordSchema, EventSchema):
     url = mm.String(attribute='external_url')
 
     @post_dump
-    def _translate_keys(self, data, **kwargs):
+    def _transform(self, data, **kwargs):
         data['type_format'] = data.pop('event_type')
+        if desc := data['_data'].get('description'):
+            data['_data']['description'] = strip_tags(desc).strip()
         return data
 
 
@@ -166,9 +169,11 @@ class ContributionRecordSchema(RecordSchema, ContributionSchema):
     url = mm.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
 
     @post_dump
-    def _translate_keys(self, data, **kwargs):
+    def _transform(self, data, **kwargs):
         if contribution_type := data.pop('contribution_type', None):
             data['type_format'] = contribution_type
+        if desc := data['_data'].get('description'):
+            data['_data']['description'] = strip_tags(desc).strip()
         return data
 
 
@@ -186,12 +191,24 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
     category_path = fields.Function(lambda subc, ctx: _get_category_chain(subc.event, ctx.get('categories')))
     url = mm.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=True))
 
+    @post_dump
+    def _transform(self, data, **kwargs):
+        if desc := data['_data'].get('description'):
+            data['_data']['description'] = strip_tags(desc).strip()
+        return data
+
 
 class _EventNoteDataSchema(EventNoteSchema):
     class Meta:
         fields = ('title', 'content', 'user')
 
     title = mm.Function(lambda note: f'{note.object.title} - Notes/Minutes')
+
+    @post_dump
+    def _transform(self, data, **kwargs):
+        if desc := data.get('content'):
+            data['content'] = strip_tags(desc).strip()
+        return data
 
 
 class EventNoteRecordSchema(RecordSchema, EventNoteSchema):
