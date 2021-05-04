@@ -19,6 +19,7 @@ def parallelize(func, entries, batch_size=200):
         loop = asyncio.get_event_loop()
         executor = ThreadPoolExecutor(max_workers=batch_size)
         tasks = []
+        results = []
         for entry in entries:
             def run(app, *_args, **_kwargs):
                 with app.app_context():
@@ -27,10 +28,11 @@ def parallelize(func, entries, batch_size=200):
                 executor, run, current_app._get_current_object(), entry, *args, **kwargs
             ))
             if len(tasks) >= batch_size:
-                loop.run_until_complete(asyncio.gather(*tasks))
+                results.extend(loop.run_until_complete(asyncio.gather(*tasks)))
                 del tasks[:]
         if tasks:
-            loop.run_until_complete(asyncio.gather(*tasks))
+            results.extend(loop.run_until_complete(asyncio.gather(*tasks)))
+        return results
 
     return wrapper
 

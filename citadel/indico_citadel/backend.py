@@ -174,9 +174,11 @@ class LiveSyncCitadelUploader(Uploader):
             entry.attachment_file_id = entry.attachment.file.id
             db.session.merge(entry)
             db.session.commit()
+            return True
         else:
             self.logger.error('Failed uploading attachment %d: [%d] %s',
                               entry.attachment.id, resp.status_code, resp.text)
+            return False
 
     def run_initial(self, events, total):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
@@ -218,7 +220,8 @@ class LiveSyncCitadelUploader(Uploader):
         session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=100))
         session.headers = self.headers
         uploader = parallelize(self.upload_file, entries=files, batch_size=100)
-        uploader(session)
+        results = uploader(session)
+        return sum(1 for success in results if not success)
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
@@ -259,8 +262,8 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         super().process_queue(uploader)
         uploader_name = type(uploader).__name__
         self.plugin.logger.info(f'{uploader_name} starting file upload')
-        total = self.run_export_files(verbose=False)
-        self.plugin.logger.info(f'{uploader_name} finished uploading %d files', total)
+        total, errors = self.run_export_files(verbose=False)
+        self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)', total, errors)
 
     def run_initial_export(self, batch_size, force=False, verbose=False):
         super().run_initial_export(batch_size, force, verbose)
@@ -300,8 +303,10 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             attachments = verbose_iterator(attachments, total, attrgetter('id'),
                                            lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
                                            print_total_time=True)
-        uploader.upload_files(attachments)
-        return total
+        else:
+            self.plugin.logger.info(f'{total} files need to be uploaded')
+        errors = uploader.upload_files(attachments)
+        return total, errors
 
     def check_reset_status(self):
         if not self.is_configured():
