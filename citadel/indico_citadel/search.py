@@ -81,5 +81,6 @@ filters = {
     'type_format': _('Type'),
     'venue': _('Location'),
     'start_range': _('Date'),
-    'category': _('Category')
+    'category': _('Category'),
+    'category_id': _('Category ID'),
 }
