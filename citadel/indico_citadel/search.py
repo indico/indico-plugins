@@ -68,7 +68,8 @@ placeholders = {
     'room': ('_data.location.room_name', _("Name of the room")),
     'address': ('_data.location.address', _("Address of the venue")),
     'file': ('_data.filename', _("Name of the attached file")),
-    'keyword': ('_data.keywords', _('A keyword associated with an event'))
+    'keyword': ('_data.keywords', _('A keyword associated with an event')),
+    'category': ('category_path.title', _('The category of an event')),
 }
 
 range_filters = {
