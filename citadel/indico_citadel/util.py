@@ -46,7 +46,7 @@ def format_query(query, placeholders):
     :param placeholders: placeholder whitelist
     :returns escaped query
     """
-    patt = r'({}):([^:"\s]+|".+")\s*'.format('|'.join(placeholders.keys()))
+    patt = r'({}):([^:"\s]+|"[^"]+")\s*'.format('|'.join(placeholders.keys()))
     # Extract all placeholders
     p = [f'+{placeholders[x.group(1)]}:{x.group(2)}'
          for x in re.finditer(patt, query) if x.group(1) in placeholders]
