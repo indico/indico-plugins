@@ -91,7 +91,10 @@ def initial_export(agent_id, batch, force, verbose):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    backend.run_initial_export(batch, force, verbose)
+    if not backend.run_initial_export(batch, force, verbose):
+        print('The initial export failed; not marking it as done')
+        return
+
     agent.initial_data_exported = True
     db.session.commit()
 
@@ -122,7 +125,7 @@ def run(agent_id, force, verbose):
             continue
         print(cformat('Running agent: %{white!}{}%{reset}').format(agent.name))
         try:
-            backend.run(verbose)
+            backend.run(verbose, from_cli=True)
             db.session.commit()
         except Exception:
             db.session.rollback()

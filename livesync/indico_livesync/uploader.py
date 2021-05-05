@@ -21,9 +21,10 @@ class Uploader:
     #: Number of queue entries to process at a time
     BATCH_SIZE = 100
 
-    def __init__(self, backend, verbose=False):
+    def __init__(self, backend, verbose=False, from_cli=False):
         self.backend = backend
         self.verbose = verbose
+        self.from_cli = from_cli
         self.logger = backend.plugin.logger
 
     def run(self, records):
@@ -40,6 +41,8 @@ class Uploader:
                 self.upload_records(batch)
         except Exception:
             self.logger.exception(f'{self_name} could not upload batch')
+            if self.from_cli:
+                raise
             return
         self.processed_records(records)
         self.logger.info(f'{self_name} finished (%d total changes from %d records)', len(simplified), len(records))
@@ -49,6 +52,7 @@ class Uploader:
 
         :param records: an iterable containing records
         :param total: the total of records to be exported
+        :return: True if everything was successful, False if not
         """
         records = verbose_iterator(
             ((rec, SimpleChange.created) for rec in records),
@@ -57,12 +61,13 @@ class Uploader:
             lambda entry: re.sub(r'\s+', ' ', strip_control_chars(getattr(entry[0], 'title', ''))),
             print_total_time=True
         )
-        self.upload_records(records)
+        return self.upload_records(records)
 
     def upload_records(self, records):
         """Executed for a batch of up to `BATCH_SIZE` records
 
         :param records: an iterator of records to upload (or queue entries)
+        :return: True if everything was successful, False if not
         """
         raise NotImplementedError  # pragma: no cover
 

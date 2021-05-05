@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 import re
+import sys
 import threading
 from functools import wraps
 
@@ -19,21 +20,30 @@ def parallelize(func, entries, batch_size=200):
         iterable_lock = threading.Lock()
         result_lock = threading.Lock()
         abort = threading.Event()
+        finished = threading.Event()
         results = []
         app = current_app._get_current_object()
         main_app_context = _app_ctx_stack.top
+        worker_exc_info = None
 
         def worker(iterator):
-            while not abort.is_set():
+            nonlocal worker_exc_info
+            while not abort.is_set() and not finished.is_set():
                 try:
                     with iterable_lock:
                         with main_app_context:
                             item = next(iterator)
                 except StopIteration:
+                    finished.set()
                     break
 
                 with app.app_context():
-                    res = func(item, *args, **kwargs)
+                    try:
+                        res = func(item, *args, **kwargs)
+                    except BaseException:
+                        worker_exc_info = sys.exc_info()
+                        finished.set()
+                        return
                     with result_lock:
                         results.append(res)
 
@@ -44,14 +54,17 @@ def parallelize(func, entries, batch_size=200):
         for t in threads:
             t.start()
 
+        try:
+            finished.wait()
+        except KeyboardInterrupt:
+            print('\nFinishing pending jobs before aborting')
+            abort.set()
+
         for t in threads:
-            try:
-                t.join()
-            except KeyboardInterrupt:
-                print('\nFinishing pending jobs before aborting')
-                abort.set()
-                t.join()
-                continue
+            t.join()
+
+        if worker_exc_info:
+            raise worker_exc_info[1].with_traceback(worker_exc_info[2])
 
         return results, abort.is_set()
 

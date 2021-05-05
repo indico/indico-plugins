@@ -117,12 +117,12 @@ class LiveSyncBackendBase:
         LiveSyncPlugin.logger.info(f'Uploading %d records via {self.uploader.__name__}', len(records))
         uploader.run(records)
 
-    def run(self, verbose=False):
+    def run(self, verbose=False, from_cli=False):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        uploader = self.uploader(self, verbose=verbose)
+        uploader = self.uploader(self, verbose=verbose, from_cli=from_cli)
         self.process_queue(uploader)
         self.update_last_run()
 
@@ -148,11 +148,12 @@ class LiveSyncBackendBase:
         """Runs the initial export.
 
         This process is expected to take a very long time.
+        :return: True if everything was successful, False if not
         """
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        uploader = self.uploader(self, verbose=verbose)
+        uploader = self.uploader(self, verbose=verbose, from_cli=True)
 
         Category.allow_relationship_preloading = True
         Category.preload_relationships(Category.query, 'acl_entries',
@@ -166,11 +167,27 @@ class LiveSyncBackendBase:
         attachments = self.get_initial_query(Attachment, force)
         notes = self.get_initial_query(EventNote, force)
 
-        uploader.run_initial(events.yield_per(batch_size), events.count())
-        uploader.run_initial(contributions.yield_per(batch_size), contributions.count())
-        uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count())
-        uploader.run_initial(attachments.yield_per(batch_size), attachments.count())
-        uploader.run_initial(notes.yield_per(batch_size), notes.count())
+        print('Exporting events')
+        if not uploader.run_initial(events.yield_per(batch_size), events.count()):
+            print('Initial export of events failed')
+            return False
+        print('Exporting contributions')
+        if not uploader.run_initial(contributions.yield_per(batch_size), contributions.count()):
+            print('Initial export of contributions failed')
+            return False
+        print('Exporting subcontributions')
+        if not uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count()):
+            print('Initial export of subcontributions failed')
+            return False
+        print('Exporting attachments')
+        if not uploader.run_initial(attachments.yield_per(batch_size), attachments.count()):
+            print('Initial export of attachments failed')
+            return False
+        print('Exporting notes')
+        if not uploader.run_initial(notes.yield_per(batch_size), notes.count()):
+            print('Initial export of notes failed')
+            return False
+        return True
 
     def check_reset_status(self):
         """Return whether a reset is allowed (or why not).

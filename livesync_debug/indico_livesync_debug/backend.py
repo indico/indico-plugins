@@ -68,6 +68,7 @@ class DebugUploader(Uploader):
         dumped_records = (_print_record(*x, print_blank=(not self._is_queue_run), verbose=self.verbose)
                           for x in dumped_records)
         collections.deque(dumped_records, maxlen=0)  # exhaust the iterator
+        return True
 
 
 class LiveSyncDebugBackend(LiveSyncBackendBase):

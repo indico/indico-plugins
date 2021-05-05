@@ -134,6 +134,7 @@ class LiveSyncCitadelUploader(Uploader):
         self.logger.debug('Updating record %d on citadel', citadel_id)
         try:
             resp = session.put(url_join(self.search_app, f'api/record/{citadel_id}'), json=data)
+            self.logger.debug('Updated %d on citadel', citadel_id)
             resp.raise_for_status()
             resp.close()
         except RequestException as exc:
@@ -146,6 +147,7 @@ class LiveSyncCitadelUploader(Uploader):
         self.logger.debug('Deleting record %d from citadel', citadel_id)
         try:
             resp = session.delete(url_join(self.search_app, f'api/record/{citadel_id}'))
+            self.logger.debug('Deleted %d from citadel', citadel_id)
             resp.raise_for_status()
             resp.close()
         except RequestException as exc:
@@ -200,10 +202,10 @@ class LiveSyncCitadelUploader(Uploader):
             resp.close()
             return False
 
-    def run_initial(self, events, total):
+    def run_initial(self, records, total):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
-        super().run_initial(events, total)
+        return super().run_initial(records, total)
 
     def upload_records(self, records):
         session = requests.Session()
@@ -227,7 +229,8 @@ class LiveSyncCitadelUploader(Uploader):
             dumped_records = (_print_record(x) for x in dumped_records)
 
         uploader = parallelize(self.upload_record, entries=dumped_records, batch_size=self.PARALLELISM_RECORDS)
-        uploader(session)
+        __, aborted = uploader(session)
+        return not aborted
 
     def upload_files(self, files):
         session = requests.Session()
@@ -289,7 +292,10 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)', total, errors)
 
     def run_initial_export(self, batch_size, force=False, verbose=False):
-        super().run_initial_export(batch_size, force, verbose)
+        if not super().run_initial_export(batch_size, force, verbose):
+            print('Initial export failed')
+            return False
+
         print('Initial export finished')
 
         if self.get_initial_query(Attachment, force=True).has_rows():
@@ -298,6 +304,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         else:
             # no files -> mark file upload as done so queue runs are possible
             self.set_initial_file_upload_state(True)
+        return True
 
     def run_export_files(self, batch=1000, force=False, max_size=None, verbose=True):
         from indico_citadel.plugin import CitadelPlugin
