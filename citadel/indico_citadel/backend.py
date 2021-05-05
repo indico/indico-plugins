@@ -241,7 +241,7 @@ class LiveSyncCitadelUploader(Uploader):
         session.headers = self.headers
         uploader = parallelize(self.upload_file, entries=files, batch_size=self.PARALLELISM_FILES)
         results, aborted = uploader(session)
-        return sum(1 for success in results if not success), aborted
+        return len(results), sum(1 for success in results if not success), aborted
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
@@ -328,7 +328,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
                                            print_total_time=True)
         else:
             self.plugin.logger.info(f'{total} files need to be uploaded')
-        errors, aborted = uploader.upload_files(attachments)
+        total, errors, aborted = uploader.upload_files(attachments)
         return total, errors, aborted
 
     def check_reset_status(self):

@@ -50,5 +50,5 @@ def upload(batch, force, max_size):
     else:
         if aborted:
             print('Upload aborted')
-        print(f'{total} files uploaded, but {errors} failed')
+        print(f'{total} files processed, {errors} failed')
         print('Please re-run this script; queue runs will remain disabled for now')
