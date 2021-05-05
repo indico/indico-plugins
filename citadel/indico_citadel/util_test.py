@@ -19,7 +19,9 @@ from indico_citadel.util import format_query, remove_none_entries
     ('title:something hey', '+title:something +(hey)'),
     ('hey title:something hey person:john', '+title:something +person:john +(hey hey)'),
     ('<*\\^()', '+(\\<*\\\\\\^\\(\\))'),
-    ('file:*.pdf', '+file:*.pdf')
+    ('file:*.pdf', '+file:*.pdf'),
+    ('title:"meeting" "jane doe"', '+title:"meeting" +("jane doe")'),
+    ('"section meeting" OR "group meeting"', '+("section meeting" OR "group meeting")')
 ])
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}

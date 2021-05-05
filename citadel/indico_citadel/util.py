@@ -104,7 +104,7 @@ def format_filters(params, filters, range_filters):
 
 def escape(query):
     """Prepend all special ElasticSearch characters with a backslash."""
-    patt = r'([+\-=><!(){}[\]\^"~?:\\\/]|&&|\|\|)'
+    patt = r'([+\-=><!(){}[\]\^~?:\\\/]|&&|\|\|)'
     return re.sub(patt, r'\\\1', query)
 
 
