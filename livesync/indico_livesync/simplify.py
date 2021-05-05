@@ -18,6 +18,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.sessions import Session
 from indico.util.enum import IndicoEnum
 
 from indico_livesync.models.queue import ChangeType, EntryType
@@ -130,6 +131,7 @@ def _process_cascaded_event_contents(records, additional_events=None):
                               found in records
     """
     changed_events = additional_events or set()
+    changed_sessions = set()
     changed_contributions = set()
     changed_subcontributions = set()
     changed_attachments = set()
@@ -150,23 +152,44 @@ def _process_cascaded_event_contents(records, additional_events=None):
 
     if event_records:
         changed_events.update(Event.query.filter(Event.id.in_(event_records)))
+
+    changed_event_ids = {ev.id for ev in changed_events}
+
+    if changed_event_ids:
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.linked_event_id.in_(event_records))
+                Attachment.folder.has(AttachmentFolder.linked_event_id.in_(changed_event_ids))
             )
         )
-        changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(event_records)))
+        changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(changed_event_ids)))
 
     yield from changed_events
 
-    # Sessions are added (explicitly changed only, since they don't need to be sent anywhere)
-    if session_records:
+    # Sessions are added (implictly + explicitly changed)
+    if changed_event_ids or session_records:
+        condition = Session.event_id.in_(changed_event_ids) & ~Session.is_deleted
+        if session_records:
+            condition = db.or_(condition, Session.id.in_(session_records))
+        changed_sessions.update(Session.query.filter(Session.event_id.in_(changed_event_ids), ~Session.is_deleted))
+
+    if changed_sessions:
+        # XXX I kept this very similar to the structure of the code for contributions below,
+        # but why aren't we just merging this into the block right above?!
+        changed_session_ids = {s.id for s in changed_sessions}
         changed_contributions.update(Contribution.query
-                                     .filter(Contribution.session_id.in_(session_records), ~Contribution.is_deleted))
+                                     .filter(Contribution.session_id.in_(changed_session_ids),
+                                             ~Contribution.is_deleted))
+        changed_attachments.update(
+            Attachment.query.filter(
+                ~Attachment.is_deleted,
+                Attachment.folder.has(db.and_(AttachmentFolder.session_id.in_(changed_session_ids),
+                                              ~AttachmentFolder.is_deleted))
+            )
+        )
+        changed_notes.update(EventNote.query.filter(EventNote.session_id.in_(changed_session_ids),
+                                                    ~EventNote.is_deleted))
 
     # Contributions are added (implictly + explicitly changed)
-    changed_event_ids = {ev.id for ev in changed_events}
-
     if changed_event_ids or contribution_records:
         condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
         if contribution_records:
@@ -181,10 +204,13 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_contribution_ids = {c.id for c in changed_contributions}
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.contribution_id.in_(changed_contribution_ids))
+                ~Attachment.is_deleted,
+                Attachment.folder.has(db.and_(AttachmentFolder.contribution_id.in_(changed_contribution_ids),
+                                              ~AttachmentFolder.is_deleted))
             )
         )
-        changed_notes.update(EventNote.query.filter(EventNote.contribution_id.in_(changed_contribution_ids)))
+        changed_notes.update(EventNote.query.filter(EventNote.contribution_id.in_(changed_contribution_ids),
+                                                    ~EventNote.is_deleted))
 
     # Same for subcontributions
     if subcontribution_records:
@@ -194,10 +220,13 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_subcontribution_ids = {sc.id for sc in changed_subcontributions}
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.subcontribution_id.in_(changed_subcontribution_ids))
+                ~Attachment.is_deleted,
+                Attachment.folder.has(db.and_(AttachmentFolder.subcontribution_id.in_(changed_subcontribution_ids),
+                                              ~AttachmentFolder.is_deleted))
             )
         )
-        changed_notes.update(EventNote.query.filter(EventNote.subcontribution_id.in_(changed_subcontribution_ids)))
+        changed_notes.update(EventNote.query.filter(EventNote.subcontribution_id.in_(changed_subcontribution_ids),
+                                                    ~EventNote.is_deleted))
 
     yield from changed_subcontributions
     yield from changed_attachments
