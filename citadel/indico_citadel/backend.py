@@ -6,11 +6,13 @@
 # see the LICENSE file for more details.
 
 import re
+import time
 from functools import cached_property
 from operator import attrgetter
 from pprint import pformat
 
 import requests
+from jinja2.filters import do_filesizeformat
 from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter
 from pygments.lexers.agile import Python3Lexer
@@ -55,6 +57,9 @@ def _print_record(record):
 
 
 class LiveSyncCitadelUploader(Uploader):
+    PARALLELISM_RECORDS = 250
+    PARALLELISM_FILES = 100
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -165,11 +170,21 @@ class LiveSyncCitadelUploader(Uploader):
             self._citadel_delete(session, citadel_id, delete_mapping=True)
 
     def upload_file(self, entry, session):
+        self.logger.debug('Uploading attachment %d (%s) [%s]', entry.attachment.file.id,
+                          entry.attachment.file.filename, do_filesizeformat(entry.attachment.file.size))
+        ts = time.time()
         with entry.attachment.file.open() as file:
+            delta = time.time() - ts
+            self.logger.debug('File opened: %d (%s) [%.03fs]', entry.attachment.file.id,
+                              entry.attachment.file.filename, delta)
+            ts = time.time()
             resp = session.put(
                 url_join(self.search_app, f'api/record/{entry.citadel_id}/files/attachment'),
                 data=file
             )
+            delta = time.time() - ts
+            self.logger.debug('Upload finished: %d (%s) [%.03fs]', entry.attachment.file.id,
+                              entry.attachment.file.filename, delta)
         if resp.ok:
             entry.attachment_file_id = entry.attachment.file.id
             db.session.merge(entry)
@@ -193,7 +208,7 @@ class LiveSyncCitadelUploader(Uploader):
             status_forcelist=[502, 503, 504],
             allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
         )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=200))
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=self.PARALLELISM_RECORDS))
         session.headers = self.headers
         dumped_records = (
             (
@@ -206,7 +221,7 @@ class LiveSyncCitadelUploader(Uploader):
         if self.verbose:
             dumped_records = (_print_record(x) for x in dumped_records)
 
-        uploader = parallelize(self.upload_record, entries=dumped_records)
+        uploader = parallelize(self.upload_record, entries=dumped_records, batch_size=self.PARALLELISM_RECORDS)
         uploader(session)
 
     def upload_files(self, files):
@@ -217,9 +232,9 @@ class LiveSyncCitadelUploader(Uploader):
             status_forcelist=[502, 503, 504],
             allowed_methods=frozenset(['PUT'])
         )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=100))
+        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=self.PARALLELISM_FILES))
         session.headers = self.headers
-        uploader = parallelize(self.upload_file, entries=files, batch_size=100)
+        uploader = parallelize(self.upload_file, entries=files, batch_size=self.PARALLELISM_FILES)
         results = uploader(session)
         return sum(1 for success in results if not success)
 
