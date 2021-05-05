@@ -5,34 +5,55 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import asyncio
 import re
-from concurrent.futures.thread import ThreadPoolExecutor
+import threading
 from functools import wraps
 
 from flask import current_app
+from flask.globals import _app_ctx_stack
 
 
 def parallelize(func, entries, batch_size=200):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        loop = asyncio.get_event_loop()
-        executor = ThreadPoolExecutor(max_workers=batch_size)
-        tasks = []
+        iterable_lock = threading.Lock()
+        result_lock = threading.Lock()
+        abort = threading.Event()
         results = []
-        for entry in entries:
-            def run(app, *_args, **_kwargs):
+        app = current_app._get_current_object()
+        main_app_context = _app_ctx_stack.top
+
+        def worker(iterator):
+            while not abort.is_set():
+                try:
+                    with iterable_lock:
+                        with main_app_context:
+                            item = next(iterator)
+                except StopIteration:
+                    break
+
                 with app.app_context():
-                    return func(*_args, **_kwargs)
-            tasks.append(loop.run_in_executor(
-                executor, run, current_app._get_current_object(), entry, *args, **kwargs
-            ))
-            if len(tasks) >= batch_size:
-                results.extend(loop.run_until_complete(asyncio.gather(*tasks)))
-                del tasks[:]
-        if tasks:
-            results.extend(loop.run_until_complete(asyncio.gather(*tasks)))
-        return results
+                    res = func(item, *args, **kwargs)
+                    with result_lock:
+                        results.append(res)
+
+        it = iter(entries)
+        threads = [threading.Thread(target=worker, name=f'worker/{i}', args=(it,))
+                   for i in enumerate(range(batch_size))]
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            try:
+                t.join()
+            except KeyboardInterrupt:
+                print('\nFinishing pending jobs before aborting')
+                abort.set()
+                t.join()
+                continue
+
+        return results, abort.is_set()
 
     return wrapper
 
