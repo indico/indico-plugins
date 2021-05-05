@@ -189,10 +189,12 @@ class LiveSyncCitadelUploader(Uploader):
             entry.attachment_file_id = entry.attachment.file.id
             db.session.merge(entry)
             db.session.commit()
+            resp.close()
             return True
         else:
             self.logger.error('Failed uploading attachment %d: [%d] %s',
                               entry.attachment.id, resp.status_code, resp.text)
+            resp.close()
             return False
 
     def run_initial(self, events, total):
