@@ -34,15 +34,16 @@ class CitadelProvider(IndicoSearchProvider):
         }
 
         operator = params.pop('default_operator', 'AND')
+        sort = params.pop('sort', None)
         filter_query, ranges = format_filters(params, filters, range_filters)
         # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
         parts = [format_query(query, {k: field for k, (field, _) in placeholders.items()})]
         if ranges:
             parts.append(ranges)
-        q = ' '.join(parts)
-        search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*',
-                         'type': [x.name for x in object_types], 'default_operator': operator, **filter_query}
+        search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': ' '.join(parts), 'highlight': '_data.*',
+                         'type': [x.name for x in object_types], 'sort': sort, 'default_operator': operator,
+                         **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
             search_params['access'] = ','.join(access)
@@ -62,6 +63,9 @@ class CitadelProvider(IndicoSearchProvider):
     def get_filters(self):
         return [SearchFilter(key, label) for key, label in filters.items()]
 
+    def get_sort_options(self):
+        return [SearchFilter(key, label) for key, label in sort_options.items()]
+
 
 placeholders = {
     'title': ('_data.title', _('The title an event, contribution, etc.)')),
@@ -78,6 +82,12 @@ placeholders = {
 
 range_filters = {
     'start_range': 'start_dt'
+}
+
+sort_options = {
+    'bestmatch': _('Best match'),
+    'newest': _('Newest first'),
+    'oldest': _('Oldest first')
 }
 
 filters = {
