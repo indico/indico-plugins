@@ -58,7 +58,7 @@ def _print_record(record):
 
 class LiveSyncCitadelUploader(Uploader):
     PARALLELISM_RECORDS = 250
-    PARALLELISM_FILES = 100
+    PARALLELISM_FILES = 200
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -235,8 +235,8 @@ class LiveSyncCitadelUploader(Uploader):
         session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=self.PARALLELISM_FILES))
         session.headers = self.headers
         uploader = parallelize(self.upload_file, entries=files, batch_size=self.PARALLELISM_FILES)
-        results = uploader(session)
-        return sum(1 for success in results if not success)
+        results, aborted = uploader(session)
+        return sum(1 for success in results if not success), aborted
 
 
 class LiveSyncCitadelBackend(LiveSyncBackendBase):
@@ -277,8 +277,11 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         super().process_queue(uploader)
         uploader_name = type(uploader).__name__
         self.plugin.logger.info(f'{uploader_name} starting file upload')
-        total, errors = self.run_export_files(verbose=False)
-        self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)', total, errors)
+        total, errors, aborted = self.run_export_files(verbose=False)
+        if aborted:
+            self.plugin.logger.info(f'{uploader_name} aborted after uploading %d files (%d failed)', total, errors)
+        else:
+            self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)', total, errors)
 
     def run_initial_export(self, batch_size, force=False, verbose=False):
         super().run_initial_export(batch_size, force, verbose)
@@ -320,8 +323,8 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
                                            print_total_time=True)
         else:
             self.plugin.logger.info(f'{total} files need to be uploaded')
-        errors = uploader.upload_files(attachments)
-        return total, errors
+        errors, aborted = uploader.upload_files(attachments)
+        return total, errors, aborted
 
     def check_reset_status(self):
         if not self.is_configured():

@@ -42,11 +42,13 @@ def upload(batch, force, max_size):
         print('Citadel is not properly configured.')
         return
 
-    total, errors = backend.run_export_files(batch, force, max_size=max_size)
-    if not errors:
+    total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size)
+    if not errors and not aborted:
         print(f'{total} files uploaded')
         backend.set_initial_file_upload_state(True)
         db.session.commit()
     else:
+        if aborted:
+            print('Upload aborted')
         print(f'{total} files uploaded, but {errors} failed')
         print('Please re-run this script; queue runs will remain disabled for now')
