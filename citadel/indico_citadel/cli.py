@@ -21,7 +21,7 @@ def cli():
 
 
 @cli.command()
-@click.option('--force', is_flag=True, help="Upload even if it has already been done once.")
+@click.option('--force', '-f', is_flag=True, help="Upload even if it has already been done once.")
 @click.option('--batch', type=int, default=1000, show_default=True, metavar='N',
               help="The amount of records yielded per upload batch.")
 @click.option('--max-size', type=int, metavar='SIZE',
