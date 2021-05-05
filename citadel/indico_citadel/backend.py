@@ -105,6 +105,7 @@ class LiveSyncCitadelUploader(Uploader):
         raise ValueError(f'unknown object ref: {obj}')
 
     def _citadel_create(self, session, object_type, object_id, data):
+        self.logger.debug('Creating %s %d on citadel', object_type.name, object_id)
         try:
             resp = session.post(self.endpoint_url, json=data)
             resp.raise_for_status()
@@ -130,6 +131,7 @@ class LiveSyncCitadelUploader(Uploader):
         resp.close()
 
     def _citadel_update(self, session, citadel_id, data):
+        self.logger.debug('Updating record %d on citadel', citadel_id)
         try:
             resp = session.put(url_join(self.search_app, f'api/record/{citadel_id}'), json=data)
             resp.raise_for_status()
@@ -141,6 +143,7 @@ class LiveSyncCitadelUploader(Uploader):
             raise Exception(f'Could not update record {citadel_id} on citadel: {exc}; {data}')
 
     def _citadel_delete(self, session, citadel_id, *, delete_mapping):
+        self.logger.debug('Deleting record %d from citadel', citadel_id)
         try:
             resp = session.delete(url_join(self.search_app, f'api/record/{citadel_id}'))
             resp.raise_for_status()
