@@ -67,15 +67,20 @@ def format_query(query, placeholders):
     :param placeholders: placeholder whitelist
     :returns escaped query
     """
-    patt = r'({}):([^:"\s]+|"[^"]+")\s*'.format('|'.join(placeholders.keys()))
-    # Extract all placeholders
-    p = [f'+{placeholders[x.group(1)]}:{x.group(2)}'
-         for x in re.finditer(patt, query) if x.group(1) in placeholders]
-    # Escape keyword based arguments
-    query = escape(re.sub(patt, '', query)).strip()
-    if query:
-        p.append(f'+({query})')
-    return ' '.join(p)
+    patt = r'(?:^|\s)({}):([^:"\s]+|"[^"]+")(?:$|\s)'.format('|'.join(placeholders.keys()))
+    idx = 0
+    keys = []
+    for x in re.finditer(patt, query):
+        placeholder = f'+{placeholders[x.group(1)]}:{escape(x.group(2))}'
+        if idx != x.start():
+            keys.append(escape(query[idx:x.start()]))
+        keys.append(placeholder)
+        idx = x.end()
+
+    if idx != len(query):
+        keys.append(escape(query[idx:len(query)]))
+
+    return ' '.join(keys)
 
 
 def format_filters(params, filters, range_filters):
