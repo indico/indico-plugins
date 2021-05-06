@@ -21,6 +21,8 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 
+from indico_livesync.util import get_excluded_categories
+
 
 def apply_acl_entry_strategy(rel, principal):
     user_strategy = rel.joinedload('user')
@@ -38,10 +40,17 @@ def apply_acl_entry_strategy(rel, principal):
     return rel
 
 
+def _get_excluded_category_filter(event_model=Event):
+    if excluded_category_ids := get_excluded_categories():
+        return event_model.category_id.notin_(excluded_category_ids)
+    return True
+
+
 def query_events():
     return (
         Event.query
         .filter_by(is_deleted=False)
+        .filter(_get_excluded_category_filter())
         .options(
             apply_acl_entry_strategy(selectinload(Event.acl_entries), EventPrincipal),
             selectinload(Event.person_links).joinedload('person').joinedload('user').load_only('is_system'),
@@ -73,7 +82,7 @@ def query_contributions():
     return (
         Contribution.query
         .join(Event)
-        .filter(~Contribution.is_deleted, ~Event.is_deleted)
+        .filter(~Contribution.is_deleted, ~Event.is_deleted, _get_excluded_category_filter())
         .options(
             selectinload(Contribution.acl_entries),
             selectinload(Contribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
@@ -120,7 +129,8 @@ def query_subcontributions():
         .join(Contribution.event.of_type(contrib_event))
         .outerjoin(Contribution.session.of_type(contrib_session))
         .outerjoin(Contribution.session_block.of_type(contrib_block))
-        .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted)
+        .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted,
+                _get_excluded_category_filter(contrib_event))
         .options(
             selectinload(SubContribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
             contrib_strategy,
@@ -191,19 +201,22 @@ def query_attachments():
         .filter(AttachmentFolder.link_type != LinkType.category)
         .filter(db.or_(
             AttachmentFolder.link_type != LinkType.event,
-            ~Event.is_deleted
+            ~Event.is_deleted & _get_excluded_category_filter(),
         ))
         .filter(db.or_(
             AttachmentFolder.link_type != LinkType.contribution,
-            ~Contribution.is_deleted & ~contrib_event.is_deleted
+            ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
         ))
         .filter(db.or_(
             AttachmentFolder.link_type != LinkType.subcontribution,
-            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted
+            db.and_(~SubContribution.is_deleted,
+                    ~subcontrib_contrib.is_deleted,
+                    ~subcontrib_event.is_deleted,
+                    _get_excluded_category_filter(subcontrib_event))
         ))
         .filter(db.or_(
             AttachmentFolder.link_type != LinkType.session,
-            ~Session.is_deleted & ~session_event.is_deleted
+            ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
         ))
         .order_by(Attachment.id)
     )
@@ -262,19 +275,22 @@ def query_notes():
         .filter(~EventNote.is_deleted)
         .filter(db.or_(
             EventNote.link_type != LinkType.event,
-            ~Event.is_deleted
+            ~Event.is_deleted & _get_excluded_category_filter()
         ))
         .filter(db.or_(
             EventNote.link_type != LinkType.contribution,
-            ~Contribution.is_deleted & ~contrib_event.is_deleted
+            ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
         ))
         .filter(db.or_(
             EventNote.link_type != LinkType.subcontribution,
-            ~SubContribution.is_deleted & ~subcontrib_contrib.is_deleted & ~subcontrib_event.is_deleted
+            db.and_(~SubContribution.is_deleted,
+                    ~subcontrib_contrib.is_deleted,
+                    ~subcontrib_event.is_deleted,
+                    _get_excluded_category_filter(subcontrib_event))
         ))
         .filter(db.or_(
             EventNote.link_type != LinkType.session,
-            ~Session.is_deleted & ~session_event.is_deleted
+            ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
         ))
         .options(
             note_strategy,
