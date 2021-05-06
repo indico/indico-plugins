@@ -105,6 +105,11 @@ def initial_export(agent_id, batch, force, verbose):
 @click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
 def run(agent_id, force, verbose):
     """Runs the livesync agent"""
+    from indico_livesync.plugin import LiveSyncPlugin
+    if LiveSyncPlugin.settings.get('disable_queue_runs'):
+        print(cformat('%{yellow!}Queue runs are disabled%{reset}'))
+        return
+
     if agent_id is None:
         agent_list = LiveSyncAgent.query.all()
     else:

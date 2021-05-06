@@ -5,6 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import NumberRange
 
@@ -12,6 +13,7 @@ from indico.core import signals
 from indico.core.plugins import IndicoPlugin, PluginCategory
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
+from indico.web.forms.widgets import SwitchWidget
 
 from indico_livesync import _
 from indico_livesync.blueprint import blueprint
@@ -31,6 +33,8 @@ class SettingsForm(IndicoForm):
                                              fields=[{'id': 'id', 'caption': _("Category ID"), 'required': True}],
                                              description=_("Changes to objects inside these categories or any of their "
                                                            "subcategories are excluded."))
+    disable_queue_runs = BooleanField(_('Disable queue runs'), widget=SwitchWidget(),
+                                      description=_('Disable all scheduled queue runs.'))
 
 
 class LiveSyncPlugin(IndicoPlugin):
@@ -42,7 +46,8 @@ class LiveSyncPlugin(IndicoPlugin):
     configurable = True
     settings_form = SettingsForm
     default_settings = {'excluded_categories': [],
-                        'queue_entry_ttl': 0}
+                        'queue_entry_ttl': 0,
+                        'disable_queue_runs': False}
     category = PluginCategory.synchronization
 
     def init(self):
