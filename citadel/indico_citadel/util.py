@@ -93,7 +93,7 @@ def format_query(query, placeholders):
     if idx != len(query):
         keys.append(escape(query[idx:len(query)]))
 
-    return ' '.join(keys)
+    return ' '.join(keys).strip()
 
 
 def format_filters(params, filters, range_filters):

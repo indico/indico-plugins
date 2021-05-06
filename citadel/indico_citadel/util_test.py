@@ -14,7 +14,7 @@ from indico_citadel.util import format_query, remove_none_entries
     ('title:"my event" ola person:john ola some:yes ola',
      '+title:"my event" ola +person:john ola some\\:yes ola'),
     ('title:"my title:something"', '+title:"my title\\:something"'),
-    ('hello   ', 'hello   '),
+    ('hello   ', 'hello'),
     ('hey title:something', 'hey +title:something'),
     ('title:something hey', '+title:something hey'),
     ('hey title:something hey person:john', 'hey +title:something hey +person:john'),
