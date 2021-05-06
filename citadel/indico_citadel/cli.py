@@ -45,8 +45,11 @@ def upload(batch, force, max_size):
     total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size)
     if not errors and not aborted:
         print(f'{total} files uploaded')
-        backend.set_initial_file_upload_state(True)
-        db.session.commit()
+        if max_size is None:
+            backend.set_initial_file_upload_state(True)
+            db.session.commit()
+        else:
+            print('Max size was set; not enabling queue runs.')
     else:
         if aborted:
             print('Upload aborted')
