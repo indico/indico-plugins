@@ -12,16 +12,18 @@ from indico_citadel.util import format_query, remove_none_entries
 
 @pytest.mark.parametrize(('query', 'expected'), [
     ('title:"my event" ola person:john ola some:yes ola',
-     '+title:"my event" +person:john +(ola ola some\\:yes ola)'),
-    ('title:"my title:something"', '+title:"my title:something"'),
-    ('hello', '+(hello)'),
-    ('hey title:something', '+title:something +(hey)'),
-    ('title:something hey', '+title:something +(hey)'),
-    ('hey title:something hey person:john', '+title:something +person:john +(hey hey)'),
-    ('<*\\^()', '+(\\<*\\\\\\^\\(\\))'),
+     '+title:"my event" ola +person:john ola some\\:yes ola'),
+    ('title:"my title:something"', '+title:"my title\\:something"'),
+    ('hello   ', 'hello   '),
+    ('hey title:something', 'hey +title:something'),
+    ('title:something hey', '+title:something hey'),
+    ('hey title:something hey person:john', 'hey +title:something hey +person:john'),
+    ('<*\\^()', '\\<*\\\\\\^\\(\\)'),
     ('file:*.pdf', '+file:*.pdf'),
-    ('title:"meeting" "jane doe"', '+title:"meeting" +("jane doe")'),
-    ('"section meeting" OR "group meeting"', '+("section meeting" OR "group meeting")')
+    ('title:"meeting" "jane doe"', '+title:"meeting" "jane doe"'),
+    ('"section meeting" OR "group meeting"', '"section meeting" OR "group meeting"'),
+    ('title:meeting AND "indico"', '+title:meeting AND "indico"'),
+    ('title:valid stringtitle:valid foo:bar', '+title:valid stringtitle\\:valid foo\\:bar')
 ])
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
