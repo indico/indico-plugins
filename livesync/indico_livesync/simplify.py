@@ -43,6 +43,7 @@ def process_records(records):
     cascaded_create_records = set()
     cascaded_update_records = set()
     cascaded_delete_records = set()
+    cascaded_location_changes = set()
 
     for record in records:
         if record.change != ChangeType.deleted and record.object is None:
@@ -65,6 +66,9 @@ def process_records(records):
             if record.type == EntryType.contribution:
                 for subcontrib in record.object.subcontributions:
                     changes[subcontrib] |= SimpleChange.updated
+        elif record.change == ChangeType.location_changed:
+            assert record.type in (EntryType.event, EntryType.contribution, EntryType.session)
+            cascaded_location_changes.add(record)
 
     for obj in _process_cascaded_category_contents(cascaded_update_records):
         changes[obj] |= SimpleChange.updated
@@ -74,6 +78,9 @@ def process_records(records):
 
     for obj in _process_cascaded_event_contents(cascaded_create_records):
         changes[obj] |= SimpleChange.created
+
+    for obj in _process_cascaded_locations(cascaded_location_changes):
+        changes[obj] |= SimpleChange.updated
 
     created_and_deleted = {obj for obj, flags in changes.items() if (flags & CREATED_DELETED) == CREATED_DELETED}
     for obj in created_and_deleted:
@@ -231,3 +238,20 @@ def _process_cascaded_event_contents(records, additional_events=None):
     yield from changed_subcontributions
     yield from changed_attachments
     yield from changed_notes
+
+
+def _process_cascaded_locations(records):
+    contributions = {rec.contribution for rec in records if rec.type == EntryType.contribution}
+    events = {rec.event for rec in records if rec.type == EntryType.event}
+    event_ids = {e.id for e in events}
+    session_ids = {rec.session_id for rec in records if rec.type == EntryType.session}
+
+    # location of the event changed
+    yield from events
+    # location of the contribution changed
+    yield from contributions
+    # location of contributions inside an event may be inherited
+    # we don't check the inheritance since we're lazy and the chain is non-trivial
+    yield from Contribution.query.filter(Contribution.event_id.in_(event_ids), ~Contribution.is_deleted)
+    # location of a contribution inside a session may be inherited as well
+    yield from Contribution.query.filter(Contribution.session_id.in_(session_ids), ~Contribution.is_deleted)

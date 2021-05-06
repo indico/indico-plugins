@@ -24,6 +24,7 @@ class ChangeType(int, IndicoEnum):
     moved = 3
     data_changed = 4
     protection_changed = 5
+    location_changed = 6
 
 
 class EntryType(int, IndicoEnum):

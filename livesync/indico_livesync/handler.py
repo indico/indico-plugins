@@ -21,6 +21,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 
 from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
 from indico_livesync.util import get_excluded_categories, obj_ref
@@ -47,6 +48,11 @@ def connect_signals(plugin):
     # event times
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Event)
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Contribution)
+    # location
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Event)
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Contribution)
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Session)
+    plugin.connect(signals.event.location_changed, _session_block_location_changed, sender=SessionBlock)
     # timetable
     plugin.connect(signals.event.timetable_entry_created, _timetable_changed)
     plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
@@ -112,6 +118,15 @@ def _updated(obj, **kwargs):
 
 def _event_times_changed(sender, obj, **kwargs):
     _register_change(obj, ChangeType.data_changed)
+
+
+def _session_block_location_changed(sender, obj, **kwargs):
+    for contrib in obj.contributions:
+        _register_change(contrib, ChangeType.location_changed)
+
+
+def _location_changed(sender, obj, **kwargs):
+    _register_change(obj, ChangeType.location_changed)
 
 
 def _timetable_changed(entry, **kwargs):
