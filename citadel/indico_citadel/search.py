@@ -9,7 +9,7 @@ import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
-from indico.modules.search.base import IndicoSearchProvider, SearchFilter
+from indico.modules.search.base import IndicoSearchProvider, SearchOption
 
 from indico_citadel import _
 from indico_citadel.result_schemas import CitadelResultSchema
@@ -58,13 +58,13 @@ class CitadelProvider(IndicoSearchProvider):
         return CitadelResultSchema(context={'results_per_page': self.RESULTS_PER_PAGE}).load(data)
 
     def get_placeholders(self):
-        return [SearchFilter(key, label) for key, (_, label) in placeholders.items()]
+        return [SearchOption(key, label) for key, (_, label) in placeholders.items()]
 
     def get_filters(self):
-        return [SearchFilter(key, label) for key, label in filters.items()]
+        return [SearchOption(key, label) for key, label in filters.items()]
 
     def get_sort_options(self):
-        return [SearchFilter(key, label) for key, label in sort_options.items()]
+        return [SearchOption(key, label) for key, label in sort_options.items()]
 
 
 placeholders = {
