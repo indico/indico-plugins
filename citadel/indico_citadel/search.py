@@ -33,12 +33,13 @@ class CitadelProvider(IndicoSearchProvider):
             'Authorization': f'Bearer {self.token}'
         }
 
+        operator = params.pop('default_operator', 'AND')
         filter_query, ranges = format_filters(params, filters, range_filters)
         # Look for objects matching the `query` and schema, make sure the query is properly escaped
         # https://cern-search.docs.cern.ch/usage/operations/#advanced-queries
         q = f'{format_query(query, {k: field for k, (field, _) in placeholders.items()})} {ranges}'
         search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': q, 'highlight': '_data.*',
-                         'type': [x.name for x in object_types], **filter_query}
+                         'type': [x.name for x in object_types], 'default_operator': operator, **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
             search_params['access'] = ','.join(access)
