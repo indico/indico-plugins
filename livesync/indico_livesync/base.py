@@ -9,8 +9,13 @@ from flask_pluginengine import depends, trim_docstring
 from sqlalchemy.orm import subqueryload
 
 from indico.core.plugins import IndicoPlugin, PluginCategory
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.events import Event
+from indico.modules.events.notes.models.notes import EventNote
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
@@ -48,6 +53,9 @@ class LiveSyncBackendBase:
     form = AgentForm
     #: whether only one agent with this backend is allowed
     unique = False
+    #: whether a reset can delete data on whatever backend is used as well or the user
+    #: needs to do it themself after doing a reset
+    reset_deletes_indexed_data = False
 
     @classproperty
     @classmethod
@@ -70,6 +78,25 @@ class LiveSyncBackendBase:
         """
         self.agent = agent
 
+    def is_configured(self):
+        """Check whether the backend is properly configured.
+
+        If this returns False, running the initial export or queue
+        will not be possible.
+        """
+        return True
+
+    def check_queue_status(self):
+        """Return whether queue runs are allowed (or why not).
+
+        :return: ``allowed, reason`` tuple; the reason is None if runs are allowed.
+        """
+        if not self.is_configured():
+            return False, 'not configured'
+        if self.agent.initial_data_exported:
+            return True, None
+        return False, 'initial export not performed'
+
     def fetch_records(self, count=None):
         query = (self.agent.queue
                  .filter_by(processed=False)
@@ -84,26 +111,49 @@ class LiveSyncBackendBase:
         """
         self.agent.last_run = now_utc()
 
-    def run(self):
+    def process_queue(self, uploader):
+        """Process queued entries during an export run."""
+        records = self.fetch_records()
+        LiveSyncPlugin.logger.info(f'Uploading %d records via {self.uploader.__name__}', len(records))
+        uploader.run(records)
+
+    def run(self, verbose=False, from_cli=False):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        records = self.fetch_records()
-        uploader = self.uploader(self)
-        LiveSyncPlugin.logger.info('Uploading %d records', len(records))
-        uploader.run(records)
+        uploader = self.uploader(self, verbose=verbose, from_cli=from_cli)
+        self.process_queue(uploader)
         self.update_last_run()
 
-    def run_initial_export(self):
+    def get_initial_query(self, model_cls, force):
+        """Get the initial export query for a given model.
+
+        Supported models are `Event`, `Contribution`, `SubContribution`,
+        `Attachment` and `EventNote`.
+
+        :param model_cls: The model class to query
+        :param force: Whether the initial export was started with ``--force``
+        """
+        fn = {
+            Event: query_events,
+            Contribution: query_contributions,
+            SubContribution: query_subcontributions,
+            Attachment: query_attachments,
+            EventNote: query_notes,
+        }[model_cls]
+        return fn()
+
+    def run_initial_export(self, batch_size, force=False, verbose=False):
         """Runs the initial export.
 
         This process is expected to take a very long time.
+        :return: True if everything was successful, False if not
         """
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
-        uploader = self.uploader(self)
+        uploader = self.uploader(self, verbose=verbose, from_cli=True)
 
         Category.allow_relationship_preloading = True
         Category.preload_relationships(Category.query, 'acl_entries',
@@ -111,13 +161,54 @@ class LiveSyncBackendBase:
                                                                                      CategoryPrincipal))
         _category_cache = Category.query.all()  # noqa: F841
 
-        events = query_events()
-        uploader.run_initial(events.yield_per(5000), events.count())
-        contributions = query_contributions()
-        uploader.run_initial(contributions.yield_per(5000), contributions.count())
-        subcontributions = query_subcontributions()
-        uploader.run_initial(subcontributions.yield_per(5000), subcontributions.count())
-        attachments = query_attachments()
-        uploader.run_initial(attachments.yield_per(5000), attachments.count())
-        notes = query_notes()
-        uploader.run_initial(notes.yield_per(5000), notes.count())
+        events = self.get_initial_query(Event, force)
+        contributions = self.get_initial_query(Contribution, force)
+        subcontributions = self.get_initial_query(SubContribution, force)
+        attachments = self.get_initial_query(Attachment, force)
+        notes = self.get_initial_query(EventNote, force)
+
+        print('Exporting events')
+        if not uploader.run_initial(events.yield_per(batch_size), events.count()):
+            print('Initial export of events failed')
+            return False
+        print('Exporting contributions')
+        if not uploader.run_initial(contributions.yield_per(batch_size), contributions.count()):
+            print('Initial export of contributions failed')
+            return False
+        print('Exporting subcontributions')
+        if not uploader.run_initial(subcontributions.yield_per(batch_size), subcontributions.count()):
+            print('Initial export of subcontributions failed')
+            return False
+        print('Exporting attachments')
+        if not uploader.run_initial(attachments.yield_per(batch_size), attachments.count()):
+            print('Initial export of attachments failed')
+            return False
+        print('Exporting notes')
+        if not uploader.run_initial(notes.yield_per(batch_size), notes.count()):
+            print('Initial export of notes failed')
+            return False
+        return True
+
+    def check_reset_status(self):
+        """Return whether a reset is allowed (or why not).
+
+        When resetting is not allowed, the message indicates why this is the case.
+
+        :return: ``allowed, reason`` tuple; the reason is None if resetting is allowed.
+        """
+        if not self.agent.queue.has_rows() and not self.agent.initial_data_exported:
+            return False, 'There is nothing to reset'
+        return True, None
+
+    def reset(self):
+        """Perform a full reset of all data related to the backend.
+
+        This deletes all queued changes, resets the initial export state back
+        to pending and do any other backend-specific tasks that may be required.
+
+        It is not necessary to delete the actual search indexes (which are possibly
+        on a remote service), but if your backend has the ability to do it you may
+        want to do it and display a message to the user indicating this.
+        """
+        self.agent.initial_data_exported = False
+        self.agent.queue.delete()

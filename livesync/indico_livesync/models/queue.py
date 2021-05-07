@@ -6,11 +6,10 @@
 # see the LICENSE file for more details.
 
 from flask import g
-from werkzeug.datastructures import ImmutableDict
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories.models.categories import Category
-from indico.modules.events.models.events import Event
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoEnum
 from indico.util.string import format_repr
@@ -25,6 +24,7 @@ class ChangeType(int, IndicoEnum):
     moved = 3
     data_changed = 4
     protection_changed = 5
+    location_changed = 6
 
 
 class EntryType(int, IndicoEnum):
@@ -33,6 +33,8 @@ class EntryType(int, IndicoEnum):
     contribution = 3
     subcontribution = 4
     session = 5
+    note = 6
+    attachment = 7
 
 
 _column_for_types = {
@@ -40,7 +42,9 @@ _column_for_types = {
     EntryType.event: 'event_id',
     EntryType.contribution: 'contribution_id',
     EntryType.subcontribution: 'subcontribution_id',
-    EntryType.session: 'session_id'
+    EntryType.session: 'session_id',
+    EntryType.note: 'note_id',
+    EntryType.attachment: 'attachment_id',
 }
 
 
@@ -142,6 +146,24 @@ class LiveSyncQueueEntry(db.Model):
         nullable=True
     )
 
+    #: ID of the changed note
+    note_id = db.Column(
+        'note_id',
+        db.Integer,
+        db.ForeignKey('events.notes.id'),
+        index=True,
+        nullable=True
+    )
+
+    #: ID of the changed attachment
+    attachment_id = db.Column(
+        'attachment_id',
+        db.Integer,
+        db.ForeignKey('attachments.attachments.id'),
+        index=True,
+        nullable=True
+    )
+
     #: The associated :class:LiveSyncAgent
     agent = db.relationship(
         'LiveSyncAgent',
@@ -198,6 +220,26 @@ class LiveSyncQueueEntry(db.Model):
         )
     )
 
+    note = db.relationship(
+        'EventNote',
+        lazy=False,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
+    attachment = db.relationship(
+        'Attachment',
+        lazy=False,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def object(self):
         """Return the changed object."""
@@ -211,16 +253,15 @@ class LiveSyncQueueEntry(db.Model):
             return self.contribution
         elif self.type == EntryType.subcontribution:
             return self.subcontribution
-
-    @property
-    def object_ref(self):
-        """Return the reference of the changed object."""
-        return ImmutableDict(type=self.type, category_id=self.category_id, event_id=self.event_id,
-                             session_id=self.session_id, contrib_id=self.contrib_id, subcontrib_id=self.subcontrib_id)
+        elif self.type == EntryType.note:
+            return self.note
+        elif self.type == EntryType.attachment:
+            return self.attachment
 
     def __repr__(self):
         return format_repr(self, 'id', 'agent_id', 'change', 'type',
-                           category_id=None, event_id=None, session_id=None, contrib_id=None, subcontrib_id=None)
+                           category_id=None, event_id=None, session_id=None, contrib_id=None, subcontrib_id=None,
+                           note_id=None, attachment_id=None)
 
     @classmethod
     def create(cls, changes, ref, excluded_categories=set()):
@@ -240,7 +281,7 @@ class LiveSyncQueueEntry(db.Model):
             if any(c.id in excluded_categories for c in obj.chain_query):
                 return
         else:
-            event = obj if isinstance(obj, Event) else obj.event
+            event = obj.folder.event if isinstance(obj, Attachment) else obj.event
             if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
                 g.livesync_excluded_categories_checked[event.category] = excluded_categories & set(event.category_chain)
             if g.livesync_excluded_categories_checked[event.category]:

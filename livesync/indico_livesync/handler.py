@@ -11,12 +11,17 @@ from flask import g
 from sqlalchemy import inspect
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 
 from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
 from indico_livesync.util import get_excluded_categories, obj_ref
@@ -42,6 +47,12 @@ def connect_signals(plugin):
     plugin.connect(signals.event.subcontribution_updated, _updated)
     # event times
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Event)
+    plugin.connect(signals.event.times_changed, _event_times_changed, sender=Contribution)
+    # location
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Event)
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Contribution)
+    plugin.connect(signals.event.location_changed, _location_changed, sender=Session)
+    plugin.connect(signals.event.location_changed, _session_block_location_changed, sender=SessionBlock)
     # timetable
     plugin.connect(signals.event.timetable_entry_created, _timetable_changed)
     plugin.connect(signals.event.timetable_entry_updated, _timetable_changed)
@@ -57,14 +68,18 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Session)
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # notes
-    plugin.connect(signals.event.notes.note_added, _note_changed)
-    plugin.connect(signals.event.notes.note_deleted, _note_changed)
-    plugin.connect(signals.event.notes.note_modified, _note_changed)
+    plugin.connect(signals.event.notes.note_added, _created)
+    plugin.connect(signals.event.notes.note_deleted, _deleted)
+    plugin.connect(signals.event.notes.note_modified, _updated)
     # attachments
-    plugin.connect(signals.attachments.folder_deleted, _attachment_changed)
-    plugin.connect(signals.attachments.attachment_created, _attachment_changed)
-    plugin.connect(signals.attachments.attachment_deleted, _attachment_changed)
-    plugin.connect(signals.attachments.attachment_updated, _attachment_changed)
+    plugin.connect(signals.attachments.folder_deleted, _attachment_folder_deleted)
+    plugin.connect(signals.attachments.attachment_created, _created)
+    plugin.connect(signals.attachments.attachment_deleted, _deleted)
+    plugin.connect(signals.attachments.attachment_updated, _updated)
+    plugin.connect(signals.acl.protection_changed, _attachment_folder_protection_changed, sender=AttachmentFolder)
+    plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Attachment)
+    plugin.connect(signals.acl.entry_changed, _attachment_folder_acl_entry_changed, sender=AttachmentFolder)
+    plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Attachment)
 
 
 def _moved(obj, old_parent, **kwargs):
@@ -80,7 +95,7 @@ def _moved(obj, old_parent, **kwargs):
 
 
 def _created(obj, **kwargs):
-    if isinstance(obj, Event):
+    if isinstance(obj, (Event, EventNote, Attachment)):
         parent = None
     elif isinstance(obj, Contribution):
         parent = obj.event
@@ -105,12 +120,21 @@ def _event_times_changed(sender, obj, **kwargs):
     _register_change(obj, ChangeType.data_changed)
 
 
+def _session_block_location_changed(sender, obj, **kwargs):
+    for contrib in obj.contributions:
+        _register_change(contrib, ChangeType.location_changed)
+
+
+def _location_changed(sender, obj, **kwargs):
+    _register_change(obj, ChangeType.location_changed)
+
+
 def _timetable_changed(entry, **kwargs):
     _register_change(entry.event, ChangeType.data_changed)
 
 
 def _category_protection_changed(sender, obj, mode, old_mode, **kwargs):
-    parent_mode = obj.protection_parent.effective_protection_mode
+    parent_mode = obj.protection_parent.effective_protection_mode if obj.protection_parent else None
     if ((old_mode == ProtectionMode.inheriting and parent_mode == mode) or
             (old_mode == parent_mode and mode == ProtectionMode.inheriting)):
         return
@@ -142,15 +166,29 @@ def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
         _register_change(obj, ChangeType.protection_changed)
 
 
-def _note_changed(note, **kwargs):
-    obj = note.event if isinstance(note.object, Session) else note.object
-    _register_change(obj, ChangeType.data_changed)
+def _attachment_folder_deleted(folder, **kwargs):
+    if folder.link_type not in (LinkType.event, LinkType.contribution, LinkType.subcontribution):
+        return
+    for attachment in folder.attachments:
+        _register_deletion(attachment)
 
 
-def _attachment_changed(attachment_or_folder, **kwargs):
-    folder = getattr(attachment_or_folder, 'folder', attachment_or_folder)
-    if not isinstance(folder.object, Category) and not isinstance(folder.object, Session):
-        _register_change(folder.object.event, ChangeType.data_changed)
+def _attachment_folder_protection_changed(sender, obj, **kwargs):
+    if not inspect(obj).persistent:
+        return
+    if obj.link_type not in (LinkType.event, LinkType.contribution, LinkType.subcontribution):
+        return
+    for attachment in obj.attachments:
+        _register_change(attachment, ChangeType.protection_changed)
+
+
+def _attachment_folder_acl_entry_changed(sender, obj, entry, old_data, **kwargs):
+    if not inspect(obj).persistent:
+        return
+    if obj.link_type not in (LinkType.event, LinkType.contribution, LinkType.subcontribution):
+        return
+    for attachment in obj.attachments:
+        _acl_entry_changed(type(attachment), attachment, entry, old_data)
 
 
 def _apply_changes(sender, **kwargs):
@@ -168,7 +206,7 @@ def _register_deletion(obj):
 
 def _register_change(obj, action):
     if not isinstance(obj, Category):
-        event = obj.event
+        event = obj.folder.event if isinstance(obj, Attachment) else obj.event
         if event is None or event.is_deleted:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
             # Also, ACL changes during user merges might involve deleted objects which we also don't care about

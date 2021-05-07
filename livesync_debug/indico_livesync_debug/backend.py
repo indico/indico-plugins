@@ -5,14 +5,70 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import collections
+from pprint import pformat
+
+from pygments import highlight
+from pygments.formatters.terminal256 import Terminal256Formatter
+from pygments.lexers.agile import Python3Lexer
+
+from indico.modules.search.schemas import EventSchema
 from indico.util.console import cformat
-from indico.util.iterables import grouper
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader, process_records
+from indico_livesync.export_schemas import AttachmentSchema, ContributionSchema, EventNoteSchema, SubContributionSchema
+
+
+lexer = Python3Lexer()
+formatter = Terminal256Formatter(style='native')
 
 
 def _change_str(change):
     return ','.join(flag.name for flag in SimpleChange if change & flag)
+
+
+def _print_record(obj_type, obj_id, data, changes, *, print_blank, verbose):
+    if print_blank:
+        print()  # verbose_iterator doesn't end its line
+    print(f'{_change_str(changes)}: {obj_type} {obj_id}')
+    if data is not None and verbose:
+        print(highlight(pformat(data), lexer, formatter))
+    return data
+
+
+class DebugUploader(Uploader):
+    BATCH_SIZE = 5
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._is_queue_run = False
+        self.schemas = [
+            EventSchema(exclude=('category_path',)),
+            ContributionSchema(exclude=('category_path',)),
+            SubContributionSchema(exclude=('category_path',)),
+            AttachmentSchema(exclude=('category_path',)),
+            EventNoteSchema(exclude=('category_path',)),
+        ]
+
+    def dump_record(self, obj):
+        for schema in self.schemas:
+            if isinstance(obj, schema.Meta.model):
+                return schema.dump(obj)
+        raise ValueError(f'unknown object ref: {obj}')
+
+    def upload_records(self, records):
+        dumped_records = (
+            (
+                type(rec).__name__, rec.id,
+                self.dump_record(rec) if not change_type & SimpleChange.deleted else None,
+                change_type
+            ) for rec, change_type in records
+        )
+
+        dumped_records = (_print_record(*x, print_blank=(not self._is_queue_run), verbose=self.verbose)
+                          for x in dumped_records)
+        collections.deque(dumped_records, maxlen=0)  # exhaust the iterator
+        return True
 
 
 class LiveSyncDebugBackend(LiveSyncBackendBase):
@@ -21,50 +77,25 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
     This backend simply dumps all changes to stdout or the logger.
     """
 
-    def _print(self, msg=''):
-        print(msg)
+    uploader = DebugUploader
 
-    def run(self):
+    def process_queue(self, uploader):
         records = self.fetch_records()
         if not records:
-            self._print(cformat('%{yellow!}No records%{reset}'))
+            print(cformat('%{yellow!}No records%{reset}'))
             return
 
-        self._print(cformat('%{white!}Raw changes:%{reset}'))
+        print(cformat('%{white!}Raw changes:%{reset}'))
         for record in records:
-            self._print(record)
+            print(record)
 
-        self._print()
-        self._print(cformat('%{white!}Simplified/cascaded changes:%{reset}'))
+        print()
+        print(cformat('%{white!}Simplified/cascaded changes:%{reset}'))
         for obj, change in process_records(records).items():
-            self._print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj))
+            print(cformat('%{white!}{}%{reset}: {}').format(_change_str(change), obj))
 
-        self._print()
-        self._print(cformat('%{white!}Resulting records:%{reset}'))
-        uploader = DebugUploader(self)
+        print()
+        print(cformat('%{white!}Resulting records:%{reset}'))
+        uploader._is_queue_run = True
         uploader.run(records)
         self.update_last_run()
-
-    def run_initial_export(self, events):
-        uploader = DebugUploader(self)
-        uploader.run_initial(events)
-        for i, batch in enumerate(grouper(events, 10, skip_missing=True), 1):
-            print()
-            print(cformat('%{white!}Batch {}:%{reset}').format(i))
-            for event in batch:
-                if event is not None:
-                    print(event)
-
-
-class DebugUploader(Uploader):
-    BATCH_SIZE = 5
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.n = 0
-
-    def upload_records(self, records, from_queue):
-        self.n += 1
-        self.backend._print(cformat('%{white!}Batch {}:%{reset}').format(self.n))
-        for record in records:
-            self.backend._print(repr(record))

@@ -30,7 +30,7 @@ jobs:
             echo "unsupported event: $GITHUB_EVENT_NAME"
             exit 1
           fi
-          if [[ $upstream_branch != master && $upstream_branch != *-maintenance ]]; then
+          if [[ $upstream_branch != master && $upstream_branch != *-maintenance && $upstream_branch != search ]]; then
             echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to master"
             upstream_branch=master
           else
@@ -190,6 +190,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - plugin: citadel
           - plugin: livesync
           - plugin: payment_paypal
           - plugin: vc_zoom
@@ -220,6 +221,11 @@ jobs:
         run: |
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install extra dependencies
+        if: matrix.plugin == 'citadel'
+        run: |
+          pip install -e "${GITHUB_WORKSPACE}/livesync/"
 
       - name: Install plugin
         run: |

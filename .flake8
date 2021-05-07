@@ -33,3 +33,5 @@ ignore =
 per-file-ignores =
     # allow nicely aligned parametrizations
     **/*_test.py:E241
+    # allow long lines in migrations (only do that for raw SQL please)
+    **/migrations/*.py:E501

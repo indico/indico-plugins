@@ -7,6 +7,7 @@
 
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin, render_plugin_template
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -81,7 +82,9 @@ class RHEditAgent(RHAdminBase):
         if form.validate_on_submit():
             data = form.data
             self.agent.name = data.pop('name')
-            self.agent.settings = data
+            if data:
+                self.agent.settings.update(data)
+                flag_modified(self.agent, 'settings')
             flash(_('Agent updated'), 'success')
             return jsonify_data(flash=False)
 
