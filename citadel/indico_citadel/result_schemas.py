@@ -79,7 +79,7 @@ class CitadelResultSchema(ResultSchema):
         ]
         aggregations = {
             key: {
-                'label': filters[key],
+                'label': str(filters[key]),  # resolve lazy strings
                 'buckets': value['buckets']
             }
             for key, value in data['aggregations'].items()
