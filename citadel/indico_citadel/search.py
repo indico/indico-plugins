@@ -86,8 +86,8 @@ range_filters = {
 
 sort_options = {
     'bestmatch': _('Best match'),
-    'newest': _('Newest first'),
-    'oldest': _('Oldest first')
+    'mostrecent': _('Newest first'),
+    '-mostrecent': _('Oldest first')
 }
 
 filters = {
