@@ -71,7 +71,7 @@ def format_query(query, placeholders):
     idx = 0
     keys = []
     for match in re.finditer(patt, query):
-        placeholder = f'+{placeholders[match.group(1)]}:{escape(match.group(2))}'
+        placeholder = f'{placeholders[match.group(1)]}:{escape(match.group(2))}'
         if idx != match.start():
             keys.append(escape(query[idx:match.start()]))
         keys.append(placeholder)
