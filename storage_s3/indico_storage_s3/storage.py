@@ -26,7 +26,9 @@ from indico.core.config import config
 from indico.core.storage import Storage, StorageError
 from indico.core.storage.backend import ReadOnlyStorageMixin, StorageReadOnlyError
 from indico.util.fs import get_file_checksum
-from indico.web.flask.util import make_content_disposition_args, send_file
+from indico.web.flask.util import send_file
+
+from indico_storage_s3.util import make_content_disposition_args
 
 
 s3_session_cache = threading.local()
