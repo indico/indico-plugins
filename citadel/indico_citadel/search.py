@@ -5,6 +5,9 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import base64
+import zlib
+
 import requests
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
@@ -46,7 +49,12 @@ class CitadelProvider(IndicoSearchProvider):
                          **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access:
-            search_params['access'] = ','.join(access)
+            access_string = ','.join(access)
+            if len(access_string) > 1024:
+                access_string_gz = base64.b64encode(zlib.compress(access_string.encode(), level=9))
+                search_params['access_gz'] = access_string_gz
+            else:
+                search_params['access'] = access_string
 
         try:
             resp = requests.get(self.records_url, params=search_params, headers=headers)
