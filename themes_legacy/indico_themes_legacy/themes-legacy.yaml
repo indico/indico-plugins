@@ -1,0 +1,10 @@
+definitions:
+  nicecompact:
+    event_types: [conference, meeting]
+    stylesheet: compact.scss
+    template: :compact_event.html
+    tt_template: :compact_timetable.html
+    title: Compact style
+    user_visible: true
+    settings:
+      page_is_dark: false
