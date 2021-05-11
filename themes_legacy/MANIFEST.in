@@ -1,0 +1,6 @@
+graft indico_themes_legacy/static
+graft indico_themes_legacy/templates
+graft indico_themes_legacy/themes
+recursive-include indico_themes_legacy *.yaml
+
+global-exclude *.pyc __pycache__ .keep
