@@ -1,121 +1,121 @@
 @import 'base/palette';
 
-body {
+div.main {
   color: #000;
   background: #fff;
   font-family: helvetica, verdana, sans-serif;
-}
 
-p,
-br,
-dl,
-strong,
-em,
-h1,
-h2,
-a {
-  font-family: helvetica, verdana, sans-serif;
-  font-size: 8pt;
-  color: #000;
-}
+  > div {
+    overflow: auto;
+  }
 
-td {
-  font-family: helvetica, verdana, sans-serif;
-  font-size: 8pt;
-  color: #000;
-}
+  p,
+  br,
+  dl,
+  strong,
+  em,
+  h1,
+  h2,
+  a {
+    font-family: helvetica, verdana, sans-serif;
+    font-size: 8pt;
+    color: #000;
+  }
 
-table p {
-  margin-top: 0;
-}
+  td {
+    font-family: helvetica, verdana, sans-serif;
+    font-size: 8pt;
+    color: #000;
+  }
 
-.headerselected {
-  color: #fff;
-  background: #006;
-}
+  table p {
+    margin-top: 0;
+  }
 
-a:visited {
-  color: #00f;
-  background: transparent;
-  text-decoration: none;
-}
+  .headerselected {
+    color: #fff;
+    background: #006;
+  }
 
-a:active {
-  color: $bright-orange;
-  background: transparent;
-}
+  a:visited {
+    color: #00f;
+    background: transparent;
+    text-decoration: none;
+  }
 
-a:hover {
-  color: $bright-orange;
-  background: transparent;
-}
+  a:active {
+    color: $bright-orange;
+    background: transparent;
+  }
 
-a.img:hover {
-  color: #00c;
-  background: transparent;
-}
+  a:hover {
+    color: $bright-orange;
+    background: transparent;
+  }
 
-a.img:active {
-  color: #00c;
-  background: transparent;
-  font-weight: normal;
-}
+  a.img:hover {
+    color: #00c;
+    background: transparent;
+  }
 
-table.eventHeader {
-  background: white;
-  width: 100%;
-}
+  a.img:active {
+    color: #00c;
+    background: transparent;
+    font-weight: normal;
+  }
 
-table.headerLegendsBorder {
-  background: silver;
-  border-spacing: 3px;
-  border: 0;
-  text-align: right;
-}
+  table.eventHeader {
+    background: white;
+    width: 100%;
+  }
 
-table.headerLegendsContent {
-  background: white;
-  border-spacing: 0;
-  border: 0;
-  width: 100%;
-  text-align: right;
-}
+  table.headerLegendsBorder {
+    background: silver;
+    border-spacing: 3px;
+    border: 0;
+    text-align: right;
+  }
 
-td.headerLegends {
-  text-align: right;
-}
+  table.headerLegendsContent {
+    background: white;
+    border-spacing: 0;
+    border: 0;
+    width: 100%;
+    text-align: right;
+  }
 
-td.sessionsLegend {
-  background: #90c0f0;
-}
+  td.headerLegends {
+    text-align: right;
+  }
 
-td.contribsLegendSilver {
-  background: silver;
-}
+  td.sessionsLegend {
+    background: #90c0f0;
+  }
 
-td.contribsLegendGrey {
-  background: #d2d2d2;
-}
+  td.contribsLegendSilver {
+    background: silver;
+  }
 
-td.breaksLegend {
-  background: #fcc;
-}
+  td.contribsLegendGrey {
+    background: #d2d2d2;
+  }
 
-table.dayList {
-  background: white;
-  border-spacing: 1px;
-  border: 0;
-  width: 100%;
-}
+  td.breaksLegend {
+    background: #fcc;
+  }
 
-.titleClass {
-  font-weight: bold;
-}
+  table.dayList {
+    background: white;
+    border-spacing: 1px;
+    border: 0;
+    width: 100%;
+  }
 
-.speakerList {
-  color: green;
-}
+  .titleClass {
+    font-weight: bold;
+  }
 
-div.main > div {
-  overflow: auto;
+  .speakerList {
+    color: green;
+  }
 }
