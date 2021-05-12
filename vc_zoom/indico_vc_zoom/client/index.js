@@ -24,6 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         handleAxiosError(error);
         killProgress();
       }
-    })
-  })
+    });
+  });
 });
