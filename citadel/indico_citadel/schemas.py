@@ -151,6 +151,8 @@ class AttachmentRecordSchema(RecordSchema, AttachmentSchema):
     @post_dump
     def _translate_keys(self, data, **kwargs):
         data['type_format'] = data.pop('attachment_type')
+        if user := data['_data'].pop('user', None):
+            data['_data']['persons'] = user
         return data
 
 
@@ -208,6 +210,8 @@ class _EventNoteDataSchema(EventNoteSchema):
     def _transform(self, data, **kwargs):
         if desc := data.get('content'):
             data['content'] = strip_tags(desc).strip()
+        if user := data.pop('user', None):
+            data['persons'] = user
         return data
 
 

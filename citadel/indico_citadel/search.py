@@ -77,9 +77,9 @@ class CitadelProvider(IndicoSearchProvider):
 
 placeholders = {
     'title': ('_data.title', _('The title an event, contribution, etc.)')),
-    'person': ('_data.persons.name', _("A speaker, author or event chair's name")),
-    'affiliation': ('_data.persons.affiliation', _("A speaker, author or event chair's affiliation")),
-    'type': ('type', _('An entry type (such as conference, meeting, file, etc.)')),
+    'person': ('_data.persons_index.name', _("A speaker, author or event chair's name")),
+    'affiliation': ('_data.persons_index.affiliation', _("A speaker, author or event chair's affiliation")),
+    'type': ('type_any', _('An entry type (such as conference, meeting, file, etc.)')),
     'venue': ('_data.location.venue_name', _("Name of the venue")),
     'room': ('_data.location.room_name', _("Name of the room")),
     'address': ('_data.location.address', _("Address of the venue")),

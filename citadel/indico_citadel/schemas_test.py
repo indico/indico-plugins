@@ -188,7 +188,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
             'filename': 'dummy_file.txt',
             'site': 'http://localhost',
             'title': 'Dummy Attachment',
-            'user': {'name': 'Guinea Pig'},
+            'persons': {'name': 'Guinea Pig'},
         },
         'attachment_id': attachment.id,
         'category_id': category_id,
@@ -247,7 +247,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
             'content': 'this is a dummy note',
             'site': 'http://localhost',
             'title': f'{note.object.title} - Notes/Minutes',
-            'user': {'name': 'Guinea Pig'}
+            'persons': {'name': 'Guinea Pig'}
         },
         'category_id': category_id,
         'category_path': [

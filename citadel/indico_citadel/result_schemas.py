@@ -11,7 +11,8 @@ from marshmallow import fields, pre_load
 
 from indico.modules.search.base import SearchTarget
 from indico.modules.search.result_schemas import (AggregationSchema, AttachmentResultSchema, BucketSchema,
-                                                  EventResultSchema, ResultItemSchema, ResultSchema)
+                                                  EventNoteResultSchema, EventResultSchema, ResultItemSchema,
+                                                  ResultSchema)
 
 
 class CitadelEventResultSchema(EventResultSchema):
@@ -26,7 +27,16 @@ class CitadelAttachmentResultSchema(AttachmentResultSchema):
     @pre_load
     def _translate_keys(self, data, **kwargs):
         data = data.copy()
+        data['user'] = data.pop('persons', None)
         data['attachment_type'] = data.pop('type_format')
+        return data
+
+
+class CitadelEventNoteResultSchema(EventNoteResultSchema):
+    @pre_load
+    def _translate_keys(self, data, **kwargs):
+        data = data.copy()
+        data['user'] = data.pop('persons', None)
         return data
 
 
@@ -52,6 +62,7 @@ class CitadelResultItemSchema(ResultItemSchema):
         **ResultItemSchema.type_schemas,
         SearchTarget.event.name: CitadelEventResultSchema,
         SearchTarget.attachment.name: CitadelAttachmentResultSchema,
+        SearchTarget.event_note.name: CitadelEventNoteResultSchema,
     }
 
 
