@@ -106,4 +106,5 @@ filters = {
     'start_range': _('Date'),
     'category': _('Category'),
     'category_id': _('Category ID'),
+    'event_id': _('Event ID'),
 }
