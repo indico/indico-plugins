@@ -193,6 +193,7 @@ jobs:
           - plugin: citadel
           - plugin: livesync
           - plugin: payment_paypal
+          - plugin: storage_s3
           - plugin: vc_zoom
 
     steps:

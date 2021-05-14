@@ -40,7 +40,7 @@ def test_resolve_bucket_name_dynamic(freeze_time, date, name_template, expected_
     storage = plugin.DynamicS3Storage(f'bucket_template={name_template},bucket_secret=secret')
     name, token = storage._get_current_bucket_name().rsplit('-', 1)
     assert name == expected_name
-    assert token == hmac.new(b'secret', expected_name, hashlib.md5).hexdigest()
+    assert token == hmac.new(b'secret', expected_name.encode(), hashlib.md5).hexdigest()
 
 
 class MockConfig:
@@ -78,7 +78,7 @@ def test_dynamic_bucket_creation_task(freeze_time, mocker, date, name_template, 
     else:
         create_bucket()
     if bucket_created:
-        token = hmac.new(b'secret', expected_name, hashlib.md5).hexdigest()
+        token = hmac.new(b'secret', expected_name.encode(), hashlib.md5).hexdigest()
         create_bucket_call.assert_called_with(f'{expected_name}-{token}')
     else:
         assert not create_bucket_call.called

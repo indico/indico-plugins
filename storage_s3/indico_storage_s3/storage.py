@@ -241,7 +241,7 @@ class DynamicS3Storage(S3StorageBase):
 
     def _get_bucket_name(self, date):
         name = self._replace_bucket_placeholders(self.bucket_name_template, date)
-        token = hmac.new(self.bucket_secret.encode(), name, hashlib.md5).hexdigest()
+        token = hmac.new(self.bucket_secret.encode(), name.encode(), hashlib.md5).hexdigest()
         return f'{name}-{token}'[:63]
 
     def _replace_bucket_placeholders(self, name, date):
