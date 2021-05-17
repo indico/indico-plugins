@@ -246,7 +246,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
         '_data': {
             'content': 'this is a dummy note',
             'site': 'http://localhost',
-            'title': f'{note.object.title} - Notes/Minutes',
+            'title': note.object.title,
             'persons': {'name': 'Guinea Pig'}
         },
         'category_id': category_id,

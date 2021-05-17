@@ -204,7 +204,7 @@ class _EventNoteDataSchema(EventNoteSchema):
     class Meta:
         fields = ('title', 'content', 'user')
 
-    title = mm.Function(lambda note: f'{note.object.title} - Notes/Minutes')
+    title = mm.String(attribute='object.title')
 
     @post_dump
     def _transform(self, data, **kwargs):
