@@ -14,6 +14,8 @@ from indico.modules.search.result_schemas import (AggregationSchema, AttachmentR
                                                   EventNoteResultSchema, EventResultSchema, ResultItemSchema,
                                                   ResultSchema)
 
+from indico_citadel.util import format_aggregations
+
 
 class CitadelEventResultSchema(EventResultSchema):
     @pre_load
@@ -88,17 +90,8 @@ class CitadelResultSchema(ResultSchema):
             }
             for item in data['hits']['hits']
         ]
-        aggregations = {
-            key: {
-                'label': str(filters[key]),  # resolve lazy strings
-                'buckets': value['buckets']
-            }
-            for key, value in data['aggregations'].items()
-            if key in filters
-        }
-
         return {
-            'aggregations': aggregations,
+            'aggregations': format_aggregations(data['aggregations'], filters),
             'results': results,
             'total': total,
             'pages': pages,

@@ -44,9 +44,11 @@ class CitadelProvider(IndicoSearchProvider):
         parts = [format_query(query, {k: field for k, (field, _) in placeholders.items()})]
         if ranges:
             parts.append(ranges)
-        search_params = {'page': page, 'size': self.RESULTS_PER_PAGE, 'q': ' '.join(parts), 'highlight': '_data.*',
-                         'type': [x.name for x in object_types], 'sort': sort, 'default_operator': operator,
-                         **filter_query}
+        search_params = {
+            'page': page, 'size': self.RESULTS_PER_PAGE, 'q': ' '.join(parts), 'highlight': '_data.*',
+            'type': [x.name for x in object_types], 'sort': sort, 'default_operator': operator,
+            **filter_query
+        }
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access := get_user_access(user):
             access_string = ','.join(access)
@@ -99,8 +101,8 @@ sort_options = {
 }
 
 filters = {
-    'affiliation': _('Affiliation'),
-    'person': _('Person'),
+    'person_affiliation': _('Affiliation'),
+    'person_name': _('Person'),
     'type_format': _('Type'),
     'venue': _('Location'),
     'start_range': _('Date'),

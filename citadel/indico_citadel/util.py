@@ -81,7 +81,7 @@ def format_query(query, placeholders):
 
     :param query: search query
     :param placeholders: placeholder whitelist
-    :returns escaped query
+    :return: escaped query
     """
     patt = r'(?:^|\s)({}):([^:"\s]+|"[^"]+")(?:$|\s)'.format('|'.join(map(re.escape, placeholders)))
     idx = 0
@@ -107,7 +107,7 @@ def format_filters(params, filters, range_filters):
     :param params: The filter query params
     :param filters: The filter whitelist
     :param range_filters: The range filter whitelist
-    :returns: filters, extracted placeholders
+    :return: filters, extracted placeholders
     """
     _filters = {}
     query = []
@@ -139,6 +139,39 @@ def remove_none_entries(obj):
     elif isinstance(obj, (list, tuple, set)):
         return type(obj)(map(remove_none_entries, obj))
     return obj
+
+
+def format_aggregations(aggregations, filters):
+    """Format aggregations into a bucket dictionary.
+
+    Besides transforming each aggregation, ensures each bucket key
+    contains the most common result as defined from Elastic Search.
+
+    :param aggregations: The raw aggregation object
+    :param filters: The filter whitelist
+    :return: key: {label, buckets: [{key, count}]}
+    """
+    return {
+        key: {
+            'label': str(filters[key]),
+            'buckets': [{
+                **bucket,
+                'key': bucket['most_common']['buckets'][0]['key'] if 'most_common' in bucket else bucket['key'],
+                'count': bucket['doc_count']
+            } for bucket in value['buckets']]
+        }
+        for key, value in _flatten(aggregations)
+        if key in filters
+    }
+
+
+def _flatten(obj, target_key='buckets', parent_key=''):
+    if not isinstance(obj, dict):
+        return
+    if target_key in obj:
+        yield parent_key, obj
+    for key, value in obj.items():
+        yield from _flatten(value, target_key, f'{parent_key}_{key}' if parent_key else key)
 
 
 @memoize_redis(3600)
