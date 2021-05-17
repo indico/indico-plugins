@@ -16,7 +16,7 @@
         function init_tracking() {
             try {
                 track_site();
-                {% if event_id %}
+                {% if event_id is defined %}
                     track_event();
                 {% endif %}
             } catch(err) {}
@@ -28,12 +28,12 @@
             general_tracker.trackPageView();
         }
 
-        {% if event_id %}
+        {% if event_id is defined %}
             function track_event() {
                 var event_tracker = Piwik.getTracker(url + 'piwik.php', {{ site_id_events }});
                 event_tracker.enableLinkTracking();
                 event_tracker.setCustomVariable(1, 'Conference', '{{ event_id }}', 'page');
-                {% if contrib_id %}
+                {% if contrib_id is defined %}
                     event_tracker.setCustomVariable(2, 'Contribution', '{{ contrib_id }}', 'page');
                 {% endif %}
                 event_tracker.trackPageView();
