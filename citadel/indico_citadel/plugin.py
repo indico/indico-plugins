@@ -69,9 +69,12 @@ class CitadelPlugin(LiveSyncPluginBase):
         self.connect(signals.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
 
+    def _is_configured(self):
+        return bool(self.settings.get('search_backend_url')) and bool(self.settings.get('search_backend_token'))
+
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider
-        if current_app.config['TESTING'] or not self.settings.get('disable_search'):
+        if current_app.config['TESTING'] or (not self.settings.get('disable_search') and self._is_configured()):
             return CitadelProvider
 
     def _extend_indico_cli(self, sender, **kwargs):
