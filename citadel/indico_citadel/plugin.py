@@ -5,6 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from flask import current_app
+from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import IntegerField, URLField
 from wtforms.validators import URL, DataRequired, NumberRange
 
@@ -12,6 +14,7 @@ from indico.core import signals
 from indico.core.plugins import PluginCategory
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, TextListField
+from indico.web.forms.widgets import SwitchWidget
 
 from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
@@ -33,6 +36,11 @@ class CitadelSettingsForm(IndicoForm):
                                                'for indexing that have not been uploaded before during the next queue '
                                                'run, which may take a long time on larger instances. You may want '
                                                'to run a manual upload for the new file size first!'))
+    disable_search = BooleanField(_('Disable search'), widget=SwitchWidget(),
+                                  description=_('This disables the search integration of the plugin. When this option '
+                                                'is used, the internal Indico search interface will be used. This may '
+                                                'be useful when you are still running a larger initial export and do '
+                                                'not want people to get incomplete search results during that time.'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -52,6 +60,7 @@ class CitadelPlugin(LiveSyncPluginBase):
             'tex', 'txt', 'wdp'
         ],
         'max_file_size': 10,
+        'disable_search': False,
     }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
 
@@ -62,7 +71,8 @@ class CitadelPlugin(LiveSyncPluginBase):
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider
-        return CitadelProvider
+        if current_app.config['TESTING'] or not self.settings.get('disable_search'):
+            return CitadelProvider
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
