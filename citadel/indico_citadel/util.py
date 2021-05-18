@@ -156,7 +156,8 @@ def format_aggregations(aggregations, filters):
             'label': str(filters[key]),
             'buckets': [{
                 'key': bucket['most_common']['buckets'][0]['key'] if 'most_common' in bucket else bucket['key'],
-                'count': bucket['doc_count']
+                'count': bucket['doc_count'],
+                **{k: v for k, v in bucket.items() if k in ('from_as_string', 'to_as_string')}
             } for bucket in value['buckets']]
         }
         for key, value in _flatten(aggregations)
