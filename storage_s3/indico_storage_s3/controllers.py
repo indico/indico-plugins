@@ -41,7 +41,7 @@ class RHBuckets(RH):
     def _get_dynamic_info(self, backend_name, storage):
         buckets = set()
         for model in StoredFileMixin.__subclasses__():
-            query = (db.session.query(db.func.split_part(model.storage_file_id, '//', 1).distinct())
+            query = (db.session.query(db.func.split_part(model.storage_file_id, '//', 1).label('bucket').distinct())
                      .filter(model.storage_file_id.isnot(None), model.storage_backend == backend_name))
             buckets.update(bucket for bucket, in query)
 
