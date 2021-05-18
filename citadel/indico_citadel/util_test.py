@@ -7,7 +7,7 @@
 
 import pytest
 
-from indico_citadel.util import format_query, remove_none_entries
+from indico_citadel.util import _flatten, format_query, remove_none_entries
 
 
 @pytest.mark.parametrize(('query', 'expected'), [
@@ -39,3 +39,13 @@ def test_query_placeholders(query, expected):
 ])
 def test_remove_none_entries(val, expected):
     assert remove_none_entries(val) == expected
+
+
+@pytest.mark.parametrize(('val', 'expected'), [
+    ({'person': {'name': {'buckets': []}, 'affiliation': {'buckets': []}}, 'other': {'other': {'buckets': []}}},
+     {'person_name', 'person_affiliation', 'other_other'}),
+    ({'other': {'other': {'other': {'other': {'buckets': []}}}}},
+     {'other_other_other_other'})
+])
+def test_flatten(val, expected):
+    assert {key for key, _ in _flatten(val)} == expected

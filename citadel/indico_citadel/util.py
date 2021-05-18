@@ -155,7 +155,6 @@ def format_aggregations(aggregations, filters):
         key: {
             'label': str(filters[key]),
             'buckets': [{
-                **bucket,
                 'key': bucket['most_common']['buckets'][0]['key'] if 'most_common' in bucket else bucket['key'],
                 'count': bucket['doc_count']
             } for bucket in value['buckets']]
