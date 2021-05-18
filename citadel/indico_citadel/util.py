@@ -13,6 +13,9 @@ from functools import wraps
 from flask import current_app
 from flask.globals import _app_ctx_stack
 
+from indico.modules.groups import GroupProxy
+from indico.util.caching import memoize_redis
+
 
 def parallelize(func, entries, batch_size=200):
     @wraps(func)
@@ -136,3 +139,15 @@ def remove_none_entries(obj):
     elif isinstance(obj, (list, tuple, set)):
         return type(obj)(map(remove_none_entries, obj))
     return obj
+
+
+@memoize_redis(3600)
+def get_user_access(user):
+    if not user:
+        return []
+    access = [user.identifier] + [u.identifier for u in user.get_merged_from_users_recursive()]
+    access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
+    if user.can_get_all_multipass_groups:
+        access += [GroupProxy(x.name, x.provider.name, x).identifier
+                   for x in user.iter_all_multipass_groups()]
+    return access
