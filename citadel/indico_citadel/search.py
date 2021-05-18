@@ -16,7 +16,7 @@ from indico.modules.search.base import IndicoSearchProvider, SearchOption
 
 from indico_citadel import _
 from indico_citadel.result_schemas import CitadelResultSchema
-from indico_citadel.util import format_filters, format_query
+from indico_citadel.util import format_filters, format_query, get_user_access
 
 
 class CitadelProvider(IndicoSearchProvider):
@@ -28,7 +28,7 @@ class CitadelProvider(IndicoSearchProvider):
         self.backend_url = CitadelPlugin.settings.get('search_backend_url')
         self.records_url = url_join(self.backend_url, 'api/records/')
 
-    def search(self, query, access, page=1, object_types=(), **params):
+    def search(self, query, user=None, page=1, object_types=(), **params):
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
@@ -48,7 +48,7 @@ class CitadelProvider(IndicoSearchProvider):
                          'type': [x.name for x in object_types], 'sort': sort, 'default_operator': operator,
                          **filter_query}
         # Filter by the objects that can be viewed by users/groups in the `access` argument
-        if access:
+        if access := get_user_access(user):
             access_string = ','.join(access)
             if len(access_string) > 1024:
                 access_string_gz = base64.b64encode(zlib.compress(access_string.encode(), level=9))
