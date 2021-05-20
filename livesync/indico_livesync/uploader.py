@@ -61,12 +61,13 @@ class Uploader:
             lambda entry: re.sub(r'\s+', ' ', strip_control_chars(getattr(entry[0], 'title', ''))),
             print_total_time=True
         )
-        return self.upload_records(records)
+        return self.upload_records(records, initial=True)
 
-    def upload_records(self, records):
+    def upload_records(self, records, initial=False):
         """Executed for a batch of up to `BATCH_SIZE` records
 
         :param records: an iterator of records to upload (or queue entries)
+        :param initial: whether the upload is part of an initial export
         :return: True if everything was successful, False if not
         """
         raise NotImplementedError  # pragma: no cover

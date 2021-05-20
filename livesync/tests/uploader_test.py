@@ -20,7 +20,7 @@ class RecordingUploader(Uploader):
         self._uploaded = []
         self.logger = MagicMock()
 
-    def upload_records(self, records):
+    def upload_records(self, records, initial=False):
         self._uploaded.append(list(records))
 
     @property
@@ -34,7 +34,7 @@ class FailingUploader(RecordingUploader):
         super().__init__(*args, **kwargs)
         self._n = 0
 
-    def upload_records(self, records):
+    def upload_records(self, records, initial=False):
         super().upload_records(records)
         self._n += 1
         if self._n == 2:

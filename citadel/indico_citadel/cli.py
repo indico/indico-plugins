@@ -42,7 +42,8 @@ def upload(batch, force, max_size):
         print('Citadel is not properly configured.')
         return
 
-    total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size)
+    initial = not agent.settings.get('file_upload_done')
+    total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size, initial=initial)
     if not errors and not aborted:
         print(f'{total} files uploaded')
         if max_size is None:

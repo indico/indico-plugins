@@ -57,9 +57,6 @@ def _print_record(record):
 
 
 class LiveSyncCitadelUploader(Uploader):
-    PARALLELISM_RECORDS = 250
-    PARALLELISM_FILES = 200
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -207,15 +204,29 @@ class LiveSyncCitadelUploader(Uploader):
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
         return super().run_initial(records, total)
 
-    def upload_records(self, records):
+    def _get_retry_config(self, initial):
+        if initial:
+            return Retry(
+                total=10,
+                backoff_factor=3,
+                status_forcelist=[502, 503, 504],
+                allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
+            )
+        else:
+            return Retry(
+                total=2,
+                backoff_factor=3,
+                status_forcelist=[502, 503, 504],
+                allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
+            )
+
+    def upload_records(self, records, initial=False):
+        setting = 'num_threads_records_initial' if initial else 'num_threads_records'
+        num_threads = self.backend.plugin.settings.get(setting)
+        self.logger.debug('Using %d parallel threads', num_threads)
         session = requests.Session()
-        retry = Retry(
-            total=10,
-            backoff_factor=3,
-            status_forcelist=[502, 503, 504],
-            allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
-        )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=self.PARALLELISM_RECORDS))
+        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(initial),
+                                                   pool_maxsize=num_threads))
         session.headers = self.headers
         dumped_records = (
             (
@@ -228,21 +239,19 @@ class LiveSyncCitadelUploader(Uploader):
         if self.verbose:
             dumped_records = (_print_record(x) for x in dumped_records)
 
-        uploader = parallelize(self.upload_record, entries=dumped_records, batch_size=self.PARALLELISM_RECORDS)
+        uploader = parallelize(self.upload_record, entries=dumped_records, batch_size=num_threads)
         __, aborted = uploader(session)
         return not aborted
 
-    def upload_files(self, files):
+    def upload_files(self, files, initial=False):
+        setting = 'num_threads_files_initial' if initial else 'num_threads_files'
+        num_threads = self.backend.plugin.settings.get(setting)
+        self.logger.debug('Using %d parallel threads', num_threads)
         session = requests.Session()
-        retry = Retry(
-            total=10,
-            backoff_factor=3,
-            status_forcelist=[502, 503, 504],
-            allowed_methods=frozenset(['PUT'])
-        )
-        session.mount(self.search_app, HTTPAdapter(max_retries=retry, pool_maxsize=self.PARALLELISM_FILES))
+        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(initial),
+                                                   pool_maxsize=num_threads))
         session.headers = self.headers
-        uploader = parallelize(self.upload_file, entries=files, batch_size=self.PARALLELISM_FILES)
+        uploader = parallelize(self.upload_file, entries=files, batch_size=num_threads)
         results, aborted = uploader(session)
         return len(results), sum(1 for success in results if not success), aborted
 
@@ -306,7 +315,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
             self.set_initial_file_upload_state(True)
         return True
 
-    def run_export_files(self, batch=1000, force=False, max_size=None, verbose=True):
+    def run_export_files(self, batch=1000, force=False, max_size=None, verbose=True, initial=False):
         from indico_citadel.plugin import CitadelPlugin
 
         if max_size is None:
@@ -335,7 +344,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
                                            print_total_time=True)
         else:
             self.plugin.logger.info(f'{total} files need to be uploaded')
-        total, errors, aborted = uploader.upload_files(attachments)
+        total, errors, aborted = uploader.upload_files(attachments, initial=initial)
         return total, errors, aborted
 
     def check_reset_status(self):

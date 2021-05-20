@@ -56,7 +56,7 @@ class DebugUploader(Uploader):
                 return schema.dump(obj)
         raise ValueError(f'unknown object ref: {obj}')
 
-    def upload_records(self, records):
+    def upload_records(self, records, initial=False):
         dumped_records = (
             (
                 type(rec).__name__, rec.id,

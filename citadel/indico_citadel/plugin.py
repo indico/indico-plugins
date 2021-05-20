@@ -36,6 +36,18 @@ class CitadelSettingsForm(IndicoForm):
                                                'for indexing that have not been uploaded before during the next queue '
                                                'run, which may take a long time on larger instances. You may want '
                                                'to run a manual upload for the new file size first!'))
+    num_threads_records = IntegerField(_('Parallel threads (records)'), [NumberRange(min=1, max=500)],
+                                       description=_('Number of threads to use when uploading records.'))
+    num_threads_records_initial = IntegerField(_('Parallel threads (records, initial export)'),
+                                               [NumberRange(min=1, max=500)],
+                                               description=_('Number of threads to use when uploading records during '
+                                                             'the initial export.'))
+    num_threads_files = IntegerField(_('Parallel threads (files)'), [NumberRange(min=1, max=500)],
+                                     description=_('Number of threads to use when uploading files.'))
+    num_threads_files_initial = IntegerField(_('Parallel threads (files, initial export)'),
+                                             [NumberRange(min=1, max=500)],
+                                             description=_('Number of threads to use when uploading files during '
+                                                           'the initial export.'))
     disable_search = BooleanField(_('Disable search'), widget=SwitchWidget(),
                                   description=_('This disables the search integration of the plugin. When this option '
                                                 'is used, the internal Indico search interface will be used. This may '
@@ -60,6 +72,10 @@ class CitadelPlugin(LiveSyncPluginBase):
             'tex', 'txt', 'wdp'
         ],
         'max_file_size': 10,
+        'num_threads_records': 5,
+        'num_threads_records_initial': 25,
+        'num_threads_files': 5,
+        'num_threads_files_initial': 25,
         'disable_search': False,
     }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
