@@ -206,19 +206,21 @@ class LiveSyncCitadelUploader(Uploader):
 
     def _get_retry_config(self, initial):
         if initial:
-            return Retry(
-                total=10,
-                backoff_factor=3,
-                status_forcelist=[502, 503, 504],
+            retry = Retry(
+                total=20,
+                backoff_factor=0.22,
+                status_forcelist=[500, 502, 503, 504],
                 allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
             )
+            retry.BACKOFF_MAX = 10
         else:
-            return Retry(
+            retry = Retry(
                 total=2,
                 backoff_factor=3,
                 status_forcelist=[502, 503, 504],
                 allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
             )
+        return retry
 
     def upload_records(self, records, initial=False):
         setting = 'num_threads_records_initial' if initial else 'num_threads_records'
