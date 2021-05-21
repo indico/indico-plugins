@@ -5,7 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import os
+import sys
 import time
+import traceback
 
 import click
 from flask_pluginengine import current_plugin
@@ -64,11 +67,12 @@ def agents():
 
 @cli.command()
 @click.argument('agent_id', type=int)
+@click.option('--retry', '-r', is_flag=True, help="Restart automatically after a failure")
 @click.option('--force', '-f', is_flag=True, help="Perform export even if it has already been done once.")
 @click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
 @click.option('--batch', type=int, default=5000, help="The amount of records yielded per export batch.",
               show_default=True, metavar='N')
-def initial_export(agent_id, batch, force, verbose):
+def initial_export(agent_id, batch, force, verbose, retry):
     """Performs the initial data export for an agent"""
     agent = LiveSyncAgent.get(agent_id)
     if agent is None:
@@ -91,9 +95,18 @@ def initial_export(agent_id, batch, force, verbose):
         print(cformat('To re-run it, use %{yellow!}--force%{reset}'))
         return
 
-    if not backend.run_initial_export(batch, force, verbose):
-        print('The initial export failed; not marking it as done')
-        return
+    try:
+        if not backend.run_initial_export(batch, force, verbose):
+            print('The initial export failed; not marking it as done')
+            return
+    except Exception:
+        if not retry:
+            raise
+        traceback.print_exc()
+        print('Restarting in 2 seconds')
+        time.sleep(2)
+        os.execl(sys.argv[0], *sys.argv)
+        return  # exec doesn't return but just in case...
 
     agent.initial_data_exported = True
     db.session.commit()
