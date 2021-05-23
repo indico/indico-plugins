@@ -9,10 +9,12 @@ import base64
 import zlib
 
 import requests
+from flask import current_app
 from requests.exceptions import RequestException
 from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider, SearchOption
+from indico.util.decorators import classproperty
 
 from indico_citadel import _
 from indico_citadel.result_schemas import CitadelResultSchema
@@ -27,6 +29,17 @@ class CitadelProvider(IndicoSearchProvider):
         self.token = CitadelPlugin.settings.get('search_backend_token')
         self.backend_url = CitadelPlugin.settings.get('search_backend_url')
         self.records_url = url_join(self.backend_url, 'api/records/')
+
+    @classproperty
+    @classmethod
+    def active(cls):
+        from indico_citadel.plugin import CitadelPlugin
+        if current_app.config['TESTING']:
+            return True
+        elif CitadelPlugin.settings.get('disable_search'):
+            return False
+        return bool(CitadelPlugin.settings.get('search_backend_url') and
+                    CitadelPlugin.settings.get('search_backend_token'))
 
     def search(self, query, user=None, page=1, object_types=(), **params):
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
