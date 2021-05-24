@@ -82,7 +82,8 @@ class RHCustomShortURLPage(RHManageEventBase):
                                                 event=self.event,
                                                 ursh_host=self.ursh_host,
                                                 original_url=original_url,
-                                                submitted=False)
+                                                submitted=False,
+                                                shortcut=None)
 
     def _process_POST(self):
         original_url = self._make_absolute_url(request.args['original_url'])

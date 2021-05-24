@@ -16,7 +16,7 @@
     <div id="ursh-shorten-request-form" class="i-has-action">
         <input id="ursh-shorten-input" name="ursh-shorten-original-url" type="url" style="font-family:monospace;"
                spellcheck="false" autocomplete="off" autocapitalize="off"
-               value="{{ request.args.url }}"
+               value="{{ request.args.get('url', '') }}"
                placeholder="{% trans %}Enter an Indico URL to shorten...{% endtrans %}">
         <button id="ursh-shorten-button" type="button" class="i-button">{% trans %}Shorten{% endtrans %}</button>
     </div>
