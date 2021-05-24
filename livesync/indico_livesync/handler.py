@@ -206,7 +206,15 @@ def _register_deletion(obj):
 
 def _register_change(obj, action):
     if not isinstance(obj, Category):
-        event = obj.folder.event if isinstance(obj, Attachment) else obj.event
+        if isinstance(obj, Attachment):
+            if obj.folder:
+                event = obj.folder.event
+            else:
+                # it looks like sqlalchemy doesn't lazyload relationships when accessed
+                # during a set event handler, so it's just none in that case...
+                event = AttachmentFolder.get(obj.folder_id).event
+        else:
+            event = obj.event
         if event is None or event.is_deleted:
             # When deleting an event we get data change signals afterwards. We can simple ignore them.
             # Also, ACL changes during user merges might involve deleted objects which we also don't care about
