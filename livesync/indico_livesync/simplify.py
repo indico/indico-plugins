@@ -169,7 +169,9 @@ def _process_cascaded_event_contents(records, additional_events=None, *, include
     if changed_event_ids:
         changed_attachments.update(
             Attachment.query.filter(
-                Attachment.folder.has(AttachmentFolder.linked_event_id.in_(changed_event_ids))
+                _deleted_cond(~Attachment.is_deleted),
+                Attachment.folder.has(db.and_(AttachmentFolder.linked_event_id.in_(changed_event_ids),
+                                              _deleted_cond(~AttachmentFolder.is_deleted)))
             )
         )
         changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(changed_event_ids)))
@@ -193,7 +195,7 @@ def _process_cascaded_event_contents(records, additional_events=None, *, include
                                              _deleted_cond(~Contribution.is_deleted)))
         changed_attachments.update(
             Attachment.query.filter(
-                ~Attachment.is_deleted,
+                _deleted_cond(~Attachment.is_deleted),
                 Attachment.folder.has(db.and_(AttachmentFolder.session_id.in_(changed_session_ids),
                                               _deleted_cond(~AttachmentFolder.is_deleted)))
             )
