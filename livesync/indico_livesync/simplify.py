@@ -114,15 +114,19 @@ def _process_cascaded_category_contents(records):
             cte = categ.get_protection_parent_cte()
             # Update only children that inherit
             inheriting_categ_children = (Event.query
+                                         .filter(~Event.is_deleted)
                                          .join(cte, db.and_((Event.category_id == cte.c.id),
                                                             (cte.c.protection_parent == categ.id))))
-            inheriting_direct_children = Event.query.filter((Event.category_id == categ.id) & Event.is_inheriting)
+            inheriting_direct_children = Event.query.filter(Event.category_id == categ.id,
+                                                            Event.is_inheriting,
+                                                            ~Event.is_deleted)
 
             changed_events.update(itertools.chain(inheriting_direct_children, inheriting_categ_children))
 
     # Add move operations and explicitly-passed event records
     if category_move_records:
-        changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_move_records)))
+        changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_move_records),
+                                                 ~Event.is_deleted))
 
     yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
