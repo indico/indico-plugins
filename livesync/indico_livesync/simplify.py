@@ -76,7 +76,7 @@ def process_records(records):
     for obj in _process_cascaded_event_contents(cascaded_delete_records):
         changes[obj] |= SimpleChange.deleted
 
-    for obj in _process_cascaded_event_contents(cascaded_create_records):
+    for obj in _process_cascaded_event_contents(cascaded_create_records, include_deleted=True):
         changes[obj] |= SimpleChange.created
 
     for obj in _process_cascaded_locations(cascaded_location_changes):
@@ -127,7 +127,7 @@ def _process_cascaded_category_contents(records):
     yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
 
-def _process_cascaded_event_contents(records, additional_events=None):
+def _process_cascaded_event_contents(records, additional_events=None, *, include_deleted=False):
     """
     Flatten a series of records into its most basic elements (subcontribution level).
 
@@ -136,6 +136,7 @@ def _process_cascaded_event_contents(records, additional_events=None):
     :param records: queue records to process
     :param additional_events: events whose content will be included in addition to those
                               found in records
+    :param include_deleted: whether to include soft-deleted objects as well
     """
     changed_events = additional_events or set()
     changed_sessions = set()
@@ -143,6 +144,9 @@ def _process_cascaded_event_contents(records, additional_events=None):
     changed_subcontributions = set()
     changed_attachments = set()
     changed_notes = set()
+
+    def _deleted_cond(cond):
+        return True if include_deleted else cond
 
     note_records = {rec.note_id for rec in records if rec.type == EntryType.note}
     attachment_records = {rec.attachment_id for rec in records if rec.type == EntryType.attachment}
@@ -174,10 +178,11 @@ def _process_cascaded_event_contents(records, additional_events=None):
 
     # Sessions are added (implictly + explicitly changed)
     if changed_event_ids or session_records:
-        condition = Session.event_id.in_(changed_event_ids) & ~Session.is_deleted
+        condition = Session.event_id.in_(changed_event_ids) & _deleted_cond(~Session.is_deleted)
         if session_records:
             condition = db.or_(condition, Session.id.in_(session_records))
-        changed_sessions.update(Session.query.filter(Session.event_id.in_(changed_event_ids), ~Session.is_deleted))
+        changed_sessions.update(Session.query.filter(Session.event_id.in_(changed_event_ids),
+                                                     _deleted_cond(~Session.is_deleted)))
 
     if changed_sessions:
         # XXX I kept this very similar to the structure of the code for contributions below,
@@ -185,20 +190,20 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_session_ids = {s.id for s in changed_sessions}
         changed_contributions.update(Contribution.query
                                      .filter(Contribution.session_id.in_(changed_session_ids),
-                                             ~Contribution.is_deleted))
+                                             _deleted_cond(~Contribution.is_deleted)))
         changed_attachments.update(
             Attachment.query.filter(
                 ~Attachment.is_deleted,
                 Attachment.folder.has(db.and_(AttachmentFolder.session_id.in_(changed_session_ids),
-                                              ~AttachmentFolder.is_deleted))
+                                              _deleted_cond(~AttachmentFolder.is_deleted)))
             )
         )
         changed_notes.update(EventNote.query.filter(EventNote.session_id.in_(changed_session_ids),
-                                                    ~EventNote.is_deleted))
+                                                    _deleted_cond(~EventNote.is_deleted)))
 
     # Contributions are added (implictly + explicitly changed)
     if changed_event_ids or contribution_records:
-        condition = Contribution.event_id.in_(changed_event_ids) & ~Contribution.is_deleted
+        condition = Contribution.event_id.in_(changed_event_ids) & _deleted_cond(~Contribution.is_deleted)
         if contribution_records:
             condition = db.or_(condition, Contribution.id.in_(contribution_records))
         changed_contributions.update(Contribution.query.filter(condition).options(joinedload('subcontributions')))
@@ -211,13 +216,13 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_contribution_ids = {c.id for c in changed_contributions}
         changed_attachments.update(
             Attachment.query.filter(
-                ~Attachment.is_deleted,
+                _deleted_cond(~Attachment.is_deleted),
                 Attachment.folder.has(db.and_(AttachmentFolder.contribution_id.in_(changed_contribution_ids),
-                                              ~AttachmentFolder.is_deleted))
+                                              _deleted_cond(~AttachmentFolder.is_deleted)))
             )
         )
         changed_notes.update(EventNote.query.filter(EventNote.contribution_id.in_(changed_contribution_ids),
-                                                    ~EventNote.is_deleted))
+                                                    _deleted_cond(~EventNote.is_deleted)))
 
     # Same for subcontributions
     if subcontribution_records:
@@ -227,13 +232,13 @@ def _process_cascaded_event_contents(records, additional_events=None):
         changed_subcontribution_ids = {sc.id for sc in changed_subcontributions}
         changed_attachments.update(
             Attachment.query.filter(
-                ~Attachment.is_deleted,
+                _deleted_cond(~Attachment.is_deleted),
                 Attachment.folder.has(db.and_(AttachmentFolder.subcontribution_id.in_(changed_subcontribution_ids),
-                                              ~AttachmentFolder.is_deleted))
+                                              _deleted_cond(~AttachmentFolder.is_deleted)))
             )
         )
         changed_notes.update(EventNote.query.filter(EventNote.subcontribution_id.in_(changed_subcontribution_ids),
-                                                    ~EventNote.is_deleted))
+                                                    _deleted_cond(~EventNote.is_deleted)))
 
     yield from changed_subcontributions
     yield from changed_attachments

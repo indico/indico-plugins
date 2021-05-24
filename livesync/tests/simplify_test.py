@@ -61,7 +61,7 @@ def test_process_records_cascade(mocker, change, cascade):
 
 
 @pytest.mark.parametrize('changes', bool_matrix('......'))
-def test_process_records_simplify(changes, mocker, db, create_event, dummy_agent):
+def test_process_records_simplify(changes, db, create_event, dummy_agent):
     """Test if queue entries for the same object are properly simplified"""
     event1 = create_event(id_=1)
     event2 = create_event(id_=2)
@@ -103,3 +103,33 @@ def test_process_records_simplify(changes, mocker, db, create_event, dummy_agent
     for i, ref in enumerate(refs):
         assert (ref['event_id'] in list(result_refs)) == bool(expected[i])
         assert result_refs.get(ref['event_id'], 0) == expected[i]
+
+
+def test_process_records_simplify_created_deleted_child(db, create_event, create_contribution, dummy_agent):
+    """Test if deleted items of newly created events are still cascaded.
+
+    This is needed because when cloning an event, there's just a creation
+    record for the event itself, but cascading creates creation records for
+    all its child objects (e.g. contributions). Now, when such a contribution
+    gets deleted WITHOUT a livesync run in between, we have the event creation
+    record and a contribution deletion record. But when cascading the creation,
+    usually deleted objects are skipped, so we'd try to delete something from
+    the search service that doesn't exist there.
+    """
+    db.session.add(dummy_agent)
+    event = create_event()
+    contrib1 = create_contribution(event, 'Test 1')
+    contrib2 = create_contribution(event, 'Test 2', is_deleted=True)
+
+    queue = [
+        LiveSyncQueueEntry(change=ChangeType.created, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.deleted, agent=dummy_agent, type=EntryType.contribution,
+                           contribution=contrib2),
+    ]
+
+    db.session.flush()
+    result = process_records(queue)
+    assert result == {
+        event: SimpleChange.created,
+        contrib1: SimpleChange.created,
+    }
