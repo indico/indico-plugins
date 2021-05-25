@@ -74,7 +74,7 @@ def connect_signals(plugin):
     # attachments
     plugin.connect(signals.attachments.folder_deleted, _attachment_folder_deleted)
     plugin.connect(signals.attachments.attachment_created, _created)
-    plugin.connect(signals.attachments.attachment_deleted, _deleted)
+    plugin.connect(signals.attachments.attachment_deleted, _attachment_deleted)
     plugin.connect(signals.attachments.attachment_updated, _updated)
     plugin.connect(signals.acl.protection_changed, _attachment_folder_protection_changed, sender=AttachmentFolder)
     plugin.connect(signals.acl.protection_changed, _protection_changed, sender=Attachment)
@@ -171,6 +171,12 @@ def _attachment_folder_deleted(folder, **kwargs):
         return
     for attachment in folder.attachments:
         _register_deletion(attachment)
+
+
+def _attachment_deleted(attachment, **kwargs):
+    if attachment.folder.link_type not in (LinkType.event, LinkType.contribution, LinkType.subcontribution):
+        return
+    _register_deletion(attachment)
 
 
 def _attachment_folder_protection_changed(sender, obj, **kwargs):
