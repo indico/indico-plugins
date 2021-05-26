@@ -5,6 +5,11 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import os
+import sys
+import time
+import traceback
+
 import click
 
 from indico.cli.core import cli_group
@@ -22,11 +27,12 @@ def cli():
 
 @cli.command()
 @click.option('--force', '-f', is_flag=True, help="Upload even if it has already been done once.")
+@click.option('--retry', '-r', is_flag=True, help="Restart automatically after a failure")
 @click.option('--batch', type=int, default=1000, show_default=True, metavar='N',
               help="The amount of records yielded per upload batch.")
 @click.option('--max-size', type=int, metavar='SIZE',
               help="The max size (in MB) of files to upload. Defaults to the size from the plugin settings.")
-def upload(batch, force, max_size):
+def upload(batch, force, max_size, retry):
     """Upload file contents for full text search."""
     agent = LiveSyncAgent.query.filter(LiveSyncAgent.backend_name == 'citadel').first()
     if agent is None:
@@ -43,7 +49,17 @@ def upload(batch, force, max_size):
         return
 
     initial = not agent.settings.get('file_upload_done')
-    total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size, initial=initial)
+    try:
+        total, errors, aborted = backend.run_export_files(batch, force, max_size=max_size, initial=initial)
+    except Exception:
+        if not retry:
+            raise
+        traceback.print_exc()
+        print('Restarting in 2 seconds\a')
+        time.sleep(2)
+        os.execl(sys.argv[0], *sys.argv)
+        return  # exec doesn't return but just in case...
+
     if not errors and not aborted:
         print(f'{total} files uploaded')
         if max_size is None:
