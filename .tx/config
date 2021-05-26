@@ -60,3 +60,9 @@ file_filter = storage_s3/indico_storage_s3/translations/<lang>/LC_MESSAGES/messa
 source_file = storage_s3/indico_storage_s3/translations/messages.pot
 source_lang = en
 type = PO
+
+[indico.citadel-messages]
+file_filter = citadel/indico_citadel/translations/<lang>/LC_MESSAGES/messages.po
+source_file = citadel/indico_citadel/translations/messages.pot
+source_lang = en
+type = PO
