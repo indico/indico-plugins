@@ -1,91 +1,87 @@
 # Translations template for PROJECT.
-# Copyright (C) 2020 ORGANIZATION
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 20:40+0200\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.1\n"
 
-#: indico_piwik/forms.py:20
+#: indico_piwik/forms.py:18
 msgid "Track global visits"
 msgstr ""
 
-#: indico_piwik/forms.py:21
+#: indico_piwik/forms.py:19
 msgid "Track events"
 msgstr ""
 
-#: indico_piwik/forms.py:22
-msgid "Track downloads"
-msgstr ""
-
-#: indico_piwik/forms.py:23
+#: indico_piwik/forms.py:20
 msgid "Cache results"
 msgstr ""
 
-#: indico_piwik/forms.py:24
+#: indico_piwik/forms.py:21
 msgid "Piwik server URL"
 msgstr ""
 
-#: indico_piwik/forms.py:25
+#: indico_piwik/forms.py:22
 msgid "Piwik API server URL"
 msgstr ""
 
-#: indico_piwik/forms.py:26
+#: indico_piwik/forms.py:23
 msgid "Should be pointing to 'index.php'"
 msgstr ""
 
-#: indico_piwik/forms.py:27
+#: indico_piwik/forms.py:24
 msgid "Piwik API token"
 msgstr ""
 
-#: indico_piwik/forms.py:28
+#: indico_piwik/forms.py:25
 msgid "Token to access the API. Do not share it!"
 msgstr ""
 
-#: indico_piwik/forms.py:29
+#: indico_piwik/forms.py:26
 msgid "Global statistics ID"
 msgstr ""
 
-#: indico_piwik/forms.py:30
+#: indico_piwik/forms.py:27
 msgid "Piwik site ID for global statistics"
 msgstr ""
 
-#: indico_piwik/forms.py:31
+#: indico_piwik/forms.py:28
 msgid "Event statistics ID"
 msgstr ""
 
-#: indico_piwik/forms.py:32
+#: indico_piwik/forms.py:29
 msgid "Piwik site ID for event statistics"
 msgstr ""
 
-#: indico_piwik/forms.py:33
+#: indico_piwik/forms.py:30
 msgid "Result cache TTL (seconds)"
 msgstr ""
 
-#: indico_piwik/forms.py:34
+#: indico_piwik/forms.py:31
 msgid "How long event reports are kept cached"
 msgstr ""
 
-#: indico_piwik/forms.py:35
+#: indico_piwik/forms.py:32
 msgid "Use Piwik server URL for all requests"
 msgstr ""
 
-#: indico_piwik/forms.py:39
+#: indico_piwik/forms.py:36
 msgid "Event statistics can't use the same Piwik site as global statistics"
 msgstr ""
 
-#: indico_piwik/plugin.py:70
+#: indico_piwik/plugin.py:66
 msgid "Statistics"
 msgstr ""
 
@@ -223,32 +219,16 @@ msgstr ""
 msgid "Visitor Systems"
 msgstr ""
 
-#: indico_piwik/templates/statistics.html:187
-msgid "Material Downloads"
-msgstr ""
-
-#: indico_piwik/templates/statistics.html:193
-msgid "Downloads for"
-msgstr ""
-
-#: indico_piwik/templates/statistics.html:197
-msgid "Total"
-msgstr ""
-
-#: indico_piwik/templates/statistics.html:201
-msgid "No material selected"
-msgstr ""
-
-#: indico_piwik/templates/statistics.html:211
+#: indico_piwik/templates/statistics.html:183
 #, python-format
 msgid "This report was generated at: %(dt)s"
 msgstr ""
 
-#: indico_piwik/templates/statistics.html:219
+#: indico_piwik/templates/statistics.html:191
 msgid "Unable to retrieve Graph Data"
 msgstr ""
 
-#: indico_piwik/templates/statistics.html:221
+#: indico_piwik/templates/statistics.html:193
 msgid ""
 "The server did not respond in a timely manner. It may be the case that "
 "the date-range is too large."
