@@ -28,7 +28,7 @@
                     <div class="toolbar right thin">
                         <div class="group">
                             <a href="{{ url_for('event_notes.view', block) }}" class="i-button">
-                                {% trans %}Minutes{% endtrans %}
+                                {{ pgettext('meeting notes', 'Minutes') }}
                             </a>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                         <div class="toolbar right thin">
                             <div class="group">
                                 <a href="{{ url_for('event_notes.view', contrib) }}" class="i-button">
-                                    {% trans %}Minutes{% endtrans %}
+                                    {{ pgettext('meeting notes', 'Minutes') }}
                                 </a>
                             </div>
                         </div>
