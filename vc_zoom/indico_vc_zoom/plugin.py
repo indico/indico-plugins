@@ -132,7 +132,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
-    default_settings = dict(VCPluginMixin.default_settings, **{
+    default_settings = VCPluginMixin.default_settings | {
         'api_key': '',
         'api_secret': '',
         'webhook_token': '',
@@ -149,7 +149,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'creation_email_footer': None,
         'send_host_url': False,
         'phone_link': '',
-    })
+    }
 
     def init(self):
         super().init()
