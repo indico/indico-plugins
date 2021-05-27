@@ -103,6 +103,7 @@ class LiveSyncCitadelUploader(Uploader):
 
     def _citadel_create(self, session, object_type, object_id, data):
         self.logger.debug('Creating %s %d on citadel', object_type.name, object_id)
+        assert data is not None
         try:
             resp = session.post(self.endpoint_url, json=data)
             resp.raise_for_status()
@@ -129,6 +130,7 @@ class LiveSyncCitadelUploader(Uploader):
 
     def _citadel_update(self, session, citadel_id, data):
         self.logger.debug('Updating record %d on citadel', citadel_id)
+        assert data is not None
         try:
             resp = session.put(url_join(self.search_app, f'api/record/{citadel_id}'), json=data)
             self.logger.debug('Updated %d on citadel', citadel_id)
@@ -160,16 +162,16 @@ class LiveSyncCitadelUploader(Uploader):
 
         if change_type & SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
-        elif change_type & SimpleChange.updated:
-            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
-            if citadel_id is None:
-                raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
-            self._citadel_update(session, citadel_id, data)
         elif change_type & SimpleChange.deleted:
             citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
             if citadel_id is None:
                 raise Exception(f'Cannot delete {object_type.name} {object_id}: No citadel ID found')
             self._citadel_delete(session, citadel_id, delete_mapping=True)
+        elif change_type & SimpleChange.updated:
+            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
+            if citadel_id is None:
+                raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
+            self._citadel_update(session, citadel_id, data)
 
     def upload_file(self, entry, session):
         self.logger.debug('Uploading attachment %d (%s) [%s]', entry.attachment.file.id,
@@ -233,7 +235,7 @@ class LiveSyncCitadelUploader(Uploader):
         dumped_records = (
             (
                 get_entry_type(rec), rec.id,
-                self.dump_record(rec) if not change_type & SimpleChange.deleted else None,
+                self.dump_record(rec) if not (change_type & SimpleChange.deleted) else None,
                 change_type
             ) for rec, change_type in records
         )
