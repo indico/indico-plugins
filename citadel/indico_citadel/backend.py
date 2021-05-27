@@ -165,7 +165,8 @@ class LiveSyncCitadelUploader(Uploader):
         elif change_type & SimpleChange.deleted:
             citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
             if citadel_id is None:
-                raise Exception(f'Cannot delete {object_type.name} {object_id}: No citadel ID found')
+                self.logger.warning('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
+                return
             self._citadel_delete(session, citadel_id, delete_mapping=True)
         elif change_type & SimpleChange.updated:
             citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
