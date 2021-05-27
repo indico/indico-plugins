@@ -178,7 +178,8 @@ def _process_cascaded_event_contents(records, additional_events=None, *, include
                                               _deleted_cond(~AttachmentFolder.is_deleted)))
             )
         )
-        changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(changed_event_ids)))
+        changed_notes.update(EventNote.query.filter(EventNote.linked_event_id.in_(changed_event_ids),
+                                                    _deleted_cond(~EventNote.is_deleted)))
 
     yield from changed_events
 
