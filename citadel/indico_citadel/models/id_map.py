@@ -13,6 +13,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 from indico.util.enum import IndicoEnum
+from indico.util.string import format_repr
 
 
 class EntryType(int, IndicoEnum):
@@ -172,6 +173,10 @@ class CitadelIdMap(db.Model):
             lazy=True
         )
     )
+
+    def __repr__(self):
+        return format_repr(self, 'id', 'entry_type', event_id=None, contrib_id=None, subcontrib_id=None,
+                           attachment_id=None, note_id=None, attachment_file_id=None, _repr=self.citadel_id)
 
     @classmethod
     def get_citadel_id(cls, obj_type, obj_id):
