@@ -30,8 +30,11 @@ class Uploader:
         """
         self_name = type(self).__name__
         simplified = process_records(records).items()
+        total = len(simplified)
+        if self.from_cli:
+            simplified = self._make_verbose(simplified, total)
         try:
-            self.logger.info(f'{self_name} uploading %d changes from %d records', len(simplified), len(records))
+            self.logger.info(f'{self_name} uploading %d changes from %d records', total, len(records))
             self.upload_records(simplified)
         except Exception:
             self.logger.exception(f'{self_name} failed')
@@ -39,7 +42,7 @@ class Uploader:
                 raise
             return
         self.processed_records(records)
-        self.logger.info(f'{self_name} finished (%d total changes from %d records)', len(simplified), len(records))
+        self.logger.info(f'{self_name} finished (%d total changes from %d records)', total, len(records))
 
     def run_initial(self, records, total):
         """Runs the initial batch upload
@@ -48,14 +51,18 @@ class Uploader:
         :param total: the total of records to be exported
         :return: True if everything was successful, False if not
         """
-        records = verbose_iterator(
-            ((rec, SimpleChange.created) for rec in records),
+        records = ((rec, SimpleChange.created) for rec in records)
+        records = self._make_verbose(records, total)
+        return self.upload_records(records, initial=True)
+
+    def _make_verbose(self, iterator, total):
+        return verbose_iterator(
+            iterator,
             total,
             lambda entry: entry[0].id,
             lambda entry: re.sub(r'\s+', ' ', strip_control_chars(getattr(entry[0], 'title', ''))),
             print_total_time=True
         )
-        return self.upload_records(records, initial=True)
 
     def upload_records(self, records, initial=False):
         """Executed to upload records.
