@@ -37,8 +37,6 @@ def _print_record(obj_type, obj_id, data, changes, *, print_blank, verbose):
 
 
 class DebugUploader(Uploader):
-    BATCH_SIZE = 5
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._is_queue_run = False

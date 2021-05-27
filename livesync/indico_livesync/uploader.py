@@ -9,7 +9,6 @@ import re
 
 from indico.core.db import db
 from indico.util.console import verbose_iterator
-from indico.util.iterables import grouper
 from indico.util.string import strip_control_chars
 
 from indico_livesync.simplify import SimpleChange, process_records
@@ -17,9 +16,6 @@ from indico_livesync.simplify import SimpleChange, process_records
 
 class Uploader:
     """Handles batch data upload to a remote service."""
-
-    #: Number of queue entries to process at a time
-    BATCH_SIZE = 100
 
     def __init__(self, backend, verbose=False, from_cli=False):
         self.backend = backend
@@ -34,13 +30,11 @@ class Uploader:
         """
         self_name = type(self).__name__
         simplified = process_records(records).items()
-        chunks = list(grouper(simplified, self.BATCH_SIZE, skip_missing=True))
         try:
-            for i, batch in enumerate(chunks, 1):
-                self.logger.info(f'{self_name} uploading chunk %d/%d', i, len(chunks))
-                self.upload_records(batch)
+            self.logger.info(f'{self_name} uploading %d changes from %d records', len(simplified), len(records))
+            self.upload_records(simplified)
         except Exception:
-            self.logger.exception(f'{self_name} could not upload batch')
+            self.logger.exception(f'{self_name} failed')
             if self.from_cli:
                 raise
             return
@@ -64,7 +58,7 @@ class Uploader:
         return self.upload_records(records, initial=True)
 
     def upload_records(self, records, initial=False):
-        """Executed for a batch of up to `BATCH_SIZE` records
+        """Executed to upload records.
 
         :param records: an iterator of records to upload (or queue entries)
         :param initial: whether the upload is part of an initial export
