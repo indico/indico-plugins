@@ -49,7 +49,6 @@ def test_dump_event(db, dummy_user, dummy_event):
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
             'persons': [{'name': 'Guinea Pig'},
                         {'affiliation': 'Indico', 'name': 'Admin Saurus'}],
-            'site': 'http://localhost',
             'title': 'dummy#0'
         },
         'category_id': 1,
@@ -60,6 +59,7 @@ def test_dump_event(db, dummy_user, dummy_event):
         'end_dt': dummy_event.end_dt.isoformat(),
         'event_id': 0,
         'start_dt': dummy_event.start_dt.isoformat(),
+        'site': 'http://localhost',
         'type': 'event',
         'type_format': 'meeting',
         'url': 'http://localhost/event/0/',
@@ -96,7 +96,6 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
             'description': 'A dummy contribution',
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
             'persons': [{'name': 'Guinea Pig'}],
-            'site': 'http://localhost',
             'title': 'Dummy Contribution',
         },
         'category_id': category_id,
@@ -107,6 +106,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
         'contribution_id': dummy_contribution.id,
         'duration': 20,
         'event_id': 0,
+        'site': 'http://localhost',
         'type': 'contribution',
         'url': f'http://localhost/event/0/contributions/{dummy_contribution.id}/',
         **extra
@@ -146,7 +146,6 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
             'description': 'A dummy subcontribution',
             'location': {'address': '', 'room_name': '', 'venue_name': ''},
             'persons': [{'name': 'Guinea Pig'}],
-            'site': 'http://localhost',
             'title': 'Dummy Subcontribution',
         },
         'category_id': category_id,
@@ -157,6 +156,7 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
         'contribution_id': dummy_contribution.id,
         'duration': 10,
         'event_id': 0,
+        'site': 'http://localhost',
         'subcontribution_id': subcontribution.id,
         'type': 'subcontribution',
         'url': f'http://localhost/event/0/contributions/{dummy_contribution.id}/subcontributions/{subcontribution.id}',
@@ -186,7 +186,6 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
         },
         '_data': {
             'filename': 'dummy_file.txt',
-            'site': 'http://localhost',
             'title': 'Dummy Attachment',
             'persons': {'name': 'Guinea Pig'},
         },
@@ -200,6 +199,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
         'event_id': 0,
         'folder_id': folder.id,
         'modified_dt': attachment.modified_dt.isoformat(),
+        'site': 'http://localhost',
         'type': 'attachment',
         'type_format': 'file',
         'url': (
@@ -245,7 +245,6 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
         },
         '_data': {
             'content': 'this is a dummy note',
-            'site': 'http://localhost',
             'title': note.object.title,
             'persons': {'name': 'Guinea Pig'}
         },
@@ -257,6 +256,7 @@ def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_t
         'modified_dt': note.current_revision.created_dt.isoformat(),
         'event_id': 0,
         'note_id': note.id,
+        'site': 'http://localhost',
         'type': 'event_note',
         'url': f'http://localhost{url}',
         **ids

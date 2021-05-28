@@ -100,20 +100,15 @@ class ACLSchema:
 
 class RecordSchema(ACLSchema):
     class Meta:
-        fields = ('_data', '_access', 'schema')
+        fields = ('_data', '_access', 'schema', 'site')
 
     schema = fields.Function(lambda _, ctx: ctx.get('schema'), data_key='$schema')
+    site = fields.Function(lambda _: config.BASE_URL)
 
     @post_dump
     def remove_none_fields(self, data, **kwargs):
         """Remove fields that are None to avoid json schema validation errors."""
         return remove_none_entries(data)
-
-    @post_dump
-    def site(self, data, **kwargs):
-        if data['_data']:
-            data['_data']['site'] = config.BASE_URL
-        return data
 
 
 class EventRecordSchema(RecordSchema, EventSchema):
