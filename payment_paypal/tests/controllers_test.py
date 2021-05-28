@@ -28,7 +28,7 @@ def test_ipn_verify_business(formdata, expected, dummy_event):
     rh = RHPaypalIPN()
     rh.registration = MagicMock()
     rh.registration.registration_form.event = dummy_event
-    PaypalPaymentPlugin.event_settings.set(dummy_event, 'business', 'test')
+    PaypalPaymentPlugin.event_settings.set(dummy_event, 'business', 'TeST')
     request.form = formdata
     with PaypalPaymentPlugin.instance.plugin_context():
         assert rh._verify_business() == expected
@@ -88,6 +88,7 @@ def test_ipn_process(mocker, fail):
     mocker.patch('indico_payment_paypal.controllers.notify_amount_inconsistency')
     post.return_value.text = 'INVALID' if fail == 'verify' else 'VERIFIED'
     rh = RHPaypalIPN()
+    rh._verify_business = MagicMock()
     rh._is_transaction_duplicated = lambda: fail == 'dup_txn'
     rh.event = MagicMock(id=1)
     rh.registration = MagicMock()
