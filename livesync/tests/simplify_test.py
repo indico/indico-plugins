@@ -92,6 +92,12 @@ def test_process_records_simplify(changes, db, create_event, dummy_agent):
         # created+deleted items are discarded
         if expected[i] & CREATED_DELETED == CREATED_DELETED:
             expected[i] = 0
+        elif expected[i] & SimpleChange.deleted:
+            expected[i] = SimpleChange.deleted
+        elif expected[i] & SimpleChange.created:
+            expected[i] = SimpleChange.created
+        elif expected[i] & SimpleChange.updated:
+            expected[i] = SimpleChange.updated
 
     db.session.flush()
 

@@ -8,6 +8,7 @@
 from operator import attrgetter
 from unittest.mock import MagicMock
 
+from indico_livesync.base import LiveSyncBackendBase
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 from indico_livesync.simplify import SimpleChange, _process_cascaded_event_contents
 from indico_livesync.uploader import Uploader
@@ -23,6 +24,7 @@ class RecordingUploader(Uploader):
 
     def upload_records(self, records, initial=False):
         self._uploaded = list(records)
+        return True
 
     @property
     def all_uploaded(self):
@@ -34,6 +36,12 @@ class FailingUploader(RecordingUploader):
 
     def upload_records(self, records, initial=False):
         raise Exception('All your data are belong to us!')
+
+
+class TestBackend(LiveSyncBackendBase):
+    def __init__(self):
+        super().__init__(MagicMock())
+        self.plugin = MagicMock()
 
 
 def test_run_initial(mocker):
@@ -54,7 +62,7 @@ def _sorted_process_cascaded_event_contents(records, additional_events=None, *, 
 
 def test_run(mocker, monkeypatch, db, create_event, dummy_agent):
     """Test uploading queued data"""
-    uploader = RecordingUploader(MagicMock())
+    uploader = RecordingUploader(TestBackend())
 
     events = tuple(create_event(id_=evt_id) for evt_id in range(4))
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt.id,
@@ -80,7 +88,7 @@ def test_run(mocker, monkeypatch, db, create_event, dummy_agent):
 
 def test_run_failing(mocker, monkeypatch, db, create_event, dummy_agent):
     """Test a failing queue run"""
-    uploader = FailingUploader(MagicMock())
+    uploader = FailingUploader(TestBackend())
 
     events = tuple(create_event(id_=evt_id) for evt_id in range(10))
     records = tuple(LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event_id=evt.id,

@@ -46,11 +46,14 @@ def _get_excluded_category_filter(event_model=Event):
     return True
 
 
-def query_events():
+def query_events(ids=None):
+    if ids is None:
+        export_filter = ~Event.is_deleted & _get_excluded_category_filter()
+    else:
+        export_filter = Event.id.in_(ids)
     return (
         Event.query
-        .filter_by(is_deleted=False)
-        .filter(_get_excluded_category_filter())
+        .filter(export_filter)
         .options(
             apply_acl_entry_strategy(selectinload(Event.acl_entries), EventPrincipal),
             selectinload(Event.person_links).joinedload('person').joinedload('user').load_only('is_system'),
@@ -61,7 +64,7 @@ def query_events():
     )
 
 
-def query_contributions():
+def query_contributions(ids=None):
     event_strategy = contains_eager(Contribution.event)
     event_strategy.joinedload(Event.own_venue)
     event_strategy.joinedload(Event.own_room).options(raiseload('*'), joinedload('location'))
@@ -79,10 +82,15 @@ def query_contributions():
     session_block_session_strategy.joinedload(Session.own_venue)
     session_block_session_strategy.joinedload(Session.own_room).options(raiseload('*'), joinedload('location'))
 
+    if ids is None:
+        export_filter = ~Contribution.is_deleted & ~Event.is_deleted & _get_excluded_category_filter()
+    else:
+        export_filter = Contribution.id.in_(ids)
+
     return (
         Contribution.query
         .join(Event)
-        .filter(~Contribution.is_deleted, ~Event.is_deleted, _get_excluded_category_filter())
+        .filter(export_filter)
         .options(
             selectinload(Contribution.acl_entries),
             selectinload(Contribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
@@ -98,7 +106,7 @@ def query_contributions():
     )
 
 
-def query_subcontributions():
+def query_subcontributions(ids=None):
     contrib_event = db.aliased(Event)
     contrib_session = db.aliased(Session)
     contrib_block = db.aliased(SessionBlock)
@@ -123,14 +131,21 @@ def query_subcontributions():
     session_block_strategy.joinedload(contrib_block.own_venue)
     session_block_strategy.joinedload(contrib_block.own_room).options(raiseload('*'), joinedload('location'))
 
+    if ids is None:
+        export_filter = db.and_(~SubContribution.is_deleted,
+                                ~Contribution.is_deleted,
+                                ~contrib_event.is_deleted,
+                                _get_excluded_category_filter(contrib_event))
+    else:
+        export_filter = SubContribution.id.in_(ids)
+
     return (
         SubContribution.query
         .join(Contribution)
         .join(Contribution.event.of_type(contrib_event))
         .outerjoin(Contribution.session.of_type(contrib_session))
         .outerjoin(Contribution.session_block.of_type(contrib_block))
-        .filter(~SubContribution.is_deleted, ~Contribution.is_deleted, ~contrib_event.is_deleted,
-                _get_excluded_category_filter(contrib_event))
+        .filter(export_filter)
         .options(
             selectinload(SubContribution.person_links).joinedload('person').joinedload('user').load_only('is_system'),
             contrib_strategy,
@@ -142,7 +157,7 @@ def query_subcontributions():
     )
 
 
-def query_attachments():
+def query_attachments(ids=None):
     contrib_event = db.aliased(Event)
     contrib_session = db.aliased(Session)
     subcontrib_contrib = db.aliased(Contribution)
@@ -183,6 +198,35 @@ def query_attachments():
     session_strategy.contains_eager(Session.event.of_type(session_event)).selectinload(session_event.acl_entries)
     apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
 
+    if ids is None:
+        export_filter = db.and_(
+            ~Attachment.is_deleted,
+            ~AttachmentFolder.is_deleted,
+            db.or_(
+                AttachmentFolder.link_type != LinkType.event,
+                ~Event.is_deleted & _get_excluded_category_filter(),
+            ),
+            db.or_(
+                AttachmentFolder.link_type != LinkType.contribution,
+                ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
+            ),
+            db.or_(
+                AttachmentFolder.link_type != LinkType.subcontribution,
+                db.and_(
+                    ~SubContribution.is_deleted,
+                    ~subcontrib_contrib.is_deleted,
+                    ~subcontrib_event.is_deleted,
+                    _get_excluded_category_filter(subcontrib_event)
+                )
+            ),
+            db.or_(
+                AttachmentFolder.link_type != LinkType.session,
+                ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
+            )
+        )
+    else:
+        export_filter = Attachment.id.in_(ids)
+
     return (
         Attachment.query
         .join(Attachment.folder)
@@ -197,32 +241,13 @@ def query_attachments():
         .outerjoin(subcontrib_contrib.session.of_type(subcontrib_session))
         .outerjoin(AttachmentFolder.session)
         .outerjoin(Session.event.of_type(session_event))
-        .filter(~Attachment.is_deleted, ~AttachmentFolder.is_deleted)
+        .filter(export_filter)
         .filter(AttachmentFolder.link_type != LinkType.category)
-        .filter(db.or_(
-            AttachmentFolder.link_type != LinkType.event,
-            ~Event.is_deleted & _get_excluded_category_filter(),
-        ))
-        .filter(db.or_(
-            AttachmentFolder.link_type != LinkType.contribution,
-            ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
-        ))
-        .filter(db.or_(
-            AttachmentFolder.link_type != LinkType.subcontribution,
-            db.and_(~SubContribution.is_deleted,
-                    ~subcontrib_contrib.is_deleted,
-                    ~subcontrib_event.is_deleted,
-                    _get_excluded_category_filter(subcontrib_event))
-        ))
-        .filter(db.or_(
-            AttachmentFolder.link_type != LinkType.session,
-            ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
-        ))
         .order_by(Attachment.id)
     )
 
 
-def query_notes():
+def query_notes(ids=None):
     contrib_event = db.aliased(Event)
     contrib_session = db.aliased(Session)
     subcontrib_contrib = db.aliased(Contribution)
@@ -260,6 +285,34 @@ def query_notes():
     session_strategy.contains_eager(Session.event.of_type(session_event)).selectinload(session_event.acl_entries)
     apply_acl_entry_strategy(session_strategy.selectinload(Session.acl_entries), SessionPrincipal)
 
+    if ids is None:
+        export_filter = db.and_(
+            ~EventNote.is_deleted,
+            db.or_(
+                EventNote.link_type != LinkType.event,
+                ~Event.is_deleted & _get_excluded_category_filter()
+            ),
+            db.or_(
+                EventNote.link_type != LinkType.contribution,
+                ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
+            ),
+            db.or_(
+                EventNote.link_type != LinkType.subcontribution,
+                db.and_(
+                    ~SubContribution.is_deleted,
+                    ~subcontrib_contrib.is_deleted,
+                    ~subcontrib_event.is_deleted,
+                    _get_excluded_category_filter(subcontrib_event)
+                )
+            ),
+            db.or_(
+                EventNote.link_type != LinkType.session,
+                ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
+            )
+        )
+    else:
+        export_filter = EventNote.id.in_(ids)
+
     return (
         EventNote.query
         .outerjoin(EventNote.linked_event)
@@ -272,26 +325,7 @@ def query_notes():
         .outerjoin(subcontrib_contrib.session.of_type(subcontrib_session))
         .outerjoin(EventNote.session)
         .outerjoin(Session.event.of_type(session_event))
-        .filter(~EventNote.is_deleted)
-        .filter(db.or_(
-            EventNote.link_type != LinkType.event,
-            ~Event.is_deleted & _get_excluded_category_filter()
-        ))
-        .filter(db.or_(
-            EventNote.link_type != LinkType.contribution,
-            ~Contribution.is_deleted & ~contrib_event.is_deleted & _get_excluded_category_filter(contrib_event)
-        ))
-        .filter(db.or_(
-            EventNote.link_type != LinkType.subcontribution,
-            db.and_(~SubContribution.is_deleted,
-                    ~subcontrib_contrib.is_deleted,
-                    ~subcontrib_event.is_deleted,
-                    _get_excluded_category_filter(subcontrib_event))
-        ))
-        .filter(db.or_(
-            EventNote.link_type != LinkType.session,
-            ~Session.is_deleted & ~session_event.is_deleted & _get_excluded_category_filter(session_event)
-        ))
+        .filter(export_filter)
         .options(
             note_strategy,
             joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user).joinedload('_affiliation'),

@@ -123,6 +123,7 @@ class LiveSyncBackendBase:
             raise NotImplementedError
 
         uploader = self.uploader(self, verbose=verbose, from_cli=from_cli)
+        self._precache_categories()
         self.process_queue(uploader)
         self.update_last_run()
 
@@ -144,6 +145,27 @@ class LiveSyncBackendBase:
         }[model_cls]
         return fn()
 
+    def get_data_query(self, model_cls, ids):
+        """Get the export query for a given model and set of ids.
+
+        Supported models are `Event`, `Contribution`, `SubContribution`,
+        `Attachment` and `EventNote`.
+
+        This is very similar to `get_initial_query` except that it will only
+        export the specified records.
+
+        :param model_cls: The model class to query
+        :param ids: A collection of ids to query
+        """
+        fn = {
+            Event: query_events,
+            Contribution: query_contributions,
+            SubContribution: query_subcontributions,
+            Attachment: query_attachments,
+            EventNote: query_notes,
+        }[model_cls]
+        return fn(ids=ids)
+
     def run_initial_export(self, batch_size, force=False, verbose=False):
         """Runs the initial export.
 
@@ -154,12 +176,7 @@ class LiveSyncBackendBase:
             raise NotImplementedError
 
         uploader = self.uploader(self, verbose=verbose, from_cli=True)
-
-        Category.allow_relationship_preloading = True
-        Category.preload_relationships(Category.query, 'acl_entries',
-                                       strategy=lambda rel: apply_acl_entry_strategy(subqueryload(rel),
-                                                                                     CategoryPrincipal))
-        _category_cache = Category.query.all()  # noqa: F841
+        self._precache_categories()
 
         events = self.get_initial_query(Event, force)
         contributions = self.get_initial_query(Contribution, force)
@@ -212,3 +229,10 @@ class LiveSyncBackendBase:
         """
         self.agent.initial_data_exported = False
         self.agent.queue.delete()
+
+    def _precache_categories(self):
+        Category.allow_relationship_preloading = True
+        Category.preload_relationships(Category.query, 'acl_entries',
+                                       strategy=lambda rel: apply_acl_entry_strategy(subqueryload(rel),
+                                                                                     CategoryPrincipal))
+        self._category_cache = Category.query.all()

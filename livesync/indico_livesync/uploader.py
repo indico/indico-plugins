@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 import re
+from collections import defaultdict
 
 from indico.core.db import db
 from indico.util.console import verbose_iterator
@@ -29,13 +30,15 @@ class Uploader:
         :param records: an iterable containing queue entries
         """
         self_name = type(self).__name__
-        simplified = process_records(records).items()
+        simplified = self.query_data(process_records(records)).items()
         total = len(simplified)
         if self.from_cli:
             simplified = self._make_verbose(simplified, total)
         try:
             self.logger.info(f'{self_name} uploading %d changes from %d records', total, len(records))
-            self.upload_records(simplified)
+            if not self.upload_records(simplified):
+                self.logger.warning('uploader indicated a failure')
+                return
         except Exception:
             self.logger.exception(f'{self_name} failed')
             if self.from_cli:
@@ -63,6 +66,26 @@ class Uploader:
             lambda entry: re.sub(r'\s+', ' ', strip_control_chars(getattr(entry[0], 'title', ''))),
             print_total_time=True
         )
+
+    def query_data(self, records):
+        """Query the data needed to dump records efficiently.
+
+        This function queries the verbose data for the given records.
+
+        :param records: an dict mapping objects to changes
+        :return: a dict of the same structure
+        """
+        by_model = defaultdict(set)
+        change_by_obj = {}
+        for obj, change in records.items():
+            by_model[type(obj)].add(obj.id)
+            change_by_obj[type(obj), obj.id] = change
+        rv = {}
+        for model, ids in by_model.items():
+            for obj in self.backend.get_data_query(model, ids).yield_per(5000):
+                rv[obj] = change_by_obj[model, obj.id]
+        assert len(records) == len(rv)
+        return rv
 
     def upload_records(self, records, initial=False):
         """Executed to upload records.

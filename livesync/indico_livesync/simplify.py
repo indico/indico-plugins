@@ -33,6 +33,17 @@ class SimpleChange(int, IndicoEnum):
 CREATED_DELETED = SimpleChange.created | SimpleChange.deleted
 
 
+def _get_final_change(change_flags):
+    if change_flags & SimpleChange.deleted:
+        assert not (change_flags & SimpleChange.created)  # filtered out earlier
+        return SimpleChange.deleted
+    elif change_flags & SimpleChange.created:
+        return SimpleChange.created
+    elif change_flags & SimpleChange.updated:
+        return SimpleChange.updated
+    raise Exception(f'Invalid change flags: {change_flags}')
+
+
 def process_records(records):
     """Converts queue entries into object changes.
 
@@ -87,7 +98,7 @@ def process_records(records):
         # discard any change where the object was both created and deleted
         del changes[obj]
 
-    return changes
+    return {obj: _get_final_change(flags) for obj, flags in changes.items()}
 
 
 def _process_cascaded_category_contents(records):

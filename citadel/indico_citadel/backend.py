@@ -20,7 +20,7 @@ from requests.adapters import HTTPAdapter
 from requests.exceptions import RequestException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.attributes import flag_modified
 from urllib3 import Retry
 from werkzeug.urls import url_join
@@ -48,9 +48,9 @@ def _format_change_str(change):
 
 
 def _print_record(record):
-    obj_type, obj_id, data, changes = record
+    obj_type, obj_id, citadel_id, data, changes = record
     print()  # verbose_iterator during initial exports doesn't end its line
-    print(f'{_format_change_str(changes)}: {obj_type.name} {obj_id}')
+    print(f'{_format_change_str(changes)}: {obj_type.name} {obj_id} [{citadel_id}]')
     if data is not None:
         print(highlight(pformat(data), lexer, formatter))
     return record
@@ -118,12 +118,14 @@ class LiveSyncCitadelUploader(Uploader):
             CitadelIdMap.create(object_type, object_id, new_citadel_id)
             db.session.commit()
         except IntegrityError:
+            # XXX this should no longer happen under any circumstances!
             # if we already have a mapping entry, delete the newly created record and
             # update the existing one in case something changed in the meantime
             self.logger.error(f'{object_type.name.title()} %d already in citadel; deleting+updating', object_id)
             db.session.rollback()
             self._citadel_delete(session, new_citadel_id, delete_mapping=False)
             existing_citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
+            db.session.close()
             assert existing_citadel_id is not None
             self._citadel_update(session, existing_citadel_id, data)
         resp.close()
@@ -147,7 +149,11 @@ class LiveSyncCitadelUploader(Uploader):
         try:
             resp = session.delete(url_join(self.search_app, f'api/record/{citadel_id}'))
             self.logger.debug('Deleted %d from citadel', citadel_id)
-            resp.raise_for_status()
+            if resp.status_code == 410:
+                # gone - record was probably already deleted
+                self.logger.warning('Record %d was already deleted on citadel', citadel_id)
+            else:
+                resp.raise_for_status()
             resp.close()
         except RequestException as exc:
             if resp := exc.response:
@@ -158,21 +164,25 @@ class LiveSyncCitadelUploader(Uploader):
             db.session.commit()
 
     def upload_record(self, entry, session):
-        object_type, object_id, data, change_type = entry
+        object_type, object_id, citadel_id, data, change_type = entry
 
-        if change_type & SimpleChange.created:
-            self._citadel_create(session, object_type, object_id, data)
-        elif change_type & SimpleChange.deleted:
-            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
+        if change_type == SimpleChange.deleted:
             if citadel_id is None:
                 self.logger.warning('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
                 return
             self._citadel_delete(session, citadel_id, delete_mapping=True)
-        elif change_type & SimpleChange.updated:
-            citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
+        elif change_type == SimpleChange.updated or (change_type == SimpleChange.created and citadel_id is not None):
             if citadel_id is None:
                 raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
+            if change_type == SimpleChange.created:
+                self.logger.warning('Citadel ID exists for %s %s (%s); updating instead',
+                                    object_type.name, object_id, citadel_id)
             self._citadel_update(session, citadel_id, data)
+        elif change_type == SimpleChange.created:
+            self._citadel_create(session, object_type, object_id, data)
+        else:
+            # we shouldn't get any combined change type bitmasks here
+            raise Exception(f'invalid change type: {change_type}')
 
     def upload_file(self, entry, session):
         self.logger.debug('Uploading attachment %d (%s) [%s]', entry.attachment.file.id,
@@ -202,9 +212,16 @@ class LiveSyncCitadelUploader(Uploader):
             resp.close()
             return False
 
-    def run_initial(self, records, total):
+    def _precache_categories(self):
         cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
         self.categories = dict(db.session.execute(select([cte.c.id, cte.c.path])).fetchall())
+
+    def run(self, records):
+        self._precache_categories()
+        return super().run(records)
+
+    def run_initial(self, records, total):
+        self._precache_categories()
         return super().run_initial(records, total)
 
     def _get_retry_config(self, initial):
@@ -235,7 +252,9 @@ class LiveSyncCitadelUploader(Uploader):
         session.headers = self.headers
         dumped_records = (
             (
-                get_entry_type(rec), rec.id,
+                get_entry_type(rec),
+                rec.id,
+                rec.citadel_id_mapping.citadel_id if rec.citadel_id_mapping else None,
                 self.dump_record(rec) if not (change_type & SimpleChange.deleted) else None,
                 change_type
             ) for rec, change_type in records
@@ -293,7 +312,11 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         query = super().get_initial_query(model_cls, force)
         if not force:
             query = query.filter(~model_cls.citadel_id_mapping.has())
-        return query
+        return query.options(joinedload(model_cls.citadel_id_mapping))
+
+    def get_data_query(self, model_cls, ids):
+        query = super().get_data_query(model_cls, ids)
+        return query.options(joinedload(model_cls.citadel_id_mapping))
 
     def process_queue(self, uploader):
         super().process_queue(uploader)
