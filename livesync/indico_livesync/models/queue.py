@@ -176,7 +176,7 @@ class LiveSyncQueueEntry(db.Model):
         backref=db.backref(
             'livesync_queue_entries',
             cascade='all, delete-orphan',
-            lazy=True
+            lazy='dynamic'
         )
     )
 
@@ -186,7 +186,7 @@ class LiveSyncQueueEntry(db.Model):
         backref=db.backref(
             'livesync_queue_entries',
             cascade='all, delete-orphan',
-            lazy=True
+            lazy='dynamic'
         )
     )
 
