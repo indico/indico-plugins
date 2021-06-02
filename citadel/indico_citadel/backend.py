@@ -224,22 +224,14 @@ class LiveSyncCitadelUploader(Uploader):
         self._precache_categories()
         return super().run_initial(records, total)
 
-    def _get_retry_config(self, initial):
-        if initial:
-            retry = Retry(
-                total=20,
-                backoff_factor=0.22,
-                status_forcelist=[500, 502, 503, 504],
-                allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
-            )
-            retry.BACKOFF_MAX = 10
-        else:
-            retry = Retry(
-                total=2,
-                backoff_factor=3,
-                status_forcelist=[502, 503, 504],
-                allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
-            )
+    def _get_retry_config(self):
+        retry = Retry(
+            total=20,
+            backoff_factor=0.22,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
+        )
+        retry.BACKOFF_MAX = 10
         return retry
 
     def upload_records(self, records, initial=False):
@@ -247,7 +239,7 @@ class LiveSyncCitadelUploader(Uploader):
         num_threads = self.backend.plugin.settings.get(setting)
         self.logger.debug('Using %d parallel threads', num_threads)
         session = requests.Session()
-        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(initial),
+        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(),
                                                    pool_maxsize=num_threads))
         session.headers = self.headers
         dumped_records = (
@@ -272,7 +264,7 @@ class LiveSyncCitadelUploader(Uploader):
         num_threads = self.backend.plugin.settings.get(setting)
         self.logger.debug('Using %d parallel threads', num_threads)
         session = requests.Session()
-        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(initial),
+        session.mount(self.search_app, HTTPAdapter(max_retries=self._get_retry_config(),
                                                    pool_maxsize=num_threads))
         session.headers = self.headers
         uploader = parallelize(self.upload_file, entries=files, batch_size=num_threads)
