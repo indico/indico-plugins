@@ -29,7 +29,7 @@ def queue_entry_dummy_object(monkeypatch):
     (ChangeType.protection_changed, False),
     (ChangeType.moved,              False),
 ))
-@pytest.mark.usefixtures('queue_entry_dummy_object')
+@pytest.mark.usefixtures('queue_entry_dummy_object', 'db')
 def test_process_records_category_ignored(mocker, change, invalid):
     """Test if categories are only kept for certain changes."""
     cascade = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
@@ -51,7 +51,7 @@ def test_process_records_category_ignored(mocker, change, invalid):
     (ChangeType.protection_changed, True),
     (ChangeType.moved,              True),
 ))
-@pytest.mark.usefixtures('queue_entry_dummy_object')
+@pytest.mark.usefixtures('queue_entry_dummy_object', 'db')
 def test_process_records_cascade(mocker, change, cascade):
     """Test if certain changes cascade to child elements"""
     cascade_mock = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
