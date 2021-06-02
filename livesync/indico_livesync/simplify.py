@@ -52,6 +52,7 @@ def process_records(records):
     """
     changes = defaultdict(int)
     cascaded_create_records = set()
+    cascaded_undelete_records = set()
     cascaded_update_records = set()
     cascaded_delete_records = set()
     cascaded_location_changes = set()
@@ -64,6 +65,9 @@ def process_records(records):
         if record.change == ChangeType.created:
             assert record.type != EntryType.category
             cascaded_create_records.add(record)
+        elif record.change == ChangeType.undeleted:
+            assert record.type != EntryType.category
+            cascaded_undelete_records.add(record)
         elif record.change == ChangeType.deleted:
             assert record.type != EntryType.category
             cascaded_delete_records.add(record)
@@ -92,6 +96,14 @@ def process_records(records):
 
     for obj in _process_cascaded_locations(cascaded_location_changes):
         changes[obj] |= SimpleChange.updated
+
+    for obj in _process_cascaded_event_contents(cascaded_undelete_records, skip_all_deleted=True):
+        # This may result in a create for an object which is already created - in the (somewhat rare)
+        # case of a deletion being followed by a restore in the same set of records.
+        # However, since we expect backends to either convert those operations to an update or skip
+        # them altogether this shouldn't be a problem
+        changes[obj] |= SimpleChange.created
+        changes[obj] &= ~SimpleChange.deleted
 
     created_and_deleted = {obj for obj, flags in changes.items() if (flags & CREATED_DELETED) == CREATED_DELETED}
     for obj in created_and_deleted:
@@ -142,7 +154,7 @@ def _process_cascaded_category_contents(records):
     yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
 
-def _process_cascaded_event_contents(records, additional_events=None, *, include_deleted=False):
+def _process_cascaded_event_contents(records, additional_events=None, *, include_deleted=False, skip_all_deleted=False):
     """
     Flatten a series of records into its most basic elements (subcontribution level).
 
@@ -152,6 +164,7 @@ def _process_cascaded_event_contents(records, additional_events=None, *, include
     :param additional_events: events whose content will be included in addition to those
                               found in records
     :param include_deleted: whether to include soft-deleted objects as well
+    :param skip_all_deleted: whether to skip soft-deleted objects even if explicitly queued
     """
     changed_events = additional_events or set()
     changed_sessions = set()
@@ -163,12 +176,27 @@ def _process_cascaded_event_contents(records, additional_events=None, *, include
     def _deleted_cond(cond):
         return True if include_deleted else cond
 
-    note_records = {rec.note_id for rec in records if rec.type == EntryType.note}
-    attachment_records = {rec.attachment_id for rec in records if rec.type == EntryType.attachment}
-    session_records = {rec.session_id for rec in records if rec.type == EntryType.session}
-    contribution_records = {rec.contrib_id for rec in records if rec.type == EntryType.contribution}
-    subcontribution_records = {rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution}
-    event_records = {rec.event_id for rec in records if rec.type == EntryType.event}
+    def _check_deleted(rec):
+        return not skip_all_deleted or not rec.object.is_deleted
+
+    note_records = {
+        rec.note_id for rec in records if rec.type == EntryType.note and _check_deleted(rec)
+    }
+    attachment_records = {
+        rec.attachment_id for rec in records if rec.type == EntryType.attachment and _check_deleted(rec)
+    }
+    session_records = {
+        rec.session_id for rec in records if rec.type == EntryType.session and _check_deleted(rec)
+    }
+    contribution_records = {
+        rec.contrib_id for rec in records if rec.type == EntryType.contribution and _check_deleted(rec)
+    }
+    subcontribution_records = {
+        rec.subcontrib_id for rec in records if rec.type == EntryType.subcontribution and _check_deleted(rec)
+    }
+    event_records = {
+        rec.event_id for rec in records if rec.type == EntryType.event and _check_deleted(rec)
+    }
 
     if attachment_records:
         changed_attachments.update(Attachment.query.filter(Attachment.id.in_(attachment_records)))

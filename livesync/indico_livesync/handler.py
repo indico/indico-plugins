@@ -35,6 +35,7 @@ def connect_signals(plugin):
     plugin.connect(signals.event.moved, _moved)
     # created
     plugin.connect(signals.event.created, _created)
+    plugin.connect(signals.event.restored, _restored)
     plugin.connect(signals.event.contribution_created, _created)
     plugin.connect(signals.event.subcontribution_created, _created)
     # deleted
@@ -69,6 +70,7 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Contribution)
     # notes
     plugin.connect(signals.event.notes.note_added, _created)
+    plugin.connect(signals.event.notes.note_restored, _restored)
     plugin.connect(signals.event.notes.note_deleted, _deleted)
     plugin.connect(signals.event.notes.note_modified, _updated)
     # attachments
@@ -106,6 +108,10 @@ def _created(obj, **kwargs):
     if parent:
         _register_change(parent, ChangeType.data_changed)
     _register_change(obj, ChangeType.created)
+
+
+def _restored(obj, **kwargs):
+    _register_change(obj, ChangeType.undeleted)
 
 
 def _deleted(obj, **kwargs):

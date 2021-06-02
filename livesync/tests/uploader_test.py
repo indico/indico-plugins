@@ -56,7 +56,8 @@ def test_run_initial(mocker):
     assert not uploader.processed_records.called
 
 
-def _sorted_process_cascaded_event_contents(records, additional_events=None, *, include_deleted=False):
+def _sorted_process_cascaded_event_contents(records, additional_events=None, *, include_deleted=False,
+                                            skip_all_deleted=False):
     return sorted(_process_cascaded_event_contents(records, additional_events), key=attrgetter('id'))
 
 

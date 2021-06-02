@@ -139,3 +139,56 @@ def test_process_records_simplify_created_deleted_child(db, create_event, create
         event: SimpleChange.created,
         contrib1: SimpleChange.created,
     }
+
+
+def test_process_records_simplify_created_deleted(db, create_event, dummy_agent):
+    db.session.add(dummy_agent)
+    event = create_event()
+
+    queue = [
+        LiveSyncQueueEntry(change=ChangeType.created, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.data_changed, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.deleted, agent=dummy_agent, type=EntryType.event, event=event),
+    ]
+
+    db.session.flush()
+    result = process_records(queue)
+    # creation + deletion should cancel each other out
+    assert result == {}
+
+
+def test_process_records_simplify_created_deleted_undeleted(db, create_event, dummy_agent):
+    db.session.add(dummy_agent)
+    event = create_event()
+
+    queue = [
+        LiveSyncQueueEntry(change=ChangeType.created, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.data_changed, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.deleted, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.undeleted, agent=dummy_agent, type=EntryType.event, event=event),
+    ]
+
+    db.session.flush()
+    result = process_records(queue)
+    # a restore always results in a creation event, even if the other changes cancelled each other
+    assert result == {event: SimpleChange.created}
+
+
+def test_process_records_simplify_deleted_undeleted(db, create_event, dummy_agent):
+    db.session.add(dummy_agent)
+    event = create_event()
+
+    queue = [
+        LiveSyncQueueEntry(change=ChangeType.deleted, agent=dummy_agent, type=EntryType.event, event=event),
+        LiveSyncQueueEntry(change=ChangeType.undeleted, agent=dummy_agent, type=EntryType.event, event=event),
+    ]
+
+    db.session.flush()
+    result = process_records(queue)
+    # this is not ideal (an empty dict would be better here, as being deleted first and THEN being restored),
+    # could cancel each other, but there is no good way to do this without losing the more important
+    # functionality from the test above unless we take the order of changes into account - and with the
+    # cascading logic this is not really possible without cascading each queue entry separately, but doing
+    # so would likely result in worse performance.
+    # see the comment in `process_records` for details
+    assert result == {event: SimpleChange.created}
