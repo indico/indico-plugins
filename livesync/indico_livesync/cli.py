@@ -121,7 +121,6 @@ def run(agent_id, force, verbose):
     from indico_livesync.plugin import LiveSyncPlugin
     if LiveSyncPlugin.settings.get('disable_queue_runs'):
         print(cformat('%{yellow!}Queue runs are disabled%{reset}'))
-        return
 
     if agent_id is None:
         agent_list = LiveSyncAgent.query.all()
