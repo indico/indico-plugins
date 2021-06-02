@@ -24,7 +24,7 @@ pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
 
 @pytest.mark.parametrize('scheduled', (False, True))
 def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, create_entry, scheduled):
-    from .export_schemas import ContributionSchema
+    from indico_livesync.export_schemas import ContributionSchema
 
     person = EventPerson.create_from_user(dummy_user, dummy_event)
     dummy_contribution.person_links.append(ContributionPersonLink(person=person))
@@ -62,7 +62,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
 
 @pytest.mark.parametrize('scheduled', (False, True))
 def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, create_entry, scheduled):
-    from .export_schemas import SubContributionSchema
+    from indico_livesync.export_schemas import SubContributionSchema
 
     extra = {'start_dt': None, 'end_dt': None}
     if scheduled:
@@ -103,7 +103,7 @@ def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, c
 
 
 def test_dump_attachment(db, dummy_user, dummy_contribution):
-    from .export_schemas import AttachmentSchema
+    from indico_livesync.export_schemas import AttachmentSchema
 
     folder = AttachmentFolder(title='Dummy Folder', description='a dummy folder')
     file = AttachmentFile(user=dummy_user, filename='dummy_file.txt', content_type='text/plain')
@@ -141,7 +141,7 @@ def test_dump_attachment(db, dummy_user, dummy_contribution):
 
 @pytest.mark.parametrize('link_type', ('event', 'contrib', 'subcontrib'))
 def test_dump_event_note(db, dummy_user, dummy_event, dummy_contribution, link_type):
-    from .export_schemas import EventNoteSchema
+    from indico_livesync.export_schemas import EventNoteSchema
 
     if link_type == 'event':
         ids = {'contribution_id': None, 'subcontribution_id': None}

@@ -17,6 +17,9 @@ class DummyBackend(LiveSyncBackendBase):
     A dummy agent for testing
     """
 
+    def _precache_categories(self):
+        pass
+
 
 class NonDescriptiveAgent(LiveSyncBackendBase):
     """Nondescriptive agent"""
