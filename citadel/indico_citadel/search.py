@@ -41,7 +41,7 @@ class CitadelProvider(IndicoSearchProvider):
         return bool(CitadelPlugin.settings.get('search_backend_url') and
                     CitadelPlugin.settings.get('search_backend_token'))
 
-    def search(self, query, user=None, page=1, object_types=(), **params):
+    def search(self, query, user=None, page=1, object_types=(), allow_admin=False, **params):
         # https://cern-search.docs.cern.ch/usage/operations/#query-documents
         # this token is used by the backend to authenticate and also to filter
         # the objects that we can actually read
@@ -64,6 +64,8 @@ class CitadelProvider(IndicoSearchProvider):
         }
         # Filter by the objects that can be viewed by users/groups in the `access` argument
         if access := get_user_access(user):
+            if allow_admin:
+                access.append('IndicoAdmin')
             access_string = ','.join(access)
             if len(access_string) > 1024:
                 access_string_gz = base64.b64encode(zlib.compress(access_string.encode(), level=9))
