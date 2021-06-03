@@ -22,6 +22,7 @@ from indico.modules.events.sessions import Session
 from indico.util.enum import IndicoEnum
 
 from indico_livesync.models.queue import ChangeType, EntryType
+from indico_livesync.util import get_excluded_categories
 
 
 class SimpleChange(int, IndicoEnum):
@@ -122,6 +123,9 @@ def _process_cascaded_category_contents(records):
 
     :param records: queue records to process
     """
+    excluded_categories = get_excluded_categories()
+    excluded_categories_filter = Event.category_id.notin_(excluded_categories) if excluded_categories else True
+
     category_prot_records = {rec.category_id for rec in records if rec.type == EntryType.category
                              and rec.change == ChangeType.protection_changed}
     category_move_records = {rec.category_id for rec in records if rec.type == EntryType.category
@@ -137,19 +141,21 @@ def _process_cascaded_category_contents(records):
             cte = categ.get_protection_parent_cte()
             # Update only children that inherit
             inheriting_categ_children = (Event.query
-                                         .filter(~Event.is_deleted)
+                                         .filter(~Event.is_deleted, excluded_categories_filter)
                                          .join(cte, db.and_((Event.category_id == cte.c.id),
                                                             (cte.c.protection_parent == categ.id))))
             inheriting_direct_children = Event.query.filter(Event.category_id == categ.id,
                                                             Event.is_inheriting,
-                                                            ~Event.is_deleted)
+                                                            ~Event.is_deleted,
+                                                            excluded_categories_filter)
 
             changed_events.update(itertools.chain(inheriting_direct_children, inheriting_categ_children))
 
     # Add move operations and explicitly-passed event records
     if category_move_records:
         changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_move_records),
-                                                 ~Event.is_deleted))
+                                                 ~Event.is_deleted,
+                                                 excluded_categories_filter))
 
     yield from _process_cascaded_event_contents(records, additional_events=changed_events)
 
