@@ -22,7 +22,7 @@ from indico.util.decorators import classproperty
 from indico_livesync.forms import AgentForm
 from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
                                      query_notes, query_subcontributions)
-from indico_livesync.models.queue import LiveSyncQueueEntry
+from indico_livesync.models.queue import EntryType, LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
 
@@ -97,11 +97,13 @@ class LiveSyncBackendBase:
             return True, None
         return False, 'initial export not performed'
 
-    def fetch_records(self, count=None):
+    def fetch_records(self):
         query = (self.agent.queue
-                 .filter_by(processed=False)
-                 .order_by(LiveSyncQueueEntry.timestamp)
-                 .limit(count))
+                 .filter(~LiveSyncQueueEntry.processed)
+                 .order_by(LiveSyncQueueEntry.timestamp))
+        if LiveSyncPlugin.settings.get('skip_category_changes'):
+            LiveSyncPlugin.logger.warning('Category changes are currently being skipped')
+            query = query.filter(LiveSyncQueueEntry.type != EntryType.category)
         return query.all()
 
     def update_last_run(self):

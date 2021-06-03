@@ -35,6 +35,11 @@ class SettingsForm(IndicoForm):
                                                            "subcategories are excluded."))
     disable_queue_runs = BooleanField(_('Disable queue runs'), widget=SwitchWidget(),
                                       description=_('Disable all scheduled queue runs.'))
+    skip_category_changes = BooleanField(_('Skip category changes'), widget=SwitchWidget(),
+                                         description=_('Skip category changes when processing the queue. This can be '
+                                                       'useful in large instances when there are significant changes '
+                                                       'to large categories in order to avoid processing those '
+                                                       'immediately.'))
 
 
 class LiveSyncPlugin(IndicoPlugin):
@@ -47,7 +52,8 @@ class LiveSyncPlugin(IndicoPlugin):
     settings_form = SettingsForm
     default_settings = {'excluded_categories': [],
                         'queue_entry_ttl': 0,
-                        'disable_queue_runs': False}
+                        'disable_queue_runs': False,
+                        'skip_category_changes': False}
     category = PluginCategory.synchronization
 
     def init(self):
