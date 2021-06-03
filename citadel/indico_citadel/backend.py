@@ -310,8 +310,8 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
         query = super().get_data_query(model_cls, ids)
         return query.options(joinedload(model_cls.citadel_id_mapping))
 
-    def process_queue(self, uploader):
-        super().process_queue(uploader)
+    def process_queue(self, uploader, allowed_categories=()):
+        super().process_queue(uploader, allowed_categories)
         uploader_name = type(uploader).__name__
         self.plugin.logger.info(f'{uploader_name} starting file upload')
         total, errors, aborted = self.run_export_files(verbose=False)

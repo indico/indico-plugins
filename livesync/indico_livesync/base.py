@@ -97,13 +97,16 @@ class LiveSyncBackendBase:
             return True, None
         return False, 'initial export not performed'
 
-    def fetch_records(self):
+    def fetch_records(self, allowed_categories=()):
         query = (self.agent.queue
                  .filter(~LiveSyncQueueEntry.processed)
                  .order_by(LiveSyncQueueEntry.timestamp))
         if LiveSyncPlugin.settings.get('skip_category_changes'):
             LiveSyncPlugin.logger.warning('Category changes are currently being skipped')
-            query = query.filter(LiveSyncQueueEntry.type != EntryType.category)
+            whitelist_filter = False
+            if allowed_categories:
+                whitelist_filter = LiveSyncQueueEntry.category_id.in_(allowed_categories)
+            query = query.filter((LiveSyncQueueEntry.type != EntryType.category) | whitelist_filter)
         return query.all()
 
     def update_last_run(self):
@@ -113,20 +116,20 @@ class LiveSyncBackendBase:
         """
         self.agent.last_run = now_utc()
 
-    def process_queue(self, uploader):
+    def process_queue(self, uploader, allowed_categories=()):
         """Process queued entries during an export run."""
-        records = self.fetch_records()
+        records = self.fetch_records(allowed_categories)
         LiveSyncPlugin.logger.info(f'Uploading %d records via {self.uploader.__name__}', len(records))
         uploader.run(records)
 
-    def run(self, verbose=False, from_cli=False):
+    def run(self, verbose=False, from_cli=False, allowed_categories=()):
         """Runs the livesync export"""
         if self.uploader is None:  # pragma: no cover
             raise NotImplementedError
 
         uploader = self.uploader(self, verbose=verbose, from_cli=from_cli)
         self._precache_categories()
-        self.process_queue(uploader)
+        self.process_queue(uploader, allowed_categories)
         self.update_last_run()
 
     def get_initial_query(self, model_cls, force):

@@ -116,11 +116,20 @@ def initial_export(agent_id, batch, force, verbose, retry):
 @click.argument('agent_id', type=int, required=False)
 @click.option('--force', '-f', is_flag=True, help="Run even if initial export was not done")
 @click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
-def run(agent_id, force, verbose):
+@click.option('--allow-category', '-c', 'allowed_categories', multiple=True, type=int,
+              help="Process changes for the specified category id even if 'Skip category changes' is enabled. "
+                   "This setting can be used multiple times.")
+def run(agent_id, force, verbose, allowed_categories):
     """Runs the livesync agent"""
     from indico_livesync.plugin import LiveSyncPlugin
+
     if LiveSyncPlugin.settings.get('disable_queue_runs'):
         print(cformat('%{yellow!}Queue runs are disabled%{reset}'))
+    if LiveSyncPlugin.settings.get('skip_category_changes'):
+        print(cformat('%{yellow!}Category changes are currently being skipped%{reset}'))
+        if allowed_categories:
+            print(cformat('Whitelisted categories: %{green}{}%{reset}')
+                  .format(', '.join(map(str, sorted(allowed_categories)))))
 
     if agent_id is None:
         agent_list = LiveSyncAgent.query.all()
@@ -142,7 +151,7 @@ def run(agent_id, force, verbose):
             continue
         print(cformat('Running agent: %{white!}{}%{reset}').format(agent.name))
         try:
-            backend.run(verbose, from_cli=True)
+            backend.run(verbose, from_cli=True, allowed_categories=allowed_categories)
             db.session.commit()
         except Exception:
             db.session.rollback()

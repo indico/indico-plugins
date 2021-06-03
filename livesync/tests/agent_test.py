@@ -7,8 +7,11 @@
 
 from unittest.mock import MagicMock
 
+import pytest
+
 from indico_livesync.base import LiveSyncBackendBase
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
+from indico_livesync.plugin import LiveSyncPlugin
 
 
 class DummyBackend(LiveSyncBackendBase):
@@ -54,3 +57,20 @@ def test_fetch_records(db, dummy_event, dummy_agent):
     dummy_agent.queue = queue
     db.session.flush()
     assert backend.fetch_records() == [queue[1]]
+
+
+@pytest.mark.parametrize('disabled', (True, False))
+@pytest.mark.parametrize('whitelisted', (True, False))
+def test_fetch_records_categories_disabled(db, dummy_event, dummy_category, dummy_agent, disabled, whitelisted):
+    """Test if the correct records are fetched"""
+    backend = DummyBackend(dummy_agent)
+    queue = [
+        LiveSyncQueueEntry(change=ChangeType.protection_changed, type=EntryType.category, category=dummy_category),
+        LiveSyncQueueEntry(change=ChangeType.created, type=EntryType.event, event=dummy_event)
+    ]
+    dummy_agent.queue = queue
+    LiveSyncPlugin.settings.set('skip_category_changes', disabled)
+    db.session.flush()
+    expected = queue[1:] if disabled and not whitelisted else queue
+    whitelist = (dummy_category.id,) if whitelisted else ()
+    assert backend.fetch_records(whitelist) == expected

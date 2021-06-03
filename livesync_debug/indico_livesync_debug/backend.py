@@ -77,8 +77,8 @@ class LiveSyncDebugBackend(LiveSyncBackendBase):
 
     uploader = DebugUploader
 
-    def process_queue(self, uploader):
-        records = self.fetch_records()
+    def process_queue(self, uploader, allowed_categories=()):
+        records = self.fetch_records(allowed_categories)
         if not records:
             print(cformat('%{yellow!}No records%{reset}'))
             return
