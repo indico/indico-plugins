@@ -175,9 +175,11 @@ def _flatten(obj, target_key='buckets', parent_key=''):
 
 
 @memoize_redis(3600)
-def get_user_access(user):
+def get_user_access(user, admin_override_enabled=False):
     if not user:
         return []
+    if admin_override_enabled and user.is_admin:
+        return ['IndicoAdmin']
     access = [user.identifier] + [u.identifier for u in user.get_merged_from_users_recursive()]
     access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:

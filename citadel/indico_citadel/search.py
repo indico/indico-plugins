@@ -64,7 +64,7 @@ class CitadelProvider(IndicoSearchProvider):
             **filter_query
         }
         # Filter by the objects that can be viewed by users/groups in the `access` argument
-        if access := get_user_access(user) if not admin_override_enabled else ['IndicoAdmin']:
+        if access := get_user_access(user, admin_override_enabled):
             access_string = ','.join(access)
             if len(access_string) > 1024:
                 access_string_gz = base64.b64encode(zlib.compress(access_string.encode(), level=9))
