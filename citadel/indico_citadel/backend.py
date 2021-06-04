@@ -228,7 +228,7 @@ class LiveSyncCitadelUploader(Uploader):
         retry = Retry(
             total=20,
             backoff_factor=0.22,
-            status_forcelist=[500, 502, 503, 504],
+            status_forcelist=[409, 500, 502, 503, 504],
             allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
         )
         retry.BACKOFF_MAX = 10
