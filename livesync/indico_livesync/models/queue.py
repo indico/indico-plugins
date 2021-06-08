@@ -26,6 +26,8 @@ class ChangeType(int, IndicoEnum):
     protection_changed = 5
     location_changed = 6
     undeleted = 7
+    published = 8
+    unpublished = 9
 
 
 class EntryType(int, IndicoEnum):
@@ -278,15 +280,17 @@ class LiveSyncQueueEntry(db.Model):
         ref = dict(ref)
         obj = obj_deref(ref)
 
-        if isinstance(obj, Category):
-            if any(c.id in excluded_categories for c in obj.chain_query):
-                return
-        else:
-            event = obj.folder.event if isinstance(obj, Attachment) else obj.event
-            if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
-                g.livesync_excluded_categories_checked[event.category] = excluded_categories & set(event.category_chain)
-            if g.livesync_excluded_categories_checked[event.category]:
-                return
+        if ChangeType.published not in changes and ChangeType.unpublished not in changes:
+            if isinstance(obj, Category):
+                if any(c.id in excluded_categories for c in obj.chain_query):
+                    return
+            else:
+                event = obj.folder.event if isinstance(obj, Attachment) else obj.event
+                if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
+                    g.livesync_excluded_categories_checked[event.category] = \
+                        excluded_categories & set(event.category_chain)
+                if g.livesync_excluded_categories_checked[event.category]:
+                    return
 
         try:
             agents = g.livesync_agents

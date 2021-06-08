@@ -84,8 +84,19 @@ def connect_signals(plugin):
     plugin.connect(signals.acl.entry_changed, _acl_entry_changed, sender=Attachment)
 
 
+def _is_category_excluded(category):
+    excluded_categories = get_excluded_categories()
+    return any(c.id in excluded_categories for c in category.chain_query)
+
+
 def _moved(obj, old_parent, **kwargs):
     _register_change(obj, ChangeType.moved)
+
+    new_category = obj if isinstance(obj, Category) else obj.category
+    old_excluded = _is_category_excluded(old_parent)
+    new_excluded = _is_category_excluded(new_category)
+    if old_excluded != new_excluded:
+        _register_change(obj, ChangeType.unpublished if new_excluded else ChangeType.published)
 
     if obj.is_inheriting:
         # If protection is inherited, check whether it changed

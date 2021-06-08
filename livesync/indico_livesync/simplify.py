@@ -53,6 +53,8 @@ def process_records(records):
     """
     changes = defaultdict(int)
     cascaded_create_records = set()
+    cascaded_publish_records = set()
+    cascaded_unpublish_records = set()
     cascaded_undelete_records = set()
     cascaded_update_records = set()
     cascaded_delete_records = set()
@@ -66,6 +68,10 @@ def process_records(records):
         if record.change == ChangeType.created:
             assert record.type != EntryType.category
             cascaded_create_records.add(record)
+        elif record.change == ChangeType.published:
+            cascaded_publish_records.add(record)
+        elif record.change == ChangeType.unpublished:
+            cascaded_unpublish_records.add(record)
         elif record.change == ChangeType.undeleted:
             assert record.type != EntryType.category
             cascaded_undelete_records.add(record)
@@ -88,6 +94,12 @@ def process_records(records):
 
     for obj in _process_cascaded_category_contents(cascaded_update_records):
         changes[obj] |= SimpleChange.updated
+
+    for obj in _process_cascaded_category_contents(cascaded_unpublish_records):
+        changes[obj] |= SimpleChange.deleted
+
+    for obj in _process_cascaded_category_contents(cascaded_publish_records):
+        changes[obj] |= SimpleChange.created
 
     for obj in _process_cascaded_event_contents(cascaded_delete_records):
         changes[obj] |= SimpleChange.deleted
@@ -130,10 +142,13 @@ def _process_cascaded_category_contents(records):
                              and rec.change == ChangeType.protection_changed}
     category_move_records = {rec.category_id for rec in records if rec.type == EntryType.category
                              and rec.change == ChangeType.moved}
+    category_publishing_records = {rec.category_id for rec in records if rec.type == EntryType.category
+                                   and rec.change in (ChangeType.published, ChangeType.unpublished)}
 
     changed_events = set()
 
     category_prot_records -= category_move_records  # A move already implies sending the whole record
+    category_prot_records -= category_publishing_records  # A publish/unpublish already implies sending the whole record
 
     # Protection changes are handled differently, as there may not be the need to re-generate the record
     if category_prot_records:
@@ -154,6 +169,10 @@ def _process_cascaded_category_contents(records):
     # Add move operations and explicitly-passed event records
     if category_move_records:
         changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_move_records),
+                                                 ~Event.is_deleted,
+                                                 excluded_categories_filter))
+    if category_publishing_records:
+        changed_events.update(Event.query.filter(Event.category_chain_overlaps(category_publishing_records),
                                                  ~Event.is_deleted,
                                                  excluded_categories_filter))
 

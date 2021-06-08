@@ -22,26 +22,27 @@ def queue_entry_dummy_object(monkeypatch):
     monkeypatch.setattr(LiveSyncQueueEntry, 'object', object)
 
 
-@pytest.mark.parametrize(('change', 'invalid'), (
-    (ChangeType.created,            True),
-    (ChangeType.deleted,            True),
-    (ChangeType.data_changed,       True),
-    (ChangeType.protection_changed, False),
-    (ChangeType.moved,              False),
+@pytest.mark.parametrize(('change', 'invalid', 'simplified'), (
+    (ChangeType.created,            True,  None),
+    (ChangeType.deleted,            True,  None),
+    (ChangeType.data_changed,       True,  None),
+    (ChangeType.location_changed,   True,  None),
+    (ChangeType.undeleted,          True,  None),
+    (ChangeType.published,          False, SimpleChange.created),
+    (ChangeType.unpublished,        False, SimpleChange.deleted),
+    (ChangeType.protection_changed, False, SimpleChange.updated),
+    (ChangeType.moved,              False, SimpleChange.updated),
 ))
-@pytest.mark.usefixtures('queue_entry_dummy_object', 'db')
-def test_process_records_category_ignored(mocker, change, invalid):
+@pytest.mark.usefixtures('queue_entry_dummy_object')
+def test_process_records_category_ignored(dummy_agent, dummy_category, dummy_event, change, invalid, simplified):
     """Test if categories are only kept for certain changes."""
-    cascade = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
-    cascade.return_value = [object()]
-    records = [LiveSyncQueueEntry(change=change, type=EntryType.category)]
+    records = [LiveSyncQueueEntry(agent=dummy_agent, change=change, type=EntryType.category, category=dummy_category)]
     if invalid:
         with pytest.raises(AssertionError):
             process_records(records)
     else:
         result = process_records(records)
-        assert len(result) == 1
-        assert list(result.values())[0] == SimpleChange.updated
+        assert result == {dummy_event: simplified}
 
 
 @pytest.mark.parametrize(('change', 'cascade'), (
@@ -57,7 +58,9 @@ def test_process_records_cascade(mocker, change, cascade):
     cascade_mock = mocker.patch('indico_livesync.simplify._process_cascaded_category_contents')
     records = [LiveSyncQueueEntry(change=change)]
     process_records(records)
-    assert cascade_mock.call_args == (({records[0]} if cascade else set(),),)
+    assert cascade_mock.call_args_list[0] == (({records[0]} if cascade else set(),),)
+    assert cascade_mock.call_args_list[1] == ((set(),),)
+    assert cascade_mock.call_args_list[2] == ((set(),),)
 
 
 @pytest.mark.parametrize('changes', bool_matrix('......'))
