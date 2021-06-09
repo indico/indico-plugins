@@ -92,7 +92,7 @@ class CitadelProvider(IndicoSearchProvider):
 
 
 placeholders = {
-    'title': ('_data.title', _('The title an event, contribution, etc.)')),
+    'title': ('_data.title', _('The title of an event, contribution, etc.)')),
     'person': ('_data.persons_index.name', _("A speaker, author or event chair's name")),
     'affiliation': ('_data.persons_index.affiliation', _("A speaker, author or event chair's affiliation")),
     'type': ('type_any', _('An entry type (such as conference, meeting, file, etc.)')),
