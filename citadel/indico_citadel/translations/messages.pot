@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 
 #: indico_citadel/search.py:95
-msgid "The title of an event, contribution, etc.)"
+msgid "The title of an event, contribution, etc."
 msgstr ""
 
 #: indico_citadel/search.py:95
