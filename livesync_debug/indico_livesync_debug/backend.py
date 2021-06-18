@@ -12,11 +12,11 @@ from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter
 from pygments.lexers.agile import Python3Lexer
 
-from indico.modules.search.schemas import EventSchema
+from indico.modules.search.schemas import (AttachmentSchema, ContributionSchema, EventNoteSchema, EventSchema,
+                                           SubContributionSchema)
 from indico.util.console import cformat
 
 from indico_livesync import LiveSyncBackendBase, SimpleChange, Uploader, process_records
-from indico_livesync.export_schemas import AttachmentSchema, ContributionSchema, EventNoteSchema, SubContributionSchema
 
 
 lexer = Python3Lexer()

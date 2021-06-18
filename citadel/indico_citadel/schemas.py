@@ -16,13 +16,12 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
-from indico.modules.search.schemas import EventSchema
+from indico.modules.search.schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
+                                           EventSchema, SubContributionSchema)
 from indico.util.string import strip_tags
 from indico.web.flask.util import url_for
 
 from indico_citadel.util import remove_none_entries
-from indico_livesync.export_schemas import (AttachmentSchema, CategorySchema, ContributionSchema, EventNoteSchema,
-                                            SubContributionSchema)
 
 
 PRINCIPAL_TYPES = {
@@ -203,8 +202,6 @@ class SubContributionRecordSchema(RecordSchema, SubContributionSchema):
 class _EventNoteDataSchema(EventNoteSchema):
     class Meta:
         fields = ('title', 'content', 'user')
-
-    title = mm.String(attribute='object.title')
 
     @post_dump
     def _transform(self, data, **kwargs):
