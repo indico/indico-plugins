@@ -84,9 +84,6 @@ class CitadelProvider(IndicoSearchProvider):
     def get_placeholders(self):
         return [SearchOption(key, label) for key, (_, label) in placeholders.items()]
 
-    def get_filters(self):
-        return [SearchOption(key, label) for key, label in filters.items()]
-
     def get_sort_options(self):
         return [SearchOption(key, label) for key, label in sort_options.items()]
 
