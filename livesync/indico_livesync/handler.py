@@ -108,16 +108,8 @@ def _moved(obj, old_parent, **kwargs):
 
 
 def _created(obj, **kwargs):
-    if isinstance(obj, (Event, EventNote, Attachment)):
-        parent = None
-    elif isinstance(obj, Contribution):
-        parent = obj.event
-    elif isinstance(obj, SubContribution):
-        parent = obj.contribution
-    else:
+    if not isinstance(obj, (Event, EventNote, Attachment, Contribution, SubContribution)):
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
-    if parent:
-        _register_change(parent, ChangeType.data_changed)
     _register_change(obj, ChangeType.created)
 
 
