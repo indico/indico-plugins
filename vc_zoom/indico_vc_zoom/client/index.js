@@ -15,15 +15,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.querySelectorAll('.vc-toolbar .action-make-host').forEach(elem => {
-    elem.addEventListener('click', async () => {
-      const killProgress = IndicoUI.Dialogs.Util.progress();
-      try {
-        await indicoAxios.post(elem.dataset.href);
-        window.location.reload();
-      } catch (error) {
-        handleAxiosError(error);
-        killProgress();
-      }
+    elem.addEventListener('click', () => {
+      confirmPrompt(
+        $T('Are you sure you want to be added as an alternative host?'),
+        $T('Make me an alternative host')
+      ).then(async () => {
+        const killProgress = IndicoUI.Dialogs.Util.progress();
+        try {
+          await indicoAxios.post(elem.dataset.href);
+          window.location.reload();
+        } catch (error) {
+          handleAxiosError(error);
+          killProgress();
+        }
+      });
     });
   });
 });
