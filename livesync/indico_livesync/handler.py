@@ -22,6 +22,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 
 from indico_livesync.models.queue import ChangeType, LiveSyncQueueEntry
 from indico_livesync.util import get_excluded_categories, obj_ref
@@ -139,7 +140,8 @@ def _location_changed(sender, obj, **kwargs):
 
 
 def _timetable_changed(entry, **kwargs):
-    _register_change(entry.event, ChangeType.data_changed)
+    if entry.type == TimetableEntryType.CONTRIBUTION:
+        _register_change(entry.object, ChangeType.data_changed)
 
 
 def _category_protection_changed(sender, obj, mode, old_mode, **kwargs):
