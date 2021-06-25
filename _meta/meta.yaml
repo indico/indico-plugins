@@ -2,4 +2,5 @@ extras: {}
 
 skip:
   - indico-plugin-livesync-debug
+  - indico-plugin-themes-legacy
   - indico-plugin-vc-dummy
