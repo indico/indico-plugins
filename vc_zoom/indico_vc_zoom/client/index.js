@@ -5,7 +5,11 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+/* global confirmPrompt:false, $T:false */
+
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+
+const $t = $T.domain('vc_zoom');
 
 document.addEventListener('DOMContentLoaded', async () => {
   $('.vc-toolbar').dropdown({
@@ -17,8 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.vc-toolbar .action-make-host').forEach(elem => {
     elem.addEventListener('click', () => {
       confirmPrompt(
-        $T('Are you sure you want to be added as an alternative host?'),
-        $T('Make me an alternative host')
+        $t.gettext('Are you sure you want to be added as an alternative host?'),
+        $t.gettext('Make me an alternative host')
       ).then(async () => {
         const killProgress = IndicoUI.Dialogs.Util.progress();
         try {
