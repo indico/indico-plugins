@@ -41,7 +41,7 @@ def apply_acl_entry_strategy(rel, principal):
 
 
 def _get_excluded_category_filter(event_model=Event):
-    if excluded_category_ids := get_excluded_categories():
+    if excluded_category_ids := get_excluded_categories(deep=True):
         return event_model.category_id.notin_(excluded_category_ids)
     return True
 

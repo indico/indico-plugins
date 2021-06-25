@@ -9,8 +9,9 @@ from datetime import timedelta
 
 from werkzeug.datastructures import ImmutableDict
 
+from indico.core.db import db
 from indico.modules.attachments.models.attachments import Attachment
-from indico.modules.categories.models.categories import Category
+from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -78,7 +79,17 @@ def clean_old_entries():
 
 
 @memoize_request
-def get_excluded_categories():
-    """Get excluded category IDs."""
+def get_excluded_categories(*, deep=False):
+    """Get excluded category IDs.
+
+    :param deep: Whether to get all subcategory ids as well
+    """
     from indico_livesync.plugin import LiveSyncPlugin
-    return {int(x['id']) for x in LiveSyncPlugin.settings.get('excluded_categories')}
+    ids = {int(x['id']) for x in LiveSyncPlugin.settings.get('excluded_categories')}
+    if not deep or not ids:
+        return ids
+    cte = Category.get_tree_cte()
+    query = (db.session.query(Category.id)
+             .join(cte, Category.id == cte.c.id)
+             .filter(cte.c.path.overlap(ids), ~cte.c.is_deleted))
+    return {x.id for x in query}

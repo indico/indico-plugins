@@ -135,7 +135,7 @@ def _process_cascaded_category_contents(records):
 
     :param records: queue records to process
     """
-    excluded_categories = get_excluded_categories()
+    excluded_categories = get_excluded_categories(deep=True)
     excluded_categories_filter = Event.category_id.notin_(excluded_categories) if excluded_categories else True
 
     category_prot_records = {rec.category_id for rec in records if rec.type == EntryType.category

@@ -11,7 +11,7 @@ from indico.util.date_time import now_utc
 
 from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
-from indico_livesync.util import clean_old_entries
+from indico_livesync.util import clean_old_entries, get_excluded_categories
 
 
 def test_clean_old_entries(dummy_event, db, dummy_agent):
@@ -34,3 +34,17 @@ def test_clean_old_entries(dummy_event, db, dummy_agent):
     clean_old_entries()
     assert LiveSyncQueueEntry.query.filter_by(processed=False).count() == 10
     assert LiveSyncQueueEntry.query.filter_by(processed=True).count() == 3
+
+
+def test_get_excluded_categories(dummy_category, create_category):
+    cat1 = create_category()
+    cat1a = create_category(parent=cat1)
+    cat1aa = create_category(parent=cat1a)
+    cat1b = create_category(parent=cat1)
+    cat2 = create_category()
+    LiveSyncPlugin.settings.set('excluded_categories', [{'id': cat1.id}])
+    assert get_excluded_categories() == {cat1.id}
+    assert get_excluded_categories(deep=True) == {cat1.id, cat1a.id, cat1aa.id, cat1b.id}
+    LiveSyncPlugin.settings.set('excluded_categories', [{'id': 0}])
+    assert get_excluded_categories() == {0}
+    assert get_excluded_categories(deep=True) == {cat1.id, cat1a.id, cat1aa.id, cat1b.id, cat2.id, dummy_category.id, 0}
