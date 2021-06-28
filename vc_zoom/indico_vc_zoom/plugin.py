@@ -114,7 +114,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                                'creation of a meeting'))
 
     phone_link = URLField(_('Join via phone'), [Optional(), URL()],
-                          description=_('Link to the list of VidyoVoice phone numbers'))
+                          description=_('Link to instructions on joining a meeting via phone'))
 
     def validate_authenticators(self, field):
         invalid = set(field.data) - set(multipass.identity_providers)
