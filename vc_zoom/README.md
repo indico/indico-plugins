@@ -1,4 +1,4 @@
-# Indico Plugin for Zoom
+# Zoom Videoconference Plugin
 
 ## Features
 

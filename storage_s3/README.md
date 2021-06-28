@@ -13,13 +13,19 @@ It is currently used in production on multiple Indico instances, so we believe i
 stable, but please be advised that we do not provide a way to move files back from S3
 to local storage (but it would of course be possible to write a script for this).
 
+## Changelog
+
+### 3.0
+
+- Initial release for Indico 3.0
+
 ## Configuration
 
 Configuration is done using the `STORAGE_BACKENDS` entry of `indico.conf`; add a new key
 with a name of your choice (e.g. `s3`) and specify the details of the S3 storage in the
 value.
 
-For a single bucket, all you need to specify is the bucket name: 
+For a single bucket, all you need to specify is the bucket name:
 
 ```python
 STORAGE_BACKENDS = {

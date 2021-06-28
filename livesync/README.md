@@ -1,0 +1,12 @@
+# LiveSync Plugin
+
+The LiveSync plugin provides a framework for exporting Indico event data to
+external services, typically to provide advanced search functionality.
+
+## Changelog
+
+### 3.0
+
+- Initial release for Indico 3.0
+- Major changes to improve efficiency and correctness of the data sent both
+  during an initial data export and during queue runs
