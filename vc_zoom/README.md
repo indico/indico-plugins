@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.0
+
+- Adapt to Indico 3 (and thus Python 3)
+
 ### 2.3
 
 - Fix deleting Zoom meetings that were already deleted on the Zoom side when running outside a web request context (e.g. during scheduled deletion of events)
