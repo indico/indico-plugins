@@ -14,7 +14,6 @@ from indico.core.cache import make_scoped_cache
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.util.date_time import format_time, now_utc, utc_to_server
-from indico.util.serializer import Serializer
 
 from indico_piwik.queries.graphs import PiwikQueryReportEventGraphCountries, PiwikQueryReportEventGraphDevices
 from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricPeakDateAndVisitors,
@@ -22,10 +21,10 @@ from indico_piwik.queries.metrics import (PiwikQueryReportEventMetricPeakDateAnd
                                           PiwikQueryReportEventMetricVisitDuration, PiwikQueryReportEventMetricVisits)
 
 
-class ReportBase(Serializer):
+class ReportBase:
     """Wrapper for Piwik report collection"""
 
-    __public__ = []
+    serializable_fields = []
     default_report_interval = 14
 
     def __init__(self, event_id, contrib_id=None, start_date=None, end_date=None, **report_params):
@@ -50,7 +49,7 @@ class ReportBase(Serializer):
         from indico_piwik.plugin import PiwikPlugin
 
         if not PiwikPlugin.settings.get('cache_enabled'):
-            return cls(*args, **kwargs).to_serializable()
+            return cls(*args, **kwargs).serialize()
 
         cache = make_scoped_cache('piwik-report')
         key = f'{cls.__name__}-{args}-{kwargs}'
@@ -59,10 +58,10 @@ class ReportBase(Serializer):
         if not report:
             report = cls(*args, **kwargs)
             cache.set(key, report, timeout=PiwikPlugin.settings.get('cache_ttl'))
-        return report.to_serializable()
+        return report.serialize()
 
     def _build_report(self):
-        """To be overriden"""
+        raise NotImplementedError
 
     def _init_date_range(self, start_date=None, end_date=None):
         """Set date range defaults if no dates are passed"""
@@ -75,23 +74,26 @@ class ReportBase(Serializer):
         if self.start_date is None:
             self.start_date = self.end_date - timedelta(days=ReportBase.default_report_interval)
 
+    def serialize(self):
+        return {attr: getattr(self, attr) for attr in self.serializable_fields}
+
 
 class ReportCountries(ReportBase):
-    __public__ = ['graphs']
+    serializable_fields = ['graphs']
 
     def _build_report(self):
         self.graphs = {'countries': PiwikQueryReportEventGraphCountries(**self.params).get_result()}
 
 
 class ReportDevices(ReportBase):
-    __public__ = ['graphs']
+    serializable_fields = ['graphs']
 
     def _build_report(self):
         self.graphs = {'devices': PiwikQueryReportEventGraphDevices(**self.params).get_result()}
 
 
 class ReportGeneral(ReportBase):
-    __public__ = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
+    serializable_fields = ['event_id', 'contrib_id', 'start_date', 'end_date', 'metrics', 'contributions', 'timestamp']
 
     def _build_report(self):
         """Build the report by performing queries to Piwik"""
@@ -124,7 +126,7 @@ class ReportGeneral(ReportBase):
 
 
 class ReportVisitsPerDay(ReportBase):
-    __public__ = ['metrics']
+    serializable_fields = ['metrics']
 
     def _build_report(self):
         self.metrics = {'unique': PiwikQueryReportEventMetricUniqueVisits(**self.params).get_result(reduced=False),
