@@ -46,5 +46,5 @@ class PiwikQueryReportEventGraphCountries(PiwikQueryReportEventGraphBase):
 
 class PiwikQueryReportEventGraphDevices(PiwikQueryReportEventGraphBase):
     def call(self, **query_params):
-        return super().call(apiModule='UserSettings', apiAction='getOS', period='range', width=320, height=260,
-                            graphType='horizontalBar', **query_params)
+        return super().call(apiModule='DevicesDetection', apiAction='getOsVersions', period='range', width=320,
+                            height=260, graphType='horizontalBar', **query_params)
