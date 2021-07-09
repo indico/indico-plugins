@@ -1,0 +1,69 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020-2021
+# Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-01-05 14:44+0000\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: indico_payment_manual/placeholders.py:33
+msgid "escaped for URLs"
+msgstr "екрановано для URL"
+
+#: indico_payment_manual/placeholders.py:38
+msgid "First name of the registrant"
+msgstr "Ім'я реєстранта"
+
+#: indico_payment_manual/placeholders.py:44
+msgid "Last name of the registrant"
+msgstr "Прізвище реєстранта"
+
+#: indico_payment_manual/placeholders.py:50
+msgid "Email address of the registrant"
+msgstr "Адреса електронної пошти реєстранта"
+
+#: indico_payment_manual/placeholders.py:60
+msgid "The ID of the event"
+msgstr "ID події"
+
+#: indico_payment_manual/placeholders.py:83
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "Сума, яку необхідно сплатити (100.00 або 100.25, н-д)"
+
+#: indico_payment_manual/placeholders.py:84
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "Сума без копійок, якщо можливо (100 або 100.25 н-д)"
+
+#: indico_payment_manual/placeholders.py:85
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "Сума як ціле число (10000 або 10025, н-д)"
+
+#: indico_payment_manual/placeholders.py:90
+msgid "The currency used in the registration"
+msgstr "Зараз використовується при реєстрації"
+
+#: indico_payment_manual/plugin.py:21
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "Дані, необхідні користувачу для оплати. Зазвичай, включає банківські реквізити, IBAN та призначення платежу. Ви також можете перенаправити користувача на власний сайт для оплати. У такому випадку впевнітьcя, що використовуєте екрановану URL версію плейсхолдерів усюди, де можливо."
+
+#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+msgid "Payment details"
+msgstr "Подробиці оплати"

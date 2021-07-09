@@ -1,0 +1,174 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Batbayar Bat-Erdene <yertonts@gmail.com>, 2021
+# batpurev batchuluun <batpurev@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-06-14 05:16+0000\n"
+"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>\n"
+"Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: mn_MN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_livesync/controllers.py:41
+msgid "Agent deleted"
+msgstr "Агентыг устгасан"
+
+#: indico_livesync/controllers.py:55
+msgid "This backend is already in use"
+msgstr "Энэ төгсгөлийг аль хэдийнэ ашиглаж байна"
+
+#: indico_livesync/controllers.py:64
+msgid "Agent added"
+msgstr "Агентыг нэмсэн"
+
+#: indico_livesync/controllers.py:65
+msgid "Don't forget to run the initial export!"
+msgstr "Эхний экспортыг ажиллуулахаа бүү мартаарай!"
+
+#: indico_livesync/controllers.py:77
+msgid "Cannot edit an agent that is not loaded"
+msgstr "Ачаалаагүй агентад өөрчлөлт оруулах боломжгүй"
+
+#: indico_livesync/controllers.py:88
+msgid "Agent updated"
+msgstr "Агентыг шинэчилсэн"
+
+#: indico_livesync/forms.py:17
+#: indico_livesync/templates/plugin_details_extra.html:26
+msgid "Name"
+msgstr "Нэр"
+
+#: indico_livesync/forms.py:18
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "Агентын нэр. Зөвхөн Админ удирдлагын хуудсанд ашиглана."
+
+#: indico_livesync/plugin.py:26
+msgid "Queue entry TTL"
+msgstr "Дараалалд оруулах TTL"
+
+#: indico_livesync/plugin.py:27
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "Жагсаалт дахь мэдээллийг хэдэн өдөр боловсруулах ёстой вэ. Жагсаалтын мэдээллээс эхлэн хугацааг тоолно, иймд LiveSync-н даалгавар тодорхой хугацаанд ажиллаагүй бол, жагсаалтын мэдээллийг боловсруулсных нь дараагийн удаад устгаж болно. Үүнийг 0 болгож тохируулах нь автомат устгалтыг хүчингүй болгоно. "
+
+#: indico_livesync/plugin.py:32
+msgid "Excluded categories"
+msgstr "Хассан ангилал"
+
+#: indico_livesync/plugin.py:33
+msgid "Category ID"
+msgstr "Ангиллын ID"
+
+#: indico_livesync/plugin.py:34
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "Эдгээр ангилал, эсвэл тэдгээрийн дэд ангилал доторх объектуудад оруулсан өөрчлөлтийг хасав. "
+
+#: indico_livesync/plugin.py:36
+msgid "Disable queue runs"
+msgstr "Дарааллын ажиллагааг идэвхгүй болгох"
+
+#: indico_livesync/plugin.py:37
+msgid "Disable all scheduled queue runs."
+msgstr "Төлөвлөсөн бүх дарааллын ажиллагааг идэвхгүй болгох."
+
+#: indico_livesync/templates/edit_agent.html:9
+msgid "Cancel"
+msgstr "Цуцлах"
+
+#: indico_livesync/templates/plugin_details_extra.html:7
+#: indico_livesync/templates/plugin_details_extra.html:11
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "%(backend)s агентыг нэмэх"
+
+#: indico_livesync/templates/plugin_details_extra.html:18
+msgid "LiveSync Agents"
+msgstr "LiveSync Агентууд"
+
+#: indico_livesync/templates/plugin_details_extra.html:25
+msgid "ID"
+msgstr "ID"
+
+#: indico_livesync/templates/plugin_details_extra.html:27
+msgid "Backend"
+msgstr "Админ хуудас"
+
+#: indico_livesync/templates/plugin_details_extra.html:28
+msgid "Last Run"
+msgstr "Сүүлчийн ажиллуулалт"
+
+#: indico_livesync/templates/plugin_details_extra.html:29
+msgid "Queue"
+msgstr "Дараалал"
+
+#: indico_livesync/templates/plugin_details_extra.html:30
+msgid "Status"
+msgstr "Төлөв"
+
+#: indico_livesync/templates/plugin_details_extra.html:31
+msgid "Actions"
+msgstr "Үйлдлүүд"
+
+#: indico_livesync/templates/plugin_details_extra.html:43
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "Ачаалаагүй: %(name)s"
+
+#: indico_livesync/templates/plugin_details_extra.html:50
+msgid "Never"
+msgstr "Хэзээ ч үгүй"
+
+#: indico_livesync/templates/plugin_details_extra.html:58
+msgid "Ready"
+msgstr "Бэлэн"
+
+#: indico_livesync/templates/plugin_details_extra.html:63
+msgid "n/a"
+msgstr "хамаарахгүй"
+
+#: indico_livesync/templates/plugin_details_extra.html:70
+msgid "Delete this agent?"
+msgstr "Энэхүү агентыг устгах уу?"
+
+#: indico_livesync/templates/plugin_details_extra.html:71
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "Та үнэхээр энэхүү агентыг устгаж түүний жагсаалтын бүх мэдээллийг хасмаар байна уу?"
+
+#: indico_livesync/templates/plugin_details_extra.html:77
+msgid "Edit LiveSync agent"
+msgstr "LiveSync агентыг өөрчлөх"
+
+#: indico_livesync/templates/plugin_details_extra.html:88
+msgid "No agents have been added yet."
+msgstr "Ямар ч агентыг нэмээгүй байна. "
+
+#: indico_livesync/templates/plugin_details_extra.html:99
+msgid "No backend plugins enabled"
+msgstr "Админ талын ямар ч плагиныг идэвхжүүлээгүй байна"
+
+#: indico_livesync/templates/plugin_details_extra.html:100
+msgid "Add"
+msgstr "Нэмэх"
+
+#: indico_livesync/templates/plugin_details_extra.html:113
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "Хавтас доторх командыг гүйцэтгэснээр зарим агентуудын эхний экспортыг хийх шаардлагатай болж болно. <br>Indico! дээр олон үйл явдлууд байвал энэ нь удаан хугацаа шаардаж болно гэдгийг анхаарна уу."

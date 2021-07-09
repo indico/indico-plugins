@@ -1,0 +1,101 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2018,2020
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-09-04 10:36+0000\n"
+"Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>\n"
+"Language-Team: Polish (Poland) (http://www.transifex.com/indico/indico/language/pl_PL/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: indico_payment_paypal/controllers.py:110
+msgid "Your payment request has been processed."
+msgstr "Twoje zlecenie zapłaty zostało przetworzone."
+
+#: indico_payment_paypal/controllers.py:118
+msgid "You cancelled the payment process."
+msgstr "Skasowałeś proces zapłaty."
+
+#: indico_payment_paypal/plugin.py:25
+msgid "API URL"
+msgstr "API URL"
+
+#: indico_payment_paypal/plugin.py:25
+msgid "URL of the PayPal HTTP API."
+msgstr "URL dla PayPal HTTP API."
+
+#: indico_payment_paypal/plugin.py:26 indico_payment_paypal/plugin.py:32
+msgid "Business"
+msgstr "Biznes"
+
+#: indico_payment_paypal/plugin.py:27
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "Domyślny PayPal ID  lub adres email związany z kontem PayPal. Administratorzy wydarzeń mogą je nadpisać."
+
+#: indico_payment_paypal/plugin.py:34
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "PayPal ID lub adres email związany z kontem PayPal,"
+
+#: indico_payment_paypal/util.py:23
+msgid "Invalid email address / paypal ID"
+msgstr "Błedny adres email lub paypal ID"
+
+#: indico_payment_paypal/templates/event_payment_form.html:4
+msgid "First name"
+msgstr "Imię"
+
+#: indico_payment_paypal/templates/event_payment_form.html:6
+msgid "Last name"
+msgstr "Nazwisko"
+
+#: indico_payment_paypal/templates/event_payment_form.html:8
+msgid "Total amount"
+msgstr "Łączna kwota"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html:4
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "Proszę się upewnić, że rachunek twojego dostawcy PayPal uzywa  <strong>UTF-8</strong> domyślnie, w przeciwnym razie pewne transakcje moga nie zostać uznane przez Indico!<br> Możesz sprawdzić jak to skonfigurować %(link)stutaj%(endlink)s."
+
+#: indico_payment_paypal/templates/transaction_details.html:6
+msgid "Transaction ID"
+msgstr "ID transakcji"
+
+#: indico_payment_paypal/templates/transaction_details.html:8
+msgid "Invoice ID"
+msgstr "ID faktury"
+
+#: indico_payment_paypal/templates/transaction_details.html:10
+msgid "Payer e-mail"
+msgstr "email płatnika"
+
+#: indico_payment_paypal/templates/transaction_details.html:19
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "Kwota zapłacona różni się od żądanej. Proszę się skontaktować z rejestratorem aby rozwiązać problem."
+
+#: indico_payment_paypal/templates/transaction_details.html:22
+msgid "Paid:"
+msgstr "Zapłacono:"
+
+#: indico_payment_paypal/templates/transaction_details.html:26
+msgid "Required:"
+msgstr "Kwota wymagana:"

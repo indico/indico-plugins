@@ -1,0 +1,238 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Batbayar Bat-Erdene <yertonts@gmail.com>, 2021
+# batpurev batchuluun <batpurev@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-26 16:24+0000\n"
+"Last-Translator: Adrian Mönnich\n"
+"Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: mn_MN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_piwik/forms.py:18
+msgid "Track global visits"
+msgstr "Олон улсын хандалтыг дагах"
+
+#: indico_piwik/forms.py:19
+msgid "Track events"
+msgstr "Үйл явдлуудыг дагах"
+
+#: indico_piwik/forms.py:20
+msgid "Cache results"
+msgstr "Шуурхай санах ойн үр дүнгүүд"
+
+#: indico_piwik/forms.py:21
+msgid "Piwik server URL"
+msgstr "Piwik серверийн URL"
+
+#: indico_piwik/forms.py:22
+msgid "Piwik API server URL"
+msgstr "Piwik API серверийн URL"
+
+#: indico_piwik/forms.py:23
+msgid "Should be pointing to 'index.php'"
+msgstr "'index.php' рүү чиглэсэн байх ёстой"
+
+#: indico_piwik/forms.py:24
+msgid "Piwik API token"
+msgstr "Piwik API токен"
+
+#: indico_piwik/forms.py:25
+msgid "Token to access the API. Do not share it!"
+msgstr "API руу нэвтрэх токен. Үүнийг бүү хуваалцаарай!"
+
+#: indico_piwik/forms.py:26
+msgid "Global statistics ID"
+msgstr "Бүх статистикийн ID"
+
+#: indico_piwik/forms.py:27
+msgid "Piwik site ID for global statistics"
+msgstr "олон улсын статистикт зориулсан Piwik сайтын ID"
+
+#: indico_piwik/forms.py:28
+msgid "Event statistics ID"
+msgstr "Үйл явдлын статистикийн ID"
+
+#: indico_piwik/forms.py:29
+msgid "Piwik site ID for event statistics"
+msgstr "Үйл явдлын статистикт зориулсан Piwik сайтын ID"
+
+#: indico_piwik/forms.py:30
+msgid "Result cache TTL (seconds)"
+msgstr "Үр дүнгийн шуурхай санах ой TTL (секунд)"
+
+#: indico_piwik/forms.py:31
+msgid "How long event reports are kept cached"
+msgstr "Үйл явдлын тайланг хэр хугацаанд шуурхай санах ойд хадгалах вэ"
+
+#: indico_piwik/forms.py:32
+msgid "Use Piwik server URL for all requests"
+msgstr "Бүх хүсэлт дээр Piwik серверийн URL-г ашиглана уу"
+
+#: indico_piwik/forms.py:36
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "Үйл явдлын статистик олон улсын статистик хэлбэрээр адилхан Piwik сайтыг ашиглах боломжгүй"
+
+#: indico_piwik/plugin.py:66
+msgid "Statistics"
+msgstr "Статистик"
+
+#: indico_piwik/templates/statistics.html:8
+msgid "Selection Information"
+msgstr "Сонголтын мэдээлэл"
+
+#: indico_piwik/templates/statistics.html:9
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s -с %(end)sруу )"
+
+#: indico_piwik/templates/statistics.html:12
+#: indico_piwik/templates/statistics.html:14
+msgid "Modify Query"
+msgstr "Асуумжийг өөрчлөх"
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Hide"
+msgstr "Нуух"
+
+#: indico_piwik/templates/statistics.html:23
+msgid "View statistics between these dates"
+msgstr "Эдгээр огноонуудын хоорондох статистикийг харах"
+
+#: indico_piwik/templates/statistics.html:29
+msgid "to"
+msgstr "руу"
+
+#: indico_piwik/templates/statistics.html:39
+msgid "Choose Event / Contribution"
+msgstr "Үйл явдал сонгох / Хувь нэмэр"
+
+#: indico_piwik/templates/statistics.html:41
+msgid "Event"
+msgstr "Үйл явдал"
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Contribution"
+msgstr "Хувь нэмэр"
+
+#: indico_piwik/templates/statistics.html:53
+msgid "Update Query"
+msgstr "Асуумжийг шинэчлэх"
+
+#: indico_piwik/templates/statistics.html:64
+msgid "Visitor Hit Rates"
+msgstr "Зочлогчийн товшилтын түвшин"
+
+#: indico_piwik/templates/statistics.html:66
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "Статистикийг plugin нэвтрүүлснээс хойш л цуглуулсан болохыг анхаарна уу. Энэ нь зарим үйл явдлын өмнөх үеийн мэдээлэл байхгүй гэсэн үг бөгөөд энэ нь тухайн үед тухайн үйл ажиллагаанд ямар нэгэн үйл явдал болоогүй гэсэн үг биш юм."
+
+#: indico_piwik/templates/statistics.html:73
+msgid "Info"
+msgstr "Мэдээлэл"
+
+#: indico_piwik/templates/statistics.html:86
+msgid "Overall Statistics"
+msgstr "Ерөнхий статистик"
+
+#: indico_piwik/templates/statistics.html:90
+msgid "Visitor Metrics"
+msgstr "Зочдын Хэмжүүр"
+
+#: indico_piwik/templates/statistics.html:94
+msgid "Visitors"
+msgstr "Зочид"
+
+#: indico_piwik/templates/statistics.html:98
+msgid "Unique Visitors"
+msgstr "Зочидын давхардаагүй тоо"
+
+#: indico_piwik/templates/statistics.html:102
+msgid "Returning Visitors"
+msgstr "Эргэн ирсэн зочид"
+
+#: indico_piwik/templates/statistics.html:106
+msgid "Avg. Duration"
+msgstr "Дундаж хугацаа"
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Peak Statistics"
+msgstr "Оргил статистик"
+
+#: indico_piwik/templates/statistics.html:115
+msgid "Peak Date"
+msgstr "Оргил цаг"
+
+#: indico_piwik/templates/statistics.html:119
+msgid "Peak Users"
+msgstr "Хамгийн их хэрэглэгчид"
+
+#: indico_piwik/templates/statistics.html:129
+msgid "Visitors Geography"
+msgstr "Зочидийн газар зүйн байршил"
+
+#: indico_piwik/templates/statistics.html:133
+msgid "Visitor Origins"
+msgstr "Зочдын гарал үүсэл"
+
+#: indico_piwik/templates/statistics.html:144
+msgid "Top Referrers"
+msgstr "Дээд зэрэглэлийн мэдээлэл өгөгч"
+
+#: indico_piwik/templates/statistics.html:148
+msgid "Traffic Inbound Top 10"
+msgstr "Орж ирж буй урсгалын эхний 10"
+
+#: indico_piwik/templates/statistics.html:152
+msgid "Referrer"
+msgstr "Мэдээлэл өгөгч"
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Visits"
+msgstr "Зочлолт"
+
+#: indico_piwik/templates/statistics.html:154
+msgid "Actions"
+msgstr "Үйлдлүүд"
+
+#: indico_piwik/templates/statistics.html:155
+msgid "Visit Length"
+msgstr "Зочилсон хугацаа"
+
+#: indico_piwik/templates/statistics.html:172
+msgid "User Systems"
+msgstr "Хэрэглэгчийн систем"
+
+#: indico_piwik/templates/statistics.html:176
+msgid "Visitor Systems"
+msgstr "Зочидын систем"
+
+#: indico_piwik/templates/statistics.html:183
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "Энэхүү тайланг хийсэн%(dt)s"
+
+#: indico_piwik/templates/statistics.html:191
+msgid "Unable to retrieve Graph Data"
+msgstr "Графикийн өгөгдлийг авах боломжгүй байна"
+
+#: indico_piwik/templates/statistics.html:193
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "Сервер түргэн хугацаанд хариу өгөөгүй. Огнооны хүрээ хэт том байсан үед ийм зүйл тохиолдож болно."

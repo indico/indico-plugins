@@ -1,0 +1,140 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Pedro Lourenço <pedroob221@gmail.com>, 2021
+# Batbayar Bat-Erdene <yertonts@gmail.com>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
+"Language-Team: Mongolian (Mongolia) (https://www.transifex.com/indico/teams/6478/mn_MN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: mn_MN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_ursh/controllers.py:68
+msgid "Shortcut already exists"
+msgstr "Товч зам аль хэдийнэ оршин байна"
+
+#: indico_ursh/controllers.py:70
+msgid "Malformed shortcut"
+msgstr "Бүрэн ажиллагаагүй товч зам"
+
+#: indico_ursh/plugin.py:23
+msgid "API key"
+msgstr "API түлхүүр"
+
+#: indico_ursh/plugin.py:24
+msgid "The API key to access the <tt>ursh</tt> service"
+msgstr ""
+"The API key to access the <tt>ursh</tt> үйлчилгээ рүү нэвтрэхэд ашиглах API "
+"түлхүүр"
+
+#: indico_ursh/plugin.py:25
+msgid "API host"
+msgstr "API хост"
+
+#: indico_ursh/plugin.py:26
+msgid ""
+"The <tt>ursh</tt> API host, providing the interface to generate short URLs"
+msgstr ""
+"<tt>ursh</tt> API хост нь богино URL-уудыг үүсгэх интерфэйсийг бий болгоно"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:6
+msgid "Create custom shortcut"
+msgstr "Тохируулсан товч замыг үүсгэх"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:14
+msgid "Custom URL creation failed:"
+msgstr "Тохируулсан URL үүсгэлт амжилтгүй боллоо:"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:21
+msgid "Custom URL created successfully"
+msgstr "Тохируулсан URL амжилттай үүслээ"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:25
+msgid "Creating a custom shortcut for the following URL:"
+msgstr "Дараах URL-н тохируулсан товч замыг үүсгэж байна:"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:29
+msgid "Please enter the desired shortcut below (at least 5 chars)."
+msgstr "Хүсэж буй товч замаа доор оруулна уу (5 тэмдэгтээс цөөнгүй)"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:39
+msgid "Enter a shortcut..."
+msgstr "Товч зам оруулах..."
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html:41
+msgid "Create"
+msgstr "Үүсгэх"
+
+#: indico_ursh/templates/ursh_dropdown.html:2
+#: indico_ursh/templates/ursh_link.html:5
+msgid "Short URL options"
+msgstr "Богино URL-н сонголтууд"
+
+#: indico_ursh/templates/ursh_dropdown.html:7
+#: indico_ursh/templates/ursh_link.html:9
+msgid "Get short URL"
+msgstr "Богино URL авах"
+
+#: indico_ursh/templates/ursh_dropdown.html:14
+#: indico_ursh/templates/ursh_link.html:16
+msgid "Create short URL"
+msgstr "Богино URL үүсгэх"
+
+#: indico_ursh/templates/ursh_dropdown.html:19
+#: indico_ursh/templates/ursh_link.html:21
+msgid "Create custom short URL"
+msgstr "Тохируулсан товч URL үүсгэх"
+
+#: indico_ursh/templates/ursh_footer.html:2
+#: indico_ursh/templates/ursh_footer.html:7
+#: indico_ursh/templates/ursh_shortener_page.html:6
+msgid "URL Shortener"
+msgstr "URL богиносгогч"
+
+#: indico_ursh/templates/ursh_link.html:28
+msgid "Obtain short URL"
+msgstr "Богино URL олж авах"
+
+#: indico_ursh/templates/ursh_shortener_page.html:11
+msgid ""
+"In this page, you can generate short links for any Indico URL. Just enter "
+"the URL below and click \"Shorten\"."
+msgstr ""
+"Энэхүү хуудас дээр та аливаа Indico URL-д зориулж богино холбоос үүсгэж "
+"болно. Доор URL оруулан, \"Богиносгох\" дээр дарна уу. "
+
+#: indico_ursh/templates/ursh_shortener_page.html:20
+msgid "Enter an Indico URL to shorten..."
+msgstr "Богиносгохын тулд Indico URL-г оруулна уу..."
+
+#: indico_ursh/templates/ursh_shortener_page.html:21
+msgid "Shorten"
+msgstr "Богиносгох"
+
+#: indico_ursh/templates/ursh_shortener_page.html:27
+msgid "Copy to clipboard"
+msgstr "Түр хуулах"
+
+#: indico_ursh/templates/ursh_shortener_page.html:31
+msgid ""
+"<strong>Tip:</strong> You can also generate short links by using the quick-"
+"links in various places within Indico! Just look for the <span class=\"icon-"
+"link\"></span> icon."
+msgstr ""
+"<strong>Санамж:</strong> Түүнчлэн, Indico доторх төрөл бүрийн газарт хурдан "
+"холбоос ашиглах замаар богино холбоосыг үүсгэж болно! <span class=\"icon-"
+"link\"></span> тэмдгийг харна уу."

@@ -3,9 +3,6 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
 # 
-# Translators:
-# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021
-# 
 #, fuzzy
 msgid ""
 msgstr ""
@@ -13,197 +10,191 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-06-28 09:56+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021\n"
-"Language-Team: Ukrainian (Ukraine) (https://www.transifex.com/indico/teams/6478/uk_UA/)\n"
+"Language-Team: English (United Kingdom) (https://www.transifex.com/indico/teams/6478/en_GB/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
-"Language: uk_UA\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: indico_vc_zoom/controllers.py:28
 msgid "You were already an (alternative) host of this meeting"
-msgstr "Ви вже (альтернативний) господар цієї зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/controllers.py:43
 msgid "You are now an alternative host of room '{room}'"
-msgstr "Ви тепер альтернативний господар кімнати '{room}'"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:27 indico_vc_zoom/forms.py:61
 msgid "Passcode visibility"
-msgstr "Видимість коду"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:28 indico_vc_zoom/forms.py:62
 msgid "Who should be able to know this meeting's passcode"
-msgstr "Хто може дізнатися код ціїє зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:31 indico_vc_zoom/forms.py:65
 msgid "Everyone"
-msgstr "Будь-хто"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:32 indico_vc_zoom/forms.py:66
 msgid "Logged-in users"
-msgstr "Авторизовані користувачі"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:33 indico_vc_zoom/forms.py:67
 msgid "Registered participants"
-msgstr "Зареєстровані учасники"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:34 indico_vc_zoom/forms.py:68
 msgid "No one"
-msgstr "Ніхто"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:44
 msgid "Meeting Type"
-msgstr "Тип зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:45
 msgid "The type of Zoom meeting to be created"
-msgstr "Тип Zoom  зустрічі що буде створена"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:48
 msgid "Regular Meeting"
-msgstr "Звичайна зустріч"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:49 indico_vc_zoom/templates/room_labels.html:4
 msgid "Webinar"
-msgstr "Вебінар"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:51
 msgid "Meeting Host"
-msgstr "Господар зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:52
 msgid "Myself"
-msgstr "Я"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:52
 msgid "Someone else"
-msgstr "Хтось інший"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:54
 msgid "User"
-msgstr "Користувач"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:57 indico_vc_zoom/templates/info_box.html:35
 #: indico_vc_zoom/templates/manage_event_info_box.html:41
 msgid "Passcode"
-msgstr "Код"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:59
 msgid "Meeting passcode (8-10 digits)"
-msgstr "Код зустрічі (8-10 цифр)"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:70 indico_vc_zoom/plugin.py:87
 msgid "Mute audio"
-msgstr "Вимкнути звук"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:72 indico_vc_zoom/plugin.py:89
 msgid "Participants will join the VC room muted by default "
-msgstr "Учасники приєднаються до VC кімнати приглушеними за замовчуваням "
+msgstr ""
 
 #: indico_vc_zoom/forms.py:74 indico_vc_zoom/plugin.py:91
 msgid "Mute video (host)"
-msgstr "Вимкнути відео (господар)"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:76 indico_vc_zoom/plugin.py:93
 msgid "The host will join the VC room with video disabled"
-msgstr "Господар приєднається до VC кімнати з вимкненим відео "
+msgstr ""
 
 #: indico_vc_zoom/forms.py:78 indico_vc_zoom/plugin.py:95
 msgid "Mute video (participants)"
-msgstr "Вимкнути відео (учасники)"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:80 indico_vc_zoom/plugin.py:97
 msgid "Participants will join the VC room with video disabled"
-msgstr "Учасники приєднаються до VC кімнати з вимкненим відео "
+msgstr ""
 
 #: indico_vc_zoom/forms.py:82 indico_vc_zoom/plugin.py:104
 msgid "Waiting room"
-msgstr "Кімната очікування"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:84 indico_vc_zoom/plugin.py:106
 msgid "Participants may be kept in a waiting room by the host"
-msgstr "Учасники можуть утримуватися господарем в кімнаті очікування"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:86 indico_vc_zoom/templates/info_box.html:15
 #: indico_vc_zoom/templates/manage_event_info_box.html:9
 msgid "Description"
-msgstr "Опис"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:86
 msgid "Optional description for this room"
-msgstr "Опис для цієї кімнати"
+msgstr ""
 
 #: indico_vc_zoom/forms.py:116
 msgid "This user has no Zoom account"
-msgstr "Цей користувач не має акаунту Zoom."
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:45
 msgid "API Credentials"
-msgstr "API облікових даних"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:46
 msgid "Zoom Account"
-msgstr " Zoom акаунт"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:48
 msgid "Room Settings"
-msgstr "Налаштування кімнати"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:50
 msgid "Notifications"
-msgstr "Нагадування"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:51
 msgid "Access"
-msgstr "Доступ"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:54
 msgid "API Key"
-msgstr "Ключ API"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:56
 msgid "API Secret"
-msgstr "Код API"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:58
 msgid "Webhook Token"
-msgstr "Вебхук токен"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:59
 msgid "Specify Zoom's webhook token if you want live updates"
-msgstr "Вкажіть Zoom  вебхук токен для оновлень"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:61
 msgid "User lookup mode"
-msgstr "Спосіб пошуку користувачів"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:62
 msgid ""
 "Specify how Indico should look up the zoom user that corresponds to an "
 "Indico user."
 msgstr ""
-"Вкажіть як Indico співставлятиме користувачів Zoom що відповідають "
-"користувачам Indico"
 
 #: indico_vc_zoom/plugin.py:65
 msgid "E-mail domains"
-msgstr "E-mail домени "
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:67
 msgid ""
 "List of e-mail domains which can use the Zoom API. Indico attempts to find "
 "Zoom accounts using all email addresses of a user which use those domains."
 msgstr ""
-"Список доменів електронної пошти, які можуть використовувати Zoom API. "
-"Indico намагається знайти облікові записи Zoom, використовуючи всі "
-"електронні адреси користувача, який використовує ці домени."
 
 #: indico_vc_zoom/plugin.py:71
 msgid "Indico identity providers"
-msgstr "Служби автентифікації Indico"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:73
 msgid ""
@@ -211,206 +202,181 @@ msgid ""
 "providers using the email addresses of the user and attempts to find Zoom "
 "accounts having an email address with the format username@enterprise-domain."
 msgstr ""
-"Cлужби автентифікації з яких отримувати імена користувачів. Indico "
-"запитуватиме ті служби, які використовують електронні адреси користувача, і "
-"намагається знайти облікові записи Zoom, що мають адресу електронної пошти у"
-" форматі username @ enterprise-domain."
 
 #: indico_vc_zoom/plugin.py:78
 msgid "Enterprise domain"
-msgstr "Корпоративний домен"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:80
 msgid ""
 "The domain name used together with the usernames from the Indico identity "
 "provider"
 msgstr ""
-"Доменне ім’я, що використовується разом з іменами користувачів служби "
-"ідентифікації Indico"
 
 #: indico_vc_zoom/plugin.py:83
 msgid "Allow Webinars (Experimental)"
-msgstr "Дозволити вебінари (експериментальна можливість)"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:85
 msgid "Allow webinars to be created through Indico. Use at your own risk."
-msgstr "Дозволити вебінари створені в Indico. Використовуйте на свій ризик."
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:99
 msgid "Join Before Host"
-msgstr "Приєднатися перед господарем"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:101
 msgid ""
 "Allow participants to join the meeting before the host starts the meeting. "
 "Only used for scheduled or recurring meetings."
 msgstr ""
-"Дозволити учасникам приєднуватися до зустрічей перед тим як господар їх "
-"розпочне. Використовуватиметься лише для запланованих або регулярних "
-"зустрічей."
 
 #: indico_vc_zoom/plugin.py:108
 msgid "Creation email footer"
-msgstr "Створення підпису електронного листа"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:109
 msgid "Footer to append to emails sent upon creation of a VC room"
 msgstr ""
-"Підпис для приєднання до електронних листів, які надсилаються в момент "
-"створення VC кімнати"
 
 #: indico_vc_zoom/plugin.py:111
 msgid "Send host URL"
-msgstr "Вислати URL господаря "
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:113
 msgid ""
 "Whether to send an e-mail with the Host URL to the meeting host upon "
 "creation of a meeting"
 msgstr ""
-"Чи посилати електронний лист з посиланням на зустріч після її створення "
-"господарю зустрічі. "
 
 #: indico_vc_zoom/plugin.py:116 indico_vc_zoom/templates/info_box.html:44
 msgid "Join via phone"
-msgstr "Приєднатися по телефону"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:117
 msgid "Link to instructions on joining a meeting via phone"
-msgstr "Посилання на інструкції для приєднання до зустрічі телефоном"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:122
 msgid "Invalid identity providers: {}"
-msgstr "Неправильні служби автентифікації: {}"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:352
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
 msgstr ""
-"Неможливо створити кімнату в Zoom. Будь-ласка зв'яжіться зі службою "
-"підтримки якщо ця помилка залишатиметься."
 
 #: indico_vc_zoom/plugin.py:437
 msgid "Room didn't exist in Zoom anymore"
-msgstr "Кімнати не існує в Zoom"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:440
 msgid "Zoom Error: \"{}\""
-msgstr "Помилка Zoom: \"{}\""
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:443
 msgid "Problem deleting room"
-msgstr "Проблема підчас видалення кімнати"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:467
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
-msgstr "Кімнати \"{}\"  більше не існує в Zoom і вона була видалена із заходу"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py:535
 msgid ""
 "There are one or more scheduled Zoom meetings associated with this event "
 "which were not automatically updated."
 msgstr ""
-"З цією подією пов’язано одну або кілька запланованих зустрічей Zoom, які не "
-"були оновлені автоматично."
 
 #: indico_vc_zoom/plugin.py:538
 msgid ""
 "There are one or more scheduled Zoom meetings associated with the "
 "contribution \"{}\" which  were not automatically updated."
 msgstr ""
-"Є одна або кілька запланованих зустрічей Zoom, пов’язаних із доповіддю "
-"\"{}\", які не були автоматично оновлені."
 
 #: indico_vc_zoom/plugin.py:541
 msgid ""
 "There are one or more scheduled Zoom meetings associated with this session "
 "block which were not automatically updated."
 msgstr ""
-"З цим блоком сеансів пов’язано одну або кілька запланованих зустрічей Zoom, "
-"які не були автоматично оновлені."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
-msgstr "Всі електронні листи"
+msgstr ""
 
 #: indico_vc_zoom/util.py:44
 msgid "Email domains"
-msgstr "E-mail домени "
+msgstr ""
 
 #: indico_vc_zoom/util.py:45
 msgid "Authenticators"
-msgstr "Служби автентифікації"
+msgstr ""
 
 #: indico_vc_zoom/util.py:125
 msgid "This room has been deleted from Zoom"
-msgstr "Ця кімната була видалена з Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py:129
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
 msgstr ""
-"Неможливо отримати доступ до кімнати в Zoom. Будь-ласка зв'яжіться зі "
-"службою підтримки якщо ця помилка залишатиметься."
 
 #: indico_vc_zoom/util.py:151
 msgid "Room no longer exists in Zoom"
-msgstr "Кімнати більше не існує в Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py:153
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
-"Неможливо оновити зустріч. Будь-ласка зв'яжіться зі службою підтримки якщо "
-"ця помилка залишатиметься."
 
 #: indico_vc_zoom/util.py:209
 msgid "Could not find Zoom user for alternative host"
-msgstr "Не можна знайти користувача для альтернативного господаря"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:9
 msgid "You will become an alternative host of this Zoom meeting"
-msgstr "Ви станете господарем цієї Zoom зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:12
 msgid "Make me alternative host"
-msgstr "Зробити мене альтернативним господарем"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:26
 #: indico_vc_zoom/templates/buttons.html:32
 msgid "Join"
-msgstr "Приєднатися"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:30
 msgid "You will need a passcode to join this Zoom meeting"
-msgstr "Вам буде потрібен код щоб приєднатися до зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:38
 #: indico_vc_zoom/templates/buttons.html:44
 #: indico_vc_zoom/templates/buttons.html:50
 msgid "This Zoom Meeting can only be seen by registered participants"
-msgstr "Лише зареєстпровані користувачі можуть бачити цю Zoom зустріч"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:40
 msgid "Please register"
-msgstr "Зареєструйтесь  будь-ласка"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:45
 msgid "Registration required"
-msgstr "Потрібна реєстрація"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:52
 msgid "Please log in and register"
-msgstr "Будь-ласка ввійдіть і зареєструйтесь "
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:57
 msgid "This Zoom Meeting can only be seen by logged in users"
-msgstr "Лише автентифіковані користувачі можуть бачити цю Zoom зустріч"
+msgstr ""
 
 #: indico_vc_zoom/templates/buttons.html:59
 msgid "Please log in"
-msgstr "Будь-ласка ввійдіть"
+msgstr ""
 
 #: indico_vc_zoom/templates/extra_delete_msg.html:2
 #, python-format
@@ -419,62 +385,57 @@ msgid ""
 " to delete this Zoom meeting from all events, please make sure that they do "
 "not use it for other events that may still need it!"
 msgstr ""
-"Господарем цієї зустрічі є  <strong> %(host)s </strong>. Якщо ви хочете "
-"видалити цю зустріч з  усіх подій, переконайтесь, що вони не використовують "
-"її для інших подій, які все ще можуть знадобитися!"
 
 #: indico_vc_zoom/templates/info_box.html:12
 #: indico_vc_zoom/templates/manage_event_info_box.html:6
 msgid "Zoom Meeting ID"
-msgstr "ID Zoom зустрічі"
+msgstr ""
 
 #: indico_vc_zoom/templates/info_box.html:19
 #: indico_vc_zoom/templates/manage_event_info_box.html:12
 msgid "Host"
-msgstr "Господар"
+msgstr ""
 
 #: indico_vc_zoom/templates/info_box.html:24
 #: indico_vc_zoom/templates/manage_event_info_box.html:18
 msgid "Alternative host"
 msgid_plural "Alternative hosts"
-msgstr[0] "Альтернативні господар"
-msgstr[1] "Альтернативні господарі"
-msgstr[2] "Альтернативні хазяї"
-msgstr[3] "Альтернативні господарі"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico_vc_zoom/templates/info_box.html:40
 msgid "Useful links"
-msgstr "Корисні посилання"
+msgstr ""
 
 #: indico_vc_zoom/templates/info_box.html:48
 #: indico_vc_zoom/templates/manage_event_info_box.html:43
 msgid "Zoom URL"
-msgstr "Zoom URL адреса"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:28
 msgid "Linked to"
-msgstr "Пов'язано з"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:34
 msgid "the whole event"
-msgstr "усім заходом"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:36
 msgid "Contribution"
-msgstr "Доповідь"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:38
 msgid "Session"
-msgstr "Засідання"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:47
 msgid "Created on"
-msgstr "Створено"
+msgstr ""
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:50
 msgid "Modified on"
-msgstr "Змінено"
+msgstr ""
 
 #: indico_vc_zoom/templates/room_labels.html:3
 msgid "This is a Zoom webinar"
-msgstr "Це вебінар Zoom "
+msgstr ""

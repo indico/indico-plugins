@@ -1,0 +1,206 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
+# Marcin Miłek, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-06-09 14:18+0200\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: Marcin Miłek, 2021\n"
+"Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: indico_citadel/plugin.py:25
+msgid "Citadel URL"
+msgstr "Citadel URL"
+
+#: indico_citadel/plugin.py:26
+msgid "The URL of the Citadel server"
+msgstr "URL serwera Citadel"
+
+#: indico_citadel/plugin.py:27
+msgid "Citadel API token"
+msgstr "Token Citadel API"
+
+#: indico_citadel/plugin.py:28
+msgid "The authentication token to access Citadel"
+msgstr "Token uwierzytelniania dostępu do Citadel"
+
+#: indico_citadel/plugin.py:29
+msgid "File extensions"
+msgstr "Rozszerzenia plików"
+
+#: indico_citadel/plugin.py:30
+msgid "File extensions to upload for full-text search"
+msgstr ""
+"Rozszerzenie pliku do przesłania do wyszukania wyszukania pełnotekstowego"
+
+#: indico_citadel/plugin.py:31
+msgid "Max. file size"
+msgstr "Maksymalny rozmiar pliku"
+
+#: indico_citadel/plugin.py:33
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+"Maksymalny rozmiar (w MB) pobierania dla wyszukania pełnotekstowego. Należy "
+"pamiętać, że zwiększenie tego ustawienia po początkowym eksporcie spowoduje "
+"pobranie wszystkich plików, które nie zostały jeszcze pobrane przy następnym"
+" uruchomieniu kolejki, co może zająć dużo czasu na najważniejszych "
+"serwerach. Możesz uruchomić najpierw ręcznie pobieranie nowego rozmiaru "
+"plików. "
+
+#: indico_citadel/plugin.py:38
+msgid "Parallel threads (records)"
+msgstr "Procesy równoległe (rejestracje)"
+
+#: indico_citadel/plugin.py:39
+msgid "Number of threads to use when uploading records."
+msgstr "Liczba procesów do wykorzystania podczas przesyłania nagrań."
+
+#: indico_citadel/plugin.py:40
+msgid "Parallel threads (records, initial export)"
+msgstr "Procesy równoległe (nagrania, eksport początkowy)"
+
+#: indico_citadel/plugin.py:42
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr ""
+"Liczba procesów do użycia podczas pobierania plików do początkowego "
+"eksportu."
+
+#: indico_citadel/plugin.py:44
+msgid "Parallel threads (files)"
+msgstr "Procesy równoległe (pliki)"
+
+#: indico_citadel/plugin.py:45
+msgid "Number of threads to use when uploading files."
+msgstr "Liczba procesów do użycia podczas pobierania plików. "
+
+#: indico_citadel/plugin.py:46
+msgid "Parallel threads (files, initial export)"
+msgstr "Procesy równoległe (pliki, eksport początkowy)"
+
+#: indico_citadel/plugin.py:48
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr ""
+"Liczba procesów do użycia podczas pobierania plików do początkowego "
+"eksportu."
+
+#: indico_citadel/plugin.py:50
+msgid "Disable search"
+msgstr "Wyłącz wyszukiwanie"
+
+#: indico_citadel/plugin.py:51
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+"Spowoduje to wyłączenie integracji wyszukiwania wtyczki. W przypadku użycia "
+"tej opcji zostanie użyty wewnętrzny interfejs wyszukiwania Indico. Może to "
+"być przydatne, gdy wykonujesz większy początkowy eksport i nie chcesz, aby "
+"użytkownicy otrzymywali w tym czasie niekompletne wyniki wyszukiwania."
+
+#: indico_citadel/search.py:95
+msgid "The title of an event, contribution, etc."
+msgstr "Tytuł wydarzenia, kontrybucji itp. "
+
+#: indico_citadel/search.py:95
+msgid "A speaker, author or event chair's name"
+msgstr "Nazwisko prelegenta, autora lub przewodniczącego wydarzenia"
+
+#: indico_citadel/search.py:96
+msgid "A speaker, author or event chair's affiliation"
+msgstr "Afiliacja prelegenta, autora lub przewodniczącego wydarzenia"
+
+#: indico_citadel/search.py:97
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "Typ wpisu (np. konferencja, spotkanie, plik itp.)"
+
+#: indico_citadel/search.py:98
+msgid "Name of the venue"
+msgstr "Nazwa miejsca wydarzenia"
+
+#: indico_citadel/search.py:99
+msgid "Name of the room"
+msgstr "Nazwa pokoju"
+
+#: indico_citadel/search.py:100
+msgid "Address of the venue"
+msgstr "Adres miejsca wydarzenia"
+
+#: indico_citadel/search.py:101
+msgid "Name of the attached file"
+msgstr "Nazwa załączonego pliku"
+
+#: indico_citadel/search.py:102
+msgid "A keyword associated with an event"
+msgstr "Słowo kluczowe powiązane z wydarzeniem"
+
+#: indico_citadel/search.py:103
+msgid "The category of an event"
+msgstr "Kategoria wydarzenia"
+
+#: indico_citadel/search.py:111
+msgid "Most relevant"
+msgstr "Najbardziej istotne"
+
+#: indico_citadel/search.py:112
+msgid "Newest first"
+msgstr "Najnowsze najpierw"
+
+#: indico_citadel/search.py:113
+msgid "Oldest first"
+msgstr "Najstarsze najpierw"
+
+#: indico_citadel/search.py:117
+msgid "Affiliation"
+msgstr "Afiliacja"
+
+#: indico_citadel/search.py:118
+msgid "Person"
+msgstr "Osoba"
+
+#: indico_citadel/search.py:119
+msgid "Type"
+msgstr "Rodzaj"
+
+#: indico_citadel/search.py:120
+msgid "Location"
+msgstr "Lokalizacja"
+
+#: indico_citadel/search.py:121
+msgid "Date"
+msgstr "Data"
+
+#: indico_citadel/search.py:122
+msgid "Category"
+msgstr "Kategoria"
+
+#: indico_citadel/search.py:123
+msgid "Category ID"
+msgstr "Identyfikator kategorii"
+
+#: indico_citadel/search.py:124
+msgid "Event ID"
+msgstr "Identyfikator wydarzenia"

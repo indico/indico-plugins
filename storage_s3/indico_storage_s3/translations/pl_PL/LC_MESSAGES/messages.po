@@ -1,0 +1,51 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020\n"
+"Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: indico_storage_s3/plugin.py:33
+msgid "Bucket info API"
+msgstr "API Bucket info"
+
+#: indico_storage_s3/plugin.py:34
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+#: indico_storage_s3/plugin.py:35
+msgid "The username to access the S3 bucket info endpoint"
+msgstr "Nazwa użytkownika punktu końcowego S3 bucket info"
+
+#: indico_storage_s3/plugin.py:36
+msgid "Password"
+msgstr "Hasło"
+
+#: indico_storage_s3/plugin.py:39
+msgid "The password to access the S3 bucket info endpoint"
+msgstr "Hasło dostępu do punktu końcowego S3 bucket info"
+
+#: indico_storage_s3/plugin.py:44
+msgid ""
+"Enables an API on {url} that returns information on all S3 buckets currently"
+" in use, including dynamically-named ones."
+msgstr ""
+"Włącza API dla {url} , które zwraca informacje o wszystkich obecnie "
+"używanych buketach S3, łącznie z nazwanymi dynamicznie."

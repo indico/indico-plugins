@@ -1,0 +1,238 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Gökhan Kalayci <gkmediagokhan@gmail.com>, 2017
+# İNFOYED TERCÜME <infoyed@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-26 16:24+0000\n"
+"Last-Translator: Adrian Mönnich\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: indico_piwik/forms.py:18
+msgid "Track global visits"
+msgstr "Küresel ziyaretleri izle"
+
+#: indico_piwik/forms.py:19
+msgid "Track events"
+msgstr "Etkinlikleri izle"
+
+#: indico_piwik/forms.py:20
+msgid "Cache results"
+msgstr "Sonuçları önbelleğe al"
+
+#: indico_piwik/forms.py:21
+msgid "Piwik server URL"
+msgstr "Piwik sunucu URL'si"
+
+#: indico_piwik/forms.py:22
+msgid "Piwik API server URL"
+msgstr "Piwik API sunucu URL'si"
+
+#: indico_piwik/forms.py:23
+msgid "Should be pointing to 'index.php'"
+msgstr "'index.php' yi işaret etmeli"
+
+#: indico_piwik/forms.py:24
+msgid "Piwik API token"
+msgstr "Piwik API simgesi"
+
+#: indico_piwik/forms.py:25
+msgid "Token to access the API. Do not share it!"
+msgstr "API'ya erişme simgesidir. Paylaşmayın!"
+
+#: indico_piwik/forms.py:26
+msgid "Global statistics ID"
+msgstr "Küresel istatistik kimliği"
+
+#: indico_piwik/forms.py:27
+msgid "Piwik site ID for global statistics"
+msgstr "Küresel istatistikler için Piwik site kimliği"
+
+#: indico_piwik/forms.py:28
+msgid "Event statistics ID"
+msgstr "Etkinlik istatistik kimliği"
+
+#: indico_piwik/forms.py:29
+msgid "Piwik site ID for event statistics"
+msgstr "Etkinlik istatistikleri için Piwik site kimliği"
+
+#: indico_piwik/forms.py:30
+msgid "Result cache TTL (seconds)"
+msgstr "Sonuç önbelleği TTL (saniye)"
+
+#: indico_piwik/forms.py:31
+msgid "How long event reports are kept cached"
+msgstr "Olay raporlarının önbelleğe alınma süresi ne kadar"
+
+#: indico_piwik/forms.py:32
+msgid "Use Piwik server URL for all requests"
+msgstr "Tüm istekler için Piwik sunucu URL'si kullan"
+
+#: indico_piwik/forms.py:36
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "Etkinlik istatistikleri, aynı Piwik sitesini genel istatistikler olarak kullanamaz"
+
+#: indico_piwik/plugin.py:66
+msgid "Statistics"
+msgstr "İstatistikler"
+
+#: indico_piwik/templates/statistics.html:8
+msgid "Selection Information"
+msgstr "Seçim Bilgileri"
+
+#: indico_piwik/templates/statistics.html:9
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s den %(end)s) ye"
+
+#: indico_piwik/templates/statistics.html:12
+#: indico_piwik/templates/statistics.html:14
+msgid "Modify Query"
+msgstr "Sorguyu Değiştir"
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Hide"
+msgstr "Gizle"
+
+#: indico_piwik/templates/statistics.html:23
+msgid "View statistics between these dates"
+msgstr "Bu tarihler arasındaki istatistikleri görüntüle"
+
+#: indico_piwik/templates/statistics.html:29
+msgid "to"
+msgstr "den"
+
+#: indico_piwik/templates/statistics.html:39
+msgid "Choose Event / Contribution"
+msgstr "Etkinlik/Katkı seç"
+
+#: indico_piwik/templates/statistics.html:41
+msgid "Event"
+msgstr "Etkinlik"
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Contribution"
+msgstr "Katkı"
+
+#: indico_piwik/templates/statistics.html:53
+msgid "Update Query"
+msgstr "Sorguyu Güncelle"
+
+#: indico_piwik/templates/statistics.html:64
+msgid "Visitor Hit Rates"
+msgstr "Ziyaretçi Ziyaret Oranları"
+
+#: indico_piwik/templates/statistics.html:66
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "Unutmayın, istatistikler yalnızca eklentinin tanıtımından bu yana toplanmıştır. Bu, bazı olayların önceki dönemleri için mevcut hiçbir veri bulunmadığı anlamına gelir; bu, olayın o zaman etkinlik göstermediği anlamına gelmez."
+
+#: indico_piwik/templates/statistics.html:73
+msgid "Info"
+msgstr "Bilgi"
+
+#: indico_piwik/templates/statistics.html:86
+msgid "Overall Statistics"
+msgstr "Genel İstatistikler"
+
+#: indico_piwik/templates/statistics.html:90
+msgid "Visitor Metrics"
+msgstr "Ziyaretçi Ölçümleri"
+
+#: indico_piwik/templates/statistics.html:94
+msgid "Visitors"
+msgstr "Ziyaretçiler"
+
+#: indico_piwik/templates/statistics.html:98
+msgid "Unique Visitors"
+msgstr "Tekil Ziyaretçiler"
+
+#: indico_piwik/templates/statistics.html:102
+msgid "Returning Visitors"
+msgstr "Geri Dönen Ziyaretçiler"
+
+#: indico_piwik/templates/statistics.html:106
+msgid "Avg. Duration"
+msgstr "Ort. Süre"
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Peak Statistics"
+msgstr "Doruk İstatistikleri"
+
+#: indico_piwik/templates/statistics.html:115
+msgid "Peak Date"
+msgstr "Doruk Tarihi"
+
+#: indico_piwik/templates/statistics.html:119
+msgid "Peak Users"
+msgstr "Doruk Kullanıcılar"
+
+#: indico_piwik/templates/statistics.html:129
+msgid "Visitors Geography"
+msgstr "Ziyaretçi Coğrafyası"
+
+#: indico_piwik/templates/statistics.html:133
+msgid "Visitor Origins"
+msgstr "Ziyaretçilerin Kaynakları"
+
+#: indico_piwik/templates/statistics.html:144
+msgid "Top Referrers"
+msgstr "En Çok Yön Verenler"
+
+#: indico_piwik/templates/statistics.html:148
+msgid "Traffic Inbound Top 10"
+msgstr "Trafik Gelen İlk 10"
+
+#: indico_piwik/templates/statistics.html:152
+msgid "Referrer"
+msgstr "Yönlendiren"
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Visits"
+msgstr "Ziyaretler"
+
+#: indico_piwik/templates/statistics.html:154
+msgid "Actions"
+msgstr "Eylemler"
+
+#: indico_piwik/templates/statistics.html:155
+msgid "Visit Length"
+msgstr "Ziyaret Uzunluğu"
+
+#: indico_piwik/templates/statistics.html:172
+msgid "User Systems"
+msgstr "Kullanıcı Sistemleri"
+
+#: indico_piwik/templates/statistics.html:176
+msgid "Visitor Systems"
+msgstr "Ziyaretçi Sistemleri"
+
+#: indico_piwik/templates/statistics.html:183
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "Bu rapor şu tarihlerde oluşturuldu: %(dt)s"
+
+#: indico_piwik/templates/statistics.html:191
+msgid "Unable to retrieve Graph Data"
+msgstr "Grafik Verileri alınamadı"
+
+#: indico_piwik/templates/statistics.html:193
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "Sunucu zamanında yanıt vermedi. Tarih aralığı çok büyük olabilir."

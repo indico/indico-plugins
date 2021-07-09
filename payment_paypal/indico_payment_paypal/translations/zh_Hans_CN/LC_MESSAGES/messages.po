@@ -1,0 +1,101 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-08-21 02:01+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
+"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_payment_paypal/controllers.py:110
+msgid "Your payment request has been processed."
+msgstr "您的付款请求已处理。"
+
+#: indico_payment_paypal/controllers.py:118
+msgid "You cancelled the payment process."
+msgstr "您取消了付款过程。"
+
+#: indico_payment_paypal/plugin.py:25
+msgid "API URL"
+msgstr "API URL"
+
+#: indico_payment_paypal/plugin.py:25
+msgid "URL of the PayPal HTTP API."
+msgstr "PayPal HTTP API 的 URL 。"
+
+#: indico_payment_paypal/plugin.py:26 indico_payment_paypal/plugin.py:32
+msgid "Business"
+msgstr "商务"
+
+#: indico_payment_paypal/plugin.py:27
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "与 PayPal 帐户关联的默认 PayPal ID 或电子邮件地址。事件管理员将能够覆盖它。"
+
+#: indico_payment_paypal/plugin.py:34
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "与PayPal帐户关联的 PayPal ID 或电子邮件地址。"
+
+#: indico_payment_paypal/util.py:23
+msgid "Invalid email address / paypal ID"
+msgstr "无效的电子邮件地址 / paypal ID "
+
+#: indico_payment_paypal/templates/event_payment_form.html:4
+msgid "First name"
+msgstr "名"
+
+#: indico_payment_paypal/templates/event_payment_form.html:6
+msgid "Last name"
+msgstr "姓"
+
+#: indico_payment_paypal/templates/event_payment_form.html:8
+msgid "Total amount"
+msgstr "总数"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html:4
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "请确保您的PayPal卖家帐户默认配置为使用<strong>UTF-8</strong>，否则某些交易可能最终无法被Indico确认！<br>您可以 %(link)s 在这里 %(endlink)s了解如何设置它。"
+
+#: indico_payment_paypal/templates/transaction_details.html:6
+msgid "Transaction ID"
+msgstr "交易 ID"
+
+#: indico_payment_paypal/templates/transaction_details.html:8
+msgid "Invoice ID"
+msgstr "发票 ID"
+
+#: indico_payment_paypal/templates/transaction_details.html:10
+msgid "Payer e-mail"
+msgstr "付款人电子邮件"
+
+#: indico_payment_paypal/templates/transaction_details.html:19
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "支付的金额与要求的金额不匹配。请联系注册人解决问题。"
+
+#: indico_payment_paypal/templates/transaction_details.html:22
+msgid "Paid:"
+msgstr "付款："
+
+#: indico_payment_paypal/templates/transaction_details.html:26
+msgid "Required:"
+msgstr "请求的："

@@ -1,0 +1,49 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2020\n"
+"Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_storage_s3/plugin.py:33
+msgid "Bucket info API"
+msgstr "存储桶信息API"
+
+#: indico_storage_s3/plugin.py:34
+msgid "Username"
+msgstr "用户名"
+
+#: indico_storage_s3/plugin.py:35
+msgid "The username to access the S3 bucket info endpoint"
+msgstr "用于访问S3存储桶信息端点的用户名"
+
+#: indico_storage_s3/plugin.py:36
+msgid "Password"
+msgstr "密码"
+
+#: indico_storage_s3/plugin.py:39
+msgid "The password to access the S3 bucket info endpoint"
+msgstr "用于访问S3存储桶信息端点的密码"
+
+#: indico_storage_s3/plugin.py:44
+msgid ""
+"Enables an API on {url} that returns information on all S3 buckets currently"
+" in use, including dynamically-named ones."
+msgstr "在 {url} 上启用API，该 API 返回有关当前正在使用的所有S3存储桶（包括动态命名的存储桶）的信息。"

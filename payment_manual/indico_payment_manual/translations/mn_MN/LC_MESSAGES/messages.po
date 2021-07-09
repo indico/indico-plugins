@@ -1,0 +1,68 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Batbayar Bat-Erdene <yertonts@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-17 16:57+0000\n"
+"Last-Translator: Pedro Lourenço <pedroob221@gmail.com>\n"
+"Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: mn_MN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_payment_manual/placeholders.py:33
+msgid "escaped for URLs"
+msgstr "URL-уудаас зайлсхийсэн"
+
+#: indico_payment_manual/placeholders.py:38
+msgid "First name of the registrant"
+msgstr "Бүртгэл дээрх нэр"
+
+#: indico_payment_manual/placeholders.py:44
+msgid "Last name of the registrant"
+msgstr "Бүртгэл дээрх овог"
+
+#: indico_payment_manual/placeholders.py:50
+msgid "Email address of the registrant"
+msgstr "Бүртгүүлэгчийн цахим шуудангийн хаяг"
+
+#: indico_payment_manual/placeholders.py:60
+msgid "The ID of the event"
+msgstr "Үйл явдлын ID дугаар"
+
+#: indico_payment_manual/placeholders.py:83
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "Бүртгүүлэгчийн төлөх шаардлагатай үнэ (тухайлбал, 100.00 эсвэл 100.25)"
+
+#: indico_payment_manual/placeholders.py:84
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "Боломжтой бол центээр илэрхийлээгүй үнэ (тухайлбал, 100 эсвэл 100.25)"
+
+#: indico_payment_manual/placeholders.py:85
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "Бүхэл тоогоор илэрхийлсэн үнэ (тухайлбал, 10000 эсвэл 100025)"
+
+#: indico_payment_manual/placeholders.py:90
+msgid "The currency used in the registration"
+msgstr "Бүртгэлд ашигласан валют"
+
+#: indico_payment_manual/plugin.py:21
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "Төлбөр хийхэд ашиглах шаардлагатай дэлгэрэнгүй мэдээлэл. Үүнд ихэвчлэн банкны дансны мэдээлэл, IBAN болон төлбөрийн лавлагаа ордог. Түүнчлэн, та төлбөрийн тусгай вэбсайт руу холбоос хийж болно. Энэ тохиолдолд, боломжтой үед зай авагчийн URL-с зайлсхийсэн хувилбарыг ашиглахаа мартуузай."
+
+#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+msgid "Payment details"
+msgstr "Төлбөрийн дэлгэрэнгүй мэдээлэл"

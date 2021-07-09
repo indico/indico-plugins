@@ -1,0 +1,32 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Sedir G. Morais <philippi.sedir@gmail.com>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"PO-Revision-Date: 2021-06-25 16:11+0000\n"
+"Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>, 2021\n"
+"Language-Team: Portuguese (Brazil) (https://www.transifex.com/indico/teams/6478/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: indico_vc_zoom/client/index.js:24
+msgid "Are you sure you want to be added as an alternative host?"
+msgstr ""
+"Você tem certeza de que deseja ser adicionado como um anfitrião alternativo?"
+
+#: indico_vc_zoom/client/index.js:25
+msgid "Make me an alternative host"
+msgstr "Torne-me um anfitrião alternativo"

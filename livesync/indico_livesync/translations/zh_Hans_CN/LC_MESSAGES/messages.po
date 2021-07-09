@@ -1,0 +1,173 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2020-2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-31 07:59+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
+"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_livesync/controllers.py:41
+msgid "Agent deleted"
+msgstr "已删除的代理"
+
+#: indico_livesync/controllers.py:55
+msgid "This backend is already in use"
+msgstr "此后端已在使用"
+
+#: indico_livesync/controllers.py:64
+msgid "Agent added"
+msgstr "已添加的代理"
+
+#: indico_livesync/controllers.py:65
+msgid "Don't forget to run the initial export!"
+msgstr "别忘了运行初始导出！"
+
+#: indico_livesync/controllers.py:77
+msgid "Cannot edit an agent that is not loaded"
+msgstr "无法编辑未加载的代理"
+
+#: indico_livesync/controllers.py:88
+msgid "Agent updated"
+msgstr "已更新的代理"
+
+#: indico_livesync/forms.py:17
+#: indico_livesync/templates/plugin_details_extra.html:26
+msgid "Name"
+msgstr "名字"
+
+#: indico_livesync/forms.py:18
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "代理的名称。仅在管理界面中使用。"
+
+#: indico_livesync/plugin.py:26
+msgid "Queue entry TTL"
+msgstr "队列条目TTL"
+
+#: indico_livesync/plugin.py:27
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "应在队列中保留处理的条目的天数。从创建队列条目开始计算时间，因此，如果LiveSync任务有一段时间没有运行，则在处理队列条目后的下一次运行期间可能会删除它们。将其设置为 0 将禁用自动删除。"
+
+#: indico_livesync/plugin.py:32
+msgid "Excluded categories"
+msgstr "排除的类别"
+
+#: indico_livesync/plugin.py:33
+msgid "Category ID"
+msgstr "类别 ID"
+
+#: indico_livesync/plugin.py:34
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "不包括对这些类别或其任何子类别中的对象所做的更改。"
+
+#: indico_livesync/plugin.py:36
+msgid "Disable queue runs"
+msgstr "禁用队列运行"
+
+#: indico_livesync/plugin.py:37
+msgid "Disable all scheduled queue runs."
+msgstr "禁用所有计划的队列运行。"
+
+#: indico_livesync/templates/edit_agent.html:9
+msgid "Cancel"
+msgstr "取消"
+
+#: indico_livesync/templates/plugin_details_extra.html:7
+#: indico_livesync/templates/plugin_details_extra.html:11
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "添加 %(backend)s 代理"
+
+#: indico_livesync/templates/plugin_details_extra.html:18
+msgid "LiveSync Agents"
+msgstr "LiveSync 代理"
+
+#: indico_livesync/templates/plugin_details_extra.html:25
+msgid "ID"
+msgstr "ID"
+
+#: indico_livesync/templates/plugin_details_extra.html:27
+msgid "Backend"
+msgstr "后端"
+
+#: indico_livesync/templates/plugin_details_extra.html:28
+msgid "Last Run"
+msgstr "最后运行"
+
+#: indico_livesync/templates/plugin_details_extra.html:29
+msgid "Queue"
+msgstr "队列"
+
+#: indico_livesync/templates/plugin_details_extra.html:30
+msgid "Status"
+msgstr "状态"
+
+#: indico_livesync/templates/plugin_details_extra.html:31
+msgid "Actions"
+msgstr "操作"
+
+#: indico_livesync/templates/plugin_details_extra.html:43
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "未加载：%(name)s"
+
+#: indico_livesync/templates/plugin_details_extra.html:50
+msgid "Never"
+msgstr "从未"
+
+#: indico_livesync/templates/plugin_details_extra.html:58
+msgid "Ready"
+msgstr "准备好"
+
+#: indico_livesync/templates/plugin_details_extra.html:63
+msgid "n/a"
+msgstr "n/a"
+
+#: indico_livesync/templates/plugin_details_extra.html:70
+msgid "Delete this agent?"
+msgstr "删除此代理？"
+
+#: indico_livesync/templates/plugin_details_extra.html:71
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "你确实要删除该代理和所有它的队列条目吗？"
+
+#: indico_livesync/templates/plugin_details_extra.html:77
+msgid "Edit LiveSync agent"
+msgstr "编辑 LiveSync 代理"
+
+#: indico_livesync/templates/plugin_details_extra.html:88
+msgid "No agents have been added yet."
+msgstr "还没有代理添加。"
+
+#: indico_livesync/templates/plugin_details_extra.html:99
+msgid "No backend plugins enabled"
+msgstr "没有后端插件可用"
+
+#: indico_livesync/templates/plugin_details_extra.html:100
+msgid "Add"
+msgstr "添加"
+
+#: indico_livesync/templates/plugin_details_extra.html:113
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "您仍然需要通过在shell中执行下面的命令来运行某些代理的初始导出。<br> 请注意，这可能需要很长的时间，如果 Indico 有许多事件！"

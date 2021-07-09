@@ -1,0 +1,173 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Jesús Martín <jesusmartin@sallep.net>, 2017
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-26 16:24+0000\n"
+"Last-Translator: Adrian Mönnich\n"
+"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_livesync/controllers.py:41
+msgid "Agent deleted"
+msgstr "Agente borrado"
+
+#: indico_livesync/controllers.py:55
+msgid "This backend is already in use"
+msgstr ""
+
+#: indico_livesync/controllers.py:64
+msgid "Agent added"
+msgstr "Agente añadido"
+
+#: indico_livesync/controllers.py:65
+msgid "Don't forget to run the initial export!"
+msgstr "¡No se olvide de ejecutar la exportación inicial!"
+
+#: indico_livesync/controllers.py:77
+msgid "Cannot edit an agent that is not loaded"
+msgstr "No se puede editar un agente que no ha sido cargado"
+
+#: indico_livesync/controllers.py:88
+msgid "Agent updated"
+msgstr "Agente actualizado"
+
+#: indico_livesync/forms.py:17
+#: indico_livesync/templates/plugin_details_extra.html:26
+msgid "Name"
+msgstr "Nombre"
+
+#: indico_livesync/forms.py:18
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "Nombre del agente. Solo se utiliza en la interfaz de administración."
+
+#: indico_livesync/plugin.py:26
+msgid "Queue entry TTL"
+msgstr "Entrada de cola TTL"
+
+#: indico_livesync/plugin.py:27
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "Días que deben mantenerse las entradas procesadas en la cola. El tiempo inicia a contar desde la creación de las entradas de cola, por lo que si la tarea de LiveSync no se está ejecutando durante algún tiempo, las entradas de cola se pueden eliminar durante la siguiente ejecución tras ser procesadas. Si se pone 0 se deshabilita la eliminación automática."
+
+#: indico_livesync/plugin.py:32
+msgid "Excluded categories"
+msgstr "Categorías excluidas"
+
+#: indico_livesync/plugin.py:33
+msgid "Category ID"
+msgstr "ID categoría"
+
+#: indico_livesync/plugin.py:34
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "Se excluyen los cambios en objetos dentro de estas categorías o cualquiera de sus subcategorías."
+
+#: indico_livesync/plugin.py:36
+msgid "Disable queue runs"
+msgstr ""
+
+#: indico_livesync/plugin.py:37
+msgid "Disable all scheduled queue runs."
+msgstr ""
+
+#: indico_livesync/templates/edit_agent.html:9
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: indico_livesync/templates/plugin_details_extra.html:7
+#: indico_livesync/templates/plugin_details_extra.html:11
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "Añadir agente %(backend)s "
+
+#: indico_livesync/templates/plugin_details_extra.html:18
+msgid "LiveSync Agents"
+msgstr "Agentes LiveSync"
+
+#: indico_livesync/templates/plugin_details_extra.html:25
+msgid "ID"
+msgstr "ID"
+
+#: indico_livesync/templates/plugin_details_extra.html:27
+msgid "Backend"
+msgstr "Backend"
+
+#: indico_livesync/templates/plugin_details_extra.html:28
+msgid "Last Run"
+msgstr "Última ejecución"
+
+#: indico_livesync/templates/plugin_details_extra.html:29
+msgid "Queue"
+msgstr "Cola"
+
+#: indico_livesync/templates/plugin_details_extra.html:30
+msgid "Status"
+msgstr ""
+
+#: indico_livesync/templates/plugin_details_extra.html:31
+msgid "Actions"
+msgstr "Acciones"
+
+#: indico_livesync/templates/plugin_details_extra.html:43
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "Sin cargar: %(name)s"
+
+#: indico_livesync/templates/plugin_details_extra.html:50
+msgid "Never"
+msgstr "Nunca"
+
+#: indico_livesync/templates/plugin_details_extra.html:58
+msgid "Ready"
+msgstr ""
+
+#: indico_livesync/templates/plugin_details_extra.html:63
+msgid "n/a"
+msgstr ""
+
+#: indico_livesync/templates/plugin_details_extra.html:70
+msgid "Delete this agent?"
+msgstr "¿Eliminar este agente?"
+
+#: indico_livesync/templates/plugin_details_extra.html:71
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "¿Realmente desea borrar este agente y todas sus entradas en cola?"
+
+#: indico_livesync/templates/plugin_details_extra.html:77
+msgid "Edit LiveSync agent"
+msgstr "Editar agente LiveSync"
+
+#: indico_livesync/templates/plugin_details_extra.html:88
+msgid "No agents have been added yet."
+msgstr "Todavía no se ha añadido ningún agente."
+
+#: indico_livesync/templates/plugin_details_extra.html:99
+msgid "No backend plugins enabled"
+msgstr "No se ha añadido ningún plugin backend"
+
+#: indico_livesync/templates/plugin_details_extra.html:100
+msgid "Add"
+msgstr "Añadir"
+
+#: indico_livesync/templates/plugin_details_extra.html:113
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "Aún es necesario ejecutar la exportación inicial de algunos agentes ejecutando los comandos siguientes en un shell. <br> Tenga en cuenta que si hay muchos eventos en Indico la operación puede llevar mucho tiempo."

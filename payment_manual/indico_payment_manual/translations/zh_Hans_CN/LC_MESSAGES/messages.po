@@ -1,0 +1,68 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-08-21 01:54+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
+"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_payment_manual/placeholders.py:33
+msgid "escaped for URLs"
+msgstr "转为 URL"
+
+#: indico_payment_manual/placeholders.py:38
+msgid "First name of the registrant"
+msgstr "注册人的名"
+
+#: indico_payment_manual/placeholders.py:44
+msgid "Last name of the registrant"
+msgstr "注册人的姓"
+
+#: indico_payment_manual/placeholders.py:50
+msgid "Email address of the registrant"
+msgstr "注册人的电子邮件地址"
+
+#: indico_payment_manual/placeholders.py:60
+msgid "The ID of the event"
+msgstr "事件 ID"
+
+#: indico_payment_manual/placeholders.py:83
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "注册人需要支付的价格（例如 100.00 或 100.25）"
+
+#: indico_payment_manual/placeholders.py:84
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "如果可能的话，价格不含分（例如 100 或 100.25）"
+
+#: indico_payment_manual/placeholders.py:85
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "格式为整数的价格（例如 10000 或 10025）"
+
+#: indico_payment_manual/placeholders.py:90
+msgid "The currency used in the registration"
+msgstr "注册时使用的货币"
+
+#: indico_payment_manual/plugin.py:21
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "用户付款所需的详细信息。这通常包括银行帐户详细信息、IBAN 和付款参考。您还可以链接到自定义付款网站。在这种情况下，请确保使用可用占位符的 URL 转义版本。"
+
+#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+msgid "Payment details"
+msgstr "付款详细信息"

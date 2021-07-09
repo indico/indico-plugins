@@ -1,0 +1,238 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Andre Garcia <sambombe@gmail.com>, 2019
+# Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-26 16:24+0000\n"
+"Last-Translator: Adrian Mönnich\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/indico/indico/language/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: indico_piwik/forms.py:18
+msgid "Track global visits"
+msgstr "Acompanhe as visitas globais"
+
+#: indico_piwik/forms.py:19
+msgid "Track events"
+msgstr "Trilhas de Eventos"
+
+#: indico_piwik/forms.py:20
+msgid "Cache results"
+msgstr "Resultados em cache"
+
+#: indico_piwik/forms.py:21
+msgid "Piwik server URL"
+msgstr "URL do servidor Piwik"
+
+#: indico_piwik/forms.py:22
+msgid "Piwik API server URL"
+msgstr "URL da API do servidor Piwik"
+
+#: indico_piwik/forms.py:23
+msgid "Should be pointing to 'index.php'"
+msgstr "Deve estar apontando para 'index.php'"
+
+#: indico_piwik/forms.py:24
+msgid "Piwik API token"
+msgstr "Token da API Piwik"
+
+#: indico_piwik/forms.py:25
+msgid "Token to access the API. Do not share it!"
+msgstr "Token para acessar a API. Não compartilhe-o."
+
+#: indico_piwik/forms.py:26
+msgid "Global statistics ID"
+msgstr "ID das Estatísticas Globais"
+
+#: indico_piwik/forms.py:27
+msgid "Piwik site ID for global statistics"
+msgstr "ID do Site do Piwik para Estatísticas Globais"
+
+#: indico_piwik/forms.py:28
+msgid "Event statistics ID"
+msgstr "ID das Estatísticas de Evento"
+
+#: indico_piwik/forms.py:29
+msgid "Piwik site ID for event statistics"
+msgstr "ID do site do Piwik para estatísticas de evento"
+
+#: indico_piwik/forms.py:30
+msgid "Result cache TTL (seconds)"
+msgstr "Resultado do cache TTL (segundos)"
+
+#: indico_piwik/forms.py:31
+msgid "How long event reports are kept cached"
+msgstr "Por quanto tempo os relatórios de evento são mantidos em cache"
+
+#: indico_piwik/forms.py:32
+msgid "Use Piwik server URL for all requests"
+msgstr "Use o URL do servidor do Piwik para todas as solicitações"
+
+#: indico_piwik/forms.py:36
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "Estatísticas de evento não podem usar o mesmo site do Piwik como estatísticas globais"
+
+#: indico_piwik/plugin.py:66
+msgid "Statistics"
+msgstr "Estatísticas"
+
+#: indico_piwik/templates/statistics.html:8
+msgid "Selection Information"
+msgstr "Informação de Seleção"
+
+#: indico_piwik/templates/statistics.html:9
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s para %(end)s)"
+
+#: indico_piwik/templates/statistics.html:12
+#: indico_piwik/templates/statistics.html:14
+msgid "Modify Query"
+msgstr "Modificar Consulta"
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Hide"
+msgstr "Ocultar"
+
+#: indico_piwik/templates/statistics.html:23
+msgid "View statistics between these dates"
+msgstr "Visualize as estatísticas entre essas datas"
+
+#: indico_piwik/templates/statistics.html:29
+msgid "to"
+msgstr "para"
+
+#: indico_piwik/templates/statistics.html:39
+msgid "Choose Event / Contribution"
+msgstr "Escolha Evento / Contribuição"
+
+#: indico_piwik/templates/statistics.html:41
+msgid "Event"
+msgstr "Evento"
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Contribution"
+msgstr "Contribuição"
+
+#: indico_piwik/templates/statistics.html:53
+msgid "Update Query"
+msgstr "Atualizar Consulta"
+
+#: indico_piwik/templates/statistics.html:64
+msgid "Visitor Hit Rates"
+msgstr "Taxas de Acesso de Visitante"
+
+#: indico_piwik/templates/statistics.html:66
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "Por favor, note que as estatísticas só foram coletadas desde a introdução do plugin. Isso significa que não há dados presentes para o período anterior de alguns eventos, isso não significa necessariamente que não houve atividade no evento naquele momento."
+
+#: indico_piwik/templates/statistics.html:73
+msgid "Info"
+msgstr "Informação"
+
+#: indico_piwik/templates/statistics.html:86
+msgid "Overall Statistics"
+msgstr "Estatísticas gerais"
+
+#: indico_piwik/templates/statistics.html:90
+msgid "Visitor Metrics"
+msgstr "Métricas de Visitante"
+
+#: indico_piwik/templates/statistics.html:94
+msgid "Visitors"
+msgstr "Visitantes"
+
+#: indico_piwik/templates/statistics.html:98
+msgid "Unique Visitors"
+msgstr "Visitantes Únicos"
+
+#: indico_piwik/templates/statistics.html:102
+msgid "Returning Visitors"
+msgstr "Visitantes que retornaram"
+
+#: indico_piwik/templates/statistics.html:106
+msgid "Avg. Duration"
+msgstr "Média de Duração"
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Peak Statistics"
+msgstr "Estatísticas de Pico"
+
+#: indico_piwik/templates/statistics.html:115
+msgid "Peak Date"
+msgstr "Data de Pico"
+
+#: indico_piwik/templates/statistics.html:119
+msgid "Peak Users"
+msgstr "Usuários de Pico"
+
+#: indico_piwik/templates/statistics.html:129
+msgid "Visitors Geography"
+msgstr "Geografia dos Visitantes"
+
+#: indico_piwik/templates/statistics.html:133
+msgid "Visitor Origins"
+msgstr "Origem dos Visitantes"
+
+#: indico_piwik/templates/statistics.html:144
+msgid "Top Referrers"
+msgstr "Principais referenciadores"
+
+#: indico_piwik/templates/statistics.html:148
+msgid "Traffic Inbound Top 10"
+msgstr "Top 10 de entrada de tráfego"
+
+#: indico_piwik/templates/statistics.html:152
+msgid "Referrer"
+msgstr "Referenciadores"
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Visits"
+msgstr "Visitas"
+
+#: indico_piwik/templates/statistics.html:154
+msgid "Actions"
+msgstr "Ações"
+
+#: indico_piwik/templates/statistics.html:155
+msgid "Visit Length"
+msgstr "Duração da Visita"
+
+#: indico_piwik/templates/statistics.html:172
+msgid "User Systems"
+msgstr "Sistemas de Usuário"
+
+#: indico_piwik/templates/statistics.html:176
+msgid "Visitor Systems"
+msgstr "Sistema que o Visitante utiliza"
+
+#: indico_piwik/templates/statistics.html:183
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "O relatório foi gerado em: %(dt)s"
+
+#: indico_piwik/templates/statistics.html:191
+msgid "Unable to retrieve Graph Data"
+msgstr "Não é possível recuperar dados do gráfico"
+
+#: indico_piwik/templates/statistics.html:193
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "O servidor não respondeu em tempo hábil. Pode ser o caso do intervalo de datas ser muito grande."

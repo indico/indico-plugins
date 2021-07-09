@@ -1,0 +1,237 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2021-05-26 16:24+0000\n"
+"Last-Translator: Adrian Mönnich\n"
+"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_piwik/forms.py:18
+msgid "Track global visits"
+msgstr "跟踪全局访问"
+
+#: indico_piwik/forms.py:19
+msgid "Track events"
+msgstr "跟踪事件"
+
+#: indico_piwik/forms.py:20
+msgid "Cache results"
+msgstr "缓存结果"
+
+#: indico_piwik/forms.py:21
+msgid "Piwik server URL"
+msgstr "Piwik 服务 URL"
+
+#: indico_piwik/forms.py:22
+msgid "Piwik API server URL"
+msgstr "Piwik API 服务 URL"
+
+#: indico_piwik/forms.py:23
+msgid "Should be pointing to 'index.php'"
+msgstr "应该指向 “index.php”"
+
+#: indico_piwik/forms.py:24
+msgid "Piwik API token"
+msgstr "Piwik API 令牌"
+
+#: indico_piwik/forms.py:25
+msgid "Token to access the API. Do not share it!"
+msgstr "访问 API 的令牌。不要分享！"
+
+#: indico_piwik/forms.py:26
+msgid "Global statistics ID"
+msgstr "全局统计 ID"
+
+#: indico_piwik/forms.py:27
+msgid "Piwik site ID for global statistics"
+msgstr "用于全局统计的 Piwik 站点 ID"
+
+#: indico_piwik/forms.py:28
+msgid "Event statistics ID"
+msgstr "事件统计 ID"
+
+#: indico_piwik/forms.py:29
+msgid "Piwik site ID for event statistics"
+msgstr "用于事件统计的 Piwik 站点 ID"
+
+#: indico_piwik/forms.py:30
+msgid "Result cache TTL (seconds)"
+msgstr "结果缓存 TTL (秒)"
+
+#: indico_piwik/forms.py:31
+msgid "How long event reports are kept cached"
+msgstr "事件报告保持缓存的时间"
+
+#: indico_piwik/forms.py:32
+msgid "Use Piwik server URL for all requests"
+msgstr "对所有请求使用 Piwik 服务 URL"
+
+#: indico_piwik/forms.py:36
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "事件统计不能使用与全局统计相同的Piwik站点"
+
+#: indico_piwik/plugin.py:66
+msgid "Statistics"
+msgstr "统计"
+
+#: indico_piwik/templates/statistics.html:8
+msgid "Selection Information"
+msgstr "选择信息"
+
+#: indico_piwik/templates/statistics.html:9
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s 到 %(end)s)"
+
+#: indico_piwik/templates/statistics.html:12
+#: indico_piwik/templates/statistics.html:14
+msgid "Modify Query"
+msgstr "修改查询"
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Hide"
+msgstr "隐藏"
+
+#: indico_piwik/templates/statistics.html:23
+msgid "View statistics between these dates"
+msgstr "查看这些日期之间的统计信息"
+
+#: indico_piwik/templates/statistics.html:29
+msgid "to"
+msgstr "到"
+
+#: indico_piwik/templates/statistics.html:39
+msgid "Choose Event / Contribution"
+msgstr "选择 事件 / 报告"
+
+#: indico_piwik/templates/statistics.html:41
+msgid "Event"
+msgstr "事件"
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Contribution"
+msgstr "报告"
+
+#: indico_piwik/templates/statistics.html:53
+msgid "Update Query"
+msgstr "更新查询"
+
+#: indico_piwik/templates/statistics.html:64
+msgid "Visitor Hit Rates"
+msgstr "访问点击率"
+
+#: indico_piwik/templates/statistics.html:66
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "请注意，自从插件推出以来，我们只收集了统计数据。这意味着一些事件的早期没有数据，这并不一定意味着当时事件中没有任何活动。"
+
+#: indico_piwik/templates/statistics.html:73
+msgid "Info"
+msgstr "信息"
+
+#: indico_piwik/templates/statistics.html:86
+msgid "Overall Statistics"
+msgstr "总体统计"
+
+#: indico_piwik/templates/statistics.html:90
+msgid "Visitor Metrics"
+msgstr "访问指标"
+
+#: indico_piwik/templates/statistics.html:94
+msgid "Visitors"
+msgstr "访客"
+
+#: indico_piwik/templates/statistics.html:98
+msgid "Unique Visitors"
+msgstr "独特的访客"
+
+#: indico_piwik/templates/statistics.html:102
+msgid "Returning Visitors"
+msgstr "回头客"
+
+#: indico_piwik/templates/statistics.html:106
+msgid "Avg. Duration"
+msgstr "平均持续时间"
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Peak Statistics"
+msgstr "峰值统计"
+
+#: indico_piwik/templates/statistics.html:115
+msgid "Peak Date"
+msgstr "高峰日期"
+
+#: indico_piwik/templates/statistics.html:119
+msgid "Peak Users"
+msgstr "高峰用户"
+
+#: indico_piwik/templates/statistics.html:129
+msgid "Visitors Geography"
+msgstr "访客地理"
+
+#: indico_piwik/templates/statistics.html:133
+msgid "Visitor Origins"
+msgstr "访客来源"
+
+#: indico_piwik/templates/statistics.html:144
+msgid "Top Referrers"
+msgstr "顶级推荐人"
+
+#: indico_piwik/templates/statistics.html:148
+msgid "Traffic Inbound Top 10"
+msgstr "入站流量前10名"
+
+#: indico_piwik/templates/statistics.html:152
+msgid "Referrer"
+msgstr "推荐人"
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Visits"
+msgstr "访问"
+
+#: indico_piwik/templates/statistics.html:154
+msgid "Actions"
+msgstr "操作"
+
+#: indico_piwik/templates/statistics.html:155
+msgid "Visit Length"
+msgstr "访问时间"
+
+#: indico_piwik/templates/statistics.html:172
+msgid "User Systems"
+msgstr "用户系统"
+
+#: indico_piwik/templates/statistics.html:176
+msgid "Visitor Systems"
+msgstr "访客系统"
+
+#: indico_piwik/templates/statistics.html:183
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "此报告生成于：%(dt)s"
+
+#: indico_piwik/templates/statistics.html:191
+msgid "Unable to retrieve Graph Data"
+msgstr "无法检索图形数据"
+
+#: indico_piwik/templates/statistics.html:193
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "服务器没有及时响应。可能是日期范围太大。"

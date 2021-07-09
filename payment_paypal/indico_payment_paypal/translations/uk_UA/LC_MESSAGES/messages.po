@@ -1,0 +1,103 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020
+# Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018
+# Sonya Sirets <prettyflysonia@gmail.com>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"PO-Revision-Date: 2020-09-18 21:28+0000\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: indico_payment_paypal/controllers.py:110
+msgid "Your payment request has been processed."
+msgstr "Ваш запит на оплату опрацьовано"
+
+#: indico_payment_paypal/controllers.py:118
+msgid "You cancelled the payment process."
+msgstr "Ви відмінили оплату."
+
+#: indico_payment_paypal/plugin.py:25
+msgid "API URL"
+msgstr "API URL"
+
+#: indico_payment_paypal/plugin.py:25
+msgid "URL of the PayPal HTTP API."
+msgstr "URL від PayPal HTTP API"
+
+#: indico_payment_paypal/plugin.py:26 indico_payment_paypal/plugin.py:32
+msgid "Business"
+msgstr "Бізнес"
+
+#: indico_payment_paypal/plugin.py:27
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "PayPal ID за замовчуванням або електронна пошта, асоційована з аккаунтом PayPal. Менеджери події можуть перепризначити це."
+
+#: indico_payment_paypal/plugin.py:34
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "PayPal ID за замовчуванням або електронна пошта, асоційована з аккаунтом PayPal."
+
+#: indico_payment_paypal/util.py:23
+msgid "Invalid email address / paypal ID"
+msgstr "Невірна електронна пошта / PayPal ID"
+
+#: indico_payment_paypal/templates/event_payment_form.html:4
+msgid "First name"
+msgstr "Ім'я"
+
+#: indico_payment_paypal/templates/event_payment_form.html:6
+msgid "Last name"
+msgstr "Прізвище"
+
+#: indico_payment_paypal/templates/event_payment_form.html:8
+msgid "Total amount"
+msgstr "Повна сума"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html:4
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "Будь ласка, переконайтеся, що ваш рахунок PayPal налаштований на використання <strong>UTF-8</strong> за замовчуванням, інакше деякі транзакції можуть бути не підтверджені Indico! Ви можете дізнатись, як це налаштувати  %(link)s тут%(endlink)s."
+
+#: indico_payment_paypal/templates/transaction_details.html:6
+msgid "Transaction ID"
+msgstr "ID транзакції"
+
+#: indico_payment_paypal/templates/transaction_details.html:8
+msgid "Invoice ID"
+msgstr "ID рахунку"
+
+#: indico_payment_paypal/templates/transaction_details.html:10
+msgid "Payer e-mail"
+msgstr "електронна пошта платника"
+
+#: indico_payment_paypal/templates/transaction_details.html:19
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "Сплачена сума не відповідає необхідній. Зверніться до реєстранту для вирішення проблеми."
+
+#: indico_payment_paypal/templates/transaction_details.html:22
+msgid "Paid:"
+msgstr "Оплачено:"
+
+#: indico_payment_paypal/templates/transaction_details.html:26
+msgid "Required:"
+msgstr "Необхідно:"

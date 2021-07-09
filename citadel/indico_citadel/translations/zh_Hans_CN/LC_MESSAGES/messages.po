@@ -1,0 +1,194 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-06-09 14:18+0200\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2021\n"
+"Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_citadel/plugin.py:25
+msgid "Citadel URL"
+msgstr "Citadel URL"
+
+#: indico_citadel/plugin.py:26
+msgid "The URL of the Citadel server"
+msgstr " Citadel 服务 URL "
+
+#: indico_citadel/plugin.py:27
+msgid "Citadel API token"
+msgstr "Citadel API 令牌"
+
+#: indico_citadel/plugin.py:28
+msgid "The authentication token to access Citadel"
+msgstr "访问 Citadel 的身份验证令牌"
+
+#: indico_citadel/plugin.py:29
+msgid "File extensions"
+msgstr "文件扩展名"
+
+#: indico_citadel/plugin.py:30
+msgid "File extensions to upload for full-text search"
+msgstr "为全文搜索上传的文件扩展名"
+
+#: indico_citadel/plugin.py:31
+msgid "Max. file size"
+msgstr "最大文件大小"
+
+#: indico_citadel/plugin.py:33
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+"为全文搜索上传的最大大小（以 MB "
+"为单位）。请注意，初始导出后增加此值将上传在下一次队列运行期间之前未上传的所有文件用于索引，这在较大的实例上可能需要很长时间。您可能需要先手动上传新文件大小！"
+
+#: indico_citadel/plugin.py:38
+msgid "Parallel threads (records)"
+msgstr "并行线程 (记录)"
+
+#: indico_citadel/plugin.py:39
+msgid "Number of threads to use when uploading records."
+msgstr "上传记录时使用的线程数。"
+
+#: indico_citadel/plugin.py:40
+msgid "Parallel threads (records, initial export)"
+msgstr "并行线程 (记录、初始导出)"
+
+#: indico_citadel/plugin.py:42
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr "在初始导出期间上传记录时使用的线程数。"
+
+#: indico_citadel/plugin.py:44
+msgid "Parallel threads (files)"
+msgstr "并行线程 (文件)"
+
+#: indico_citadel/plugin.py:45
+msgid "Number of threads to use when uploading files."
+msgstr "上传文件时使用的线程数。"
+
+#: indico_citadel/plugin.py:46
+msgid "Parallel threads (files, initial export)"
+msgstr "并行线程 (文件、初始导出)"
+
+#: indico_citadel/plugin.py:48
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr "在初始导出期间上传文件时使用的线程数。"
+
+#: indico_citadel/plugin.py:50
+msgid "Disable search"
+msgstr "禁用搜索"
+
+#: indico_citadel/plugin.py:51
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+"这将禁用插件的搜索集成。 使用此选项时，将使用 Indico 内部搜索界面。 "
+"当您仍在运行较大的初始导出并且不希望人们在此期间获得不完整的搜索结果时，这可能很有用。"
+
+#: indico_citadel/search.py:95
+msgid "The title of an event, contribution, etc."
+msgstr "事件，报告等的标题。"
+
+#: indico_citadel/search.py:95
+msgid "A speaker, author or event chair's name"
+msgstr "报告人、作者或事件主席的姓名"
+
+#: indico_citadel/search.py:96
+msgid "A speaker, author or event chair's affiliation"
+msgstr "报告人、作者或事件主席的工作单位"
+
+#: indico_citadel/search.py:97
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "条目类型（例如大会、会议、文件等）"
+
+#: indico_citadel/search.py:98
+msgid "Name of the venue"
+msgstr "会场名称"
+
+#: indico_citadel/search.py:99
+msgid "Name of the room"
+msgstr "会议室名称"
+
+#: indico_citadel/search.py:100
+msgid "Address of the venue"
+msgstr "会场地址"
+
+#: indico_citadel/search.py:101
+msgid "Name of the attached file"
+msgstr "附件名称"
+
+#: indico_citadel/search.py:102
+msgid "A keyword associated with an event"
+msgstr "与事件关联的关键字"
+
+#: indico_citadel/search.py:103
+msgid "The category of an event"
+msgstr "事件的类别"
+
+#: indico_citadel/search.py:111
+msgid "Most relevant"
+msgstr "最相关"
+
+#: indico_citadel/search.py:112
+msgid "Newest first"
+msgstr "最新优先"
+
+#: indico_citadel/search.py:113
+msgid "Oldest first"
+msgstr "最老优先"
+
+#: indico_citadel/search.py:117
+msgid "Affiliation"
+msgstr "工作单位"
+
+#: indico_citadel/search.py:118
+msgid "Person"
+msgstr "人"
+
+#: indico_citadel/search.py:119
+msgid "Type"
+msgstr "类型"
+
+#: indico_citadel/search.py:120
+msgid "Location"
+msgstr "地点"
+
+#: indico_citadel/search.py:121
+msgid "Date"
+msgstr "日期"
+
+#: indico_citadel/search.py:122
+msgid "Category"
+msgstr "类别"
+
+#: indico_citadel/search.py:123
+msgid "Category ID"
+msgstr "类别ID"
+
+#: indico_citadel/search.py:124
+msgid "Event ID"
+msgstr "事件ID"
