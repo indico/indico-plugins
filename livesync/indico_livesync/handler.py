@@ -30,7 +30,7 @@ from indico_livesync.util import get_excluded_categories, obj_ref
 
 def connect_signals(plugin):
     # request
-    plugin.connect(signals.after_process, _apply_changes)
+    plugin.connect(signals.core.after_process, _apply_changes)
     # moved
     plugin.connect(signals.category.moved, _moved)
     plugin.connect(signals.event.moved, _moved)

@@ -59,7 +59,7 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def init(self):
         super().init()
-        self.connect(signals.get_placeholders, self._get_details_placeholders, sender='manual-payment-details')
+        self.connect(signals.core.get_placeholders, self._get_details_placeholders, sender='manual-payment-details')
 
     def _get_details_placeholders(self, sender, regform, registration, **kwargs):
         from indico_payment_manual.placeholders import (CurrencyPlaceholder, EmailPlaceholder, EventIDPlaceholder,

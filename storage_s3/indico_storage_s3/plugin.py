@@ -61,7 +61,7 @@ class S3StoragePlugin(IndicoPlugin):
 
     def init(self):
         super().init()
-        self.connect(signals.get_storage_backends, self._get_storage_backends)
+        self.connect(signals.core.get_storage_backends, self._get_storage_backends)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
 
     def _get_storage_backends(self, sender, **kwargs):

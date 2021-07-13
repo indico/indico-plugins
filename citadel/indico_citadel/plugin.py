@@ -81,7 +81,7 @@ class CitadelPlugin(LiveSyncPluginBase):
 
     def init(self):
         super().init()
-        self.connect(signals.get_search_providers, self.get_search_providers)
+        self.connect(signals.core.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
 
     def get_search_providers(self, sender, **kwargs):
