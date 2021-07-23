@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - master
-      - 2.3-maintenance
+      - '*.x'
   pull_request:
     branches:
       - master
-      - 2.3-maintenance
+      - '*.x'
 
 jobs:
   setup:
@@ -30,9 +30,9 @@ jobs:
             echo "unsupported event: $GITHUB_EVENT_NAME"
             exit 1
           fi
-          if [[ $upstream_branch != master && $upstream_branch != *-maintenance ]]; then
-            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3-maintenance"
-            upstream_branch=2.3-maintenance
+          if [[ $upstream_branch != master && $upstream_branch != *.x ]]; then
+            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3.x"
+            upstream_branch=2.3.x
           else
             echo "using indico upstream branch ${upstream_branch}"
           fi
@@ -112,9 +112,9 @@ jobs:
             echo "unsupported event: $GITHUB_EVENT_NAME"
             exit 1
           fi
-          if [[ $upstream_branch != master && $upstream_branch != *-maintenance ]]; then
-            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3-maintenance"
-            upstream_branch=2.3-maintenance
+          if [[ $upstream_branch != master && $upstream_branch != *.x ]]; then
+            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3.x"
+            upstream_branch=2.3.x
           else
             echo "using indico upstream branch ${upstream_branch}"
           fi
@@ -203,9 +203,9 @@ jobs:
             echo "unsupported event: $GITHUB_EVENT_NAME"
             exit 1
           fi
-          if [[ $upstream_branch != master && $upstream_branch != *-maintenance ]]; then
-            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3-maintenance"
-            upstream_branch=2.3-maintenance
+          if [[ $upstream_branch != master && $upstream_branch != *.x ]]; then
+            echo "assuming there is no branch named ${upstream_branch} in indico; defaulting to 2.3.x"
+            upstream_branch=2.3.x
           else
             echo "using indico upstream branch ${upstream_branch}"
           fi
