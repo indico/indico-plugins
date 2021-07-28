@@ -4,29 +4,24 @@
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
-"""Utility functions used by the Sixpay payment plugin."""
 
 import uuid
 
 import iso4217
-from flask_pluginengine import current_plugin
 from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
 
-from indico.util.i18n import make_bound_gettext
+from indico_payment_sixpay import _
 
-
-#: internationalisation/localisation of strings
-gettext = make_bound_gettext('payment_sixpay')
 
 # Saferpay API details
-saferpay_json_api_spec = '1.12'
-saferpay_pp_init_url = 'Payment/v1/PaymentPage/Initialize'
-saferpay_pp_assert_url = 'Payment/v1/PaymentPage/Assert'
-saferpay_pp_capture_url = 'Payment/v1/Transaction/Capture'
-saferpay_pp_cancel_url = 'Payment/v1/Transaction/Cancel'
+SIXPAY_JSON_API_SPEC = '1.12'
+SIXPAY_PP_INIT_URL = 'Payment/v1/PaymentPage/Initialize'
+SIXPAY_PP_ASSERT_URL = 'Payment/v1/PaymentPage/Assert'
+SIXPAY_PP_CAPTURE_URL = 'Payment/v1/Transaction/Capture'
+SIXPAY_PP_CANCEL_URL = 'Payment/v1/Transaction/Cancel'
 
-# provider string
-provider = 'sixpay'
+# payment provider identifier
+PROVIDER_SIXPAY = 'sixpay'
 
 # currencies for which the major to minor currency ratio
 # is not a multiple of 10
@@ -37,24 +32,17 @@ def validate_currency(iso_code):
     """Check whether the currency can be properly handled by this plugin.
 
     :param iso_code: an ISO4217 currency code, e.g. ``"EUR"``
-    :type iso_code: basestring
     :raises: :py:exc:`~.HTTPNotImplemented` if the currency is not valid
     """
     if iso_code in NON_DECIMAL_CURRENCY:
         raise HTTPNotImplemented(
-            gettext(
-                "Unsupported currency '{0}' for SixPay."
-                ' Please contact the organisers'
-            ).format(iso_code)
+            _("Unsupported currency '{}' for SixPay. Please contact the organizers").format(iso_code)
         )
     try:
         iso4217.Currency(iso_code)
     except ValueError:
         raise HTTPNotImplemented(
-            gettext(
-                "Unknown currency '{0}' for SixPay."
-                ' Please contact the organisers'
-            ).format(iso_code)
+            _("Unknown currency '{}' for SixPay. Please contact the organizers").format(iso_code)
         )
 
 
@@ -82,21 +70,12 @@ def to_large_currency(small_currency_amount, iso_code):
 
 
 def get_request_header(api_spec, account_id):
-    """Return request header dict.
-
-    Contained information:
-    - SpecVersion
-    - CustomerId
-    - RequestId
-    - RetryIndicator
-    """
-    request_header = {
+    return {
         'SpecVersion': api_spec,
         'CustomerId': get_customer_id(account_id),
         'RequestId': str(uuid.uuid4()),
         'RetryIndicator': 0,
     }
-    return request_header
 
 
 def get_customer_id(account_id):
@@ -118,10 +97,8 @@ def get_terminal_id(account_id):
 
 def get_setting(setting, event=None):
     """Return a configuration setting of the plugin."""
+    from indico_payment_sixpay.plugin import SixpayPaymentPlugin
     if event:
-        return (
-            current_plugin.event_settings.get(event, setting)
-            or current_plugin.settings.get(setting)
-        )
+        return SixpayPaymentPlugin.event_settings.get(event, setting)
     else:
-        return current_plugin.settings.get(setting)
+        return SixpayPaymentPlugin.settings.get(setting)

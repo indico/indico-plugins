@@ -8,9 +8,5 @@ Clicking on the <strong>{% trans %}Pay Now{% endtrans %}</strong> button you wil
     <dt>{% trans %}Total amount{% endtrans %}</dt>
     <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
     <dt></dt>
-    <dd>
-        <form action="{{ payment_url }}" method="POST">
-            <button type="submit">{% trans %}Pay Now{% endtrans %}</button>
-        </form>
-    </dd>
+    <dd><a class="i-button" href="{{ payment_url }}">{% trans %}Pay Now{% endtrans %}</a></dd>
 </dl>
