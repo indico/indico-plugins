@@ -22,7 +22,8 @@ setup(
     },
     packages=find_packages(),
     package_data={'indico_sixpay': ['templates/*.html']},
-    install_requires=['requests', 'indico>=2.0', 'iso4217'],
+    install_requires=['requests', 'indico>=3.0', 'iso4217'],
+    python_requires='~=3.9.0',
     license='GPLv3+',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
