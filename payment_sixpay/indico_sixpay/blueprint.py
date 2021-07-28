@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of the SixPay Indico EPayment Plugin.
 # Copyright (C) 2017 - 2018 Max Fischer
@@ -17,7 +16,6 @@
 # along with SixPay Indico EPayment Plugin;
 # if not, see <http://www.gnu.org/licenses/>.
 """Definition of callbacks exposed by the Indico server."""
-from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 

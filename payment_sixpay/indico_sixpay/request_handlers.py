@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of the SixPay Indico EPayment Plugin.
 # Copyright (C) 2017 - 2018 Max Fischer
@@ -17,7 +16,6 @@
 # along with SixPay Indico EPayment Plugin;
 # if not, see <http://www.gnu.org/licenses/>.
 """Callbacks for asynchronous replies by Saferpay and to redirect the user."""
-from __future__ import unicode_literals
 
 import requests
 from urllib.parse import urljoin
@@ -84,12 +82,12 @@ class SixPayResponseHandler(BaseRequestHandler):
 
     def __init__(self):
         """Initialize request handler."""
-        super(SixPayResponseHandler, self).__init__()
+        super().__init__()
         # registration context is not initialised before `self._process_args`
         self.sixpay_url = None  # type: str
 
     def _process_args(self):
-        super(SixPayResponseHandler, self)._process_args()
+        super()._process_args()
         self.sixpay_url = get_setting('url')
 
     def _process(self):
@@ -325,7 +323,7 @@ class UserSuccessHandler(SixPayResponseHandler):
             self._process_confirmation()
         except TransactionFailure as err:
             current_plugin.logger.warning(
-                'SixPay transaction failed during %s: %s' % (
+                'SixPay transaction failed during {}: {}'.format(
                     err.step, err.details
                 )
             )

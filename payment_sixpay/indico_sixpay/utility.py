@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of the SixPay Indico EPayment Plugin.
 # Copyright (C) 2017 - 2018 Max Fischer
@@ -17,7 +16,6 @@
 # along with SixPay Indico EPayment Plugin;
 # if not, see <http://www.gnu.org/licenses/>.
 """Utility functions used by the Sixpay payment plugin."""
-from __future__ import division, unicode_literals
 
 import uuid
 

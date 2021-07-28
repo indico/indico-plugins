@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of the SixPay Indico EPayment Plugin.
 # Copyright (C) 2017 - 2018 Max Fischer

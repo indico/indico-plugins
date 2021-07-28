@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is part of the SixPay Indico EPayment Plugin.
 # Copyright (C) 2017 - 2018 Max Fischer
 #
@@ -22,7 +21,6 @@ The entry point for indico is the :py:class:`~.SixpayPaymentPlugin`.
 It handles configuration via the settings forms, initiates payments
 and provides callbacks for finished payments via its blueprint.
 """
-from __future__ import absolute_import, unicode_literals
 
 import requests
 from urllib.parse import urljoin
@@ -64,7 +62,7 @@ from .utility import (get_request_header, get_terminal_id, gettext, provider, sa
 #   - validators: Input validation, see wtforms.validators
 #   - description: help text of the field, an internationalised text
 
-class FormatField(object):
+class FormatField:
     """Validator for format fields, i.e. strings with ``{key}`` placeholders.
 
     :param max_length: optional maximum length, checked on a test formatting
@@ -112,13 +110,13 @@ class FormatField(object):
         try:
             test_format = field.data.format(**self.field_map)
         except KeyError as err:
-            raise ValidationError('Invalid format string key: {}'.format(err))
+            raise ValidationError(f'Invalid format string key: {err}')
         except ValueError as err:
-            raise ValidationError('Malformed format string: {}'.format(err))
+            raise ValidationError(f'Malformed format string: {err}')
         if len(test_format) > self.max_length:
             raise ValidationError(
                 'Too long format string:'
-                ' shortest replacement with {0}, expected {1}'
+                ' shortest replacement with {}, expected {}'
                 .format(
                     len(test_format), self.max_length
                 )
@@ -301,7 +299,7 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             'event_id': registration.event_id,
             'event_title': registration.event.title,
             'eventuser_id':
-                'e{0}u{1}'.format(registration.event_id, registration.user_id),
+                f'e{registration.event_id}u{registration.user_id}',
             'registration_title': registration.registration_form.title
         }
 
