@@ -51,7 +51,7 @@ class BaseRequestHandler(RH):
     CSRF_ENABLED = False
 
     def _process_args(self):
-        self.registration = Registration.find_first(uuid=request.args['token'])
+        self.registration = Registration.query.filter_by(uuid=request.args['token']).first()
         if not self.registration:
             raise BadRequest
         self.token = (

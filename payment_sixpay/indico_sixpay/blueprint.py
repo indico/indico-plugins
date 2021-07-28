@@ -25,10 +25,7 @@ from .request_handlers import SixPayResponseHandler, UserCancelHandler, UserFail
 #: url mount points exposing callbacks
 blueprint = IndicoPluginBlueprint(
     'payment_sixpay', __name__,
-    url_prefix=(
-        '/event/<confId>/registrations/'
-        '<int:reg_form_id>/payment/response/sixpay'
-    )
+    url_prefix='/event/<int:event_id>/registrations/<int:reg_form_id>/payment/response/sixpay'
 )
 
 blueprint.add_url_rule(
