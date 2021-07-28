@@ -25,7 +25,7 @@ and provides callbacks for finished payments via its blueprint.
 from __future__ import absolute_import, unicode_literals
 
 import requests
-import urlparse
+from urllib.parse import urljoin
 from werkzeug.exceptions import InternalServerError as HTTPInternalServerError
 from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
 from wtforms.fields import StringField
@@ -182,7 +182,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         validators=[Optional(), Email(), Length(0, 50)],
         description=gettext(
             'Mail address to receive notifications of transactions.'
-            'This is independent of Indico\'s own payment notifications.'
+            "This is independent of Indico's own payment notifications."
         )
     )
 
@@ -191,9 +191,6 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     """Configuration form for the Plugin for a specific event."""
 
     # every setting may be overwritten for each event
-    #url = PluginSettingsForm.url
-    #username = PluginSettingsForm.username
-    #password = PluginSettingsForm.password
     account_id = PluginSettingsForm.account_id
     order_description = PluginSettingsForm.order_description
     order_identifier = PluginSettingsForm.order_identifier
@@ -318,23 +315,11 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                     plugin_settings[format_field].format(**format_map)
                 )
             except ValueError:
-                message = (
-                    "Invalid format field placeholder for {0},"
-                    " please contact the event organisers!"
-                )
-                raise HTTPNotImplemented(
-                    (gettext(message) + '\n\n[' + message + ']')
-                    .format(self.name)
-                 )
+                message = 'Invalid format field placeholder for {0}, please contact the event organisers!'
+                raise HTTPNotImplemented((gettext(message) + '\n\n[' + message + ']').format(self.name))
             except KeyError:
-                message = (
-                    'Unknown format field placeholder "{0}" for {1},'
-                    ' please contact the event organisers!'
-                )
-                raise HTTPNotImplemented((
-                        gettext(message) + '\n\n[' + message + ']'
-                    ).format(format_field, self.name)
-                )
+                message = 'Unknown format field placeholder "{0}" for {1}, please contact the event organisers!'
+                raise HTTPNotImplemented((gettext(message) + '\n\n[' + message + ']').format(format_field, self.name))
 
         # see the SixPay Manual
         # https://saferpay.github.io/jsonapi/#Payment_v1_PaymentPage_Initialize
@@ -398,7 +383,7 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def _init_payment_page(self, sixpay_url, transaction_data, credentials):
         """Initialize payment page."""
-        endpoint = urlparse.urljoin(sixpay_url, saferpay_pp_init_url)
+        endpoint = urljoin(sixpay_url, saferpay_pp_init_url)
         url_request = requests.post(
             endpoint,
             json=transaction_data,
@@ -413,6 +398,6 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             raise HTTPInternalServerError(
                 'Failed request to SixPay service:'
                 ' {ErrorMessage}. {ErrorDetail}'
-                .format(response)
+                .format(**response)
             )
         return response

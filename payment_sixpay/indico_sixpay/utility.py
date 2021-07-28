@@ -57,7 +57,7 @@ def validate_currency(iso_code):
         raise HTTPNotImplemented(
             gettext(
                 "Unsupported currency '{0}' for SixPay."
-                " Please contact the organisers"
+                ' Please contact the organisers'
             ).format(iso_code)
         )
     try:
@@ -66,7 +66,7 @@ def validate_currency(iso_code):
         raise HTTPNotImplemented(
             gettext(
                 "Unknown currency '{0}' for SixPay."
-                " Please contact the organisers"
+                ' Please contact the organisers'
             ).format(iso_code)
         )
 

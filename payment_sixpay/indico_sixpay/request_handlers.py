@@ -20,7 +20,7 @@
 from __future__ import unicode_literals
 
 import requests
-import urlparse
+from urllib.parse import urljoin
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
@@ -98,7 +98,7 @@ class SixPayResponseHandler(BaseRequestHandler):
             self._process_confirmation()
         except TransactionFailure as err:
             current_plugin.logger.warning(
-                "SixPay transaction failed during %s: %s"
+                'SixPay transaction failed during %s: %s'
                 % (err.step, err.details)
             )
 
@@ -123,7 +123,7 @@ class SixPayResponseHandler(BaseRequestHandler):
                 self._register_payment(assert_response)
         except TransactionFailure as err:
             current_plugin.logger.warning(
-                "SixPay transaction failed during %s: %s"
+                'SixPay transaction failed during %s: %s'
                 % (err.step, err.details)
             )
             raise
@@ -142,7 +142,7 @@ class SixPayResponseHandler(BaseRequestHandler):
         request. If the request itself fails, a :py:exc:`~.TransactionFailure`
         is raised for ``task``.
         """
-        request_url = urlparse.urljoin(self.sixpay_url, endpoint)
+        request_url = urljoin(self.sixpay_url, endpoint)
         credentials = (
             get_setting('username'),
             get_setting('password')
@@ -325,7 +325,7 @@ class UserSuccessHandler(SixPayResponseHandler):
             self._process_confirmation()
         except TransactionFailure as err:
             current_plugin.logger.warning(
-                "SixPay transaction failed during %s: %s" % (
+                'SixPay transaction failed during %s: %s' % (
                     err.step, err.details
                 )
             )
