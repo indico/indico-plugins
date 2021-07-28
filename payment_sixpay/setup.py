@@ -1,5 +1,7 @@
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
+
 
 repo_base_dir = os.path.abspath(os.path.dirname(__file__))
 # pull in the packages metadata

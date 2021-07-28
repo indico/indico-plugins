@@ -17,15 +17,16 @@
 # along with SixPay Indico EPayment Plugin;
 # if not, see <http://www.gnu.org/licenses/>.
 """Utility functions used by the Sixpay payment plugin."""
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
 import uuid
 
 import iso4217
-from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
 from flask_pluginengine import current_plugin
+from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
 
 from indico.util.i18n import make_bound_gettext
+
 
 #: internationalisation/localisation of strings
 gettext = make_bound_gettext('payment_sixpay')

@@ -22,41 +22,27 @@ The entry point for indico is the :py:class:`~.SixpayPaymentPlugin`.
 It handles configuration via the settings forms, initiates payments
 and provides callbacks for finished payments via its blueprint.
 """
-from __future__ import unicode_literals, absolute_import
-import urlparse
+from __future__ import absolute_import, unicode_literals
 
 import requests
-from werkzeug.exceptions import (
-    NotImplemented as HTTPNotImplemented,
-    InternalServerError as HTTPInternalServerError
-)
-
+import urlparse
+from werkzeug.exceptions import InternalServerError as HTTPInternalServerError
+from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
 from wtforms.fields import StringField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import (
-    DataRequired, Optional, Regexp, Length, Email, ValidationError
-)
-from indico.web.forms.fields import IndicoPasswordField
+from wtforms.validators import DataRequired, Email, Length, Optional, Regexp, ValidationError
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.modules.events.payment import (
-    PaymentEventSettingsFormBase,
-    PaymentPluginMixin,
-    PaymentPluginSettingsFormBase)
-from indico.modules.events.payment.models.transactions import (
-    PaymentTransaction,
-    TransactionAction
-)
+from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
+                                           PaymentPluginSettingsFormBase)
+from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionAction
+from indico.web.forms.fields import IndicoPasswordField
 
-
-from .utility import (
-    gettext, to_small_currency, get_request_header, get_terminal_id,
-    provider
-)
 # blueprint mounts the request handlers onto URLs
 from .blueprint import blueprint
+from .utility import (get_request_header, get_terminal_id, gettext, provider, saferpay_json_api_spec,
+                      saferpay_pp_init_url, to_small_currency)
 
-from .utility import saferpay_json_api_spec, saferpay_pp_init_url
 
 # Dear Future Maintainer,
 #

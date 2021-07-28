@@ -21,10 +21,7 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from .request_handlers import (
-    SixPayResponseHandler, UserCancelHandler,
-    UserFailureHandler, UserSuccessHandler
-)
+from .request_handlers import SixPayResponseHandler, UserCancelHandler, UserFailureHandler, UserSuccessHandler
 
 
 #: url mount points exposing callbacks

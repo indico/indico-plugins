@@ -18,32 +18,23 @@
 # if not, see <http://www.gnu.org/licenses/>.
 """Callbacks for asynchronous replies by Saferpay and to redirect the user."""
 from __future__ import unicode_literals
-import urlparse
 
 import requests
+import urlparse
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.payment.models.transactions import TransactionAction
-from indico.modules.events.payment.notifications \
-    import notify_amount_inconsistency
-from indico.modules.events.registration.models.registrations \
-    import Registration
+from indico.modules.events.payment.notifications import notify_amount_inconsistency
+from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
-from .utility import (
-    gettext, to_large_currency, to_small_currency, get_request_header,
-    get_setting
-)
-from .utility import (
-    saferpay_pp_assert_url,
-    saferpay_pp_capture_url,
-    saferpay_json_api_spec,
-    saferpay_pp_cancel_url,
-    provider
-)
+from .utility import (get_request_header, get_setting, gettext, provider, saferpay_json_api_spec,
+                      saferpay_pp_assert_url, saferpay_pp_cancel_url, saferpay_pp_capture_url, to_large_currency,
+                      to_small_currency)
+
 
 # RH from indico.web.rh
 # - the logic to execute when SixPay/Users are redirected *after* a transaction
