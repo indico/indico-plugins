@@ -1,3 +1,9 @@
+# This file is part of the Indico plugins.
+# Copyright (C) 2017 - 2021 Max Fischer, Martin Claus, CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
 import os
 
 from setuptools import find_packages, setup
@@ -26,7 +32,7 @@ setup(
     package_data={'indico_sixpay': ['templates/*.html']},
     install_requires=['requests', 'indico>=3.0', 'iso4217'],
     python_requires='~=3.9.0',
-    license='GPLv3+',
+    license='MIT',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Plugins',
@@ -34,7 +40,7 @@ setup(
         'Intended Audience :: Science/Research',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Other Audience',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
         'Topic :: Communications :: Conferencing',
