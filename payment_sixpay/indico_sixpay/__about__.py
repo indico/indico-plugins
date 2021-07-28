@@ -44,7 +44,7 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMA
 ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-__title__ = 'indico_sixpay'
+__title__ = 'indico-plugin-sixpay'
 __summary__ = 'Indico EPayment Plugin for SixPay services'
 __url__ = 'https://github.com/maxfischer2781/indico_sixpay'
 
