@@ -29,7 +29,7 @@ def cli():
 
 @cli.command()
 def available_backends():
-    """Lists the currently available backend types"""
+    """Lists the currently available backend types."""
     print('The following LiveSync agents are available:')
     for name, backend in current_plugin.backend_classes.items():
         print(cformat('  - %{white!}{}%{reset}: {} ({})').format(name, backend.title, backend.description))
@@ -37,7 +37,7 @@ def available_backends():
 
 @cli.command()
 def agents():
-    """Lists the currently active agents"""
+    """Lists the currently active agents."""
     print('The following LiveSync agents are active:')
     agent_list = LiveSyncAgent.query.order_by(LiveSyncAgent.backend_name, db.func.lower(LiveSyncAgent.name)).all()
     table_data = [['ID', 'Name', 'Backend', 'Queue', 'Status']]
@@ -73,7 +73,7 @@ def agents():
 @click.option('--batch', type=int, default=5000, help="The amount of records yielded per export batch.",
               show_default=True, metavar='N')
 def initial_export(agent_id, batch, force, verbose, retry):
-    """Performs the initial data export for an agent"""
+    """Performs the initial data export for an agent."""
     agent = LiveSyncAgent.get(agent_id)
     if agent is None:
         print('No such agent')
@@ -120,7 +120,7 @@ def initial_export(agent_id, batch, force, verbose, retry):
               help="Process changes for the specified category id even if 'Skip category changes' is enabled. "
                    "This setting can be used multiple times.")
 def run(agent_id, force, verbose, allowed_categories):
-    """Runs the livesync agent"""
+    """Runs the livesync agent."""
     from indico_livesync.plugin import LiveSyncPlugin
 
     if LiveSyncPlugin.settings.get('disable_queue_runs'):
@@ -161,7 +161,7 @@ def run(agent_id, force, verbose, allowed_categories):
 @cli.command()
 @click.argument('agent_id', type=int)
 def reset(agent_id):
-    """Performs the initial data export for an agent"""
+    """Resets all livesync data for an agent."""
     agent = LiveSyncAgent.get(agent_id)
     if agent is None:
         print('No such agent')
