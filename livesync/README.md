@@ -5,6 +5,10 @@ external services, typically to provide advanced search functionality.
 
 ## Changelog
 
+### 3.0.1
+
+- Add `indico livesync enqueue` CLI to manually add queue entries
+
 ### 3.0
 
 - Initial release for Indico 3.0

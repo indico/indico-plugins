@@ -20,6 +20,8 @@ from indico.core.db import db
 from indico.util.console import cformat
 
 from indico_livesync.models.agents import LiveSyncAgent
+from indico_livesync.models.queue import ChangeType, EntryType, LiveSyncQueueEntry
+from indico_livesync.util import get_excluded_categories, obj_ref
 
 
 @cli_group(name='livesync')
@@ -201,3 +203,46 @@ def reset(agent_id):
     db.session.commit()
     print(cformat('Reset complete; run %{green!}indico livesync initial-export {}%{reset} for a new export')
           .format(agent.id))
+
+
+@cli.command()
+@click.option('--type', '-t',
+              type=click.Choice(EntryType.__members__),
+              callback=lambda c, p, v: getattr(EntryType, v) if v else None,
+              default='event',
+              help='The object type (default: event)')
+@click.option('--change', '-c',
+              type=click.Choice(ChangeType.__members__),
+              callback=lambda c, p, v: getattr(ChangeType, v) if v else None,
+              default='protection_changed',
+              help='The change type (default: protection_changed)')
+@click.argument('ids', nargs=-1, type=int, metavar='ID...')
+def enqueue(type, change, ids):
+    """Adds the given objects to the LiveSync queues.
+
+    This is intended to be used if a change was not recorded by LiveSync
+    for some reason and you want to manually force an update. Note that
+    enqueuing a deletion for something that is not deleted may be
+    dangerous and can cause agent runs to fail.
+
+    By default this util uses the `protection_changed` change type since
+    that way it cascades to all child objects when used on anything except
+    categories.
+    """
+
+    model = {
+        EntryType.category: db.m.Category,
+        EntryType.event: db.m.Event,
+        EntryType.contribution: db.m.Contribution,
+        EntryType.subcontribution: db.m.SubContribution,
+        EntryType.session: db.m.Session,
+        EntryType.note: db.m.EventNote,
+        EntryType.attachment: db.m.Attachment,
+    }[type]
+
+    objs = model.query.filter(model.id.in_(ids)).all()
+    excluded_categories = get_excluded_categories()
+    for obj in objs:
+        click.echo(f'Enqueuing {obj}')
+        LiveSyncQueueEntry.create({change}, obj_ref(obj), excluded_categories=excluded_categories)
+    db.session.commit()
