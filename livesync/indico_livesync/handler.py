@@ -94,14 +94,14 @@ def _moved(obj, old_parent, **kwargs):
     _register_change(obj, ChangeType.moved)
 
     new_category = obj if isinstance(obj, Category) else obj.category
-    old_excluded = _is_category_excluded(old_parent)
+    old_excluded = _is_category_excluded(old_parent) if old_parent else False
     new_excluded = _is_category_excluded(new_category)
     if old_excluded != new_excluded:
         _register_change(obj, ChangeType.unpublished if new_excluded else ChangeType.published)
 
     if obj.is_inheriting:
         # If protection is inherited, check whether it changed
-        category_protection = old_parent.effective_protection_mode
+        category_protection = old_parent.effective_protection_mode if old_parent else None
         new_category_protection = obj.protection_parent.effective_protection_mode
         # Protection of new parent is different
         if category_protection != new_category_protection:
