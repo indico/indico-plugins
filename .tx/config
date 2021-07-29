@@ -37,6 +37,12 @@ source_file = payment_manual/indico_payment_manual/translations/messages.pot
 source_lang = en
 type = PO
 
+[indico.payment-sixpay-messages]
+file_filter = payment_sixpay/indico_payment_sixpay/translations/<lang>/LC_MESSAGES/messages.po
+source_file = payment_sixpay/indico_payment_sixpay/translations/messages.pot
+source_lang = en
+type = PO
+
 [indico.livesync-messages]
 file_filter = livesync/indico_livesync/translations/<lang>/LC_MESSAGES/messages.po
 source_file = livesync/indico_livesync/translations/messages.pot
