@@ -30,7 +30,7 @@ from indico_payment_sixpay.util import (PROVIDER_SIXPAY, SIXPAY_JSON_API_SPEC, S
 
 
 class TransactionFailure(Exception):
-    """A transaction with SixPay failed.
+    """A transaction with SIXPay failed.
 
     :param step: name of the step at which the transaction failed
     :param details: verbose description of what went wrong
@@ -42,12 +42,12 @@ class TransactionFailure(Exception):
 
 
 class RHSixpayBase(RH):
-    """Request Handler for asynchronous callbacks from SixPay.
+    """Request Handler for asynchronous callbacks from SIXPay.
 
     These handlers are used either by
 
-    - the user, when he is redirected from SixPay back to Indico
-    - SixPay, when it sends back the result of a transaction
+    - the user, when he is redirected from SIXPay back to Indico
+    - SIXPay, when it sends back the result of a transaction
     """
 
     CSRF_ENABLED = False
@@ -78,7 +78,7 @@ class RHInitSixpayPayment(RHPaymentBase):
         }
         order_description = settings['order_description'].format(**format_map)
         order_identifier = settings['order_identifier'].format(**format_map)
-        # see the SixPay Manual
+        # see the SIXPay Manual
         # https://saferpay.github.io/jsonapi/#Payment_v1_PaymentPage_Initialize
         # on what these things mean
         transaction_parameters = {
@@ -102,7 +102,7 @@ class RHInitSixpayPayment(RHPaymentBase):
                 'Abort': url_for_plugin('payment_sixpay.cancel', self.registration.locator.uuid, _external=True)
             },
             'Notification': {
-                # where to asynchronously call back from SixPay
+                # where to asynchronously call back from SIXPay
                 'NotifyUrl': url_for_plugin('payment_sixpay.notify', self.registration.locator.uuid, _external=True)
             }
         }
@@ -151,8 +151,8 @@ class RHInitSixpayPayment(RHPaymentBase):
         return redirect(payment_url)
 
 
-class SixPayNotificationHandler(RHSixpayBase):
-    """Handler for notification from SixPay service."""
+class SixpayNotificationHandler(RHSixpayBase):
+    """Handler for notification from SIXPay service."""
 
     def __init__(self):
         """Initialize request handler."""
@@ -164,15 +164,15 @@ class SixPayNotificationHandler(RHSixpayBase):
         self.sixpay_url = get_setting('url')
 
     def _process(self):
-        """Process the reply from SixPay about the transaction."""
+        """Process the reply from SIXPay about the transaction."""
         try:
             self._process_confirmation()
         except TransactionFailure as exc:
-            SixpayPaymentPlugin.logger.warning('SixPay transaction failed during %s: %s', exc.step, exc.details)
+            SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
 
     def _process_confirmation(self):
         """Process the confirmation response inside indico."""
-        # assert transaction status from SixPay
+        # assert transaction status from SIXPay
         try:
             assert_response = self._assert_payment()
             if self._is_duplicate_transaction(assert_response):
@@ -183,15 +183,15 @@ class SixPayNotificationHandler(RHSixpayBase):
                 self._verify_amount(assert_response)
                 self._register_payment(assert_response)
         except TransactionFailure as exc:
-            SixpayPaymentPlugin.logger.warning('SixPay transaction failed during %s: %s', exc.step, exc.details)
+            SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
             raise
         return True
 
     def _perform_request(self, task, endpoint, data):
-        """Perform a request against SixPay.
+        """Perform a request against SIXPay.
 
         :param task: description of the request, used for error handling
-        :param endpoint: the URL endpoint *relative* to the SixPay base URL
+        :param endpoint: the URL endpoint *relative* to the SIXPay base URL
         :param **data: data passed during the request
 
         This will automatically raise any HTTP errors encountered during the
@@ -208,7 +208,7 @@ class SixPayNotificationHandler(RHSixpayBase):
         return response
 
     def _assert_payment(self):
-        """Check the status of the transaction with SixPay.
+        """Check the status of the transaction with SIXPay.
 
         Returns transaction assert data.
         """
@@ -269,7 +269,7 @@ class SixPayNotificationHandler(RHSixpayBase):
         return False
 
     def _capture_transaction(self, assert_data):
-        """Confirm to SixPay that the transaction is accepted.
+        """Confirm to SIXPay that the transaction is accepted.
 
         On success returns the response JSON data.
         """
@@ -343,14 +343,14 @@ class UserFailureHandler(RHSixpayBase):
         return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
 
 
-class UserSuccessHandler(SixPayNotificationHandler):
+class UserSuccessHandler(SixpayNotificationHandler):
     """User redirect target in case of successful payment."""
 
     def _process(self):
         try:
             self._process_confirmation()
         except TransactionFailure as exc:
-            SixpayPaymentPlugin.logger.warning('SixPay transaction failed during %s: %s', exc.step, exc.details)
+            SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
             flash(_('Your payment could not be confirmed. Please contact the event organizers.'), 'warning')
         else:
             flash(_('Your payment has been confirmed.'), 'success')

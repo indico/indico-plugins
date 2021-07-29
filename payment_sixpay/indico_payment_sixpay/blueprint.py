@@ -7,7 +7,7 @@
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_payment_sixpay.controllers import (RHInitSixpayPayment, SixPayNotificationHandler, UserCancelHandler,
+from indico_payment_sixpay.controllers import (RHInitSixpayPayment, SixpayNotificationHandler, UserCancelHandler,
                                                UserFailureHandler, UserSuccessHandler)
 
 
@@ -20,4 +20,4 @@ blueprint.add_url_rule('/init', 'init', RHInitSixpayPayment, methods=('GET', 'PO
 blueprint.add_url_rule('/failure', 'failure', UserCancelHandler, methods=('GET', 'POST'))
 blueprint.add_url_rule('/cancel', 'cancel', UserFailureHandler, methods=('GET', 'POST'))
 blueprint.add_url_rule('/success', 'success', UserSuccessHandler, methods=('GET', 'POST'))
-blueprint.add_url_rule('/notify', 'notify', SixPayNotificationHandler, methods=('Get', 'POST'))
+blueprint.add_url_rule('/notify', 'notify', SixpayNotificationHandler, methods=('Get', 'POST'))

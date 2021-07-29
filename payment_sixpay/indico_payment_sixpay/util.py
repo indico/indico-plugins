@@ -36,13 +36,13 @@ def validate_currency(iso_code):
     """
     if iso_code in NON_DECIMAL_CURRENCY:
         raise HTTPNotImplemented(
-            _("Unsupported currency '{}' for SixPay. Please contact the organizers").format(iso_code)
+            _("Unsupported currency '{}' for SIXPay. Please contact the organizers").format(iso_code)
         )
     try:
         iso4217.Currency(iso_code)
     except ValueError:
         raise HTTPNotImplemented(
-            _("Unknown currency '{}' for SixPay. Please contact the organizers").format(iso_code)
+            _("Unknown currency '{}' for SIXPay. Please contact the organizers").format(iso_code)
         )
 
 

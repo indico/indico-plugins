@@ -1,8 +1,9 @@
-# SIXPay Payment Plugin
+# SIXPay-Saferpay Payment Plugin
 
-This plugin provides a SIXPay payment option for Indico's payment module.
+This plugin provides a payment option for Indico's payment module using the
+SIXPay Saferpay API.
 
-When used, the user will be sent to SIXPay to make the payment, and afterwards
+When used, the user will be sent to Saferpay to make the payment, and afterwards
 they are automatically sent back to Indico.
 
 ## Changelog

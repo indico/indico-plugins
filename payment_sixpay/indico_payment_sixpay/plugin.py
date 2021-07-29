@@ -12,7 +12,7 @@ from indico_payment_sixpay.forms import EventSettingsForm, PluginSettingsForm
 
 
 class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
-    """SIXPay
+    """SIXPay Saferpay
 
     Provides a payment method using the SIXPay Saferpay API.
     """
@@ -24,7 +24,7 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     event_settings_form = EventSettingsForm
     #: global default settings - should be a reasonable default
     default_settings = {
-        'method_name': 'SIXPay',
+        'method_name': 'SIXPay Saferpay',
         'url': 'https://www.saferpay.com/api/',
         'username': None,
         'password': None,
