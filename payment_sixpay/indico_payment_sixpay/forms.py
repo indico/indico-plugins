@@ -112,16 +112,18 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         description=_(
             'The default description of each order in a human readable way. '
             'It is presented to the registrant during the transaction with Saferpay. '
-            'Event managers will be able to override this.'
-        )
+            'Event managers will be able to override this. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
         validators=[DataRequired(), FormatField(max_length=80)],
         description=_(
             'The default identifier of each order for further processing. '
-            'Event managers will be able to override this.'
-        )
+            'Event managers will be able to override this. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
@@ -150,13 +152,17 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         validators=[DataRequired(), FormatField(max_length=80)],
         description=_(
             'The description of each order in a human readable way. '
-            'It is presented to the registrant during the transaction with Saferpay.'
-        )
+            'It is presented to the registrant during the transaction with Saferpay. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
         validators=[DataRequired(), FormatField(max_length=80)],
-        description=_('The default identifier of each order for further processing.')
+        description=_(
+            'The default identifier of each order for further processing. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
