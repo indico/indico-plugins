@@ -9,11 +9,14 @@ from urllib.parse import urljoin
 
 import requests
 from flask import flash, redirect, request
-from werkzeug.exceptions import BadRequest
+from requests import RequestException
+from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.plugins import url_for_plugin
+from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import register_transaction
+from indico.modules.events.payment.util import get_active_payment_plugins, register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
@@ -21,8 +24,9 @@ from indico.web.rh import RH
 from indico_payment_sixpay import _
 from indico_payment_sixpay.plugin import SixpayPaymentPlugin
 from indico_payment_sixpay.util import (PROVIDER_SIXPAY, SIXPAY_JSON_API_SPEC, SIXPAY_PP_ASSERT_URL,
-                                        SIXPAY_PP_CANCEL_URL, SIXPAY_PP_CAPTURE_URL, get_request_header, get_setting,
-                                        to_large_currency, to_small_currency)
+                                        SIXPAY_PP_CANCEL_URL, SIXPAY_PP_CAPTURE_URL, SIXPAY_PP_INIT_URL,
+                                        get_request_header, get_setting, get_terminal_id, to_large_currency,
+                                        to_small_currency)
 
 
 class TransactionFailure(Exception):
@@ -56,6 +60,95 @@ class RHSixpayBase(RH):
 
     def _get_setting(self, setting):
         return get_setting(setting, self.registration.event)
+
+
+class RHInitSixpayPayment(RHPaymentBase):
+    def _get_transaction_parameters(self):
+        """Get parameters for creating a transaction request."""
+        settings = SixpayPaymentPlugin.event_settings.get_all(self.event)
+        format_map = {
+            'user_id': self.registration.user_id,
+            'user_name': self.registration.full_name,
+            'user_firstname': self.registration.first_name,
+            'user_lastname': self.registration.last_name,
+            'event_id': self.registration.event_id,
+            'event_title': self.registration.event.title,
+            'registration_id': self.registration.id,
+            'regform_title': self.registration.registration_form.title
+        }
+        order_description = settings['order_description'].format(**format_map)
+        order_identifier = settings['order_identifier'].format(**format_map)
+        # see the SixPay Manual
+        # https://saferpay.github.io/jsonapi/#Payment_v1_PaymentPage_Initialize
+        # on what these things mean
+        transaction_parameters = {
+            'RequestHeader': get_request_header(SIXPAY_JSON_API_SPEC, settings['account_id']),
+            'TerminalId': get_terminal_id(settings['account_id']),
+            'Payment': {
+                'Amount': {
+                    # indico handles price as largest currency, but six expects
+                    # smallest. E.g. EUR: indico uses 100.2 Euro, but six
+                    # expects 10020 Cent
+                    'Value': str(to_small_currency(self.registration.price, self.registration.currency)),
+                    'CurrencyCode': self.registration.currency,
+                },
+                'OrderId': order_identifier[:80],
+                'DESCRIPTION': order_description[:1000],
+            },
+            # callbacks of the transaction - where to announce success etc., when redircting the user
+            'ReturnUrls': {
+                'Success': url_for_plugin('payment_sixpay.success', self.registration.locator.uuid, _external=True),
+                'Fail': url_for_plugin('payment_sixpay.failure', self.registration.locator.uuid, _external=True),
+                'Abort': url_for_plugin('payment_sixpay.cancel', self.registration.locator.uuid, _external=True)
+            },
+            'Notification': {
+                # where to asynchronously call back from SixPay
+                'NotifyUrl': url_for_plugin('payment_sixpay.notify', self.registration.locator.uuid, _external=True)
+            }
+        }
+        if settings['notification_mail']:
+            transaction_parameters['Notification']['MerchantEmails'] = [settings['notification_mail']]
+        return transaction_parameters
+
+    def _init_payment_page(self, transaction_data):
+        """Initialize payment page."""
+        endpoint = urljoin(SixpayPaymentPlugin.settings.get('url'), SIXPAY_PP_INIT_URL)
+        credentials = (SixpayPaymentPlugin.settings.get('username'), SixpayPaymentPlugin.settings.get('password'))
+        resp = requests.post(endpoint, json=transaction_data, auth=credentials)
+        try:
+            resp.raise_for_status()
+        except RequestException as exc:
+            self.logger.error('Could not initialize payment: %s', exc.response.text)
+            raise Exception('Could not initialize payment')
+        return resp.json()
+
+    def _process_args(self):
+        RHPaymentBase._process_args(self)
+        if 'sixpay' not in get_active_payment_plugins(self.event):
+            raise NotFound
+        if not SixpayPaymentPlugin.instance.supports_currency(self.registration.currency):
+            raise BadRequest
+
+    def _process(self):
+        transaction_params = self._get_transaction_parameters()
+        init_response = self._init_payment_page(transaction_params)
+        payment_url = init_response['RedirectUrl']
+
+        # create pending transaction and store Saferpay transaction token
+        new_indico_txn = register_transaction(
+            self.registration,
+            self.registration.price,
+            self.registration.currency,
+            TransactionAction.pending,
+            PROVIDER_SIXPAY,
+            {'Init_PP_response': init_response}
+        )
+        if not new_indico_txn:
+            # set it on the current transaction if we could not create a next one
+            # this happens if we already have a pending transaction and it's incredibly
+            # ugly...
+            self.registration.transaction.data = {'Init_PP_response': init_response}
+        return redirect(payment_url)
 
 
 class SixPayNotificationHandler(RHSixpayBase):

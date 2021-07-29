@@ -7,16 +7,17 @@
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_payment_sixpay.controllers import (SixPayNotificationHandler, UserCancelHandler, UserFailureHandler,
-                                               UserSuccessHandler)
+from indico_payment_sixpay.controllers import (RHInitSixpayPayment, SixPayNotificationHandler, UserCancelHandler,
+                                               UserFailureHandler, UserSuccessHandler)
 
 
 blueprint = IndicoPluginBlueprint(
     'payment_sixpay', __name__,
-    url_prefix='/event/<int:event_id>/registrations/<int:reg_form_id>/payment/response/sixpay'
+    url_prefix='/event/<int:event_id>/registrations/<int:reg_form_id>/payment/sixpay'
 )
 
+blueprint.add_url_rule('/init', 'init', RHInitSixpayPayment, methods=('GET', 'POST'))
 blueprint.add_url_rule('/failure', 'failure', UserCancelHandler, methods=('GET', 'POST'))
 blueprint.add_url_rule('/cancel', 'cancel', UserFailureHandler, methods=('GET', 'POST'))
 blueprint.add_url_rule('/success', 'success', UserSuccessHandler, methods=('GET', 'POST'))
-blueprint.add_url_rule('/ipn', 'notify', SixPayNotificationHandler, methods=('Get', 'POST'))
+blueprint.add_url_rule('/notify', 'notify', SixPayNotificationHandler, methods=('Get', 'POST'))
