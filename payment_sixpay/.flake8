@@ -1,0 +1,29 @@
+[flake8]
+max-line-length = 120
+
+# colored output
+format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+
+# decent quote styles
+inline-quotes = single
+multiline-quotes = single
+docstring-quotes = double
+avoid-escape = true
+
+extend-exclude =
+    build
+    dist
+    docs
+    htmlcov
+    *.egg-info
+    node_modules
+    .*/
+
+ignore =
+    # allow omitting whitespace around arithmetic operators
+    E226
+    # don't require specific wrapping before/after binary operators
+    W503
+    W504
+    # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
+    E731

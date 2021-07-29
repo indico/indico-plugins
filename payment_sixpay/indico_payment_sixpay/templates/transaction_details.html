@@ -1,0 +1,9 @@
+{% extends 'events/payment/transaction_details.html' %}
+{% block details %}
+    {% if transaction.data.Transaction %}
+        <dt>{% trans %}Transaction ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.Transaction.Id }}</dd>
+        <dt>{% trans %}Order ID{% endtrans %}</dt>
+        <dd>{{ transaction.data.Transaction.OrderId }}</dd>
+    {% endif %}
+{% endblock %}
