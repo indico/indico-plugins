@@ -25,8 +25,7 @@ from indico_payment_sixpay import _
 from indico_payment_sixpay.plugin import SixpayPaymentPlugin
 from indico_payment_sixpay.util import (PROVIDER_SIXPAY, SIXPAY_JSON_API_SPEC, SIXPAY_PP_ASSERT_URL,
                                         SIXPAY_PP_CANCEL_URL, SIXPAY_PP_CAPTURE_URL, SIXPAY_PP_INIT_URL,
-                                        get_request_header, get_setting, get_terminal_id, to_large_currency,
-                                        to_small_currency)
+                                        get_request_header, get_terminal_id, to_large_currency, to_small_currency)
 
 
 class TransactionFailure(Exception):
@@ -57,9 +56,6 @@ class RHSixpayBase(RH):
         if not self.registration:
             raise BadRequest
         self.token = self.registration.transaction.data['Init_PP_response']['Token']
-
-    def _get_setting(self, setting):
-        return get_setting(setting, self.registration.event)
 
 
 class RHInitSixpayPayment(RHPaymentBase):
@@ -154,15 +150,6 @@ class RHInitSixpayPayment(RHPaymentBase):
 class SixpayNotificationHandler(RHSixpayBase):
     """Handler for notification from SIXPay service."""
 
-    def __init__(self):
-        """Initialize request handler."""
-        super().__init__()
-        self.sixpay_url = None
-
-    def _process_args(self):
-        super()._process_args()
-        self.sixpay_url = get_setting('url')
-
     def _process(self):
         """Process the reply from SIXPay about the transaction."""
         try:
@@ -198,8 +185,8 @@ class SixpayNotificationHandler(RHSixpayBase):
         request. If the request itself fails, a :py:exc:`~.TransactionFailure`
         is raised for ``task``.
         """
-        request_url = urljoin(self.sixpay_url, endpoint)
-        credentials = (get_setting('username'), get_setting('password'))
+        request_url = urljoin(SixpayPaymentPlugin.settings.get('url'), endpoint)
+        credentials = (SixpayPaymentPlugin.settings.get('username'), SixpayPaymentPlugin.settings.get('password'))
         response = requests.post(request_url, json=data, auth=credentials)
         try:
             response.raise_for_status()
@@ -212,11 +199,12 @@ class SixpayNotificationHandler(RHSixpayBase):
 
         Returns transaction assert data.
         """
+        account_id = SixpayPaymentPlugin.event_settings.get(self.registration.event, 'account_id')
         assert_response = self._perform_request(
             'assert',
             SIXPAY_PP_ASSERT_URL,
             {
-                'RequestHeader': get_request_header(SIXPAY_JSON_API_SPEC, self._get_setting('account_id')),
+                'RequestHeader': get_request_header(SIXPAY_JSON_API_SPEC, account_id),
                 'Token': self.token,
             }
         )
@@ -232,8 +220,8 @@ class SixpayNotificationHandler(RHSixpayBase):
             'Transaction' not in prev_transaction.data
         ):
             return False
-        old = prev_transaction.data.get('Transaction')
-        new = transaction_data.get('Transaction')
+        old = prev_transaction.data['Transaction']
+        new = transaction_data['Transaction']
         return (
             old['OrderId'] == new['OrderId'] and
             old['Type'] == new['Type'] and
@@ -273,8 +261,9 @@ class SixpayNotificationHandler(RHSixpayBase):
 
         On success returns the response JSON data.
         """
+        account_id = SixpayPaymentPlugin.event_settings.get(self.registration.event, 'account_id')
         capture_data = {
-            'RequestHeader': get_request_header(SIXPAY_JSON_API_SPEC, self._get_setting('account_id')),
+            'RequestHeader': get_request_header(SIXPAY_JSON_API_SPEC, account_id),
             'TransactionReference': {'TransactionId': assert_data['Transaction']['Id']}
         }
         capture_response = self._perform_request('capture', SIXPAY_PP_CAPTURE_URL, capture_data)
@@ -286,9 +275,10 @@ class SixpayNotificationHandler(RHSixpayBase):
         Cancel the transaction at Sixpay. This method is implemented but
         not used and tested yet.
         """
+        account_id = SixpayPaymentPlugin.event_settings.get(self.registration.event, 'account_id')
         cancel_data = {
             'RequestHeader': get_request_header(
-                SIXPAY_JSON_API_SPEC, self._get_setting('account_id')
+                SIXPAY_JSON_API_SPEC, account_id
             ),
             'TransactionReference': {
                 'TransactionId': assert_data['Transaction']['Id']

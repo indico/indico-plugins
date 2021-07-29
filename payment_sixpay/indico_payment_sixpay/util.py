@@ -93,12 +93,3 @@ def get_terminal_id(account_id):
     account ID.
     """
     return account_id.split('-')[1]
-
-
-def get_setting(setting, event=None):
-    """Return a configuration setting of the plugin."""
-    from indico_payment_sixpay.plugin import SixpayPaymentPlugin
-    if event:
-        return SixpayPaymentPlugin.event_settings.get(event, setting)
-    else:
-        return SixpayPaymentPlugin.settings.get(setting)
