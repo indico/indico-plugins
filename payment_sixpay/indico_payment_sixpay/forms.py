@@ -127,7 +127,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         label=_('Notification Email'),
         validators=[Optional(), Email(), Length(0, 50)],
         description=_(
-            'Emmil address to receive notifications of transactions. '
+            'Email address to receive notifications of transactions. '
             "This is independent of Indico's own payment notifications. "
             'Event managers will be able to override this.'
         )
@@ -162,7 +162,7 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         label=_('Notification Email'),
         validators=[DataRequired(), Email(), Length(0, 50)],
         description=_(
-            'Emmil address to receive notifications of transactions. '
+            'Email address to receive notifications of transactions. '
             "This is independent of Indico's own payment notifications."
         )
     )
