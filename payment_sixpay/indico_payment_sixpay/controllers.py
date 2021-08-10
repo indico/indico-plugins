@@ -114,7 +114,7 @@ class RHInitSixpayPayment(RHPaymentBase):
         try:
             resp.raise_for_status()
         except RequestException as exc:
-            self.logger.error('Could not initialize payment: %s', exc.response.text)
+            SixpayPaymentPlugin.logger.error('Could not initialize payment: %s', exc.response.text)
             raise Exception('Could not initialize payment')
         return resp.json()
 
