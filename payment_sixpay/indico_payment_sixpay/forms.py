@@ -5,6 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import re
+
 from wtforms.fields import StringField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError
@@ -42,17 +44,24 @@ class FormatField:
         'regform_title': 'EarlyBird Registration'
     }
 
-    def __init__(self, max_length=float('inf'), field_map=None):
+    #: id-safe placeholders to test length after formatting
+    id_safe_field_map = {
+        'user_id': 12345,
+        'event_id': 12345,
+        'registration_id': 12345,
+    }
+
+    def __init__(self, max_length=float('inf'), id_safe=False):
         """Format field validator, i.e. strings with ``{key}`` placeholders.
 
         :param max_length: optional maximum length,
                            checked on a test formatting
         :param field_map: keyword arguments to use for test formatting
+        :param id_safe: only allow fields safe for a saferpay id argument
         """
         self.max_length = max_length
-        self.field_map = self.default_field_map.copy()
-        if field_map is not None:
-            self.field_map.update(field_map)
+        self.id_safe = id_safe
+        self.field_map = self.id_safe_field_map if id_safe else self.default_field_map
 
     def __call__(self, form, field):
         """Validate format field data.
@@ -73,6 +82,9 @@ class FormatField:
                 _('Format string too long: shortest replacement with {len}, expected {max}')
                 .format(len=len(test_format), max=self.max_length)
             )
+        if self.id_safe and not re.match(r'^[A-Za-z0-9.:_-]+$', test_format):
+            raise ValidationError(_('This field may only contain alphanumeric chars, dots, colons, '
+                                    'hyphens and underscores.'))
         return True
 
 
@@ -80,7 +92,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
     """Configuration form for the Plugin across all events."""
 
     url = URLField(
-        label=_('Saferpay JSON API URL'),
+        label=_('API URL'),
         validators=[DataRequired()],
         description=_('URL to contact the Saferpay JSON API'),
     )
@@ -118,12 +130,12 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
-        validators=[DataRequired(), FormatField(max_length=80)],
+        validators=[DataRequired(), FormatField(max_length=80, id_safe=True)],
         description=_(
             'The default identifier of each order for further processing. '
             'Event managers will be able to override this. '
             'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
@@ -158,11 +170,11 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
-        validators=[DataRequired(), FormatField(max_length=80)],
+        validators=[DataRequired(), FormatField(max_length=80, id_safe=True)],
         description=_(
             'The default identifier of each order for further processing. '
             'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
