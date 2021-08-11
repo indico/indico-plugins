@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-29 12:19+0200\n"
+"POT-Creation-Date: 2021-08-11 16:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,118 +17,124 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: indico_payment_sixpay/controllers.py:327
+#: indico_payment_sixpay/controllers.py:317
 msgid "You cancelled the payment."
 msgstr ""
 
-#: indico_payment_sixpay/controllers.py:342
+#: indico_payment_sixpay/controllers.py:332
 msgid "Your payment has failed."
 msgstr ""
 
-#: indico_payment_sixpay/controllers.py:354
+#: indico_payment_sixpay/controllers.py:344
 msgid "Your payment could not be confirmed. Please contact the event organizers."
 msgstr ""
 
-#: indico_payment_sixpay/controllers.py:356
+#: indico_payment_sixpay/controllers.py:346
 msgid "Your payment has been confirmed."
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:68
+#: indico_payment_sixpay/forms.py:77
 msgid "Invalid format string key: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:70
+#: indico_payment_sixpay/forms.py:79
 msgid "Malformed format string: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:73
+#: indico_payment_sixpay/forms.py:82
 msgid "Format string too long: shortest replacement with {len}, expected {max}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:83
-msgid "Saferpay JSON API URL"
-msgstr ""
-
-#: indico_payment_sixpay/forms.py:85
-msgid "URL to contact the Saferpay JSON API"
-msgstr ""
-
-#: indico_payment_sixpay/forms.py:88
-msgid "API username"
-msgstr ""
-
-#: indico_payment_sixpay/forms.py:90
-msgid "The username to access the SaferPay JSON API"
-msgstr ""
-
-#: indico_payment_sixpay/forms.py:93
-msgid "API password"
+#: indico_payment_sixpay/forms.py:86
+msgid ""
+"This field may only contain alphanumeric chars, dots, colons, hyphens and"
+" underscores."
 msgstr ""
 
 #: indico_payment_sixpay/forms.py:95
+msgid "API URL"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py:97
+msgid "URL to contact the Saferpay JSON API"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py:100
+msgid "API username"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py:102
+msgid "The username to access the SaferPay JSON API"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py:105
+msgid "API password"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py:107
 msgid "The password to access the SaferPay JSON API"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:99 indico_payment_sixpay/forms.py:143
+#: indico_payment_sixpay/forms.py:111 indico_payment_sixpay/forms.py:155
 msgid "Account ID"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:104
+#: indico_payment_sixpay/forms.py:116
 msgid ""
 "Default Saferpay account ID, such as \"123456-12345678\". Event managers "
 "will be able to override this."
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:110 indico_payment_sixpay/forms.py:151
+#: indico_payment_sixpay/forms.py:122 indico_payment_sixpay/forms.py:163
 msgid "Order Description"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:112
+#: indico_payment_sixpay/forms.py:124
 msgid ""
 "The default description of each order in a human readable way. It is "
 "presented to the registrant during the transaction with Saferpay. Event "
 "managers will be able to override this. Supported placeholders: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:120 indico_payment_sixpay/forms.py:160
+#: indico_payment_sixpay/forms.py:132 indico_payment_sixpay/forms.py:172
 msgid "Order Identifier"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:122
+#: indico_payment_sixpay/forms.py:134
 msgid ""
 "The default identifier of each order for further processing. Event "
 "managers will be able to override this. Supported placeholders: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:129 indico_payment_sixpay/forms.py:168
+#: indico_payment_sixpay/forms.py:141 indico_payment_sixpay/forms.py:180
 msgid "Notification Email"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:131
+#: indico_payment_sixpay/forms.py:143
 msgid ""
 "Email address to receive notifications of transactions. This is "
 "independent of Indico's own payment notifications. Event managers will be"
 " able to override this."
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:148
+#: indico_payment_sixpay/forms.py:160
 msgid "The Saferpay account ID, such as \"123456-12345678\"."
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:153
+#: indico_payment_sixpay/forms.py:165
 msgid ""
 "The description of each order in a human readable way. It is presented to"
 " the registrant during the transaction with Saferpay. Supported "
 "placeholders: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:162
+#: indico_payment_sixpay/forms.py:174
 msgid ""
 "The default identifier of each order for further processing. Supported "
 "placeholders: {}"
 msgstr ""
 
-#: indico_payment_sixpay/forms.py:170
+#: indico_payment_sixpay/forms.py:182
 msgid ""
 "Email address to receive notifications of transactions. This is "
 "independent of Indico's own payment notifications."
