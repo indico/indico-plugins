@@ -5,6 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import json
+import time
 from urllib.parse import urljoin
 
 import requests
@@ -161,15 +163,33 @@ class SixpayNotificationHandler(RHSixpayBase):
             assert_response = self._assert_payment()
             if self._is_duplicate_transaction(assert_response):
                 # we have already handled the transaction
-                return True
-            if self._is_authorized(assert_response) and not self._is_captured(assert_response):
+                return
+            elif self._is_captured(assert_response):
+                # We already captured the payment. This usually happens because sixpay
+                # calls a background notification endpoint but we also try to capture
+                # it after being redirected to the user-facing success endpoint
+                SixpayPaymentPlugin.logger.info('Not processing already-captured transaction')
+                time.sleep(1)  # wait a bit to make sure the other request finished!
+                return
+            elif self._is_authorized(assert_response):
                 self._capture_transaction(assert_response)
                 self._verify_amount(assert_response)
                 self._register_payment(assert_response)
         except TransactionFailure as exc:
+            if exc.step == 'capture':
+                try:
+                    payload = json.loads(exc.details)
+                except (json.JSONDecodeError, TypeError):
+                    payload = {}
+                if payload.get('ErrorName') == 'TRANSACTION_ALREADY_CAPTURED':
+                    # Same as the self._is_captured(assert_response) case above, but a race
+                    # between the two requests (user-facing and background) resulted in both
+                    # asserts returning an 'authorized' state
+                    SixpayPaymentPlugin.logger.info('Not processing already-captured transaction (parallel request)')
+                    time.sleep(1)  # wait a bit to make sure the other request finished
+                    return
             SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
             raise
-        return True
 
     def _perform_request(self, task, endpoint, data):
         """Perform a request against SIXPay.
