@@ -152,10 +152,7 @@ class SixpayNotificationHandler(RHSixpayBase):
 
     def _process(self):
         """Process the reply from SIXPay about the transaction."""
-        try:
-            self._process_confirmation()
-        except TransactionFailure as exc:
-            SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
+        self._process_confirmation()
 
     def _process_confirmation(self):
         """Process the confirmation response inside indico."""
@@ -339,8 +336,7 @@ class UserSuccessHandler(SixpayNotificationHandler):
     def _process(self):
         try:
             self._process_confirmation()
-        except TransactionFailure as exc:
-            SixpayPaymentPlugin.logger.warning('SIXPay transaction failed during %s: %s', exc.step, exc.details)
+        except TransactionFailure:
             flash(_('Your payment could not be confirmed. Please contact the event organizers.'), 'warning')
         else:
             flash(_('Your payment has been confirmed.'), 'success')
