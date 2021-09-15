@@ -91,13 +91,17 @@ def _is_category_excluded(category):
 
 
 def _moved(obj, old_parent, **kwargs):
-    _register_change(obj, ChangeType.moved)
+    # if an unlisted event is moved, it triggers a creation instead
+    if isinstance(obj, Event) and old_parent is None:
+        _register_change(obj, ChangeType.created)
+    else:
+        _register_change(obj, ChangeType.moved)
 
-    new_category = obj if isinstance(obj, Category) else obj.category
-    old_excluded = _is_category_excluded(old_parent) if old_parent else False
-    new_excluded = _is_category_excluded(new_category)
-    if old_excluded != new_excluded:
-        _register_change(obj, ChangeType.unpublished if new_excluded else ChangeType.published)
+        new_category = obj if isinstance(obj, Category) else obj.category
+        old_excluded = _is_category_excluded(old_parent) if old_parent else False
+        new_excluded = _is_category_excluded(new_category)
+        if old_excluded != new_excluded:
+            _register_change(obj, ChangeType.unpublished if new_excluded else ChangeType.published)
 
     if obj.is_inheriting:
         # If protection is inherited, check whether it changed
@@ -111,6 +115,9 @@ def _moved(obj, old_parent, **kwargs):
 def _created(obj, **kwargs):
     if not isinstance(obj, (Event, EventNote, Attachment, Contribution, SubContribution)):
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
+    # we don't care about unlisted events
+    if isinstance(obj, Event) and not obj.category:
+        return
     _register_change(obj, ChangeType.created)
 
 
@@ -159,6 +166,9 @@ def _protection_changed(sender, obj, **kwargs):
 
 
 def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
+    # we don't care about unlisted events
+    if isinstance(obj, Event) and not obj.category:
+        return
     if not inspect(obj).persistent:
         return
     register = False
