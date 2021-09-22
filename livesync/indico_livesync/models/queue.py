@@ -286,12 +286,13 @@ class LiveSyncQueueEntry(db.Model):
                     return
             else:
                 event = obj.folder.event if isinstance(obj, Attachment) else obj.event
-                if event.category:
-                    if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
-                        g.livesync_excluded_categories_checked[event.category] = \
-                            excluded_categories & set(event.category_chain)
-                    if g.livesync_excluded_categories_checked[event.category]:
-                        return
+                if event.is_unlisted:
+                    return
+                if event.category not in g.setdefault('livesync_excluded_categories_checked', {}):
+                    g.livesync_excluded_categories_checked[event.category] = \
+                        excluded_categories & set(event.category_chain)
+                if g.livesync_excluded_categories_checked[event.category]:
+                    return
 
         try:
             agents = g.livesync_agents

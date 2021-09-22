@@ -115,9 +115,6 @@ def _moved(obj, old_parent, **kwargs):
 def _created(obj, **kwargs):
     if not isinstance(obj, (Event, EventNote, Attachment, Contribution, SubContribution)):
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
-    # we don't care about unlisted events
-    if isinstance(obj, Event) and not obj.category:
-        return
     _register_change(obj, ChangeType.created)
 
 
@@ -166,9 +163,6 @@ def _protection_changed(sender, obj, **kwargs):
 
 
 def _acl_entry_changed(sender, obj, entry, old_data, **kwargs):
-    # we don't care about unlisted events
-    if isinstance(obj, Event) and not obj.category:
-        return
     if not inspect(obj).persistent:
         return
     register = False
