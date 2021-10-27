@@ -1,6 +1,5 @@
 [run]
 branch = true
-include = indico_*
 
 [report]
 exclude_lines =
