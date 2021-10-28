@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.0.1
+
+- Adapt to Indico 3.0.3 changes (option to show videoconference link on the main conference page)
+
 ### 3.0
 
 - Adapt to Indico 3 (and thus Python 3)
