@@ -9,9 +9,7 @@ from flask import flash, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
-from wtforms.fields import TextAreaField
-from wtforms.fields.core import BooleanField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import URL, DataRequired, Optional, ValidationError
 

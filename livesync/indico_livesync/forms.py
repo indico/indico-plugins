@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from wtforms.fields.core import StringField
+from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 
 from indico.web.forms.base import IndicoForm

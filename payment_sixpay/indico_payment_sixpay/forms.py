@@ -7,8 +7,7 @@
 
 import re
 
-from wtforms.fields import StringField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import StringField, URLField
 from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError
 
 from indico.modules.events.payment import PaymentEventSettingsFormBase, PaymentPluginSettingsFormBase

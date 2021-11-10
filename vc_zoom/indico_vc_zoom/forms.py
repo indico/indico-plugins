@@ -7,7 +7,7 @@
 
 from flask import session
 from flask_pluginengine import current_plugin
-from wtforms.fields.core import BooleanField, StringField
+from wtforms.fields import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 

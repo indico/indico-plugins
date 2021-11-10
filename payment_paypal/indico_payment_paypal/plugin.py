@@ -6,8 +6,7 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine import render_plugin_template
-from wtforms.fields.core import StringField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import StringField, URLField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
