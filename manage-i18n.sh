@@ -16,7 +16,12 @@ fi
 ACTION="$1"
 LOCALE="$2"
 PLUGINS=$(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;)
-PLUGINSINPARAMS=${@:3}
+
+if [[ "$ACTION" == "extract" ]]; then
+    PLUGINSINPARAMS=${@:2}
+else
+    PLUGINSINPARAMS=${@:3}
+fi
 
 if [[ ! -z $PLUGINSINPARAMS ]]; then
     PLUGINS=$PLUGINSINPARAMS
@@ -36,7 +41,7 @@ fi
 
 for plugin in $PLUGINS; do
     [[ "$plugin" == "_meta" ]] && continue
-    [[ ! -d "$plugin" ]] && echo "plugin not found $plugin" && exit 1
+    [[ ! -d "$plugin" ]] && echo "plugin $plugin not found" && exit 1
     pushd "${plugin}" >/dev/null
     if [[ "$ACTION" == "init" ]]; then
         require_locale
