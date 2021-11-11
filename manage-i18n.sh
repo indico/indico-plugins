@@ -36,7 +36,7 @@ fi
 
 for plugin in $PLUGINS; do
     [[ "$plugin" == "_meta" ]] && continue
-    [[ ! -d "$plugin" ]] && echo "plugin not found $plugin" && continue
+    [[ ! -d "$plugin" ]] && echo "plugin not found $plugin" && exit 1
     pushd "${plugin}" >/dev/null
     if [[ "$ACTION" == "init" ]]; then
         require_locale
