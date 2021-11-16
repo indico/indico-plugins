@@ -1,0 +1,22 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    {% set src = field.filepicker_url + '?origin=' + field.origin %}
+    <div class="i-form-field-fixed-width">
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-files" {{ input_args | html_params }}>
+        <span id="{{ field.id }}-container">
+            <iframe id="{{ field.id }}-file-picker" class="owncloudfilepicker" src={{ src }}></iframe>
+        </span>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupOwncloudFilePickerWidget({
+            filepicker_url: {{ field.filepicker_url | tojson }},
+            fieldId: {{ field.id | tojson }},
+            required: {{ input_args.required | default(false) | tojson }},
+            disabled: {{ input_args.disabled | default(false) | tojson }},
+        });
+    </script>
+{% endblock %}
