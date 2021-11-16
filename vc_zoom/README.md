@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.0.2
+
+- Fix JavaScript being included twice on conference VC page
+- Fix JavaScript error breaking the "make me co-host" button
+
 ### 3.0.1
 
 - Adapt to Indico 3.0.3 changes (option to show videoconference link on the main conference page)
