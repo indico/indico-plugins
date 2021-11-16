@@ -17,7 +17,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
-from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDisplay
+from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
@@ -158,7 +158,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
-        self.inject_bundle('main.js', WPConferenceDisplayBase)
+        self.inject_bundle('main.js', WPConferenceDisplay)
 
     @property
     def logo_url(self):
