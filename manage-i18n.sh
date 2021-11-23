@@ -6,7 +6,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-USAGE="$0 [init <locale>|extract|update <locale>|compile <locale>]"
+USAGE="$0 [init <locale>|extract|update <locale>|compile <locale>] [plugin...]"
 
 if [[ $# -eq 0 || "$1" == '-h' || "$1" == '--help' ]]; then
     echo "$USAGE"
@@ -15,6 +15,17 @@ fi
 
 ACTION="$1"
 LOCALE="$2"
+PLUGINS=$(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;)
+
+if [[ "$ACTION" == "extract" ]]; then
+    PLUGINSINPARAMS=${@:2}
+else
+    PLUGINSINPARAMS=${@:3}
+fi
+
+if [[ ! -z $PLUGINSINPARAMS ]]; then
+    PLUGINS=$PLUGINSINPARAMS
+fi
 
 function require_locale {
     if [[ -z "$LOCALE" ]]; then
@@ -28,8 +39,9 @@ if [[ ! "init extract update compile" =~ $ACTION ]]; then
     exit 1
 fi
 
-for plugin in $(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;); do
+for plugin in $PLUGINS; do
     [[ "$plugin" == "_meta" ]] && continue
+    [[ ! -d "$plugin" ]] && echo "plugin $plugin not found" && exit 1
     pushd "${plugin}" >/dev/null
     if [[ "$ACTION" == "init" ]]; then
         require_locale
