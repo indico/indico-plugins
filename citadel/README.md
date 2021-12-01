@@ -5,6 +5,10 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 ## Changelog
 
+### 3.1
+
+- Correctly handle remote groups whose capitalization changed at some point
+
 ### 3.0
 
 - Initial release
