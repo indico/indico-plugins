@@ -544,7 +544,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             flash(message, 'warning')
 
-    def _event_metadata_postprocess(self, sender, event, data, user=None, **kwargs):
+    def _event_metadata_postprocess(self, sender, event, data, user=None, skip_access_check=False, **kwargs):
         urls = []
         if 'description' in kwargs.get('html_fields', ()):
             linebreak = '<br>\n'
@@ -558,6 +558,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 continue
             visibility = assoc.data.get('password_visibility', 'logged_in')
             if (
+                (skip_access_check and visibility != 'no_one') or
                 visibility == 'everyone' or
                 (visibility == 'logged_in' and user is not None) or
                 (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
@@ -566,7 +567,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['url']))
             elif visibility == 'no_one':
                 # XXX: Not sure if showing this is useful, but on the event page we show the join link
-                # with no passcode as well, so let's the logic identical here.
+                # with no passcode as well, so let's keep the logic identical here.
                 urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['public_url']))
 
         if urls:

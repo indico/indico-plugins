@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.1
+
+- Adapt to Indico 3.1 changes (include Zoom link in event reminder emails regardless of visibility)
+
 ### 3.0.2
 
 - Fix JavaScript being included twice on conference VC page
