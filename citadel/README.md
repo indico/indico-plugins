@@ -7,6 +7,7 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 ### 3.1
 
+- Adapt to Indico 3.1 changes
 - Correctly handle remote groups whose capitalization changed at some point
 
 ### 3.0

@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.1
+
+- Adapt to Indico 3.1 changes
+
 ### 3.0
 
 - Initial release for Indico 3.0

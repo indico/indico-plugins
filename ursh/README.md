@@ -13,6 +13,10 @@ human-friendly shortcuts pointing to an event (such as `https://indico.example.c
 
 ## Changelog
 
+### 3.1
+
+- Adapt to Indico 3.1 changes
+
 ### 3.0
 
 - Initial release for Indico 3.0
