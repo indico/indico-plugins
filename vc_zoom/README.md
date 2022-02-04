@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.1.1
+
+- Fix processing webhooks for Zoom meetings updated/deleted outside Indico
+
 ### 3.1
 
 - Adapt to Indico 3.1 changes (include Zoom link in event reminder emails regardless of visibility)
