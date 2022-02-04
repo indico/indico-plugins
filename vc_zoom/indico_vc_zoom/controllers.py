@@ -7,6 +7,7 @@
 
 from flask import flash, jsonify, request, session
 from flask_pluginengine import current_plugin
+from marshmallow import EXCLUDE
 from sqlalchemy.orm.attributes import flag_modified
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -56,7 +57,7 @@ class RHWebhook(RH):
     @use_kwargs({
         'event': fields.String(required=True),
         'payload': fields.Dict(required=True)
-    })
+    }, unknown=EXCLUDE)
     def _process(self, event, payload):
         meeting_id = payload['object']['id']
         vc_room = VCRoom.query.filter(VCRoom.data.contains({'zoom_id': meeting_id})).first()
