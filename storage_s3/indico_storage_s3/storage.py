@@ -20,6 +20,7 @@ from boto3.s3.transfer import TransferConfig
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from werkzeug.datastructures import Headers
+from werkzeug.urls import url_quote
 from werkzeug.utils import cached_property, redirect
 
 from indico.core.config import config
@@ -155,7 +156,7 @@ class S3StorageBase(Storage):
             if self.proxy_downloads == ProxyDownloadsMode.nginx:
                 # nginx can proxy the request to S3 to avoid exposing the redirect and
                 # bucket URL to the end user (since it is quite ugly and temporary)
-                response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + url.replace('://', '/', 1)
+                response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + url_quote(url.replace('://', '/', 1))
             return response
         except Exception as exc:
             raise StorageError(f'Could not send file "{file_id}": {exc}') from exc

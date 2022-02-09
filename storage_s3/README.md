@@ -15,6 +15,10 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.1
+
+- Fix "invalid signature" S3 error in some cases when using `proxy=nginx` for downloads
+
 ### 3.0
 
 - Initial release for Indico 3.0
