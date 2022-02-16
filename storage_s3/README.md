@@ -15,12 +15,6 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
-### 3.1.1
-
-- Revert the fix from the previous version and replace it with one that's more reliable as
-  the problematic behavior seems to be caused by an nginx bug and the previous fix caused
-  failures in other cases
-
 ### 3.1
 
 - Fix "invalid signature" S3 error in some cases when using `proxy=nginx` for downloads
