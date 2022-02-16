@@ -15,6 +15,11 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.1.1
+
+- No technical changes, just adding the missing README to PyPI and updating the nginx
+  config snippet to correclty work with the changes from 3.1 (avoiding an [nginx bug][nginx-bug])
+
 ### 3.1
 
 - Fix "invalid signature" S3 error in some cases when using `proxy=nginx` for downloads
@@ -105,7 +110,7 @@ large) attachment to memory first that comes with `proxy=on`, you need to add th
 to the `server` block in your nginx config that is responsible for Indico.
 
 ```nginx
-location ~ ^/.xsf/s3/(https?)/([^/]+)/(.+)$ {
+location ~ ^/\.xsf/s3/(?<download_protocol>https?)/(?<download_host>[^/]+)/(?<download_path>.+)$ {
         internal;
         set $download_protocol $1;
         set $download_host $2;
@@ -154,3 +159,4 @@ You would need to write your own script that downloads those files from S3.
 
 [amazon-s3]: https://aws.amazon.com/s3/
 [nginx-blog]: https://www.mediasuite.co.nz/blog/proxying-s3-downloads-nginx/
+[nginx-bug]: https://trac.nginx.org/nginx/ticket/2320
