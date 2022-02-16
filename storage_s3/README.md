@@ -15,6 +15,10 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.1.2
+
+- No technical changes, just fixing a mistake in the README change from 3.1.1
+
 ### 3.1.1
 
 - No technical changes, just adding the missing README to PyPI and updating the nginx
@@ -112,9 +116,6 @@ to the `server` block in your nginx config that is responsible for Indico.
 ```nginx
 location ~ ^/\.xsf/s3/(?<download_protocol>https?)/(?<download_host>[^/]+)/(?<download_path>.+)$ {
         internal;
-        set $download_protocol $1;
-        set $download_host $2;
-        set $download_path $3;
         set $download_url $download_protocol://$download_host/$download_path;
         resolver YOUR_RESOLVER;
         proxy_set_header Host $download_host;
