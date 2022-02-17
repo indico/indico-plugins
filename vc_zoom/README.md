@@ -11,6 +11,12 @@
 
 ## Changelog
 
+### 3.1.2
+
+- Do not include Zoom link in event descriptions returned by the HTTP API (iCalendar files for
+  events and categories are no longer generated through the API and other consumers of the API
+  typically do not expect Zoom links in there)
+
 ### 3.1.1
 
 - Fix processing webhooks for Zoom meetings updated/deleted outside Indico

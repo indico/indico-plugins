@@ -153,7 +153,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._times_changed)
-        self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess)
+        self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPVCEventPage)
