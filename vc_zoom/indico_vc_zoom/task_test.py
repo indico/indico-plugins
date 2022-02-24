@@ -1,8 +1,17 @@
-import pytest
+# This file is part of the Indico plugins.
+# Copyright (C) 2020 - 2022 CERN and ENEA
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
 from datetime import datetime, timedelta
 
+import pytest
+
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
+
 from vc_zoom.indico_vc_zoom.util import ZoomMeetingType
 
 
@@ -34,9 +43,5 @@ def test_meeting_reschedule(app, db, dummy_event, dummy_user, dummy_vc_room, zoo
     }
     dummy_event.start_dt = meeting_time + timedelta(days=5)
     refresh_meetings(dummy_event.vc_room_associations, dummy_event.start_dt)
-    assert zoom_client.get_meeting.call_count == 1
-    assert zoom_client.update_meeting.call_count == 0
-    dummy_event.start_dt = dummy_event.start_dt + timedelta(days=26)
-    refresh_meetings(dummy_event.vc_room_associations, dummy_event.start_dt)
-    assert zoom_client.get_meeting.call_count == 2
+    assert zoom_client.get_meeting.call_count == 0
     assert zoom_client.update_meeting.call_count == 1
