@@ -12,12 +12,12 @@ import pytest
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
 
-from vc_zoom.indico_vc_zoom.util import ZoomMeetingType
+from indico_vc_zoom.util import ZoomMeetingType
 
 
 @pytest.fixture
 def zoom_client(mocker):
-    client = mocker.patch('vc_zoom.indico_vc_zoom.api.ZoomIndicoClient', autospec=True)
+    client = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient', autospec=True)
     client.return_value = client
     return client
 
@@ -34,7 +34,7 @@ def dummy_vc_room(db, dummy_event, dummy_user):
 
 
 def test_meeting_reschedule(app, db, dummy_event, dummy_user, dummy_vc_room, zoom_client):
-    from vc_zoom.indico_vc_zoom.task import refresh_meetings
+    from indico_vc_zoom.task import refresh_meetings
     meeting_time = datetime.now() - timedelta(days=30)
     zoom_client.get_meeting.return_value = {
         'id': dummy_vc_room.id,

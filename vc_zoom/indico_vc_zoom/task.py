@@ -8,8 +8,8 @@
 from indico.core import signals
 from indico.core.celery import celery
 
-from vc_zoom.indico_vc_zoom.api import ZoomIndicoClient
-from vc_zoom.indico_vc_zoom.util import ZoomMeetingType
+from indico_vc_zoom.api import ZoomIndicoClient
+from indico_vc_zoom.util import ZoomMeetingType
 
 
 @signals.event.updated.connect
