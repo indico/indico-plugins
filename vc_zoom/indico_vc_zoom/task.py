@@ -5,27 +5,33 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from indico.core import signals
+from requests.exceptions import HTTPError
+from sqlalchemy.orm.attributes import flag_modified
+
 from indico.core.celery import celery
-
-from indico_vc_zoom.api import ZoomIndicoClient
-from indico_vc_zoom.util import ZoomMeetingType
+from indico.core.db import db
 
 
-@signals.event.updated.connect
-@signals.event.contribution_updated.connect
-@signals.event.session_block_updated.connect
-def check_meetings(target, changes):
-    if 'start_dt' not in changes:
-        return
-    refresh_meetings.delay(target.vc_room_associations, target.start_dt)
+def update_state_log(log_entry, failed):
+    log_entry.data['State'] = 'failed' if failed else 'succeeded'
+    flag_modified(log_entry, 'data')
 
 
-@celery.task(plugin='vc_zoom')
-def refresh_meetings(vc_rooms, target_dt):
+@celery.task(plugin='vc_zoom', max_retries=None)
+def refresh_meetings(vc_rooms, target_dt, log_entry=None):
+    from indico_vc_zoom.api import ZoomIndicoClient
     client = ZoomIndicoClient()
-    vc_rooms = [room for room in vc_rooms if room.vc_room.type == 'zoom'
-                and room.data['meeting_type'] == ZoomMeetingType.scheduled_meeting]
-    for vc_room in vc_rooms:
-        serialized_date = target_dt.replace(microsecond=0).isoformat() + 'Z'
-        client.update_meeting(vc_room.data['zoom_id'], {'start_time': serialized_date})
+    failed = False
+    try:
+        for vc_room in [room for room in vc_rooms if room.type == 'zoom']:
+            client.update_meeting(vc_room.data['zoom_id'], {'start_time': target_dt})
+    except HTTPError:
+        failed = True
+    except Exception:
+        if log_entry:
+            update_state_log(log_entry, True)
+            db.session.commit()
+        raise
+    if log_entry:
+        update_state_log(log_entry, failed)
+        db.session.commit()

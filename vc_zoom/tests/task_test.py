@@ -8,8 +8,10 @@
 from datetime import datetime, timedelta
 
 import pytest
+from requests.exceptions import HTTPError
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
 
 from indico_vc_zoom.util import ZoomMeetingType
@@ -36,12 +38,12 @@ def dummy_vc_room(db, dummy_event, dummy_user):
 def test_meeting_reschedule(app, db, dummy_event, dummy_user, dummy_vc_room, zoom_client):
     from indico_vc_zoom.task import refresh_meetings
     meeting_time = datetime.now() - timedelta(days=30)
-    zoom_client.get_meeting.return_value = {
-        'id': dummy_vc_room.id,
-        'start_time': meeting_time.replace(microsecond=0).isoformat() + 'Z',
-        'timezone': 'Europe/Lisbon'
-    }
+    log_entry = dummy_event.log(EventLogRealm.event, LogKind.change, 'Test', 'Test', data={'State': 'pending'})
     dummy_event.start_dt = meeting_time + timedelta(days=5)
-    refresh_meetings(dummy_event.vc_room_associations, dummy_event.start_dt)
-    assert zoom_client.get_meeting.call_count == 0
+    refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event.start_dt, log_entry)
     assert zoom_client.update_meeting.call_count == 1
+    assert log_entry.data['State'] == 'succeeded'
+    zoom_client.update_meeting.side_effect = HTTPError()
+    refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event.start_dt, log_entry)
+    assert zoom_client.update_meeting.call_count == 2
+    assert log_entry.data['State'] == 'failed'
