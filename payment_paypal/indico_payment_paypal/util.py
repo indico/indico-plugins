@@ -15,7 +15,7 @@ from indico_payment_paypal import _
 
 
 def validate_business(form, field):
-    """Valiates a PayPal business string.
+    """Validates a PayPal business string.
 
     It can either be an email address or a paypal business account ID.
     """
