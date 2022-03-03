@@ -152,7 +152,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.connect(signals.event.times_changed, self._times_changed)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
@@ -520,29 +519,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if vc_room.plugin != self:
             return
         return render_plugin_template('room_labels.html', vc_room=vc_room)
-
-    def _times_changed(self, sender, obj, **kwargs):
-        from indico.modules.events.contributions.models.contributions import Contribution
-        from indico.modules.events.models.events import Event
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-
-        if not hasattr(obj, 'vc_room_associations'):
-            return
-
-        if any(assoc.vc_room.type == 'zoom' and len(assoc.vc_room.events) == 1 for assoc in obj.vc_room_associations):
-            if sender == Event:
-                message = _('There are one or more scheduled Zoom meetings associated with this event which were not '
-                            'automatically updated.')
-            elif sender == Contribution:
-                message = _('There are one or more scheduled Zoom meetings associated with the contribution "{}" which '
-                            ' were not automatically updated.').format(obj.title)
-            elif sender == SessionBlock:
-                message = _('There are one or more scheduled Zoom meetings associated with this session block which '
-                            'were not automatically updated.')
-            else:
-                return
-
-            flash(message, 'warning')
 
     def _event_metadata_postprocess(self, sender, event, data, user=None, skip_access_check=False, **kwargs):
         urls = []
