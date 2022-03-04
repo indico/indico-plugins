@@ -15,9 +15,11 @@ from wtforms.validators import URL, DataRequired, Optional, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
@@ -33,6 +35,7 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
+from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
                                  process_alternative_hosts, update_zoom_meeting)
@@ -152,6 +155,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.connect(signals.event.updated, self._check_meetings)
+        self.connect(signals.event.contribution_updated, self._check_meetings)
+        self.connect(signals.event.session_block_updated, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
@@ -514,6 +520,18 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_notification_cc_list(self, action, vc_room, event):
         return {principal_from_identifier(vc_room.data['host']).email}
+
+    def _check_meetings(self, target, changes):
+        if 'start_dt' not in changes:
+            return
+        zoom_rooms = [room.vc_room for room in target.vc_room_associations if room.vc_room.type == 'zoom']
+        log_entry = target.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
+            'Meetings': ','.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
+            'Date': target.start_dt.isoformat(),
+            'State': 'pending'
+        })
+        db.session.commit()
+        refresh_meetings.delay(zoom_rooms, target.start_dt, log_entry)
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
         if vc_room.plugin != self:
