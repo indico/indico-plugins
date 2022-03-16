@@ -55,6 +55,24 @@ class RegistrationIDPlaceholder(IDPlaceholder):
     name = 'registration_id'
 
 
+class RegistrationDatabaseIDPlaceholder(Placeholder):
+    name = 'registration_db_id'
+    description = _("The database ID of the registration")
+
+    @classmethod
+    def render(cls, regform, registration):
+        return registration.id
+
+
+class RegistrationFormIDPlaceholder(Placeholder):
+    name = 'registration_form_id'
+    description = _("The ID of the registration form")
+
+    @classmethod
+    def render(cls, regform, registration):
+        return registration.registration_form.id
+
+
 class EventIDPlaceholder(Placeholder):
     name = 'event_id'
     description = _("The ID of the event")

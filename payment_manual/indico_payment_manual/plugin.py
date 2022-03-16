@@ -64,11 +64,14 @@ class ManualPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     def _get_details_placeholders(self, sender, regform, registration, **kwargs):
         from indico_payment_manual.placeholders import (CurrencyPlaceholder, EmailPlaceholder, EventIDPlaceholder,
                                                         FirstNamePlaceholder, LastNamePlaceholder, PricePlaceholder,
-                                                        RegistrationIDPlaceholder)
+                                                        RegistrationDatabaseIDPlaceholder,
+                                                        RegistrationFormIDPlaceholder, RegistrationIDPlaceholder)
         yield FirstNamePlaceholder
         yield LastNamePlaceholder
         yield EmailPlaceholder
         yield RegistrationIDPlaceholder
+        yield RegistrationDatabaseIDPlaceholder
+        yield RegistrationFormIDPlaceholder
         yield EventIDPlaceholder
         yield PricePlaceholder
         yield CurrencyPlaceholder
