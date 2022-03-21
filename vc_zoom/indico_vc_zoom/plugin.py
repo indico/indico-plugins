@@ -155,9 +155,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.connect(signals.event.updated, self._check_meetings)
-        self.connect(signals.event.contribution_updated, self._check_meetings)
-        self.connect(signals.event.session_block_updated, self._check_meetings)
+        self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
@@ -521,17 +519,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_notification_cc_list(self, action, vc_room, event):
         return {principal_from_identifier(vc_room.data['host']).email}
 
-    def _check_meetings(self, target, changes, **kwargs):
-        if 'start_dt' not in changes:
-            return
-        zoom_rooms = [room.vc_room for room in target.vc_room_associations if room.vc_room.type == 'zoom']
-        log_entry = target.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
+    def _check_meetings(self, sender, obj, **kwargs):
+        zoom_rooms = [room.vc_room for room in obj.vc_room_associations if room.vc_room.type == 'zoom']
+        log_entry = obj.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
             'Meetings': ','.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
-            'Date': target.start_dt.isoformat(),
+            'Date': obj.start_dt.isoformat(),
             'State': 'pending'
         })
         db.session.commit()
-        refresh_meetings.delay(zoom_rooms, target.start_dt, log_entry)
+        refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry)
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
         if vc_room.plugin != self:
