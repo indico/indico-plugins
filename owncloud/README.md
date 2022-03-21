@@ -8,6 +8,6 @@ copied as attachments.
 
 ## Changelog
 
-### 3.1
+### 3.2
 
-- Initial release for Indico 3.1
+- Initial release for Indico 3.2

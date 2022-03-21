@@ -17,7 +17,6 @@ from indico_owncloud.util import get_filepicker_url
 
 
 class IndicoOwncloudField(Field):
-
     widget = JinjaWidget('owncloud_filepicker_widget.html', plugin='owncloud', single_line=True, single_kwargs=True)
 
     def __init__(self, label=None, validators=None, **kwargs):
@@ -26,7 +25,7 @@ class IndicoOwncloudField(Field):
         self.origin = config.BASE_URL
 
     def process_formdata(self, valuelist):
-        if valuelist and len(valuelist):
+        if valuelist:
             self.data = {'files': [f.rstrip() for f in valuelist[0].split('\n')]}
 
 

@@ -2,9 +2,9 @@
 <a href="#" class="i-button js-dialog-action"
    data-href="{{ url_for_plugin('owncloud.owncloud_event', event_id=id) }}"
    data-title="{%- trans -%}Add files from {{ service_name }}{%- endtrans -%}">
-    <span class={{ 'icon-cloud2' if not button_icon_url }}></span>
+    <span class="{{ 'icon-cloud2' if not button_icon_url }}"></span>
     {%- if button_icon_url -%}
-        <img height=24 src={{ button_icon_url }} />
+        <img height="24" src="{{ button_icon_url }}">
     {%- endif -%}
     <span class="button-label">{%- trans -%}From {{ service_name }}{%- endtrans -%}</span>
 </a>

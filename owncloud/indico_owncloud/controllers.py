@@ -43,8 +43,9 @@ class AddAttachmentOwncloudMixin:
                 content_type = mimetypes.guess_type(local_filename)[0] or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=local_filename, content_type=content_type)
 
-                with requests.get(f) as r:
-                    attachment.file.save(r.content)
+                file_response = requests.get(f)
+                file_response.raise_for_status()
+                attachment.file.save(file_response.content)
 
                 db.session.add(attachment)
                 db.session.flush()
