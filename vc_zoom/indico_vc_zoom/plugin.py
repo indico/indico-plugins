@@ -521,7 +521,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_notification_cc_list(self, action, vc_room, event):
         return {principal_from_identifier(vc_room.data['host']).email}
 
-    def _check_meetings(self, target, changes):
+    def _check_meetings(self, target, changes, **kwargs):
         if 'start_dt' not in changes:
             return
         zoom_rooms = [room.vc_room for room in target.vc_room_associations if room.vc_room.type == 'zoom']
