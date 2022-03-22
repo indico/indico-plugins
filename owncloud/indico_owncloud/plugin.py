@@ -29,9 +29,6 @@ class PluginSettingsForm(IndicoForm):
                                description=_('URL for a customized icon to show in the add attachment button. If '
                                              'empty, the default cloud icon will be used'))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class OwncloudPlugin(IndicoPlugin):
     """OwnCloud integration

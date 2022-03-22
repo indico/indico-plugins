@@ -10,39 +10,11 @@
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
-        global.messageIfFolderProtected = function messageIfFolderProtected(
-            protectionField,
-            folderField,
-            protectionInfo,
-            selfProtection,
-            inheritedProtection,
-            folderProtection
-        ) {
-            folderField.on('change', function() {
-                const selectedFolder = $(this);
-                if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
-                    selfProtection.hide();
-                    inheritedProtection.hide();
-                    folderProtection
-                        .find('.folder-name')
-                        .html(selectedFolder.children('option:selected').text());
-                    folderProtection.show();
-                } else {
-                    folderProtection.hide();
-                    selfProtection.toggle(protectionField.prop('checked'));
-                    inheritedProtection.toggle(!protectionField.prop('checked'));
-                }
-            });
-            _.defer(function() {
-                folderField.triggerHandler('change');
-            });
-        };
-
         (function() {
             'use strict';
 
             $('#{{ form.folder.id }}').nullableselector();
-            var form = $('#attachment-owncloudfilepicker-form');
+            const form = $('#attachment-owncloudfilepicker-form');
             aclIfProtected(
                 $('#{{ form.protected.id }}'),
                 $('#{{ form.acl.id }}'),
