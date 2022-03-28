@@ -5,14 +5,11 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-window.setupOwncloudFilePickerWidget = function setupOwncloudFilePickerWidget({
-  filepicker_url,
-  fieldId,
-}) {
+window.setupOwncloudFilePickerWidget = ({filepickerUrl, fieldId}) => {
   window.addEventListener('message', function(message) {
     const iframe = document.querySelector('#owncloud_filepicker-file-picker');
     if (
-      message.origin === filepicker_url &&
+      message.origin === filepickerUrl &&
       message.source === iframe.contentWindow &&
       message.data &&
       message.data.files

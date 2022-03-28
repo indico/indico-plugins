@@ -13,7 +13,7 @@
 {% block javascript %}
     <script>
         setupOwncloudFilePickerWidget({
-            filepicker_url: {{ field.filepicker_url | tojson }},
+            filepickerUrl: {{ field.filepicker_url | tojson }},
             fieldId: {{ field.id | tojson }},
             required: {{ input_args.required | default(false) | tojson }},
             disabled: {{ input_args.disabled | default(false) | tojson }},
