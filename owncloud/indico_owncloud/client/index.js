@@ -5,8 +5,9 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+// eslint-disable-next-line import/unambiguous
 window.setupOwncloudFilePickerWidget = ({filepickerUrl, fieldId}) => {
-  window.addEventListener('message', function(message) {
+  window.addEventListener('message', message => {
     const iframe = document.querySelector('#owncloud_filepicker-file-picker');
     if (
       message.origin === filepickerUrl &&
