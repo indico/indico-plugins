@@ -15,4 +15,4 @@ def is_configured():
 def get_filepicker_url():
     from indico_owncloud.plugin import OwncloudPlugin
 
-    return OwncloudPlugin.settings.get('filepicker_url')
+    return OwncloudPlugin.settings.get('filepicker_url').rstrip('/')
