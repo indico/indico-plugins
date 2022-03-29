@@ -5,7 +5,7 @@
     <div class="i-form-field-fixed-width">
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-files" {{ input_args | html_params }}>
         <span id="{{ field.id }}-container">
-            <iframe id="{{ field.id }}-file-picker" class="owncloudfilepicker" src={{ src }}></iframe>
+            <iframe id="{{ field.id }}-file-picker" class="owncloudfilepicker" src="{{ src }}"></iframe>
         </span>
     </div>
 {% endblock %}
@@ -15,8 +15,6 @@
         setupOwncloudFilePickerWidget({
             filepickerUrl: {{ field.filepicker_url | tojson }},
             fieldId: {{ field.id | tojson }},
-            required: {{ input_args.required | default(false) | tojson }},
-            disabled: {{ input_args.disabled | default(false) | tojson }},
         });
     </script>
 {% endblock %}
