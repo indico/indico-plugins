@@ -15,7 +15,7 @@ from pathlib import Path
 import click
 import yaml
 from packaging.version import Version
-from setuptools.config import read_configuration
+from setuptools.config.setupcfg import read_configuration
 
 
 START_MARKER = '# BEGIN GENERATED REQUIREMENTS'
