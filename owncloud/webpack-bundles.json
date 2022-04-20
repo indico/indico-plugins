@@ -1,0 +1,6 @@
+{
+  "entry": {
+    "owncloud": "./index.js",
+    "main": "./style.scss"
+  }
+}

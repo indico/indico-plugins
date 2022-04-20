@@ -1,0 +1,6 @@
+graft indico_owncloud/client
+graft indico_owncloud/static
+graft indico_owncloud/templates
+graft indico_owncloud/translations
+
+global-exclude *.pyc __pycache__ .keep

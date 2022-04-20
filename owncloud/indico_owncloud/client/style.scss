@@ -1,0 +1,23 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2022 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+@import 'base/palette';
+
+form#attachment-owncloudfilepicker-form.full-width .owncloudfilepicker {
+  width: 770px;
+  height: 280px;
+  border: 1px solid $light-gray;
+}
+
+.owncloudfilepicker {
+  border: 0px none;
+  width: 100%;
+}
+
+.button-label {
+  margin-left: 0.4rem;
+}
