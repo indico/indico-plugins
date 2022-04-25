@@ -30,7 +30,7 @@ class RHEventPreviewIPyNB(RH):
     def _process(self):
         config = Config()
         config.HTMLExporter.preprocessors = [CppHighlighter]
-        config.HTMLExporter.template_file = 'basic'
+        config.HTMLExporter.template_name = 'classic'
 
         with self.attachment.file.open() as f:
             notebook = nbformat.read(f, as_version=4)
@@ -45,9 +45,9 @@ class RHEventPreviewIPyNB(RH):
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        csp_header = f"script-src cdn.mathjax.org 'nonce-{nonce}';"
-        response.headers['Content-Security-Policy'] = csp_header
-        response.headers['X-Webkit-CSP'] = csp_header
+        # csp_header = f"script-src self 'nonce-{nonce}';"
+        # response.headers['Content-Security-Policy'] = csp_header
+        # response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
         response.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
 

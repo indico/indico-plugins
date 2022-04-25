@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "indico-plugin-previewer-jupyter",
+  "dependencies": {
+    "mathjax": "^3.2.0"
+  }
+}
