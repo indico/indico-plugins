@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.1.3
+
+- Fix error with user identifiers (in "authenticators" lookup mode) containing a forward slash
+
 ### 3.1.2
 
 - Do not include Zoom link in event descriptions returned by the HTTP API (iCalendar files for
