@@ -60,7 +60,8 @@ def _iter_user_identifiers(user):
     done = set()
     for provider in ZoomPlugin.settings.get('authenticators'):
         for __, identifier in user.iter_identifiers(check_providers=True, providers={provider}):
-            if identifier in done:
+            # skip garbage that breaks API calls; a valid identifier will never contain a slash..
+            if identifier in done or '/' in identifier:
                 continue
             done.add(identifier)
             yield identifier
