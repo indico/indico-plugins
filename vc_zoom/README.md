@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.1.4
+
+- Fix JS error on the dropdown for "make me co-host"
+
 ### 3.1.3
 
 - Fix error with user identifiers (in "authenticators" lookup mode) containing a forward slash
