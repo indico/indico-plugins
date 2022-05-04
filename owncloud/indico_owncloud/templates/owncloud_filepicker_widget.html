@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    {% set src = field.filepicker_url + '?origin=' + field.origin %}
+    {% set src = field.filepicker_url + '?userHome=1&style=indico&origin=' + field.origin %}
     <div class="i-form-field-fixed-width">
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-files" {{ input_args | html_params }}>
         <span id="{{ field.id }}-container">
