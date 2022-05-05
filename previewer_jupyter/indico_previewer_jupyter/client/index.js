@@ -1,0 +1,24 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2022 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+import renderMathInElement from 'katex/dist/contrib/auto-render.js';
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false},
+      {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+      {left: '\\begin{align}', right: '\\end{align}', display: true},
+      {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+      {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+      {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+      {left: '\\[', right: '\\]', display: true},
+    ],
+  });
+});
