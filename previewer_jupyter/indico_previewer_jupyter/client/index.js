@@ -6,7 +6,7 @@
 // see the LICENSE file for more details.
 
 import renderMathInElement from 'katex/dist/contrib/auto-render.js';
-import 'katex/dist/katex.css';
+import './index.css';
 
 document.addEventListener('DOMContentLoaded', function() {
   const element = document.getElementById('notebook-wrapper');

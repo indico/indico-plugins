@@ -7,10 +7,9 @@
 
 from uuid import uuid4
 
-from flask_pluginengine import current_plugin
-
 import nbformat
 from flask import current_app, render_template, request, session
+from flask_pluginengine import current_plugin
 from nbconvert.exporters import HTMLExporter
 from traitlets.config import Config
 from werkzeug.exceptions import Forbidden
