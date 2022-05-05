@@ -7,6 +7,8 @@
 
 from uuid import uuid4
 
+from flask_pluginengine import current_plugin
+
 import nbformat
 from flask import current_app, render_template, request, session
 from nbconvert.exporters import HTMLExporter
@@ -43,7 +45,7 @@ class RHEventPreviewIPyNB(RH):
 
         nonce = str(uuid4())
         html = render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
-                               html_code=body, css_code=css_code, nonce=nonce)
+                               html_code=body, css_code=css_code, nonce=nonce, plugin=current_plugin)
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS

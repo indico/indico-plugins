@@ -6,9 +6,11 @@
 // see the LICENSE file for more details.
 
 import renderMathInElement from 'katex/dist/contrib/auto-render.js';
+import 'katex/dist/katex.css';
 
 document.addEventListener('DOMContentLoaded', function() {
-  renderMathInElement(document.body, {
+  const element = document.getElementById('notebook-wrapper');
+  renderMathInElement(element, {
     delimiters: [
       {left: '$$', right: '$$', display: true},
       {left: '$', right: '$', display: false},

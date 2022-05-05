@@ -16,8 +16,6 @@ from indico.modules.attachments.preview import Previewer
 
 from indico_previewer_jupyter.blueprint import blueprint
 
-from indico.web.views import WPBase
-
 
 def register_custom_mimetypes():
     mimetypes.add_type('application/x-ipynb+json', '.ipynb')
@@ -44,7 +42,6 @@ class JupyterPreviewerPlugin(IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.attachments.get_file_previewers, self._get_file_previewers)
-        self.inject_bundle('main.js', WPBase)
 
     def get_blueprints(self):
         yield blueprint

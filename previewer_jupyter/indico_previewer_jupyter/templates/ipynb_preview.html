@@ -5,8 +5,11 @@
         <style>
             {{ css_code }}
         </style>
+        {{ plugin.manifest['main.js'] }}
     </head>
     <body>
-        {{ html_code | safe }}
+        <div id="notebook-wrapper">
+            {{ html_code | safe }}
+        </div>
     </body>
 </html>
