@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import flash, has_request_context, request, session
+from flask import after_this_request, flash, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -18,6 +18,7 @@ from indico.core.auth import multipass
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
@@ -33,6 +34,7 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
+from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
                                  process_alternative_hosts, update_zoom_meeting)
@@ -152,7 +154,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.connect(signals.event.times_changed, self._times_changed)
+        self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
@@ -516,33 +518,23 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_notification_cc_list(self, action, vc_room, event):
         return {principal_from_identifier(vc_room.data['host']).email}
 
+    def _check_meetings(self, sender, obj, **kwargs):
+        zoom_rooms = [room.vc_room for room in obj.vc_room_associations if room.vc_room.type == 'zoom']
+        log_entry = obj.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
+            'Meetings': ', '.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
+            'Date': obj.start_dt.isoformat(),
+            'State': 'pending'
+        })
+
+        @after_this_request
+        def _launch_task(response):
+            refresh_meetings.delay(zoom_rooms, obj, log_entry)
+            return response
+
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
         if vc_room.plugin != self:
             return
         return render_plugin_template('room_labels.html', vc_room=vc_room)
-
-    def _times_changed(self, sender, obj, **kwargs):
-        from indico.modules.events.contributions.models.contributions import Contribution
-        from indico.modules.events.models.events import Event
-        from indico.modules.events.sessions.models.blocks import SessionBlock
-
-        if not hasattr(obj, 'vc_room_associations'):
-            return
-
-        if any(assoc.vc_room.type == 'zoom' and len(assoc.vc_room.events) == 1 for assoc in obj.vc_room_associations):
-            if sender == Event:
-                message = _('There are one or more scheduled Zoom meetings associated with this event which were not '
-                            'automatically updated.')
-            elif sender == Contribution:
-                message = _('There are one or more scheduled Zoom meetings associated with the contribution "{}" which '
-                            ' were not automatically updated.').format(obj.title)
-            elif sender == SessionBlock:
-                message = _('There are one or more scheduled Zoom meetings associated with this session block which '
-                            'were not automatically updated.')
-            else:
-                return
-
-            flash(message, 'warning')
 
     def _event_metadata_postprocess(self, sender, event, data, user=None, skip_access_check=False, **kwargs):
         urls = []
