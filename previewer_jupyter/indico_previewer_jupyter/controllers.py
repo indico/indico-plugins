@@ -5,8 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from uuid import uuid4
-
 import nbformat
 from flask import current_app, render_template, request, session
 from flask_pluginengine import current_plugin
@@ -42,13 +40,12 @@ class RHEventPreviewIPyNB(RH):
         body, resources = html_exporter.from_notebook_node(notebook)
         css_code = '\n'.join(resources['inlining'].get('css', []))
 
-        nonce = str(uuid4())
         html = render_template('previewer_jupyter:ipynb_preview.html', attachment=self.attachment,
-                               html_code=body, css_code=css_code, nonce=nonce, plugin=current_plugin)
+                               html_code=body, css_code=css_code, plugin=current_plugin)
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        csp_header = f"script-src 'self' cdnjs.cloudflare.com 'nonce-{nonce}';"
+        csp_header = "script-src 'self';"
         response.headers['Content-Security-Policy'] = csp_header
         response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
