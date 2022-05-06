@@ -48,9 +48,9 @@ class RHEventPreviewIPyNB(RH):
 
         response = current_app.response_class(html)
         # Use CSP to restrict access to possibly malicious scripts or inline JS
-        # csp_header = f"script-src cdnjs.cloudflare.com cdn.jsdelivr.net 'nonce-{nonce}';"
-        # response.headers['Content-Security-Policy'] = csp_header
-        # response.headers['X-Webkit-CSP'] = csp_header
+        csp_header = f"script-src 'self' cdnjs.cloudflare.com 'nonce-{nonce}';"
+        response.headers['Content-Security-Policy'] = csp_header
+        response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
         response.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
 
