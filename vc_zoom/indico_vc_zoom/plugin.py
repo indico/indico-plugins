@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import flash, has_request_context, request, session, after_this_request
+from flask import after_this_request, flash, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -15,7 +15,6 @@ from wtforms.validators import URL, DataRequired, Optional, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
-from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
@@ -530,7 +529,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         @after_this_request
         def _launch_task(response):
             prev_dt = obj.start_dt
-            refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry, lambda: obj.start_dt == prev_dt)
+            refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry, int(obj.duration.seconds / 60),
+                                   lambda: obj.start_dt == prev_dt)
             return response
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
