@@ -18,14 +18,12 @@ def update_state_log(log_entry, failed):
 
 
 @celery.task(plugin='vc_zoom', autoretry_for=(HTTPError,))
-def refresh_meetings(vc_rooms, target_dt, log_entry=None, duration=None, condition=None):
+def refresh_meetings(vc_rooms, obj, log_entry=None):
     from indico_vc_zoom.api import ZoomIndicoClient
-    if condition and not condition():
-        return
     client = ZoomIndicoClient()
     failed = False
-    payload = {'start_time': target_dt}
-    if duration:
+    payload = {'start_time': obj.start_dt}
+    if duration := int(obj.duration.total_seconds() / 60):
         payload['duration'] = duration
     try:
         for vc_room in vc_rooms:

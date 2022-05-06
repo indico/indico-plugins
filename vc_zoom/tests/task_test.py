@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 from requests.exceptions import HTTPError
@@ -13,6 +13,7 @@ from requests.exceptions import HTTPError
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
+from indico.util.date_time import now_utc
 
 from indico_vc_zoom.util import ZoomMeetingType
 
@@ -35,15 +36,17 @@ def dummy_vc_room(db, dummy_event, dummy_user):
     return room
 
 
-def test_meeting_reschedule(app, db, dummy_event, dummy_user, dummy_vc_room, zoom_client):
+@pytest.mark.usefixtures('dummy_vc_room')
+def test_meeting_reschedule(dummy_event, zoom_client):
     from indico_vc_zoom.task import refresh_meetings
-    meeting_time = datetime.now() - timedelta(days=30)
+    meeting_time = now_utc() - timedelta(days=30)
     log_entry = dummy_event.log(EventLogRealm.event, LogKind.change, 'Test', 'Test', data={'State': 'pending'})
     dummy_event.start_dt = meeting_time + timedelta(days=5)
-    refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event.start_dt, log_entry)
+    refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event, log_entry)
     assert zoom_client.update_meeting.call_count == 1
     assert log_entry.data['State'] == 'succeeded'
     zoom_client.update_meeting.side_effect = HTTPError()
-    refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event.start_dt, log_entry)
+    with pytest.raises(HTTPError):
+        refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event, log_entry)
     assert zoom_client.update_meeting.call_count == 2
     assert log_entry.data['State'] == 'failed'

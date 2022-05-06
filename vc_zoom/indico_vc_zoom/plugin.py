@@ -528,9 +528,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         @after_this_request
         def _launch_task(response):
-            prev_dt = obj.start_dt
-            refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry, int(obj.duration.seconds / 60),
-                                   lambda: obj.start_dt == prev_dt)
+            refresh_meetings.delay(zoom_rooms, obj, log_entry)
             return response
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
