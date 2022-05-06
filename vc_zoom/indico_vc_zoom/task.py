@@ -17,21 +17,18 @@ def update_state_log(log_entry, failed):
     flag_modified(log_entry, 'data')
 
 
-@celery.task(plugin='vc_zoom', max_retries=None)
+@celery.task(plugin='vc_zoom', autoretry_for=(HTTPError,))
 def refresh_meetings(vc_rooms, target_dt, log_entry=None):
     from indico_vc_zoom.api import ZoomIndicoClient
     client = ZoomIndicoClient()
     failed = False
     try:
-        for vc_room in [room for room in vc_rooms if room.type == 'zoom']:
+        for vc_room in vc_rooms:
             client.update_meeting(vc_room.data['zoom_id'], {'start_time': target_dt})
-    except HTTPError:
-        failed = True
     except Exception:
-        if log_entry:
-            update_state_log(log_entry, True)
-            db.session.commit()
+        failed = True
         raise
-    if log_entry:
-        update_state_log(log_entry, failed)
-        db.session.commit()
+    finally:
+        if log_entry:
+            update_state_log(log_entry, failed)
+            db.session.commit()

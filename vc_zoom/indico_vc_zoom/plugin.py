@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import flash, has_request_context, request, session
+from flask import flash, has_request_context, request, session, after_this_request
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -522,12 +522,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _check_meetings(self, sender, obj, **kwargs):
         zoom_rooms = [room.vc_room for room in obj.vc_room_associations if room.vc_room.type == 'zoom']
         log_entry = obj.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
-            'Meetings': ','.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
+            'Meetings': ', '.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
             'Date': obj.start_dt.isoformat(),
             'State': 'pending'
         })
-        db.session.commit()
-        refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry)
+
+        @after_this_request
+        def _launch_task(response):
+            refresh_meetings.delay(zoom_rooms, obj.start_dt, log_entry)
+            return response
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
         if vc_room.plugin != self:
