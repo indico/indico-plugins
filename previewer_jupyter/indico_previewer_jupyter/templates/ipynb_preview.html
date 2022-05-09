@@ -5,27 +5,12 @@
         <style>
             {{ css_code }}
         </style>
+        {{ plugin.manifest['main.css'] }}
+        {{ plugin.manifest['main.js'] }}
     </head>
     <body>
-        {{ html_code | safe }}
-        <script type="text/javascript" nonce="{{ nonce }}">
-            var MathJax = {
-                tex2jax: {
-                    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-                    processEscapes: true,
-                    processEnvironments: true
-                },
-                // Center justify equations in code and markdown cells. Elsewhere
-                // we use CSS to left justify single line equations in code cells.
-                displayAlign: 'center',
-                "HTML-CSS": {
-                    styles: {'.MathJax_Display': {"margin": 0}},
-                    linebreaks: { automatic: true }
-                }
-            };
-        </script>
-        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-        </script>
+        <div id="notebook-wrapper">
+            {{ html_code | safe }}
+        </div>
     </body>
 </html>
