@@ -30,8 +30,10 @@ class RHEventPreviewIPyNB(RH):
         config = Config()
         config.HTMLExporter.preprocessors = [CppHighlighter]
         config.HTMLExporter.template_name = 'classic'
-        # Disable mathjax
+        # Disable unused extensions
         config.HTMLExporter.mathjax_url = ''
+        config.HTMLExporter.jquery_url = ''
+        config.HTMLExporter.require_js_url = ''
 
         with self.attachment.file.open() as f:
             notebook = nbformat.read(f, as_version=4)
