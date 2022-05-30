@@ -5,8 +5,11 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import dateutil.parser
+
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.payment import PaymentPluginMixin
+from indico.util.date_time import now_utc
 
 from indico_payment_sixpay.forms import EventSettingsForm, PluginSettingsForm
 
@@ -47,3 +50,8 @@ class SixpayPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         """Blueprint for URL endpoints with callbacks."""
         from indico_payment_sixpay.blueprint import blueprint
         return blueprint
+
+    def is_pending_transaction_expired(self, transaction):
+        if not (expiration := transaction.data.get('Init_PP_response', {}).get('Expiration')):
+            return False
+        return dateutil.parser.parse(expiration) <= now_utc()

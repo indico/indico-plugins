@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.1.1
+
+- Ignore pending transactions once they expired
+
 ### 3.1
 
 - Adapt to Indico 3.1 changes
