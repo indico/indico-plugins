@@ -230,7 +230,7 @@ def query_attachments(ids=None):
     return (
         Attachment.query
         .join(Attachment.folder)
-        .options(folder_strategy, attachment_strategy, joinedload(Attachment.user).joinedload('_affiliation'))
+        .options(folder_strategy, attachment_strategy, joinedload(Attachment.user))
         .outerjoin(AttachmentFolder.linked_event)
         .outerjoin(AttachmentFolder.contribution)
         .outerjoin(Contribution.event.of_type(contrib_event))
@@ -328,7 +328,7 @@ def query_notes(ids=None):
         .filter(export_filter)
         .options(
             note_strategy,
-            joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user).joinedload('_affiliation'),
+            joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user),
         )
         .order_by(EventNote.id)
     )
