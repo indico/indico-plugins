@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.1.2
+
+- Fix error after successful payment if background confirmation already happened
+
 ### 3.1.1
 
 - Ignore pending transactions once they expired
