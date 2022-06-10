@@ -18,7 +18,7 @@ from indico.core.plugins import url_for_plugin
 from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import get_active_payment_plugins, register_transaction
+from indico.modules.events.payment.util import TransactionStatus, get_active_payment_plugins, register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
@@ -57,7 +57,12 @@ class RHSixpayBase(RH):
         self.registration = Registration.query.filter_by(uuid=request.args['token']).first()
         if not self.registration:
             raise BadRequest
-        self.token = self.registration.transaction.data['Init_PP_response']['Token']
+        try:
+            self.token = self.registration.transaction.data['Init_PP_response']['Token']
+        except KeyError:
+            # if the transaction was already recorded as successful via background notification,
+            # we no longer have a token in the local transaction
+            self.token = None
 
 
 class RHInitSixpayPayment(RHPaymentBase):
@@ -154,7 +159,8 @@ class SixpayNotificationHandler(RHSixpayBase):
 
     def _process(self):
         """Process the reply from SIXPay about the transaction."""
-        self._process_confirmation()
+        if self.token is not None:
+            self._process_confirmation()
 
     def _process_confirmation(self):
         """Process the confirmation response inside indico."""
@@ -355,9 +361,11 @@ class UserSuccessHandler(SixpayNotificationHandler):
 
     def _process(self):
         try:
-            self._process_confirmation()
+            if self.token is not None:
+                self._process_confirmation()
         except TransactionFailure:
             flash(_('Your payment could not be confirmed. Please contact the event organizers.'), 'warning')
         else:
-            flash(_('Your payment has been confirmed.'), 'success')
+            if self.registration.transaction.status == TransactionStatus.successful:
+                flash(_('Your payment has been confirmed.'), 'success')
         return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
