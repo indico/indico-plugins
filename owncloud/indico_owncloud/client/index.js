@@ -10,6 +10,7 @@ window.setupOwncloudFilePickerWidget = ({filepickerUrl, fieldId}) => {
   window.addEventListener('message', message => {
     const iframe = document.querySelector('#owncloud_filepicker-file-picker');
     if (
+      iframe &&
       message.origin === filepickerUrl &&
       message.source === iframe.contentWindow &&
       message.data &&
