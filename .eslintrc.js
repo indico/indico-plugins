@@ -45,6 +45,7 @@ try {
 
 const reactPath = resolve.sync('react', {basedir: indicoBaseDir});
 const react = require(reactPath);
+const babelConfigFile = path.join(indicoBaseDir, 'babel.config.js');
 
 module.exports = _.merge(defaultConfig, {
   settings: {
@@ -60,4 +61,9 @@ module.exports = _.merge(defaultConfig, {
       },
     },
   },
+  parserOptions: {
+    babelOptions: {
+      configFile: babelConfigFile
+    }
+  }
 });
