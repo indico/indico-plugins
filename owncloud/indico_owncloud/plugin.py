@@ -11,7 +11,10 @@ from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
 from indico.modules.attachments.views import WPEventAttachments
-from indico.modules.categories.views import WPCategoryManagement
+from indico.modules.categories.views import WPCategory, WPCategoryManagement
+from indico.modules.events.contributions.views import WPContributions, WPManageContributions
+from indico.modules.events.sessions.views import WPDisplaySession, WPManageSessions
+from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.web.forms.base import IndicoForm
 
@@ -47,20 +50,19 @@ class OwncloudPlugin(IndicoPlugin):
     def init(self):
         super().init()
         self.template_hook('attachment-sources', self._inject_owncloud_button)
-        self.inject_bundle('owncloud.js', WPEventAttachments)
-        self.inject_bundle('owncloud.js', WPSimpleEventDisplay)
-        self.inject_bundle('owncloud.js', WPConferenceDisplay)
-        self.inject_bundle('owncloud.js', WPCategoryManagement)
-        self.inject_bundle('main.css', WPEventAttachments)
-        self.inject_bundle('main.css', WPSimpleEventDisplay)
-        self.inject_bundle('main.css', WPConferenceDisplay)
-        self.inject_bundle('main.css', WPCategoryManagement)
+        wps = (
+            WPCategory, WPSimpleEventDisplay, WPConferenceDisplay, WPDisplaySession, WPContributions,
+            WPCategoryManagement, WPEventAttachments, WPManageContributions, WPManageSessions, WPManageTimetable
+        )
+        for wp in wps:
+            self.inject_bundle('owncloud.js', wp)
+            self.inject_bundle('main.css', wp)
 
     def get_blueprints(self):
         return blueprint
 
     def _inject_owncloud_button(self, linked_object=None, **kwargs):
         if is_configured():
-            return render_plugin_template('owncloud_button.html', id=linked_object.id, linked_object=linked_object,
+            return render_plugin_template('owncloud_button.html', linked_object=linked_object,
                                           service_name=self.settings.get('service_name'),
                                           button_icon_url=self.settings.get('button_icon_url'))
