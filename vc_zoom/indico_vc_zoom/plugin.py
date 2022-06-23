@@ -520,7 +520,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _check_meetings(self, sender, obj, **kwargs):
         zoom_rooms = [room.vc_room for room in obj.vc_room_associations if room.vc_room.type == 'zoom']
-        log_entry = obj.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Schedule updated', data={
+        if not zoom_rooms:
+            return
+
+        log_entry = obj.log(EventLogRealm.event, LogKind.change, 'Videoconference', 'Zoom schedule updated', data={
             'Meetings': ', '.join([f'{room.name} (ID: {room.id})' for room in zoom_rooms]),
             'Date': obj.start_dt.isoformat(),
             'State': 'pending'
