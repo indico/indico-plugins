@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.2
+
+- Adapt to Indico 3.2 changes
+- Re-schedule (non-recurring) Zoom meetings when the event time gets changed
+
 ### 3.1.4
 
 - Fix JS error on the dropdown for "make me co-host"
