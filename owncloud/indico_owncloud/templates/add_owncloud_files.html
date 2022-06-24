@@ -3,6 +3,7 @@
 {%- block content %}
     {{ form_header(form, id='attachment-owncloudfilepicker-form', classes=('full-width')) }}
     {{ form_row(form.owncloud_filepicker, skip_label=true) }}
+    {{ form_rows(form, skip=('folder', 'protected', 'acl', 'owncloud_filepicker')) }}
     {{ form_rows(form, fields=('folder', 'protected', 'acl')) }}
     {{ protection_message | safe }}
     {% call form_footer(attach_form) %}
