@@ -9,8 +9,9 @@ import mimetypes
 
 import requests
 from flask import flash, session
-from flask_pluginengine import render_plugin_template
+from flask_pluginengine import current_plugin, render_plugin_template
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.attachments.controllers.management.base import (_get_folders_protection_info,
                                                                     _render_attachment_list, _render_protection_message)
@@ -49,6 +50,8 @@ class AddAttachmentOwncloudMixin:
 
                 db.session.add(attachment)
                 db.session.flush()
+                current_plugin.logger.info('Attachment %s uploaded by %s', attachment, session.user)
+                signals.attachments.attachment_created.send(attachment, user=session.user)
             flash(_('Attachment added'))
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('add_owncloud_files.html', _render_func=render_plugin_template, form=form,
