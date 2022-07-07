@@ -1,0 +1,10 @@
+{
+  "name": "recaptcha",
+  "private": true,
+  "version": "1.0.0",
+  "repository": "https://github.com/indico/indico-plugins",
+  "author": "Indico Team <indico-team@cern.ch>",
+  "dependencies": {
+    "react-google-recaptcha": "^2.1.0"
+  }
+}

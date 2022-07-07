@@ -1,0 +1,38 @@
+// This file is part of the CERN Indico plugins.
+// Copyright (C) 2014 - 2022 CERN
+//
+// The CERN Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License; see
+// the LICENSE file for more details.
+
+.captcha,
+.error {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.captcha {
+  margin-top: 1em;
+
+  &:global(.ui.form .field) {
+    margin-bottom: 0;
+  }
+
+  :global(.field) iframe {
+    border-radius: 4px;
+    border: 1px solid transparent;
+  }
+
+  :global(.field.error) iframe {
+    border: 1px solid #cc0000;
+  }
+}
+
+.error {
+  margin-top: 1em;
+
+  :global(.ui.error.message) {
+    margin-bottom: 0;
+  }
+}
