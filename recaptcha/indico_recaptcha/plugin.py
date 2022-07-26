@@ -10,10 +10,11 @@ from requests.exceptions import RequestException
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 
-from indico.web.forms.base import IndicoForm
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.registration.plugins import CaptchaPluginMixin
+from indico.web.forms.base import IndicoForm
 from indico.web.views import WPBase
+
 from indico_recaptcha import _
 
 
@@ -45,7 +46,7 @@ class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
         self.inject_bundle('main.css', WPBase)
 
     def generate_captcha(self):
-        return None, {'site_key': self.settings.get('site_key')}
+        return {'site_key': self.settings.get('site_key')}
 
     def validate_captcha(self, answer):
         secret = self.settings.get('secret_key')
