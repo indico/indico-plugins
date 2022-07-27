@@ -45,9 +45,6 @@ class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
         self.inject_bundle('main.js', WPBase)
         self.inject_bundle('main.css', WPBase)
 
-    def generate_captcha(self):
-        return {'site_key': self.settings.get('site_key')}
-
     def validate_captcha(self, answer):
         secret = self.settings.get('secret_key')
         url = f'https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={answer}'
@@ -60,3 +57,6 @@ class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
             # TODO: Should we handle this better?
             return False
         return resp.json()['success']
+
+    def get_captcha_settings(self):
+        return {'siteKey': self.settings.get('site_key')}

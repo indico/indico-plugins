@@ -9,4 +9,4 @@ import {registerPluginComponent} from 'indico/utils/plugins';
 
 import Captcha from './Captcha';
 
-registerPluginComponent('recaptcha', 'regformCaptcha', Captcha);
+registerPluginComponent('recaptcha', 'captcha', Captcha);
