@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useCallback} from 'react';
 import {useFormState, useForm} from 'react-final-form';
 import ReCAPTCHA from 'react-google-recaptcha';
-import {Message} from 'semantic-ui-react';
+import {Message, Form} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -62,7 +62,7 @@ export default function Captcha({name, settings}) {
           </div>
         )}
         {siteKey && (
-          <div className="ui form" styleName="captcha">
+          <Form as="div" styleName="captcha">
             <FinalField
               name={name}
               required
@@ -70,7 +70,7 @@ export default function Captcha({name, settings}) {
               siteKey={siteKey}
               reCaptchaRef={reCaptchaRef}
             />
-          </div>
+          </Form>
         )}
       </div>
     </Message>
