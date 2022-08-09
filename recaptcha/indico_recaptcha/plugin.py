@@ -11,7 +11,7 @@ from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
-from indico.modules.events.registration.plugins import CaptchaPluginMixin
+from indico.modules.core.plugins import CaptchaPluginMixin
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.views import WPBase
