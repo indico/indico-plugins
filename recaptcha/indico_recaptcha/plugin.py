@@ -30,9 +30,7 @@ class ReCaptchaSettingsForm(IndicoForm):
 class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
     """Google reCAPTCHA
 
-    Provides ReCAPTCHA check for registrations.
-    The plugin needs the site key and secret key to work properly which
-    you can obtain from the reCAPTCHA admin dashboard.
+    Replaces Indico's default CAPTCHA with Google reCAPTCHA.
     """
 
     configurable = True
