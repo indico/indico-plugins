@@ -54,24 +54,15 @@ export default function Captcha({name, settings}) {
         <Translate>Confirm that you are not a robot</Translate> 🤖
       </Message.Header>
       <div>
-        {!siteKey && (
-          <div styleName="error">
-            <Message error>
-              <Translate>The Site key is not set. Please add it in the plugin settings.</Translate>
-            </Message>
-          </div>
-        )}
-        {siteKey && (
-          <Form as="div" styleName="captcha">
-            <FinalField
-              name={name}
-              required
-              component={CaptchaField}
-              siteKey={siteKey}
-              reCaptchaRef={reCaptchaRef}
-            />
-          </Form>
-        )}
+        <Form as="div" styleName="captcha">
+          <FinalField
+            name={name}
+            required
+            component={CaptchaField}
+            siteKey={siteKey}
+            reCaptchaRef={reCaptchaRef}
+          />
+        </Form>
       </div>
     </Message>
   );

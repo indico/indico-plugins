@@ -7,18 +7,20 @@
 
 import requests
 from requests.exceptions import RequestException
-from wtforms.fields import StringField
+from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.registration.plugins import CaptchaPluginMixin
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.views import WPBase
 
 from indico_recaptcha import _
 
 
 class ReCaptchaSettingsForm(IndicoForm):
+    enabled = BooleanField(_('Enabled'), widget=SwitchWidget(), description=_('Whether to enable the access overrides'))
     site_key = StringField(_('Site key'), [DataRequired()],
                            description=_('The site key available in the reCAPTCHA admin dashboard'))
     secret_key = StringField(_('Secret key'), [DataRequired()],
@@ -36,25 +38,27 @@ class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
     configurable = True
     settings_form = ReCaptchaSettingsForm
     default_settings = {
+        'enabled': False,
         'site_key': '',
         'secret_key': '',
     }
 
     def init(self):
         super().init()
-        self.inject_bundle('main.js', WPBase)
-        self.inject_bundle('main.css', WPBase)
+        self.inject_bundle('main.js', WPBase, condition=lambda: self.settings.get('enabled'))
+        self.inject_bundle('main.css', WPBase, condition=lambda: self.settings.get('enabled'))
+
+    def is_captcha_available(self):
+        return self.settings.get('enabled') and bool(self.settings.get('site_key'))
 
     def validate_captcha(self, answer):
         secret = self.settings.get('secret_key')
-        url = f'https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={answer}'
-
-        resp = requests.post(url)
+        resp = requests.post('https://www.google.com/recaptcha/api/siteverify',
+                             data={'secret': secret, 'response': answer})
         try:
             resp.raise_for_status()
         except RequestException as exc:
             self.logger.error('Failed to validate CAPTCHA: %s', exc.response.text)
-            # TODO: Should we handle this better?
             return False
         return resp.json()['success']
 
