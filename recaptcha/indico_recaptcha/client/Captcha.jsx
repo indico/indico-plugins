@@ -52,7 +52,32 @@ CaptchaField.defaultProps = {
 };
 
 function WTFCaptcha({name, siteKey}) {
+  const fieldRef = useRef(null);
   const [response, setResponse] = useState('');
+  const [hasError, setError] = useState(false);
+
+  useEffect(() => {
+    const form = fieldRef.current?.form;
+    if (!form || response) {
+      return;
+    }
+    // prevent form submission until the user solved the captcha
+    const handleSubmit = evt => {
+      evt.preventDefault();
+      setError(true);
+    };
+    form.addEventListener('submit', handleSubmit);
+
+    return () => {
+      form.removeEventListener('submit', handleSubmit);
+    };
+  }, [fieldRef, response]);
+
+  const handleChange = resp => {
+    setResponse(resp);
+    // clear error, or go into error state if CAPTCHA expired
+    setError(!resp);
+  };
 
   return (
     <Message info style={{marginTop: 0}}>
@@ -61,8 +86,10 @@ function WTFCaptcha({name, siteKey}) {
       </Message.Header>
       <div>
         <Form as="div" styleName="captcha">
-          <input type="hidden" name={name} value={response} />
-          <CaptchaField siteKey={siteKey} onChange={setResponse} />
+          <input type="hidden" name={name} value={response} ref={fieldRef} />
+          <Form.Field error={hasError}>
+            <CaptchaField siteKey={siteKey} onChange={handleChange} />
+          </Form.Field>
         </Form>
       </div>
     </Message>
