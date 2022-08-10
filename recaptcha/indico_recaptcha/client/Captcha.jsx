@@ -5,6 +5,7 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import PropTypes from 'prop-types';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useFormState, useForm} from 'react-final-form';
@@ -16,11 +17,11 @@ import {Translate} from 'indico/react/i18n';
 
 import './Captcha.module.scss';
 
-export default function Captcha({name, settings: {siteKey}, wtf}) {
+export default function Captcha({name, settings: {siteKey, hCaptcha}, wtf}) {
   return wtf ? (
-    <WTFCaptcha name={name} siteKey={siteKey} />
+    <WTFCaptcha name={name} siteKey={siteKey} hCaptcha={hCaptcha} />
   ) : (
-    <FinalCaptcha name={name} siteKey={siteKey} />
+    <FinalCaptcha name={name} siteKey={siteKey} hCaptcha={hCaptcha} />
   );
 }
 
@@ -29,6 +30,7 @@ Captcha.propTypes = {
   wtf: PropTypes.bool,
   settings: PropTypes.shape({
     siteKey: PropTypes.string.isRequired,
+    hCaptcha: PropTypes.bool.isRequired,
   }).isRequired,
 };
 
@@ -37,13 +39,23 @@ Captcha.defaultProps = {
   wtf: false,
 };
 
-function CaptchaField({onChange, siteKey, reCaptchaRef}) {
-  return <ReCAPTCHA sitekey={siteKey} onChange={onChange} ref={reCaptchaRef} />;
+function CaptchaField({onChange, siteKey, hCaptcha, reCaptchaRef}) {
+  return hCaptcha ? (
+    <HCaptcha
+      sitekey={siteKey}
+      onVerify={onChange}
+      onExpire={() => onChange(null)}
+      ref={reCaptchaRef}
+    />
+  ) : (
+    <ReCAPTCHA sitekey={siteKey} onChange={onChange} ref={reCaptchaRef} />
+  );
 }
 
 CaptchaField.propTypes = {
   onChange: PropTypes.func.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
   reCaptchaRef: PropTypes.object,
 };
 
@@ -51,7 +63,7 @@ CaptchaField.defaultProps = {
   reCaptchaRef: undefined,
 };
 
-function WTFCaptcha({name, siteKey}) {
+function WTFCaptcha({name, siteKey, hCaptcha}) {
   const fieldRef = useRef(null);
   const [response, setResponse] = useState('');
   const [hasError, setError] = useState(false);
@@ -88,7 +100,7 @@ function WTFCaptcha({name, siteKey}) {
         <Form as="div" styleName="captcha">
           <input type="hidden" name={name} value={response} ref={fieldRef} />
           <Form.Field error={hasError}>
-            <CaptchaField siteKey={siteKey} onChange={handleChange} />
+            <CaptchaField siteKey={siteKey} onChange={handleChange} hCaptcha={hCaptcha} />
           </Form.Field>
         </Form>
       </div>
@@ -99,9 +111,10 @@ function WTFCaptcha({name, siteKey}) {
 WTFCaptcha.propTypes = {
   name: PropTypes.string.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
 };
 
-function FinalCaptcha({name, siteKey}) {
+function FinalCaptcha({name, siteKey, hCaptcha}) {
   const reCaptchaRef = useRef(null);
   const form = useForm();
   const {submitErrors} = useFormState({
@@ -134,6 +147,7 @@ function FinalCaptcha({name, siteKey}) {
             required
             component={CaptchaField}
             siteKey={siteKey}
+            hCaptcha={hCaptcha}
             reCaptchaRef={reCaptchaRef}
           />
         </Form>
@@ -145,4 +159,5 @@ function FinalCaptcha({name, siteKey}) {
 FinalCaptcha.propTypes = {
   name: PropTypes.string.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
 };
