@@ -5,6 +5,7 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import PropTypes from 'prop-types';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useFormState, useForm} from 'react-final-form';
@@ -14,44 +15,55 @@ import {Message, Form} from 'semantic-ui-react';
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import './Captcha.module.scss';
+import './CloudCaptcha.module.scss';
 
-export default function Captcha({name, settings: {siteKey}, wtf}) {
+export default function CloudCaptcha({name, settings: {siteKey, hCaptcha}, wtf}) {
   return wtf ? (
-    <WTFCaptcha name={name} siteKey={siteKey} />
+    <WTFCloudCaptcha name={name} siteKey={siteKey} hCaptcha={hCaptcha} />
   ) : (
-    <FinalCaptcha name={name} siteKey={siteKey} />
+    <FinalCloudCaptcha name={name} siteKey={siteKey} hCaptcha={hCaptcha} />
   );
 }
 
-Captcha.propTypes = {
+CloudCaptcha.propTypes = {
   name: PropTypes.string,
   wtf: PropTypes.bool,
   settings: PropTypes.shape({
     siteKey: PropTypes.string.isRequired,
+    hCaptcha: PropTypes.bool.isRequired,
   }).isRequired,
 };
 
-Captcha.defaultProps = {
+CloudCaptcha.defaultProps = {
   name: 'captcha',
   wtf: false,
 };
 
-function CaptchaField({onChange, siteKey, reCaptchaRef}) {
-  return <ReCAPTCHA sitekey={siteKey} onChange={onChange} ref={reCaptchaRef} />;
+function CloudCaptchaField({onChange, siteKey, hCaptcha, reCaptchaRef}) {
+  return hCaptcha ? (
+    <HCaptcha
+      sitekey={siteKey}
+      onVerify={onChange}
+      onExpire={() => onChange(null)}
+      ref={reCaptchaRef}
+    />
+  ) : (
+    <ReCAPTCHA sitekey={siteKey} onChange={onChange} ref={reCaptchaRef} />
+  );
 }
 
-CaptchaField.propTypes = {
+CloudCaptchaField.propTypes = {
   onChange: PropTypes.func.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
   reCaptchaRef: PropTypes.object,
 };
 
-CaptchaField.defaultProps = {
+CloudCaptchaField.defaultProps = {
   reCaptchaRef: undefined,
 };
 
-function WTFCaptcha({name, siteKey}) {
+function WTFCloudCaptcha({name, siteKey, hCaptcha}) {
   const fieldRef = useRef(null);
   const [response, setResponse] = useState('');
   const [hasError, setError] = useState(false);
@@ -88,7 +100,7 @@ function WTFCaptcha({name, siteKey}) {
         <Form as="div" styleName="captcha">
           <input type="hidden" name={name} value={response} ref={fieldRef} />
           <Form.Field error={hasError}>
-            <CaptchaField siteKey={siteKey} onChange={handleChange} />
+            <CloudCaptchaField siteKey={siteKey} onChange={handleChange} hCaptcha={hCaptcha} />
           </Form.Field>
         </Form>
       </div>
@@ -96,12 +108,13 @@ function WTFCaptcha({name, siteKey}) {
   );
 }
 
-WTFCaptcha.propTypes = {
+WTFCloudCaptcha.propTypes = {
   name: PropTypes.string.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
 };
 
-function FinalCaptcha({name, siteKey}) {
+function FinalCloudCaptcha({name, siteKey, hCaptcha}) {
   const reCaptchaRef = useRef(null);
   const form = useForm();
   const {submitErrors} = useFormState({
@@ -132,8 +145,9 @@ function FinalCaptcha({name, siteKey}) {
           <FinalField
             name={name}
             required
-            component={CaptchaField}
+            component={CloudCaptchaField}
             siteKey={siteKey}
+            hCaptcha={hCaptcha}
             reCaptchaRef={reCaptchaRef}
           />
         </Form>
@@ -142,7 +156,8 @@ function FinalCaptcha({name, siteKey}) {
   );
 }
 
-FinalCaptcha.propTypes = {
+FinalCloudCaptcha.propTypes = {
   name: PropTypes.string.isRequired,
   siteKey: PropTypes.string.isRequired,
+  hCaptcha: PropTypes.bool.isRequired,
 };

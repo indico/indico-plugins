@@ -7,6 +7,6 @@
 
 import {registerPluginComponent} from 'indico/utils/plugins';
 
-import Captcha from './Captcha';
+import CloudCaptcha from './CloudCaptcha';
 
-registerPluginComponent('recaptcha', 'captcha', Captcha);
+registerPluginComponent('cloud_captchas', 'captcha', CloudCaptcha);
