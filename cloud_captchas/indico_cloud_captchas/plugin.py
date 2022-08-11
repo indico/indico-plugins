@@ -52,7 +52,7 @@ class CloudCaptchasSettingsForm(IndicoForm):
         description=_('The site key available in the hCaptcha admin dashboard')
     )
     hcaptcha_secret_key = StringField(
-        _('reCAPTCHA secret key'),
+        _('hCAPTCHA secret key'),
         [HiddenUnless('provider', CaptchaProvider.hcaptcha, preserve_data=True), DataRequired()],
         description=_('The secret key available in the hCaptcha admin dashboard')
     )
@@ -79,7 +79,6 @@ class CloudCaptchasPlugin(CaptchaPluginMixin, IndicoPlugin):
 
     def init(self):
         super().init()
-        # TODO split hcaptcha/recaptcha (hcaptcha is pretty big since it includes react)
         self.inject_bundle('main.js', WPBase, condition=lambda: self.settings.get('provider') != CaptchaProvider.none)
         self.inject_bundle('main.css', WPBase, condition=lambda: self.settings.get('provider') != CaptchaProvider.none)
 
