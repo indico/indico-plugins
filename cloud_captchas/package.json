@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "indico-plugin-cloud-captchas",
+  "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.4.4",
+    "react-google-recaptcha": "^2.1.0"
+  }
+}

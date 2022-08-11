@@ -1,4 +1,0 @@
-graft indico_recaptcha/static
-graft indico_recaptcha/translations
-
-global-exclude *.pyc __pycache__ .keep

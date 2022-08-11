@@ -1,4 +1,4 @@
-# reCAPTCHA / hCaptcha Plugin
+# Cloud CAPTCHAs Plugin
 
 This plugin replaces the built-in CAPTCHA with Google's reCAPTCHA v2 or hCaptcha.
 

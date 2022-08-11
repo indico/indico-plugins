@@ -19,7 +19,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import HiddenUnless
 from indico.web.views import WPBase
 
-from indico_recaptcha import _
+from indico_cloud_captchas import _
 
 
 class CaptchaProvider(RichIntEnum):
@@ -29,7 +29,7 @@ class CaptchaProvider(RichIntEnum):
     hcaptcha = 2
 
 
-class ReCaptchaSettingsForm(IndicoForm):
+class CloudCaptchasSettingsForm(IndicoForm):
     provider = IndicoEnumSelectField(
         _('Type'), enum=CaptchaProvider,
         description=_('Select which CAPTCHA provider you want to use')
@@ -58,14 +58,14 @@ class ReCaptchaSettingsForm(IndicoForm):
     )
 
 
-class ReCaptchaPlugin(CaptchaPluginMixin, IndicoPlugin):
-    """reCAPTCHA / hCaptcha
+class CloudCaptchasPlugin(CaptchaPluginMixin, IndicoPlugin):
+    """Cloud CAPTCHAs
 
     Replaces Indico's default CAPTCHA with reCAPTCHA or hCaptcha.
     """
 
     configurable = True
-    settings_form = ReCaptchaSettingsForm
+    settings_form = CloudCaptchasSettingsForm
     default_settings = {
         'provider': CaptchaProvider.none,
         'recaptcha_site_key': '',
