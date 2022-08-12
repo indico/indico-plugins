@@ -519,7 +519,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return {principal_from_identifier(vc_room.data['host']).email}
 
     def _check_meetings(self, sender, obj, **kwargs):
-        zoom_rooms = [room.vc_room for room in obj.vc_room_associations if room.vc_room.type == 'zoom']
+        zoom_rooms = [ass.vc_room for ass in getattr(obj, 'vc_room_associations', []) if ass.vc_room.type == 'zoom']
         if not zoom_rooms:
             return
 
