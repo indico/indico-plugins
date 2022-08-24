@@ -1,21 +1,21 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: indico_livesync/controllers.py:41
 msgid "Agent deleted"
@@ -50,11 +50,11 @@ msgstr ""
 msgid "The name of the agent. Only used in the administration interface."
 msgstr ""
 
-#: indico_livesync/plugin.py:26
+#: indico_livesync/plugin.py:25
 msgid "Queue entry TTL"
 msgstr ""
 
-#: indico_livesync/plugin.py:27
+#: indico_livesync/plugin.py:26
 msgid ""
 "How many days should processed entries be kept in the queue. The time "
 "counts from the creation of the queue entries, so if the LiveSync task is"
@@ -62,26 +62,37 @@ msgid ""
 "run after processing them. Setting it to 0 disables automatic deletion."
 msgstr ""
 
-#: indico_livesync/plugin.py:32
+#: indico_livesync/plugin.py:31
 msgid "Excluded categories"
 msgstr ""
 
-#: indico_livesync/plugin.py:33
+#: indico_livesync/plugin.py:32
 msgid "Category ID"
 msgstr ""
 
-#: indico_livesync/plugin.py:34
+#: indico_livesync/plugin.py:33
 msgid ""
 "Changes to objects inside these categories or any of their subcategories "
 "are excluded."
 msgstr ""
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py:35
 msgid "Disable queue runs"
 msgstr ""
 
-#: indico_livesync/plugin.py:37
+#: indico_livesync/plugin.py:36
 msgid "Disable all scheduled queue runs."
+msgstr ""
+
+#: indico_livesync/plugin.py:37
+msgid "Skip category changes"
+msgstr ""
+
+#: indico_livesync/plugin.py:38
+msgid ""
+"Skip category changes when processing the queue. This can be useful in "
+"large instances when there are significant changes to large categories in"
+" order to avoid processing those immediately."
 msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:9
