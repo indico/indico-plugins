@@ -17,6 +17,10 @@ The following languages are supported:
 
 ## Changelog
 
+### 3.2
+
+- Declare compatibility with Python 3.10
+
 ### 3.0
 
 - Initial release for Indico 3.0
