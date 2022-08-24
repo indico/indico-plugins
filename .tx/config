@@ -1,79 +1,79 @@
 [main]
 host = https://www.transifex.com
 
-[indico.vc-zoom-messages]
+[o:indico:p:indico:r:vc-zoom-messages]
 file_filter = vc_zoom/indico_vc_zoom/translations/<lang>/LC_MESSAGES/messages.po
 source_file = vc_zoom/indico_vc_zoom/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.vc-zoom-messages-js]
+[o:indico:p:indico:r:vc-zoom-messages-js]
 file_filter = vc_zoom/indico_vc_zoom/translations/<lang>/LC_MESSAGES/messages-js.po
 source_file = vc_zoom/indico_vc_zoom/translations/messages-js.pot
 source_lang = en
 type = PO
 
-[indico.piwik-messages]
+[o:indico:p:indico:r:piwik-messages]
 file_filter = piwik/indico_piwik/translations/<lang>/LC_MESSAGES/messages.po
 source_file = piwik/indico_piwik/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.piwik-messages-js]
+[o:indico:p:indico:r:piwik-messages-js]
 file_filter = piwik/indico_piwik/translations/<lang>/LC_MESSAGES/messages-js.po
 source_file = piwik/indico_piwik/translations/messages-js.pot
 source_lang = en
 type = PO
 
-[indico.payment-paypal-messages]
+[o:indico:p:indico:r:payment-paypal-messages]
 file_filter = payment_paypal/indico_payment_paypal/translations/<lang>/LC_MESSAGES/messages.po
 source_file = payment_paypal/indico_payment_paypal/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.payment-manual-messages]
+[o:indico:p:indico:r:payment-manual-messages]
 file_filter = payment_manual/indico_payment_manual/translations/<lang>/LC_MESSAGES/messages.po
 source_file = payment_manual/indico_payment_manual/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.payment-sixpay-messages]
+[o:indico:p:indico:r:payment-sixpay-messages]
 file_filter = payment_sixpay/indico_payment_sixpay/translations/<lang>/LC_MESSAGES/messages.po
 source_file = payment_sixpay/indico_payment_sixpay/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.livesync-messages]
+[o:indico:p:indico:r:livesync-messages]
 file_filter = livesync/indico_livesync/translations/<lang>/LC_MESSAGES/messages.po
 source_file = livesync/indico_livesync/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.ursh-messages]
+[o:indico:p:indico:r:ursh-messages]
 file_filter = ursh/indico_ursh/translations/<lang>/LC_MESSAGES/messages.po
 source_file = ursh/indico_ursh/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.storage_s3-messages]
+[o:indico:p:indico:r:storage_s3-messages]
 file_filter = storage_s3/indico_storage_s3/translations/<lang>/LC_MESSAGES/messages.po
 source_file = storage_s3/indico_storage_s3/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.citadel-messages]
+[o:indico:p:indico:r:citadel-messages]
 file_filter = citadel/indico_citadel/translations/<lang>/LC_MESSAGES/messages.po
 source_file = citadel/indico_citadel/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.cloud_captchas-messages]
+[o:indico:p:indico:r:cloud_captchas-messages]
 file_filter = cloud_captchas/indico_cloud_captchas/translations/<lang>/LC_MESSAGES/messages.po
 source_file = cloud_captchas/indico_cloud_captchas/translations/messages.pot
 source_lang = en
 type = PO
 
-[indico.themes_legacy-messages]
+[o:indico:p:indico:r:themes_legacy-messages]
 file_filter = themes_legacy/indico_themes_legacy/translations/<lang>/LC_MESSAGES/messages.po
 source_file = themes_legacy/indico_themes_legacy/translations/messages.pot
 source_lang = en
