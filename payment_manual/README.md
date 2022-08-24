@@ -8,6 +8,10 @@ integration with Indico.
 
 ## Changelog
 
+### 3.2
+
+- Update translations
+
 ### 3.1
 
 - Add placeholders for the registration form id and the registration's database id

@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.2
+
+- Update translations
+
 ### 3.1.2
 
 - Fix error after successful payment if background confirmation already happened
