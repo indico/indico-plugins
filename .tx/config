@@ -67,6 +67,12 @@ source_file = citadel/indico_citadel/translations/messages.pot
 source_lang = en
 type = PO
 
+[indico.cloud_captchas-messages]
+file_filter = cloud_captchas/indico_cloud_captchas/translations/<lang>/LC_MESSAGES/messages.po
+source_file = cloud_captchas/indico_cloud_captchas/translations/messages.pot
+source_lang = en
+type = PO
+
 [indico.themes_legacy-messages]
 file_filter = themes_legacy/indico_themes_legacy/translations/<lang>/LC_MESSAGES/messages.po
 source_file = themes_legacy/indico_themes_legacy/translations/messages.pot
