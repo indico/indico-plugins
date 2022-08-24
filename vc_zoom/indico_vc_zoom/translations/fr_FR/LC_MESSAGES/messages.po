@@ -1,10 +1,10 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
-# Adrian Mönnich, 2021
+# Adrian, 2021
 # Thomas Baron <thomas.baron@cern.ch>, 2021
 # 
 #, fuzzy
@@ -12,22 +12,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: fr_FR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: indico_vc_zoom/controllers.py:28
+#: indico_vc_zoom/controllers.py:29
 msgid "You were already an (alternative) host of this meeting"
 msgstr "Vous étiez déjà un hôte (alternatif) de cette réunion"
 
-#: indico_vc_zoom/controllers.py:43
+#: indico_vc_zoom/controllers.py:44
 msgid "You are now an alternative host of room '{room}'"
 msgstr "Vous êtes maintenant un hôte alternatif de la réunion '{room}'"
 
@@ -288,7 +288,7 @@ msgstr "Lien vers les instructions pour rejoindre une réunion par téléphone"
 msgid "Invalid identity providers: {}"
 msgstr "Fournisseurs d'identité invalides: {}"
 
-#: indico_vc_zoom/plugin.py:352
+#: indico_vc_zoom/plugin.py:353
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
@@ -296,47 +296,23 @@ msgstr ""
 "Impossible de créer la réunion dans Zoom. Veuillez contacter le support si "
 "l'erreur persiste"
 
-#: indico_vc_zoom/plugin.py:437
+#: indico_vc_zoom/plugin.py:438
 msgid "Room didn't exist in Zoom anymore"
 msgstr "La réunion n'existait plus dans Zoom"
 
-#: indico_vc_zoom/plugin.py:440
+#: indico_vc_zoom/plugin.py:441
 msgid "Zoom Error: \"{}\""
 msgstr "Erreur Zoom: \"{}\""
 
-#: indico_vc_zoom/plugin.py:443
+#: indico_vc_zoom/plugin.py:444
 msgid "Problem deleting room"
 msgstr "Erreur lors de la suppression de la salle"
 
-#: indico_vc_zoom/plugin.py:467
+#: indico_vc_zoom/plugin.py:468
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
 "La salle \"{}\" n'existe plus dans Zoom et a donc été supprimée de "
 "l'évènement"
-
-#: indico_vc_zoom/plugin.py:535
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this event "
-"which were not automatically updated."
-msgstr ""
-"Il existe une ou plusieurs réunions Zoom associées à cet événement qui n'ont"
-" pas été automatiquement mises à jour."
-
-#: indico_vc_zoom/plugin.py:538
-msgid ""
-"There are one or more scheduled Zoom meetings associated with the "
-"contribution \"{}\" which  were not automatically updated."
-msgstr ""
-"Il y a une ou plusieurs réunion Zoom associées à la contribution \"{}\" qui "
-"n'ont pas été automatiquement mises à jour."
-
-#: indico_vc_zoom/plugin.py:541
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this session "
-"block which were not automatically updated."
-msgstr ""
-"Il existe une ou plusieurs réunions Zoom associées à ce bloc de session qui "
-"n'ont pas été automatiquement mises à jour."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
@@ -350,11 +326,11 @@ msgstr "Domaines de courriel"
 msgid "Authenticators"
 msgstr "Authentificateurs"
 
-#: indico_vc_zoom/util.py:125
+#: indico_vc_zoom/util.py:126
 msgid "This room has been deleted from Zoom"
 msgstr "Cette réunion a été effacée de Zoom"
 
-#: indico_vc_zoom/util.py:129
+#: indico_vc_zoom/util.py:130
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
@@ -362,17 +338,17 @@ msgstr ""
 "Erreur en récupérant la réunion Zoom. Veuillez contacter le support si cette"
 " erreur persiste."
 
-#: indico_vc_zoom/util.py:151
+#: indico_vc_zoom/util.py:152
 msgid "Room no longer exists in Zoom"
 msgstr "La salle n'existe plus dans Zoom"
 
-#: indico_vc_zoom/util.py:153
+#: indico_vc_zoom/util.py:154
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
 "Impossible de mettre à jour la réunion. Veuillez contacter le support si "
 "l'erreur persiste."
 
-#: indico_vc_zoom/util.py:209
+#: indico_vc_zoom/util.py:210
 msgid "Could not find Zoom user for alternative host"
 msgstr "Impossible de trouver l'utilisateur Zoom comme hôte alternatif"
 
@@ -448,6 +424,7 @@ msgid "Alternative host"
 msgid_plural "Alternative hosts"
 msgstr[0] "Hôte alternatif"
 msgstr[1] "Hôtes alternatifs"
+msgstr[2] "Hôtes alternatifs"
 
 #: indico_vc_zoom/templates/info_box.html:40
 msgid "Useful links"

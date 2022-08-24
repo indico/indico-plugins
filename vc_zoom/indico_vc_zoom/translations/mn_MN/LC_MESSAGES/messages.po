@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
 # Pedro Lourenço <pedroob221@gmail.com>, 2021
@@ -13,22 +13,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (https://www.transifex.com/indico/teams/6478/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: mn_MN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: indico_vc_zoom/controllers.py:28
+#: indico_vc_zoom/controllers.py:29
 msgid "You were already an (alternative) host of this meeting"
 msgstr "Та аль хэдийнэ энэхүү хурлын (хосолмол) удирдагч болсон байна."
 
-#: indico_vc_zoom/controllers.py:43
+#: indico_vc_zoom/controllers.py:44
 msgid "You are now an alternative host of room '{room}'"
 msgstr "Та одоо өрөө '{room}'-ний өөр нэг удирдагч боллоо."
 
@@ -282,7 +282,7 @@ msgstr "Утсаар дамжуулж хуралд нэмэгдэх тухай �
 msgid "Invalid identity providers: {}"
 msgstr "хүчингүй тодорхойлолт хангагч: {}"
 
-#: indico_vc_zoom/plugin.py:352
+#: indico_vc_zoom/plugin.py:353
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
@@ -290,45 +290,21 @@ msgstr ""
 "Зүүм дотор өрөө үүсгэж чадахгүй байна. Алдаа үргэлжилбэл тусламжийн багтай "
 "холбогдоно уу."
 
-#: indico_vc_zoom/plugin.py:437
+#: indico_vc_zoom/plugin.py:438
 msgid "Room didn't exist in Zoom anymore"
 msgstr "Зүүм дотор өрөө оршихоо больсон байсан"
 
-#: indico_vc_zoom/plugin.py:440
+#: indico_vc_zoom/plugin.py:441
 msgid "Zoom Error: \"{}\""
 msgstr "Зүүмийн алдаа: \"{}\""
 
-#: indico_vc_zoom/plugin.py:443
+#: indico_vc_zoom/plugin.py:444
 msgid "Problem deleting room"
 msgstr "Өрөө устгах асуудал"
 
-#: indico_vc_zoom/plugin.py:467
+#: indico_vc_zoom/plugin.py:468
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr "Өрөө \"{}\" Зүүм дотор оршихоо байсан ба үйл явдлаас устгагдсан байна"
-
-#: indico_vc_zoom/plugin.py:535
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this event "
-"which were not automatically updated."
-msgstr ""
-"Автоматаар шинэчлэгдээгүй энэхүү үйл явдалтай холбоотой нэг ба түүнээс дээш "
-"төлөвлөсөн Зүүм хурлууд байна."
-
-#: indico_vc_zoom/plugin.py:538
-msgid ""
-"There are one or more scheduled Zoom meetings associated with the "
-"contribution \"{}\" which  were not automatically updated."
-msgstr ""
-"Автоматаар шинэчлэгдээгүй \"{}\"-д хувь нэмэр оруулахтай холбоотой нэг ба "
-"түүнээс дээш төлөвлөсөн Зүүм хурлууд байна."
-
-#: indico_vc_zoom/plugin.py:541
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this session "
-"block which were not automatically updated."
-msgstr ""
-"Автоматаар шинэчлэгдээгүй энэхүү хурлын блоктой холбоотой нэг ба түүнээс "
-"дээш төлөвлөсөн Зүүм хурлууд байна."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
@@ -342,11 +318,11 @@ msgstr "Цахим шуудангийн домэйнүүд"
 msgid "Authenticators"
 msgstr "Баталгаажуулагчид"
 
-#: indico_vc_zoom/util.py:125
+#: indico_vc_zoom/util.py:126
 msgid "This room has been deleted from Zoom"
 msgstr "Энэхүү өрөөг Зүүмээс устгалаа"
 
-#: indico_vc_zoom/util.py:129
+#: indico_vc_zoom/util.py:130
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
@@ -354,17 +330,17 @@ msgstr ""
 "Зүүмээс өрөө зөөхөд үүсэх асуудал. Алдаа үргэлжилж байвал дэмжлэгийн багтай "
 "холбогдоно уу."
 
-#: indico_vc_zoom/util.py:151
+#: indico_vc_zoom/util.py:152
 msgid "Room no longer exists in Zoom"
 msgstr "Зүүм дотор өрөө оршихоо больсон."
 
-#: indico_vc_zoom/util.py:153
+#: indico_vc_zoom/util.py:154
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
 "Хурлыг шинэчилж чадахгүй байна. Алдаа үргэлжилж байвал дэмжлэгийн багтай "
 "холбоо барина уу"
 
-#: indico_vc_zoom/util.py:209
+#: indico_vc_zoom/util.py:210
 msgid "Could not find Zoom user for alternative host"
 msgstr "Өөр хост дээрх Зүүмийн хэрэглэгчийг олж чадахгүй байна."
 

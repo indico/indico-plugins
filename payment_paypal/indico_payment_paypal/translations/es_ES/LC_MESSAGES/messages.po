@@ -1,23 +1,23 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # 
 # Translators:
-# Jesús Martín <jesusmartin@sallep.net>, 2017
+# Jesús Martín <jesusmartin@sallep.net>, 2017,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
-"PO-Revision-Date: 2020-08-19 18:43+0000\n"
-"Last-Translator: Adrian Mönnich\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017,2021\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: es_ES\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: indico_payment_paypal/controllers.py:110
 msgid "Your payment request has been processed."
@@ -27,25 +27,25 @@ msgstr "Su solicitud de pago ha sido procesada."
 msgid "You cancelled the payment process."
 msgstr "Ha cancelado el proceso de pago."
 
-#: indico_payment_paypal/plugin.py:25
+#: indico_payment_paypal/plugin.py:24
 msgid "API URL"
 msgstr "API URL"
 
-#: indico_payment_paypal/plugin.py:25
+#: indico_payment_paypal/plugin.py:24
 msgid "URL of the PayPal HTTP API."
 msgstr "URL de la API HTTP PayPal."
 
-#: indico_payment_paypal/plugin.py:26 indico_payment_paypal/plugin.py:32
+#: indico_payment_paypal/plugin.py:25 indico_payment_paypal/plugin.py:31
 msgid "Business"
 msgstr "Negocio"
 
-#: indico_payment_paypal/plugin.py:27
+#: indico_payment_paypal/plugin.py:26
 msgid ""
 "The default PayPal ID or email address associated with a PayPal account. "
 "Event managers will be able to override this."
 msgstr "El ID de PayPal o la dirección de correo electrónico predeterminados asociados con una cuenta de PayPal. Los administradores de eventos podrán anular esto."
 
-#: indico_payment_paypal/plugin.py:34
+#: indico_payment_paypal/plugin.py:33
 msgid "The PayPal ID or email address associated with a PayPal account."
 msgstr "El ID de PayPal o la dirección de correo electrónico asociados con una cuenta de PayPal."
 
@@ -72,7 +72,7 @@ msgid ""
 "<strong>UTF-8</strong> by default, otherwise some transactions may end up "
 "not being acknowledged by Indico!<br> You can find out how to set this up "
 "%(link)shere%(endlink)s."
-msgstr ""
+msgstr "Asegúrese de tener su cuenta de vendedor de PayPal configurada para usar <strong>UTF-8</strong> de forma predeterminada. De lo contrario, Indico<br> podría no reconocer algunas transacciones. Puede averiguar cómo configurar esto %(link)saquí%(endlink)s."
 
 #: indico_payment_paypal/templates/transaction_details.html:6
 msgid "Transaction ID"

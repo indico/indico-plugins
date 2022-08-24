@@ -1,5 +1,5 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # 
 # Translators:
@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
-"PO-Revision-Date: 2021-06-14 05:16+0000\n"
-"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: mn_MN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -53,11 +53,11 @@ msgstr "Нэр"
 msgid "The name of the agent. Only used in the administration interface."
 msgstr "Агентын нэр. Зөвхөн Админ удирдлагын хуудсанд ашиглана."
 
-#: indico_livesync/plugin.py:26
+#: indico_livesync/plugin.py:25
 msgid "Queue entry TTL"
 msgstr "Дараалалд оруулах TTL"
 
-#: indico_livesync/plugin.py:27
+#: indico_livesync/plugin.py:26
 msgid ""
 "How many days should processed entries be kept in the queue. The time counts"
 " from the creation of the queue entries, so if the LiveSync task is not "
@@ -65,27 +65,38 @@ msgid ""
 "after processing them. Setting it to 0 disables automatic deletion."
 msgstr "Жагсаалт дахь мэдээллийг хэдэн өдөр боловсруулах ёстой вэ. Жагсаалтын мэдээллээс эхлэн хугацааг тоолно, иймд LiveSync-н даалгавар тодорхой хугацаанд ажиллаагүй бол, жагсаалтын мэдээллийг боловсруулсных нь дараагийн удаад устгаж болно. Үүнийг 0 болгож тохируулах нь автомат устгалтыг хүчингүй болгоно. "
 
-#: indico_livesync/plugin.py:32
+#: indico_livesync/plugin.py:31
 msgid "Excluded categories"
 msgstr "Хассан ангилал"
 
-#: indico_livesync/plugin.py:33
+#: indico_livesync/plugin.py:32
 msgid "Category ID"
 msgstr "Ангиллын ID"
 
-#: indico_livesync/plugin.py:34
+#: indico_livesync/plugin.py:33
 msgid ""
 "Changes to objects inside these categories or any of their subcategories are"
 " excluded."
 msgstr "Эдгээр ангилал, эсвэл тэдгээрийн дэд ангилал доторх объектуудад оруулсан өөрчлөлтийг хасав. "
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py:35
 msgid "Disable queue runs"
 msgstr "Дарааллын ажиллагааг идэвхгүй болгох"
 
-#: indico_livesync/plugin.py:37
+#: indico_livesync/plugin.py:36
 msgid "Disable all scheduled queue runs."
 msgstr "Төлөвлөсөн бүх дарааллын ажиллагааг идэвхгүй болгох."
+
+#: indico_livesync/plugin.py:37
+msgid "Skip category changes"
+msgstr ""
+
+#: indico_livesync/plugin.py:38
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:9
 msgid "Cancel"

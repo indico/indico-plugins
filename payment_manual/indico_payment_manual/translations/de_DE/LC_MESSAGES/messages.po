@@ -1,0 +1,80 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020
+# bbb user, 2022
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017
+# Jan Schumacher, 2018
+# Marvin <marvin.mundry@uni-hamburg.de>, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:48+0000\n"
+"Last-Translator: bbb user, 2022\n"
+"Language-Team: German (Germany) (http://www.transifex.com/indico/indico/language/de_DE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_payment_manual/placeholders.py:33
+msgid "escaped for URLs"
+msgstr "kodiert für URLs"
+
+#: indico_payment_manual/placeholders.py:38
+msgid "First name of the registrant"
+msgstr "Vorname des Teilnehmers"
+
+#: indico_payment_manual/placeholders.py:44
+msgid "Last name of the registrant"
+msgstr "Nachname des Teilnehmers"
+
+#: indico_payment_manual/placeholders.py:50
+msgid "Email address of the registrant"
+msgstr "E-Mail-Adresse des Teilnehmers"
+
+#: indico_payment_manual/placeholders.py:60
+msgid "The database ID of the registration"
+msgstr "Die Datenbank-ID der Anmeldung"
+
+#: indico_payment_manual/placeholders.py:69
+msgid "The ID of the registration form"
+msgstr "Die ID des Anmeldeformulars"
+
+#: indico_payment_manual/placeholders.py:78
+msgid "The ID of the event"
+msgstr "Die ID der Veranstaltung"
+
+#: indico_payment_manual/placeholders.py:101
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "Die Summe, die der Teilnehmer zahlen muss (z.B. 100.00 oder 100.25)."
+
+#: indico_payment_manual/placeholders.py:102
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "Die Summe (wenn möglich ohne Cent), die der Registrierte zahlen muss (z.B. 100 oder 100.25)."
+
+#: indico_payment_manual/placeholders.py:103
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "Die Summe, die der Registrierte zahlen muss in Cent (z.B. 10000 oder 10025)."
+
+#: indico_payment_manual/placeholders.py:108
+msgid "The currency used in the registration"
+msgstr "Die bei der Anmeldung verwendete Währung"
+
+#: indico_payment_manual/plugin.py:21
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "Die Zahlungsdetails für den Benutzer. Dies beinhaltet normalerweise die Kontoinformationen, die IBAN und einen Verwendungszweck. Man kann auch auf eine andere Zahlungsseite verweisen. Dafür bitte sicherstellen, dass die URL-kodierten Versionen von Platzhaltern verwendet werden."
+
+#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+msgid "Payment details"
+msgstr "Zahlungsinformationen"

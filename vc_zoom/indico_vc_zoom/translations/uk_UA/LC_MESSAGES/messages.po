@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021
@@ -11,22 +11,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021\n"
 "Language-Team: Ukrainian (Ukraine) (https://www.transifex.com/indico/teams/6478/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: indico_vc_zoom/controllers.py:28
+#: indico_vc_zoom/controllers.py:29
 msgid "You were already an (alternative) host of this meeting"
 msgstr "Ви вже (альтернативний) господар цієї зустрічі"
 
-#: indico_vc_zoom/controllers.py:43
+#: indico_vc_zoom/controllers.py:44
 msgid "You are now an alternative host of room '{room}'"
 msgstr "Ви тепер альтернативний господар кімнати '{room}'"
 
@@ -283,7 +283,7 @@ msgstr "Посилання на інструкції для приєднання
 msgid "Invalid identity providers: {}"
 msgstr "Неправильні служби автентифікації: {}"
 
-#: indico_vc_zoom/plugin.py:352
+#: indico_vc_zoom/plugin.py:353
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
@@ -291,45 +291,21 @@ msgstr ""
 "Неможливо створити кімнату в Zoom. Будь-ласка зв'яжіться зі службою "
 "підтримки якщо ця помилка залишатиметься."
 
-#: indico_vc_zoom/plugin.py:437
+#: indico_vc_zoom/plugin.py:438
 msgid "Room didn't exist in Zoom anymore"
 msgstr "Кімнати не існує в Zoom"
 
-#: indico_vc_zoom/plugin.py:440
+#: indico_vc_zoom/plugin.py:441
 msgid "Zoom Error: \"{}\""
 msgstr "Помилка Zoom: \"{}\""
 
-#: indico_vc_zoom/plugin.py:443
+#: indico_vc_zoom/plugin.py:444
 msgid "Problem deleting room"
 msgstr "Проблема підчас видалення кімнати"
 
-#: indico_vc_zoom/plugin.py:467
+#: indico_vc_zoom/plugin.py:468
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr "Кімнати \"{}\"  більше не існує в Zoom і вона була видалена із заходу"
-
-#: indico_vc_zoom/plugin.py:535
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this event "
-"which were not automatically updated."
-msgstr ""
-"З цією подією пов’язано одну або кілька запланованих зустрічей Zoom, які не "
-"були оновлені автоматично."
-
-#: indico_vc_zoom/plugin.py:538
-msgid ""
-"There are one or more scheduled Zoom meetings associated with the "
-"contribution \"{}\" which  were not automatically updated."
-msgstr ""
-"Є одна або кілька запланованих зустрічей Zoom, пов’язаних із доповіддю "
-"\"{}\", які не були автоматично оновлені."
-
-#: indico_vc_zoom/plugin.py:541
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this session "
-"block which were not automatically updated."
-msgstr ""
-"З цим блоком сеансів пов’язано одну або кілька запланованих зустрічей Zoom, "
-"які не були автоматично оновлені."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
@@ -343,11 +319,11 @@ msgstr "E-mail домени "
 msgid "Authenticators"
 msgstr "Служби автентифікації"
 
-#: indico_vc_zoom/util.py:125
+#: indico_vc_zoom/util.py:126
 msgid "This room has been deleted from Zoom"
 msgstr "Ця кімната була видалена з Zoom"
 
-#: indico_vc_zoom/util.py:129
+#: indico_vc_zoom/util.py:130
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
@@ -355,17 +331,17 @@ msgstr ""
 "Неможливо отримати доступ до кімнати в Zoom. Будь-ласка зв'яжіться зі "
 "службою підтримки якщо ця помилка залишатиметься."
 
-#: indico_vc_zoom/util.py:151
+#: indico_vc_zoom/util.py:152
 msgid "Room no longer exists in Zoom"
 msgstr "Кімнати більше не існує в Zoom"
 
-#: indico_vc_zoom/util.py:153
+#: indico_vc_zoom/util.py:154
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
 "Неможливо оновити зустріч. Будь-ласка зв'яжіться зі службою підтримки якщо "
 "ця помилка залишатиметься."
 
-#: indico_vc_zoom/util.py:209
+#: indico_vc_zoom/util.py:210
 msgid "Could not find Zoom user for alternative host"
 msgstr "Не можна знайти користувача для альтернативного господаря"
 

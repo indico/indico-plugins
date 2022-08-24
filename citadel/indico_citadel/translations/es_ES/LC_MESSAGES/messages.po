@@ -1,52 +1,56 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# 
+# Translators:
+# Jesús Martín <jesusmartin@sallep.net>, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-09 14:18+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2021\n"
 "Language-Team: Spanish (Spain) (https://www.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: es_ES\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_citadel/plugin.py:24
+msgid "Citadel URL"
+msgstr "URL servidores Citadel"
 
 #: indico_citadel/plugin.py:25
-msgid "Citadel URL"
-msgstr ""
+msgid "The URL of the Citadel server"
+msgstr "La URL del servidor Citadel"
 
 #: indico_citadel/plugin.py:26
-msgid "The URL of the Citadel server"
-msgstr ""
+msgid "Citadel API token"
+msgstr "Token de API de Citadel"
 
 #: indico_citadel/plugin.py:27
-msgid "Citadel API token"
-msgstr ""
+msgid "The authentication token to access Citadel"
+msgstr "El token de autenticación para acceder a Citadel"
 
 #: indico_citadel/plugin.py:28
-msgid "The authentication token to access Citadel"
-msgstr ""
+msgid "File extensions"
+msgstr "Extensiones de archivo"
 
 #: indico_citadel/plugin.py:29
-msgid "File extensions"
-msgstr ""
+msgid "File extensions to upload for full-text search"
+msgstr "Extensiones de archivo posibles para búsqueda de texto completo"
 
 #: indico_citadel/plugin.py:30
-msgid "File extensions to upload for full-text search"
-msgstr ""
-
-#: indico_citadel/plugin.py:31
 msgid "Max. file size"
-msgstr ""
+msgstr "Max. tamaño del archivo"
 
-#: indico_citadel/plugin.py:33
+#: indico_citadel/plugin.py:32
 msgid ""
 "Maximum size (in MB) to upload for full-text search. Note that increasing "
 "this after the initial export will upload all files for indexing that have "
@@ -54,133 +58,147 @@ msgid ""
 "time on larger instances. You may want to run a manual upload for the new "
 "file size first!"
 msgstr ""
+"Tamaño máximo (en MB) de subida para la búsqueda en textos completos. Tenga "
+"en cuenta que aumentarlo tras la exportación inicial subirá todos los "
+"archivos para su indexado, lo que puede llevar mucho tiempo con instancias "
+"grandes. Es posible que primero desee ejecutar una subida manual para el "
+"nuevo tamaño de archivo."
+
+#: indico_citadel/plugin.py:37
+msgid "Parallel threads (records)"
+msgstr "Subprocesos paralelos (registros)"
 
 #: indico_citadel/plugin.py:38
-msgid "Parallel threads (records)"
-msgstr ""
+msgid "Number of threads to use when uploading records."
+msgstr "Número de subprocesos o hilos que se utilizarán al subir registros."
 
 #: indico_citadel/plugin.py:39
-msgid "Number of threads to use when uploading records."
-msgstr ""
-
-#: indico_citadel/plugin.py:40
 msgid "Parallel threads (records, initial export)"
-msgstr ""
+msgstr "Subprocesos paralelos (registros, exportación inicial)"
 
-#: indico_citadel/plugin.py:42
+#: indico_citadel/plugin.py:41
 msgid ""
 "Number of threads to use when uploading records during the initial export."
 msgstr ""
+"Número de subprocesos que se utilizarán al cargar registros durante la "
+"exportación inicial."
+
+#: indico_citadel/plugin.py:43
+msgid "Parallel threads (files)"
+msgstr "Subprocesos paralelos (archivos)"
 
 #: indico_citadel/plugin.py:44
-msgid "Parallel threads (files)"
-msgstr ""
+msgid "Number of threads to use when uploading files."
+msgstr "Número de subprocesos que se utilizarán al subir archivos."
 
 #: indico_citadel/plugin.py:45
-msgid "Number of threads to use when uploading files."
-msgstr ""
-
-#: indico_citadel/plugin.py:46
 msgid "Parallel threads (files, initial export)"
-msgstr ""
+msgstr "Subprocesos paralelos (archivos, exportación inicial)"
 
-#: indico_citadel/plugin.py:48
+#: indico_citadel/plugin.py:47
 msgid ""
 "Number of threads to use when uploading files during the initial export."
 msgstr ""
+"Número de subprocesos que se utilizarán al cargar archivos durante la "
+"exportación inicial."
+
+#: indico_citadel/plugin.py:49
+msgid "Disable search"
+msgstr "Desactivar búsqueda"
 
 #: indico_citadel/plugin.py:50
-msgid "Disable search"
-msgstr ""
-
-#: indico_citadel/plugin.py:51
 msgid ""
 "This disables the search integration of the plugin. When this option is "
 "used, the internal Indico search interface will be used. This may be useful "
 "when you are still running a larger initial export and do not want people to"
 " get incomplete search results during that time."
 msgstr ""
+"Esto deshabilita la integración de búsqueda del plugin. Cuando se utiliza "
+"esta opción, se utilizará la interfaz de búsqueda interna de Indico. Puede "
+"ser útil cuando todavía está ejecutando una exportación inicial más grande y"
+" no desea que las personas obtengan resultados de búsqueda incompletos "
+"durante ese tiempo."
 
-#: indico_citadel/search.py:95
+#: indico_citadel/search.py:92
 msgid "The title of an event, contribution, etc."
-msgstr ""
+msgstr "El título de un evento, contribución, etc."
+
+#: indico_citadel/search.py:93
+msgid "A speaker, author or event chair's name"
+msgstr "Nombre de un orador, autor o presidente del evento."
+
+#: indico_citadel/search.py:94
+msgid "A speaker, author or event chair's affiliation"
+msgstr "Afiliación de un orador, autor o presidente del evento."
 
 #: indico_citadel/search.py:95
-msgid "A speaker, author or event chair's name"
-msgstr ""
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "Un tipo de entrada (como conferencia, reunión, archivo, etc.)"
 
 #: indico_citadel/search.py:96
-msgid "A speaker, author or event chair's affiliation"
-msgstr ""
+msgid "Name of the venue"
+msgstr "Nombre de la sede"
 
 #: indico_citadel/search.py:97
-msgid "An entry type (such as conference, meeting, file, etc.)"
-msgstr ""
+msgid "Name of the room"
+msgstr "Nombre de la sala"
 
 #: indico_citadel/search.py:98
-msgid "Name of the venue"
-msgstr ""
+msgid "Address of the venue"
+msgstr "Dirección de la sede"
 
 #: indico_citadel/search.py:99
-msgid "Name of the room"
-msgstr ""
+msgid "Name of the attached file"
+msgstr "Nombre del archivo adjunto"
 
 #: indico_citadel/search.py:100
-msgid "Address of the venue"
-msgstr ""
+msgid "A keyword associated with an event"
+msgstr "Una palabra clave asociada a un evento."
 
 #: indico_citadel/search.py:101
-msgid "Name of the attached file"
-msgstr ""
-
-#: indico_citadel/search.py:102
-msgid "A keyword associated with an event"
-msgstr ""
-
-#: indico_citadel/search.py:103
 msgid "The category of an event"
-msgstr ""
+msgstr "La categoría de un evento"
+
+#: indico_citadel/search.py:109
+msgid "Most relevant"
+msgstr "Más relevante"
+
+#: indico_citadel/search.py:110
+msgid "Newest first"
+msgstr "El más nuevo primero"
 
 #: indico_citadel/search.py:111
-msgid "Most relevant"
-msgstr ""
-
-#: indico_citadel/search.py:112
-msgid "Newest first"
-msgstr ""
-
-#: indico_citadel/search.py:113
 msgid "Oldest first"
-msgstr ""
+msgstr "El más antiguo primero"
+
+#: indico_citadel/search.py:115
+msgid "Affiliation"
+msgstr "Afiliación"
+
+#: indico_citadel/search.py:116
+msgid "Person"
+msgstr "Persona"
 
 #: indico_citadel/search.py:117
-msgid "Affiliation"
-msgstr ""
+msgid "Type"
+msgstr "Tipo"
 
 #: indico_citadel/search.py:118
-msgid "Person"
-msgstr ""
+msgid "Location"
+msgstr "Lugar"
 
 #: indico_citadel/search.py:119
-msgid "Type"
-msgstr ""
+msgid "Date"
+msgstr "Fecha"
 
 #: indico_citadel/search.py:120
-msgid "Location"
-msgstr ""
+msgid "Category"
+msgstr "Categoría"
 
 #: indico_citadel/search.py:121
-msgid "Date"
-msgstr ""
+msgid "Category ID"
+msgstr "ID de la categoría"
 
 #: indico_citadel/search.py:122
-msgid "Category"
-msgstr ""
-
-#: indico_citadel/search.py:123
-msgid "Category ID"
-msgstr ""
-
-#: indico_citadel/search.py:124
 msgid "Event ID"
-msgstr ""
+msgstr "ID del evento"

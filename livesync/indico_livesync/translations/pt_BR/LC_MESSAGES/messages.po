@@ -1,5 +1,5 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # 
 # Translators:
@@ -10,16 +10,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
-"PO-Revision-Date: 2021-07-02 13:05+0000\n"
-"Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/indico/indico/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: pt_BR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: indico_livesync/controllers.py:41
 msgid "Agent deleted"
@@ -54,11 +54,11 @@ msgstr "Nome"
 msgid "The name of the agent. Only used in the administration interface."
 msgstr "O nome do agente. Somente usado na administração da interface."
 
-#: indico_livesync/plugin.py:26
+#: indico_livesync/plugin.py:25
 msgid "Queue entry TTL"
 msgstr "Entrada na fila TTL"
 
-#: indico_livesync/plugin.py:27
+#: indico_livesync/plugin.py:26
 msgid ""
 "How many days should processed entries be kept in the queue. The time counts"
 " from the creation of the queue entries, so if the LiveSync task is not "
@@ -66,27 +66,38 @@ msgid ""
 "after processing them. Setting it to 0 disables automatic deletion."
 msgstr "Quantos dias as entradas processadas devem ser mantidas na fila. O tempo conta a partir da criação das entradas da fila, portanto, se a tarefa do LiveSync não estiver em execução por algum tempo, as entradas da fila poderão ser excluídas durante a próxima execução após serem processadas. Definir como 0 desabilita a exclusão automática."
 
-#: indico_livesync/plugin.py:32
+#: indico_livesync/plugin.py:31
 msgid "Excluded categories"
 msgstr "Categorias excluídas"
 
-#: indico_livesync/plugin.py:33
+#: indico_livesync/plugin.py:32
 msgid "Category ID"
 msgstr "ID da Categoria"
 
-#: indico_livesync/plugin.py:34
+#: indico_livesync/plugin.py:33
 msgid ""
 "Changes to objects inside these categories or any of their subcategories are"
 " excluded."
 msgstr "Alterações a objetos dentro dessas categorias ou qualquer uma de suas subcategorias são excluídas."
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py:35
 msgid "Disable queue runs"
 msgstr "Desativar execuções de fila"
 
-#: indico_livesync/plugin.py:37
+#: indico_livesync/plugin.py:36
 msgid "Disable all scheduled queue runs."
 msgstr "Desativar todas as execuções de fila programadas."
+
+#: indico_livesync/plugin.py:37
+msgid "Skip category changes"
+msgstr ""
+
+#: indico_livesync/plugin.py:38
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:9
 msgid "Cancel"

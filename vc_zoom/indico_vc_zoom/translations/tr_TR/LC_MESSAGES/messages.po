@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
 # İNFOYED TERCÜME <infoyed@gmail.com>, 2021
@@ -12,22 +12,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/indico/teams/6478/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: indico_vc_zoom/controllers.py:28
+#: indico_vc_zoom/controllers.py:29
 msgid "You were already an (alternative) host of this meeting"
 msgstr "Bu toplantı için zaten (alternatif) host olarak atanmışsınız."
 
-#: indico_vc_zoom/controllers.py:43
+#: indico_vc_zoom/controllers.py:44
 msgid "You are now an alternative host of room '{room}'"
 msgstr "Şimdi odanın '{room}' alternatif bir konağısınız"
 
@@ -220,9 +220,9 @@ msgid ""
 "accounts having an email address with the format username@enterprise-domain."
 msgstr ""
 "Kullanıcı adlarının alındığı kimlik sağlayıcılardır. Indico, kullanıcının "
-"e-posta adreslerini kullanarak bu sağlayıcıları sorgular ve kullanıcıadı"
-"@şirket-alanadı formatına sahip e-posta adreslerinin olduğu Zoom hesaplarını"
-" bulmaya çalışır."
+"e-posta adreslerini kullanarak bu sağlayıcıları sorgular ve "
+"kullanıcıadı@şirket-alanadı formatına sahip e-posta adreslerinin olduğu Zoom"
+" hesaplarını bulmaya çalışır."
 
 #: indico_vc_zoom/plugin.py:78
 msgid "Enterprise domain"
@@ -292,7 +292,7 @@ msgstr "Telefonla toplantıya katılma yönergelerine bağlantı"
 msgid "Invalid identity providers: {}"
 msgstr "Geçersiz kimlik sağlayıcıları: {} "
 
-#: indico_vc_zoom/plugin.py:352
+#: indico_vc_zoom/plugin.py:353
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
@@ -300,45 +300,21 @@ msgstr ""
 "Zoom'da oda oluşturulamadı. Lütfen hatanın devam etmesi halinde iletişime "
 "geçin."
 
-#: indico_vc_zoom/plugin.py:437
+#: indico_vc_zoom/plugin.py:438
 msgid "Room didn't exist in Zoom anymore"
 msgstr "Oda artık  Zoom'da mevcut değil"
 
-#: indico_vc_zoom/plugin.py:440
+#: indico_vc_zoom/plugin.py:441
 msgid "Zoom Error: \"{}\""
 msgstr "Zoom Hatası: \"{}\""
 
-#: indico_vc_zoom/plugin.py:443
+#: indico_vc_zoom/plugin.py:444
 msgid "Problem deleting room"
 msgstr "Oda silme sorunu"
 
-#: indico_vc_zoom/plugin.py:467
+#: indico_vc_zoom/plugin.py:468
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr "\"{}\" odası artık Zoom'da mevcut değildir ve etkinlikten kaldırılmıştır"
-
-#: indico_vc_zoom/plugin.py:535
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this event "
-"which were not automatically updated."
-msgstr ""
-"Otomatik olarak güncellenmemiş bu etkinlikle ilişkilendirilmiş bir veya daha"
-" fazla planlanmış Zoom toplantısı var."
-
-#: indico_vc_zoom/plugin.py:538
-msgid ""
-"There are one or more scheduled Zoom meetings associated with the "
-"contribution \"{}\" which  were not automatically updated."
-msgstr ""
-"Otomatik olarak güncellenmemiş \"{}\" katkısıyla ilişkilendirilmiş bir veya "
-"daha fazla planlanmış Zoom toplantısı var."
-
-#: indico_vc_zoom/plugin.py:541
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this session "
-"block which were not automatically updated."
-msgstr ""
-"Otomatik olarak güncellenmemiş bu seans öbeğiyle ilişkilendirilmiş bir veya "
-"daha fazla planlanmış Zoom toplantısı var."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
@@ -352,11 +328,11 @@ msgstr "E-posta alan adları"
 msgid "Authenticators"
 msgstr "Kimlik denetleyiciler"
 
-#: indico_vc_zoom/util.py:125
+#: indico_vc_zoom/util.py:126
 msgid "This room has been deleted from Zoom"
 msgstr "Oda Zoom'dan silinmiştir"
 
-#: indico_vc_zoom/util.py:129
+#: indico_vc_zoom/util.py:130
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
@@ -364,17 +340,17 @@ msgstr ""
 "Sorun Zoom'dan kaynaklanmaktadır. Lütfen hatanın devam etmesi halinde "
 "iletişime geçiniz."
 
-#: indico_vc_zoom/util.py:151
+#: indico_vc_zoom/util.py:152
 msgid "Room no longer exists in Zoom"
 msgstr "Oda artık  Zoom'da mevcut değil"
 
-#: indico_vc_zoom/util.py:153
+#: indico_vc_zoom/util.py:154
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
 "Toplantı güncellenmiyor. Lütfen hatanın devam etmesi halinde iletişime "
 "geçiniz."
 
-#: indico_vc_zoom/util.py:209
+#: indico_vc_zoom/util.py:210
 msgid "Could not find Zoom user for alternative host"
 msgstr "Alternatif konak için Zoom kullanıcısı bulunamadı"
 

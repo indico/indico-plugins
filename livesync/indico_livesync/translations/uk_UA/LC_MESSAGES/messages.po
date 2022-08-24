@@ -1,5 +1,5 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # 
 # Translators:
@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
-"PO-Revision-Date: 2021-06-30 08:21+0000\n"
-"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
@@ -54,11 +54,11 @@ msgstr "Назва"
 msgid "The name of the agent. Only used in the administration interface."
 msgstr "Назва агента. Використовується лише в інтерфейсі адміністратора."
 
-#: indico_livesync/plugin.py:26
+#: indico_livesync/plugin.py:25
 msgid "Queue entry TTL"
 msgstr "TTL запис черги"
 
-#: indico_livesync/plugin.py:27
+#: indico_livesync/plugin.py:26
 msgid ""
 "How many days should processed entries be kept in the queue. The time counts"
 " from the creation of the queue entries, so if the LiveSync task is not "
@@ -66,27 +66,38 @@ msgid ""
 "after processing them. Setting it to 0 disables automatic deletion."
 msgstr "Як багато днів мають залишатися записи для обробки в черзі. Час враховується від створення записів черги, тому якщо задача LiveSync не працює деякий час, записи черги можуть бути вилучені під час наступної обробки. Встановлення у 0 вимикає автоматичне вилучення."
 
-#: indico_livesync/plugin.py:32
+#: indico_livesync/plugin.py:31
 msgid "Excluded categories"
 msgstr "Виключені категорії"
 
-#: indico_livesync/plugin.py:33
+#: indico_livesync/plugin.py:32
 msgid "Category ID"
 msgstr "Номер категорії"
 
-#: indico_livesync/plugin.py:34
+#: indico_livesync/plugin.py:33
 msgid ""
 "Changes to objects inside these categories or any of their subcategories are"
 " excluded."
 msgstr "Зміни об'єктів всередині цих категорії чи їхніх підкатегорій не допускаються."
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py:35
 msgid "Disable queue runs"
 msgstr "Вимкнути запуски черг"
 
-#: indico_livesync/plugin.py:37
+#: indico_livesync/plugin.py:36
 msgid "Disable all scheduled queue runs."
 msgstr "Вимкнути всі запуски в  черзі"
+
+#: indico_livesync/plugin.py:37
+msgid "Skip category changes"
+msgstr ""
+
+#: indico_livesync/plugin.py:38
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr ""
 
 #: indico_livesync/templates/edit_agent.html:9
 msgid "Cancel"
