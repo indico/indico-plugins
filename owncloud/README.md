@@ -22,6 +22,11 @@ it.
 
 ## Changelog
 
+## 3.2.1
+
+- Disable the confirmation button in the 'add files' dialog if the File-picker
+  is working or selection is empty
+
 ### 3.2
 
 - Initial release for Indico 3.2

@@ -34,7 +34,7 @@ class AttachmentOwncloudFormMixin:
 
     def validate_owncloud_filepicker(self, field):
         if self.owncloud_filepicker.data and self.owncloud_filepicker.data['files'] == ['']:
-            raise ValidationError("Select files to add and click 'Select resources'")
+            raise ValidationError('Select some files')
 
 
 class AddAttachmentOwncloudForm(AttachmentOwncloudFormMixin, AttachmentFormBase):

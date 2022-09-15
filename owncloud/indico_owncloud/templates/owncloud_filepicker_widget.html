@@ -12,6 +12,7 @@
 
 {% block javascript %}
     <script>
+        document.querySelector('#attachment-owncloudfilepicker-form input[type=submit]').disabled = true;
         setupOwncloudFilePickerWidget({
             filepickerUrl: {{ field.filepicker_url | tojson }},
             fieldId: {{ field.id | tojson }},

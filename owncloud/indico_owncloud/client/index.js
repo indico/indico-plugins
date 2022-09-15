@@ -9,6 +9,10 @@
 window.setupOwncloudFilePickerWidget = ({filepickerUrl, fieldId}) => {
   window.addEventListener('message', message => {
     const iframe = document.querySelector('#owncloud_filepicker-file-picker');
+    const submitButton = document.querySelector(
+      '#attachment-owncloudfilepicker-form input[type=submit]'
+    );
+
     if (
       iframe &&
       message.origin === filepickerUrl &&
@@ -17,6 +21,7 @@ window.setupOwncloudFilePickerWidget = ({filepickerUrl, fieldId}) => {
       message.data.files
     ) {
       document.getElementById(`${fieldId}-files`).value = message.data.files.join('\n');
+      submitButton.disabled = !message.data.ready || !message.data.files.length;
     }
   });
 };
