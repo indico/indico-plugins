@@ -46,7 +46,7 @@ In general, the following steps can be your guide for setting a local developmen
     $ pyenv activate indico-plugin-stripe-dev
 
     # From within the root directory and with an active virtualenv, install the dependencies and package itself
-    $ pip install -e .[dev]
+    $ pip3 install -e . # To install dev dependencies run `pip3 install -r requirements-dev.txt`
 
     # Check that everything works by running the tests
     $ tox -i https://pypi.org/simple
