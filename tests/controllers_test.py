@@ -8,6 +8,7 @@
 import pytest
 from flask import request
 from mock import MagicMock
+from types import SimpleNamespace
 
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico_payment_stripe.controllers import RHStripe
@@ -62,10 +63,10 @@ def test_handler_process(
 
     rt = mocker.patch('indico_payment_stripe.controllers.register_transaction')
     stripe = mocker.patch('indico_payment_stripe.controllers.stripe')
-    stripe_charge = stripe.Charge.create
-    # This is a pared down return value of the API call, where we only define
-    # the attributes actually used afterwards.
-    stripe.Charge.create.return_value = {
+    stripe_payment_intent = stripe.PaymentIntent.retrieve
+
+    stripe_charge = {
+        'id': 1,
         'status': 'succeeded',
         'amount': stripe_amount,
         'currency': curr,
@@ -74,6 +75,15 @@ def test_handler_process(
         },
         'receipt_url': 'https://foo.com'
     }
+
+    payment_intent_object = {
+        'charges': SimpleNamespace(**{
+            'data': [stripe_charge]
+        })
+    }
+
+    stripe.PaymentIntent.retrieve.return_value = SimpleNamespace(
+        **payment_intent_object)
 
     rh = RHStripe()
     rh.event = MagicMock(id=1)
@@ -84,7 +94,16 @@ def test_handler_process(
     rh.registration.locator.registrant = {
         'confId': rh.event.id,
         'reg_form_id': rh.registration.registration_form_id,
+        'event_id': dummy_event.id
     }
+
+    payment_intent_id = 'pi_1DsqyX2eZvKYlo2CxTM01D6z'
+    payment_session = {
+        'payment_intent': payment_intent_id
+    }
+
+    rh.session = SimpleNamespace(**payment_session)
+
     # Stripe-specific attributes.
     rh.stripe_token = 'xxx'
     rh.stripe_token_type = 'card'
@@ -95,20 +114,16 @@ def test_handler_process(
         'token': 'c6ea3f2b-062f-4371-8927-21e543be3ead',
     }
     request.form = {
-        'stripeToken': rh.stripe_token,
-        'stripeTokenType': rh.stripe_token_type,
-        'stripeEmail': rh.stripe_email,
+        'charge_id': 1
     }
+
     with StripePaymentPlugin.instance.plugin_context():
         rh._process()
 
-    stripe_charge.assert_called_once_with(
-        api_key=eff_sec_key,
-        amount=stripe_amount,
-        currency=curr.lower(),
-        description='mock_description',
-        source='xxx',
+    stripe_payment_intent.assert_called_once_with(
+        payment_intent_id
     )
+
     rt.assert_called_once_with(
         registration=rh.registration,
         amount=indico_amount,

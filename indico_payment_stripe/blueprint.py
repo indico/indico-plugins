@@ -6,7 +6,7 @@
     The plugin blueprint.
 
 """
-from __future__ import unicode_literals
+
 
 from indico.core.plugins import IndicoPluginBlueprint
 

@@ -6,7 +6,7 @@
     Controllers used by the plugin.
 
 """
-from __future__ import unicode_literals
+
 
 import stripe
 from flask_pluginengine import current_plugin
@@ -22,6 +22,7 @@ from indico.web.rh import RH
 from .utils import _, conv_from_stripe_amount
 
 __all__ = ['RHStripe']
+
 
 class RHStripe(RH):
     """Processes the responses sent by Stripe."""

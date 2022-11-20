@@ -8,7 +8,7 @@
 """
 from indico.web.flask.util import url_for
 
-from wtforms.fields.core import BooleanField, StringField
+from wtforms.fields.simple import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
@@ -24,6 +24,7 @@ from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
 
 import stripe
+
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
@@ -136,6 +137,9 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'description': None,
         'require_postal_code': False,
     }
+
+    def init(self):
+        super().init()
 
     @property
     def logo_url(self):

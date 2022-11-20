@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from setuptools import find_packages, setup
 
 from indico_payment_stripe import __author__, __homepage__, __version__
@@ -39,7 +37,7 @@ setup(
         'Environment :: Plugins',
         'Environment :: Web Environment',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.9'
     ],
     entry_points={
         'indico.plugins': {

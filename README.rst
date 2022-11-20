@@ -7,8 +7,10 @@ indico-plugin-payment-stripe
 
 This plugin was tested and developed using:
 
-* Indico version 2.2.4
-* Stripe API version 2020-02-18.
+* Indico version 3.2.1
+* Stripe API version 2022-11-15. (Stripe Python 5.0.0)
+* PostgresSQL
+* Redis
 
 Other versions of Indico and/or Stripe may or may not function as intended. We recommend that you test your integration
 thoroughly before using this plugin.
@@ -26,8 +28,7 @@ outstanding issues. We welcome any kind of contributions, from bug reports to pu
 Requirements
 ------------
 
-* Python 2.7
-
+* Python 3.12
 
 Development
 -----------
@@ -39,18 +40,24 @@ In general, the following steps can be your guide for setting a local developmen
 
 .. code-block:: bash
 
+    # Install all requirements
+    $ brew install pyenv pyenv-virtualenv postgres redis
+
     # Clone the repository and cd into it
     $ git clone {repo-url}
     $ cd indico-payment-stripe
 
     # Create your virtualenv, using pyenv for example (highly recommended: https://github.com/pyenv/pyenv)
-    $ pyenv virtualenv 2.7.15 indico-plugin-stripe-dev
+    # Besides of pyenv you will need pyenv-virtualenv
+    $ pyenv install 3.9
+    $ pyenv virtualenv 3.9 indico-plugin-stripe-dev
+    $ pyenv activate indico-plugin-stripe-dev
 
     # From within the root directory and with an active virtualenv, install the dependencies and package itself
     $ pip install -e .[dev]
 
     # Check that everything works by running the tests
-    $ tox
+    $ tox -i https://pypi.org/simple
 
 
 License
