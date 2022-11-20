@@ -7,7 +7,7 @@ indico-plugin-payment-stripe
 
 This plugin was tested and developed using:
 
-* Indico version 3.2.1
+* Indico version 3.2.0
 * Stripe API version 2022-11-15. (Stripe Python 5.0.0)
 * PostgresSQL
 * Redis
@@ -17,18 +17,10 @@ thoroughly before using this plugin.
 
 See the `Stripe testing documentation <https://stripe.com/docs/testing>`_ for a testing guide.
 
-
-Issues
-------
-
-Check out our `issue tracker <https://github.com/neicnordic/indico-plugin-stripe/issues>`_ for a complete list of
-outstanding issues. We welcome any kind of contributions, from bug reports to pull requests.
-
-
 Requirements
 ------------
 
-* Python 3.12
+* Python 3.9
 
 Development
 -----------
