@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.2.1
+
+- Do not break Zoom meetings that require registration when cloning or attaching to another event
+
 ### 3.2
 
 - Adapt to Indico 3.2 changes

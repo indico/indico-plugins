@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import after_this_request, flash, has_request_context, request, session
+from flask import after_this_request, flash, g, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
@@ -227,6 +227,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             try:
                 # this is not a new room
                 if association_is_new:
+                    self.refresh_room(vc_room, event)
+                    if vc_room.data.get('registration_required'):
+                        raise UserValueError(
+                            _('The room "{}" is using Zoom registration and thus cannot be attached to another event')
+                            .format(vc_room.name)
+                        )
                     # this means we are updating an existing meeting with a new vc_room-event association
                     update_zoom_meeting(vc_room.data['zoom_id'], {
                         'start_time': None,
@@ -356,7 +362,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'zoom_id': str(meeting_obj['id']),
             'start_url': meeting_obj['start_url'],
             'host': host.identifier,
-            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', ''))
+            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', '')),
+            'registration_required': meeting_obj['settings'].get('approval_type') != 2,
         })
         vc_room.data.update(get_url_data_args(meeting_obj['join_url']))
         flag_modified(vc_room, 'data')
@@ -417,7 +424,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_audio': zoom_meeting['settings'].get('mute_upon_entry'),
             'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
             'waiting_room': zoom_meeting['settings'].get('waiting_room'),
-            'alternative_hosts': process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts'))
+            'alternative_hosts': process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts')),
+            'registration_required': zoom_meeting['settings'].get('approval_type') != 2,
         })
         vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
         flag_modified(vc_room, 'data')
@@ -448,28 +456,42 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
         has_only_one_association = len({assoc.event_id for assoc in vc_room.events}) == 1
 
-        if has_only_one_association:
+        refreshed = g.setdefault('zoom_refreshed_rooms', set())
+        deleted = False
+        if vc_room not in refreshed:
+            refreshed.add(vc_room)
             try:
-                update_zoom_meeting(vc_room.data['zoom_id'], {
-                    'start_time': None,
-                    'duration': None,
-                    'type': (
-                        ZoomMeetingType.recurring_webinar_no_time
-                        if is_webinar
-                        else ZoomMeetingType.recurring_meeting_no_time
-                    )
-                })
+                self.refresh_room(vc_room, old_event_vc_room.event)
             except VCRoomNotFoundError:
-                # this check is needed in order to avoid multiple flashes
-                if vc_room.status != VCRoomStatus.deleted:
-                    # mark room as deleted
-                    vc_room.status = VCRoomStatus.deleted
-                    flash(
-                        _('The room "{}" no longer exists in Zoom and was removed from the event').format(vc_room.name),
-                        'warning'
-                    )
-                # no need to create an association to a room marked as deleted
-                return None
+                deleted = True
+
+        if deleted or vc_room.status == VCRoomStatus.deleted:
+            # this check is needed in order to avoid multiple flashes
+            if vc_room.status != VCRoomStatus.deleted:
+                # mark room as deleted
+                vc_room.status = VCRoomStatus.deleted
+                flash(
+                    _('The room "{}" no longer exists in Zoom and was removed from the event').format(vc_room.name),
+                    'warning'
+                )
+            return None
+
+        if vc_room.data.get('registration_required'):
+            flash(_('The room "{}" is using Zoom registration and thus cannot be attached to the new event')
+                  .format(vc_room.name), 'warning')
+            return None
+
+        if has_only_one_association:
+            update_zoom_meeting(vc_room.data['zoom_id'], {
+                'start_time': None,
+                'duration': None,
+                'type': (
+                    ZoomMeetingType.recurring_webinar_no_time
+                    if is_webinar
+                    else ZoomMeetingType.recurring_meeting_no_time
+                )
+            })
+
         # return the new association
         return super().clone_room(old_event_vc_room, link_object)
 
