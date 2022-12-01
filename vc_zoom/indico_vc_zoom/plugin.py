@@ -42,7 +42,7 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
-        (_('API Credentials'), ['api_key', 'api_secret', 'webhook_token']),
+        (_('API Credentials'), ['api_key', 'api_secret', 'account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
                              'allow_webinars', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
@@ -51,9 +51,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         (_('Access'), ['managers', 'acl'])
     ]
 
-    api_key = StringField(_('API Key'), [DataRequired()])
-
-    api_secret = IndicoPasswordField(_('API Secret'), [DataRequired()], toggle=True)
+    api_key = StringField(_('API Key (Legacy JWT)'), [])
+    api_secret = IndicoPasswordField(_('API Secret (Legacy JWT)'), [], toggle=True)
+    account_id = StringField(_('Account ID (Server OAuth)'), [])
+    client_id = StringField(_('Client ID (Server OAuth)'), [])
+    client_secret = IndicoPasswordField(_('Client Secret (Server OAuth)'), [], toggle=True)
 
     webhook_token = IndicoPasswordField(_('Webhook Token'), toggle=True,
                                         description=_("Specify Zoom's webhook token if you want live updates"))
@@ -135,6 +137,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     default_settings = VCPluginMixin.default_settings | {
         'api_key': '',
         'api_secret': '',
+        'account_id': '',
+        'client_id': '',
+        'client_secret': '',
         'webhook_token': '',
         'user_lookup_mode': UserLookupMode.email_domains,
         'email_domains': [],

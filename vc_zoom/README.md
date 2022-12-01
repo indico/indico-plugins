@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.2.3
+
+- Support Zoom's Server-to-Server OAuth in addition to the (deprecated) JWT
+
 ### 3.2.2
 
 - Correctly show current "Mute video (host)" status when editing zoom meeting
@@ -118,9 +122,25 @@ These are the most relevant configuration options:
  * **Webhook token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
 
 
-### Zoom API key/secret (JWT)
+### Zoom Server-to-Server OAuth
+
+See the [zoom documentation](https://marketplace.zoom.us/docs/guides/build/server-to-server-oauth-app/#create-a-server-to-server-oauth-app) on how to get the credentials for authenticating with the Zoom servers.
+
+The scopes to select when creating the app are:
+
+- `meeting:read:admin`
+- `meeting:write:admin`
+- `user:read:admin`
+- `webinar:read:admin` (optional, only needed when using webinars)
+- `webinar:write:admin` (optional, only needed when using webinars)
+
+
+### Zoom API key/secret (JWT, deprecated)
 
 To obtain API key and API secret, please visit [https://marketplace.zoom.us/docs/guides/auth/jwt](https://marketplace.zoom.us/docs/guides/auth/jwt).
+
+Do not use this; Zoom will remove it in June 2023: https://marketplace.zoom.us/docs/guides/auth/jwt/
+Once it's no longer supported by Zoom, it will also be removed from this plugin.
 
 
 ## Intellectual Property

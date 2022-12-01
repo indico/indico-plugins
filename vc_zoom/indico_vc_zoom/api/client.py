@@ -8,9 +8,16 @@
 import time
 
 import jwt
+import requests
 from pytz import utc
 from requests import Session
 from requests.exceptions import HTTPError
+
+from indico.core.cache import make_scoped_cache
+from indico.util.string import crc32
+
+
+token_cache = make_scoped_cache('zoom-api-token')
 
 
 def format_iso_dt(d):
@@ -39,6 +46,8 @@ class APIException(Exception):
 
 
 class BaseComponent:
+    OAUTH_URI = 'https://zoom.us/oauth/token'
+
     def __init__(self, base_uri, config, timeout):
         self.base_uri = base_uri
         self.config = config
@@ -46,9 +55,37 @@ class BaseComponent:
 
     @property
     def token(self):
-        header = {'alg': 'HS256', 'typ': 'JWT'}
-        payload = {'iss': self.config['api_key'], 'exp': int(time.time() + 3600)}
-        return jwt.encode(payload, self.config['api_secret'], algorithm='HS256', headers=header)
+        from indico_vc_zoom.plugin import ZoomPlugin
+        account_id = self.config['account_id']
+        client_id = self.config['client_id']
+        client_secret = self.config['client_secret']
+        if account_id and client_id and client_secret:
+            ZoomPlugin.logger.debug('Using Server-to-Server-OAuth')
+            hash_key = '-'.join((account_id, client_id, client_secret))
+            cache_key = f'token-{crc32(hash_key)}'
+            if token := token_cache.get(cache_key):
+                ZoomPlugin.logger.debug('Using token from cache (%s)', cache_key)
+                return token
+            try:
+                resp = requests.post(self.OAUTH_URI,
+                                     params={'grant_type': 'account_credentials', 'account_id': account_id},
+                                     auth=(client_id, client_secret))
+                resp.raise_for_status()
+            except HTTPError as exc:
+                ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
+                raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
+            token_data = resp.json()
+            ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
+                                    token_data['scope'])
+            token_cache.set(cache_key, token_data['access_token'], int(token_data['expires_in'] * 0.8))
+            return token_data['access_token']
+        elif self.config['api_key'] and self.config['api_secret']:
+            ZoomPlugin.logger.warning('Using JWT (deprecated)')
+            header = {'alg': 'HS256', 'typ': 'JWT'}
+            payload = {'iss': self.config['api_key'], 'exp': int(time.time() + 3600)}
+            return jwt.encode(payload, self.config['api_secret'], algorithm='HS256', headers=header)
+        else:
+            raise Exception('Zoom authentication not configured')
 
     @property
     def session(self):
@@ -151,17 +188,23 @@ class ZoomClient:
         'webinar': WebinarComponent
     }
 
-    def __init__(self, api_key, api_secret, timeout=15):
+    def __init__(self, api_key, api_secret, account_id, client_id, client_secret, timeout=15):
         """Create a new Zoom client.
 
         :param api_key: the Zoom JWT API key
         :param api_secret: the Zoom JWT API Secret
+        :param account_id: the Zoom Server OAuth Account ID
+        :param client_id: the Zoom Server OAuth Client ID
+        :param client_secret: the Zoom Server OAuth Client Secret
         :param timeout: the time out to use for API requests
         """
         # Setup the config details
         config = {
             'api_key': api_key,
-            'api_secret': api_secret
+            'api_secret': api_secret,
+            'account_id': account_id,
+            'client_id': client_id,
+            'client_secret': client_secret,
         }
 
         # Instantiate the components
@@ -191,7 +234,10 @@ class ZoomIndicoClient:
         from indico_vc_zoom.plugin import ZoomPlugin
         self.client = ZoomClient(
             ZoomPlugin.settings.get('api_key'),
-            ZoomPlugin.settings.get('api_secret')
+            ZoomPlugin.settings.get('api_secret'),
+            ZoomPlugin.settings.get('account_id'),
+            ZoomPlugin.settings.get('client_id'),
+            ZoomPlugin.settings.get('client_secret'),
         )
 
     def create_meeting(self, user_id, **kwargs):
