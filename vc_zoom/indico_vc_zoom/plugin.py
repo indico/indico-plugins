@@ -418,7 +418,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'description': zoom_meeting.get('agenda', ''),
             'zoom_id': zoom_meeting['id'],
             'password': zoom_meeting['password'],
-            'mute_host_video': zoom_meeting['settings']['host_video'],
+            'mute_host_video': not zoom_meeting['settings']['host_video'],
 
             # these options will be empty for webinars
             'mute_audio': zoom_meeting['settings'].get('mute_upon_entry'),
