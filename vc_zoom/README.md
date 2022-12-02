@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.2.2
+
+- Correctly show current "Mute video (host)" status when editing zoom meeting
+
 ### 3.2.1
 
 - Do not break Zoom meetings that require registration when cloning or attaching to another event
