@@ -17,7 +17,7 @@ blueprint = IndicoPluginBlueprint(
     'payment_stripe',
     __name__,
     url_prefix=(
-        '/event/<confId>/registrations/'
+        '/event/<int:event_id>/registrations/'
         '<int:reg_form_id>/payment/response/stripe'
     )
 )
