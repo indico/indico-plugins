@@ -171,23 +171,33 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
         name = registration.event.title
         description = registration.registration_form.title
+
+        success_base_url = url_for_plugin('payment_stripe.handler',
+            registration.event,
+            registration.registration_form,
+            _external=True)
+
+        failure_url = url_for('payment.event_payment',
+            registration.registration_form,
+            _external=True)
+
         session = stripe.checkout.Session.create(
+            mode='payment',
             payment_method_types=['card'],
             line_items=[{
-                'name': name,
-                'description': description,
-                'amount': price,
-                'currency': registration.currency,
                 'quantity': 1,
+                'price_data': {
+                    'currency': registration.currency,
+                    'unit_amount': price,
+                    'product_data': {
+                        'name': name,
+                        'description': description,
+                    }
+                },
             }],
-            success_url=url_for_plugin('payment_stripe.handler',
-                                       registration.event,
-                                       registration.registration_form,
-                                       _external=True)
-            + '?session_id={CHECKOUT_SESSION_ID}'
-            + '&registration_uuid=' + registration.uuid,
-            cancel_url=url_for('payment.event_payment',
-                               registration.registration_form,
-                               _external=True),
+            success_url=success_base_url
+                + '?session_id={CHECKOUT_SESSION_ID}'
+                + '&registration_uuid=' + registration.uuid,
+            cancel_url=failure_url,
         )
         data['stripe_session_id'] = session.id

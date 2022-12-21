@@ -37,8 +37,8 @@ class RHStripe(RH):
         )
 
     def _process_args(self):
-        registration_uuid = request.args['registration_uuid']
-        self.registration = Registration.find_first(uuid=registration_uuid)
+        uuid = request.args['registration_uuid']
+        self.registration = Registration.query.filter_by(uuid=uuid).first()
         if not self.registration:
             raise BadRequest("Registration UUID not provided in callback")
 
