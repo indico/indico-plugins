@@ -173,13 +173,13 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         description = registration.registration_form.title
 
         success_base_url = url_for_plugin('payment_stripe.handler',
-            registration.event,
-            registration.registration_form,
-            _external=True)
+                                          registration.event,
+                                          registration.registration_form,
+                                          _external=True)
 
         failure_url = url_for('payment.event_payment',
-            registration.registration_form,
-            _external=True)
+                              registration.registration_form,
+                              _external=True)
 
         session = stripe.checkout.Session.create(
             mode='payment',
@@ -196,8 +196,8 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                 },
             }],
             success_url=success_base_url
-                + '?session_id={CHECKOUT_SESSION_ID}'
-                + '&registration_uuid=' + registration.uuid,
+            + '?session_id={CHECKOUT_SESSION_ID}'
+            + '&registration_uuid=' + registration.uuid,
             cancel_url=failure_url,
         )
-        data['stripe_session_id'] = session.id
+        data['stripe_redirect_url'] = session.url

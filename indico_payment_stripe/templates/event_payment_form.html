@@ -2,40 +2,15 @@
 <html>
   <head>
     <title>Payment Form</title>
+    <style>
+      #checkout-button {
+        margin: 0 auto;
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <dl class="i-data-list">
-      <dt>{% trans %}First name{% endtrans %}</dt>
-      <dd>{{ registration.first_name }}</dd>
-      <dt>{% trans %}Last name{% endtrans %}</dt>
-      <dd>{{ registration.last_name }}</dd>
-      <dt>{% trans %}Total amount{% endtrans %}</dt>
-      <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
-      <dt></dt>
-      <button id="checkout-button">Pay</button>
-    </dl>
-    <script>
-      js = document.createElement("script");
-      js.type = "text/javascript";
-      js.src = "https://js.stripe.com/v3";
-      js.onload = event => {
-        var checkoutButton = document.querySelector("#checkout-button");
-        checkoutButton.addEventListener("click", function() {
-          var stripe = Stripe("{{ pub_key }}");
-          console.log(stripe);
-          stripe
-            .redirectToCheckout({
-              sessionId: "{{ stripe_session_id }}"
-            })
-            .then(function(result) {
-              // If `redirectToCheckout` fails due to a browser or network
-              // error, display the localized error message to your customer
-              // using `result.error.message`.
-            });
-        });
-      };
-      let s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(js, s);
-    </script>
+    <h4>Clicking on the <strong>Pay now</strong> button you will get redirected to Stripe in order to complete your transaction.</h4>
+    <a id="checkout-button" href="{{ stripe_redirect_url }}" class="action-button next highlight">Pay now</a>
   </body>
 </html>
