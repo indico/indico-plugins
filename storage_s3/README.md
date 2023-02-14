@@ -22,7 +22,7 @@ to local storage (but it would of course be possible to write a script for this)
 ### 3.1.1
 
 - No technical changes, just adding the missing README to PyPI and updating the nginx
-  config snippet to correclty work with the changes from 3.1 (avoiding an [nginx bug][nginx-bug])
+  config snippet to correctly work with the changes from 3.1 (avoiding an [nginx bug][nginx-bug])
 
 ### 3.1
 
