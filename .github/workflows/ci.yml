@@ -18,7 +18,7 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get upstream branch name
         run: |
@@ -39,7 +39,7 @@ jobs:
           echo "INDICO_BRANCH=${upstream_branch}" >> "$GITHUB_ENV"
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
@@ -59,23 +59,23 @@ jobs:
 
       - name: Get pip cache dir
         id: pip-cache
-        run: echo "::set-output name=dir::$(pip cache dir)"
+        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache pip
         id: cache-pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: pip|${{ runner.os }}|3.9|${{ hashFiles('**/setup.cfg') }}
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: cache-npm
         with:
           path: node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: '14.x'
@@ -93,7 +93,7 @@ jobs:
         run: tar cf /tmp/env.tar .venv node_modules
 
       - name: Upload environment
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: environment
           retention-days: 1
@@ -108,7 +108,7 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get upstream branch name
         run: |
@@ -129,17 +129,17 @@ jobs:
           echo "INDICO_BRANCH=${upstream_branch}" >> "$GITHUB_ENV"
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '14.x'
 
       - name: Download environment
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: environment
           path: /tmp
@@ -197,20 +197,20 @@ jobs:
           - plugin: vc_zoom
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '14.x'
 
       - name: Download environment
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: environment
           path: /tmp
