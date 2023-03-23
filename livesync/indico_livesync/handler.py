@@ -19,6 +19,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -39,14 +40,18 @@ def connect_signals(plugin):
     plugin.connect(signals.event.restored, _restored)
     plugin.connect(signals.event.contribution_created, _created)
     plugin.connect(signals.event.subcontribution_created, _created)
+    plugin.connect(signals.event.registration_created, _created)
     # deleted
     plugin.connect(signals.event.deleted, _deleted)
     plugin.connect(signals.event.contribution_deleted, _deleted)
     plugin.connect(signals.event.subcontribution_deleted, _deleted)
+    plugin.connect(signals.event.registration_deleted, _deleted)
     # updated
     plugin.connect(signals.event.updated, _updated)
     plugin.connect(signals.event.contribution_updated, _updated)
     plugin.connect(signals.event.subcontribution_updated, _updated)
+    plugin.connect(signals.event.registration_updated, _updated)
+    plugin.connect(signals.event.registration_form_edited, _updated)
     # event times
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Event)
     plugin.connect(signals.event.times_changed, _event_times_changed, sender=Contribution)
@@ -113,7 +118,7 @@ def _moved(obj, old_parent, **kwargs):
 
 
 def _created(obj, **kwargs):
-    if not isinstance(obj, (Event, EventNote, Attachment, Contribution, SubContribution)):
+    if not isinstance(obj, (Event, EventNote, Attachment, Contribution, SubContribution, Registration)):
         raise TypeError(f'Unexpected object: {type(obj).__name__}')
     _register_change(obj, ChangeType.created)
 

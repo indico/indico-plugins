@@ -13,6 +13,8 @@ from indico.modules.attachments import Attachment, AttachmentFolder
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.users.models.users import User
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.principals import EventPrincipal
@@ -61,6 +63,26 @@ def query_events(ids=None):
             joinedload(Event.own_room).options(raiseload('*'), joinedload('location')),
         )
         .order_by(Event.id)
+    )
+
+def query_registrations(ids=None):
+    event_strategy = contains_eager(Registration.event)
+    apply_acl_entry_strategy(event_strategy.selectinload(Event.acl_entries), EventPrincipal)
+
+    if ids is None:
+        export_filter = ~Registration.is_deleted & ~Event.is_deleted & _get_excluded_category_filter()
+    else:
+        export_filter = Registration.id.in_(ids)
+
+    return (
+        Registration.query
+        .join(Event)
+        .join(User)
+        .filter(export_filter)
+        .options(
+            event_strategy,
+        )
+        .order_by(Registration.id)
     )
 
 

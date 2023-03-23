@@ -38,6 +38,7 @@ class EntryType(int, IndicoEnum):
     session = 5
     note = 6
     attachment = 7
+    registration = 8
 
 
 _column_for_types = {
@@ -48,6 +49,7 @@ _column_for_types = {
     EntryType.session: 'session_id',
     EntryType.note: 'note_id',
     EntryType.attachment: 'attachment_id',
+    EntryType.registration: 'registration_id',
 }
 
 
@@ -127,6 +129,14 @@ class LiveSyncQueueEntry(db.Model):
         'contribution_id',
         db.Integer,
         db.ForeignKey('events.contributions.id'),
+        index=True,
+        nullable=True
+    )
+
+    #: ID of the changed registration
+    registration_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.registrations.id'),
         index=True,
         nullable=True
     )
@@ -213,6 +223,16 @@ class LiveSyncQueueEntry(db.Model):
         )
     )
 
+    registration = db.relationship(
+        'Registration',
+        lazy=True,
+        backref=db.backref(
+            'livesync_queue_entries',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
     subcontribution = db.relationship(
         'SubContribution',
         lazy=False,
@@ -260,6 +280,8 @@ class LiveSyncQueueEntry(db.Model):
             return self.note
         elif self.type == EntryType.attachment:
             return self.attachment
+        elif self.type == EntryType.registration:
+            return self.registration
 
     def __repr__(self):
         return format_repr(self, 'id', 'agent_id', 'change', 'type',
