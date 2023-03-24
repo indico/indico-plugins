@@ -5,9 +5,7 @@ Revises: ff1323696f67
 Create Date: 2023-03-06 15:20:02.568517
 """
 
-import sqlalchemy as sa
 from alembic import op
-
 
 
 # revision identifiers, used by Alembic.
@@ -15,7 +13,6 @@ revision = '86fd11a6cab4'
 down_revision = 'ff1323696f67'
 branch_labels = None
 depends_on = None
-
 
 
 def upgrade():
@@ -69,7 +66,7 @@ def downgrade():
         alter table plugin_livesync.queues drop constraint ck_queues_valid_enum_type;
         alter table plugin_livesync.queues add constraint ck_queues_valid_enum_type CHECK (type = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7]));
 
-        
+
         alter table plugin_livesync.queues drop constraint ck_queues_valid_attachment_entry;
         alter table plugin_livesync.queues add  constraint ck_queues_valid_attachment_entry CHECK (type <> 7 OR category_id IS NULL AND contribution_id IS NULL AND event_id IS NULL AND note_id IS NULL AND session_id IS NULL AND subcontribution_id IS NULL AND attachment_id IS NOT NULL);
 

@@ -15,14 +15,14 @@ from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
-from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
 from indico_livesync.forms import AgentForm
 from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
-                                     query_registrations, query_notes, query_subcontributions)
+                                     query_notes, query_registrations, query_subcontributions)
 from indico_livesync.models.queue import EntryType, LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 

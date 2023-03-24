@@ -13,15 +13,15 @@ from indico.modules.attachments import Attachment, AttachmentFolder
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.users.models.users import User
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.notes.models.notes import EventNote, EventNoteRevision
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.principals import SessionPrincipal
+from indico.modules.users.models.users import User
 
 from indico_livesync.util import get_excluded_categories
 
@@ -64,6 +64,7 @@ def query_events(ids=None):
         )
         .order_by(Event.id)
     )
+
 
 def query_registrations(ids=None):
     event_strategy = contains_eager(Registration.event)

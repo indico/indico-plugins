@@ -15,8 +15,8 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc

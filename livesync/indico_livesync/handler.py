@@ -19,8 +19,8 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.timetable.models.entries import TimetableEntryType
