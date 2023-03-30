@@ -26,9 +26,27 @@ ignore =
     E731
     # while single quotes are nicer, we have double quotes in way too many places
     Q000
+    # not all our exceptions are errors
+    N818
 
 per-file-ignores =
     # allow nicely aligned parametrizations
     **/*_test.py:E241
     # allow long lines in migrations (only do that for raw SQL please)
     **/migrations/*.py:E501
+    # piwik plugin uses too much camelcase
+    piwik/indico_piwik/queries/graphs.py:N803
+
+classmethod_decorators =
+    classmethod
+    declared_attr
+    strict_classproperty
+    expression
+    comparator
+
+ignore_names =
+    _process_GET
+    _process_POST
+    _process_PATCH
+    _process_PUT
+    _process_DELETE
