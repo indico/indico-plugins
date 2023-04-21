@@ -5,18 +5,26 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from datetime import timedelta
+
 from wtforms.fields import IntegerField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
+from indico.core.settings.converters import TimedeltaConverter
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import TimeDeltaField
 
 from indico_prometheus import _
 from indico_prometheus.blueprint import blueprint
 
 
 class PluginSettingsForm(IndicoForm):
-    cache_ttl = IntegerField(_('Cache TTL (s)'), [DataRequired()], description=_('TTL for cache (seconds)'))
+    cache_ttl = TimeDeltaField(
+        _('Cache TTL'),
+        [DataRequired()], description=_('TTL for cache'),
+        units=('seconds', 'minutes', 'hours')
+    )
     token = StringField(
         _('Bearer Token'),
         [Optional()],
@@ -39,9 +47,12 @@ class PrometheusPlugin(IndicoPlugin):
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {
-        'cache_ttl': 120,
+        'cache_ttl': timedelta(minutes=5),
         'token': '',
         'active_user_hours': 48
+    }
+    settings_converters = {
+       'cache_ttl': TimedeltaConverter
     }
 
     def get_blueprints(self):

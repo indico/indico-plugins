@@ -93,7 +93,7 @@ def update_metrics(active_user_hours):
         .count()
     )
 
-    attachment_subq = db.aliased(Attachment, get_attachment_query().subquery("attachment"))
+    attachment_subq = db.aliased(Attachment, get_attachment_query().subquery('attachment'))
     size_active_attachment_files.set(
         db.session.query(db.func.sum(AttachmentFile.size))
         .filter(AttachmentFile.id == attachment_subq.file_id)
@@ -144,6 +144,6 @@ def update_metrics(active_user_hours):
             ReservationOccurrence.start_dt < now,
             ReservationOccurrence.end_dt > now
         ).join(Reservation)
-         .join(Room)
-         .count()
+        .join(Room)
+        .count()
     )
