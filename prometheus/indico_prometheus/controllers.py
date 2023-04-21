@@ -30,8 +30,8 @@ class RHMetrics(RH):
                 raise Unauthorized
 
     def _process(self):
-        accept_header = request.headers['Accept']
-        accept_encoding_header = request.headers['Accept-Encoding']
+        accept_header = request.headers.get('Accept')
+        accept_encoding_header = request.headers.get('Accept-Encoding')
         metrics = cache.get('metrics')
 
         cached = False
@@ -48,7 +48,7 @@ class RHMetrics(RH):
         resp = make_response(output)
         resp.status = status
 
-        resp.headers['X-Cached'] = 'Yes' if cached else 'No'
+        resp.headers['X-Cached'] = 'yes' if cached else 'no'
         for key, val in headers:
             resp.headers[key] = val
 

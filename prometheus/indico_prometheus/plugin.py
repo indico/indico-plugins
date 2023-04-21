@@ -52,7 +52,7 @@ class PrometheusPlugin(IndicoPlugin):
         'active_user_hours': 48
     }
     settings_converters = {
-       'cache_ttl': TimedeltaConverter
+        'cache_ttl': TimedeltaConverter
     }
 
     def get_blueprints(self):

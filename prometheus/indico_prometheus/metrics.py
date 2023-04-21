@@ -94,16 +94,17 @@ def update_metrics(active_user_hours):
     )
 
     attachment_subq = db.aliased(Attachment, get_attachment_query().subquery('attachment'))
+
     size_active_attachment_files.set(
         db.session.query(db.func.sum(AttachmentFile.size))
         .filter(AttachmentFile.id == attachment_subq.file_id)
-        .scalar()
+        .scalar() or 0
     )
 
     size_attachment_files.set(
         db.session.query(db.func.sum(AttachmentFile.size))
         .join(Attachment, AttachmentFile.attachment_id == Attachment.id)
-        .scalar()
+        .scalar() or 0
     )
 
     if LIVESYNC_AVAILABLE:
