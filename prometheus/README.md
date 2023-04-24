@@ -17,6 +17,16 @@ scrape_configs:
     authorization:
         credentials: inds_metrics_xxxxxx
     # this is only needed in development setups
-    tls_config:
-      insecure_skip_verify: true
 ```
+
+If you're doing development you may want to add this under `scrape_configs`:
+```yaml
+    tls_config:
+      insecure_skip_verify: false
+```
+
+## Changelog
+
+### 3.2
+
+- Initial release for Indico 3.2

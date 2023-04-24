@@ -10,6 +10,7 @@ from datetime import timedelta
 from prometheus_client import metrics
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile
 from indico.modules.auth.models.identities import Identity
 from indico.modules.categories.models.categories import Category
@@ -58,6 +59,11 @@ num_notes = metrics.Gauge('indico_num_notes', 'Number of notes')
 
 num_active_rooms = metrics.Gauge('indico_num_active_rooms', 'Number of active rooms')
 num_rooms = metrics.Gauge('indico_num_rooms', 'Number of rooms')
+num_restricted_rooms = metrics.Gauge('indico_num_restricted_rooms', 'Number of restricted rooms')
+num_rooms_with_confirmation = metrics.Gauge(
+    'indico_num_rooms_with_confirmation',
+    'Number or rooms requiring manual confirmation'
+)
 
 num_bookings = metrics.Gauge('indico_num_bookings', 'Number of bookings')
 num_valid_bookings = metrics.Gauge('indico_num_valid_bookings', 'Number of valid bookings')
@@ -72,7 +78,7 @@ if LIVESYNC_AVAILABLE:
     size_livesync_queues = metrics.Gauge('indico_size_livesync_queues', 'Items in Livesync queues')
 
 
-def update_metrics(active_user_hours):
+def update_metrics(active_user_age: timedelta):
     """Update all metrics."""
     now = now_utc()
     num_events.set(Event.query.filter(~Event.is_deleted).count())
@@ -80,7 +86,7 @@ def update_metrics(active_user_hours):
     num_users.set(User.query.filter(~User.is_deleted).count())
     num_active_users.set(
         User.query
-        .filter(Identity.last_login_dt > (now - timedelta(hours=active_user_hours)))
+        .filter(Identity.last_login_dt > (now - active_user_age))
         .join(Identity).group_by(User).count()
     )
     num_categories.set(Category.query.filter(~Category.is_deleted).count())
@@ -114,6 +120,10 @@ def update_metrics(active_user_hours):
 
     num_rooms.set(Room.query.filter(~Room.is_deleted).count())
     num_active_rooms.set(Room.query.filter(~Room.is_deleted, Room.is_reservable).count())
+    num_restricted_rooms.set(
+        Room.query.filter(~Room.is_deleted, Room.protection_mode == ProtectionMode.protected).count()
+    )
+    num_rooms_with_confirmation.set(Room.query.filter(~Room.is_deleted, Room.reservations_need_confirmation).count())
 
     num_bookings.set(Reservation.query.filter(~Room.is_deleted).join(Room).count())
     num_valid_bookings.set(Reservation.query.filter(~Room.is_deleted, ~Reservation.is_rejected).join(Room).count())
@@ -129,7 +139,7 @@ def update_metrics(active_user_hours):
     num_valid_occurrences.set(
         ReservationOccurrence
         .query
-        .filter(~Room.is_deleted, ~Reservation.is_rejected, ReservationOccurrence.is_valid)
+        .filter(~Room.is_deleted, Reservation.is_accepted, ReservationOccurrence.is_valid)
         .join(Reservation)
         .join(Room)
         .count()
@@ -140,7 +150,7 @@ def update_metrics(active_user_hours):
         .query
         .filter(
             ~Room.is_deleted,
-            ~Reservation.is_rejected,
+            Reservation.is_accepted,
             ReservationOccurrence.is_valid,
             ReservationOccurrence.start_dt < now,
             ReservationOccurrence.end_dt > now

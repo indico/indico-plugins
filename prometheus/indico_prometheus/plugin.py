@@ -7,7 +7,7 @@
 
 from datetime import timedelta
 
-from wtforms.fields import IntegerField, StringField
+from wtforms.fields import StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
@@ -22,7 +22,8 @@ from indico_prometheus.blueprint import blueprint
 class PluginSettingsForm(IndicoForm):
     cache_ttl = TimeDeltaField(
         _('Cache TTL'),
-        [DataRequired()], description=_('TTL for cache'),
+        [DataRequired()],
+        description=_('TTL for cache'),
         units=('seconds', 'minutes', 'hours')
     )
     token = StringField(
@@ -31,10 +32,11 @@ class PluginSettingsForm(IndicoForm):
         description=_("Authentication bearer token for Prometheus. Please note that it should be "
                       "preceded by 'inds_metrics_'")
     )
-    active_user_hours = IntegerField(
-        _('Max. Active user age (h)'),
+    active_user_age = TimeDeltaField(
+        _('Max. Active user age'),
         [DataRequired()],
-        description=_('Number of hours since login after which a user is not considered active anymore')
+        description=_('Time since login after which a user is not considered active anymore'),
+        units=('minutes', 'hours', 'days')
     )
 
 
@@ -49,10 +51,11 @@ class PrometheusPlugin(IndicoPlugin):
     default_settings = {
         'cache_ttl': timedelta(minutes=5),
         'token': '',
-        'active_user_hours': 48
+        'active_user_age': timedelta(hours=48)
     }
     settings_converters = {
-        'cache_ttl': TimedeltaConverter
+        'cache_ttl': TimedeltaConverter,
+        'active_user_age': TimedeltaConverter
     }
 
     def get_blueprints(self):

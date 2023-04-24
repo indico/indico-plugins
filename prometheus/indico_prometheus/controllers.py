@@ -21,8 +21,6 @@ cache = make_scoped_cache('prometheus_metrics')
 
 
 class RHMetrics(RH):
-    CSRF_ENABLED = False
-
     def _check_access(self):
         token = current_plugin.settings.get('token')
         if token:
@@ -39,7 +37,7 @@ class RHMetrics(RH):
             cached = True
             status, headers, output = metrics
         else:
-            update_metrics(current_plugin.settings.get('active_user_hours'))
+            update_metrics(current_plugin.settings.get('active_user_age'))
             status, headers, output = _bake_output(
                 REGISTRY, accept_header, accept_encoding_header, request.args, False
             )
@@ -49,7 +47,6 @@ class RHMetrics(RH):
         resp.status = status
 
         resp.headers['X-Cached'] = 'yes' if cached else 'no'
-        for key, val in headers:
-            resp.headers[key] = val
+        resp.headers.extend(headers)
 
         return resp
