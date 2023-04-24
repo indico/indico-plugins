@@ -19,10 +19,10 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "lodash": "^4.17.21",
     "prettier": "~1.18.2",
-    "stylelint": "^14.9.1",
+    "stylelint": "^15.6.0",
     "stylelint-config-prettier": "^9.0.3",
-    "stylelint-config-recommended-scss": "^6.0.0",
+    "stylelint-config-recommended-scss": "^11.0.0",
     "stylelint-prettier": "^1.2.0",
-    "stylelint-scss": "^4.2.0"
+    "stylelint-scss": "^4.6.0"
   }
 }
