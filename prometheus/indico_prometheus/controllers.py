@@ -12,7 +12,7 @@ from prometheus_client.registry import REGISTRY
 from werkzeug.exceptions import Unauthorized
 
 from indico.core.cache import make_scoped_cache
-from indico.web.rh import RH
+from indico.web.rh import RH, custom_auth
 
 from indico_prometheus.metrics import update_metrics
 
@@ -20,11 +20,12 @@ from indico_prometheus.metrics import update_metrics
 cache = make_scoped_cache('prometheus_metrics')
 
 
+@custom_auth
 class RHMetrics(RH):
     def _check_access(self):
         token = current_plugin.settings.get('token')
         if token:
-            if f'inds_metrics_{token}' != request.bearer_token:
+            if token != request.bearer_token:
                 raise Unauthorized
 
     def _process(self):

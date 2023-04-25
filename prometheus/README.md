@@ -15,7 +15,7 @@ scrape_configs:
         - yourindicoserver.example.com
     # it is recommended that you set a bearer token in the config
     authorization:
-        credentials: inds_metrics_xxxxxx
+        credentials: xxxxxx
     # this is only needed in development setups
 ```
 

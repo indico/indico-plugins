@@ -81,5 +81,5 @@ def test_endpoint_authentication(get_metrics):
     plugin_engine.get_plugin('prometheus').settings.set('token', 'schnitzel_with_naughty_rice')
     get_metrics(expect_status_code=401)
 
-    get_metrics(token='inds_metrics_schnitzel_with_naughty_rice')
-    get_metrics(token='inds_metrics_spiritual_codfish', expect_status_code=401)
+    get_metrics(token='schnitzel_with_naughty_rice')
+    get_metrics(token='spiritual_codfish', expect_status_code=401)

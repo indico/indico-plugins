@@ -29,8 +29,7 @@ class PluginSettingsForm(IndicoForm):
     token = StringField(
         _('Bearer Token'),
         [Optional()],
-        description=_("Authentication bearer token for Prometheus. Please note that it should be "
-                      "preceded by 'inds_metrics_'")
+        description=_('Authentication bearer token for Prometheus')
     )
     active_user_age = TimeDeltaField(
         _('Max. Active user age'),
