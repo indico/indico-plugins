@@ -24,9 +24,8 @@ cache = make_scoped_cache('prometheus_metrics')
 class RHMetrics(RH):
     def _check_access(self):
         token = current_plugin.settings.get('token')
-        if token:
-            if token != request.bearer_token:
-                raise Unauthorized
+        if token and token != request.bearer_token:
+            raise Unauthorized
 
     def _process(self):
         accept_header = request.headers.get('Accept')
