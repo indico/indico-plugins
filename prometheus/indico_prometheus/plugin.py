@@ -7,13 +7,12 @@
 
 from datetime import timedelta
 
-from wtforms.fields import StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
 from indico.core.settings.converters import TimedeltaConverter
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TimeDeltaField
+from indico.web.forms.fields import IndicoPasswordField, TimeDeltaField
 
 from indico_prometheus import _
 from indico_prometheus.blueprint import blueprint
@@ -26,9 +25,10 @@ class PluginSettingsForm(IndicoForm):
         description=_('TTL for cache'),
         units=('seconds', 'minutes', 'hours')
     )
-    token = StringField(
+    token = IndicoPasswordField(
         _('Bearer Token'),
         [Optional()],
+        toggle=True,
         description=_('Authentication bearer token for Prometheus')
     )
     active_user_age = TimeDeltaField(
