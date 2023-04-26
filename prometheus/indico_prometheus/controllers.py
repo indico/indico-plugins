@@ -37,11 +37,13 @@ class RHMetrics(RH):
             cached = True
             status, headers, output = metrics
         else:
-            update_metrics(current_plugin.settings.get('active_user_age'))
+            update_metrics(
+                current_plugin.settings.get('active_user_age'), cache, current_plugin.settings.get('heavy_cache_ttl')
+            )
             status, headers, output = _bake_output(
                 REGISTRY, accept_header, accept_encoding_header, request.args, False
             )
-            cache.set('metrics', (status, headers, output), timeout=current_plugin.settings.get('cache_ttl'))
+            cache.set('metrics', (status, headers, output), timeout=current_plugin.settings.get('global_cache_ttl'))
 
         resp = make_response(output)
         resp.status = status

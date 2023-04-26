@@ -19,10 +19,16 @@ from indico_prometheus.blueprint import blueprint
 
 
 class PluginSettingsForm(IndicoForm):
-    cache_ttl = TimeDeltaField(
-        _('Cache TTL'),
+    global_cache_ttl = TimeDeltaField(
+        _('Global Cache TTL'),
         [DataRequired()],
-        description=_('TTL for cache'),
+        description=_('TTL for "global" cache (everything)'),
+        units=('seconds', 'minutes', 'hours')
+    )
+    heavy_cache_ttl = TimeDeltaField(
+        _('Heavy Cache TTL'),
+        [DataRequired()],
+        description=_('TTL for "heavy" cache (more expensive queries such as attachments)'),
         units=('seconds', 'minutes', 'hours')
     )
     token = IndicoPasswordField(
@@ -48,12 +54,14 @@ class PrometheusPlugin(IndicoPlugin):
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {
-        'cache_ttl': timedelta(minutes=5),
+        'global_cache_ttl': timedelta(minutes=5),
+        'heavy_cache_ttl': timedelta(minutes=30),
         'token': '',
         'active_user_age': timedelta(hours=48)
     }
     settings_converters = {
-        'cache_ttl': TimedeltaConverter,
+        'global_cache_ttl': TimedeltaConverter,
+        'heavy_cache_ttl': TimedeltaConverter,
         'active_user_age': TimedeltaConverter
     }
 

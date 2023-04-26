@@ -9,6 +9,7 @@ from datetime import timedelta
 
 from prometheus_client import metrics
 
+from indico.core.cache import ScopedCache
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile
@@ -78,7 +79,26 @@ if LIVESYNC_AVAILABLE:
     size_livesync_queues = metrics.Gauge('indico_size_livesync_queues', 'Items in Livesync queues')
 
 
-def update_metrics(active_user_age: timedelta):
+def get_attachment_stats():
+    attachment_subq = db.aliased(Attachment, get_attachment_query().subquery('attachment'))
+
+    return {
+        'num_active': get_attachment_query().count(),
+        'num_total': AttachmentFile.query.join(Attachment, AttachmentFile.attachment_id == Attachment.id).count(),
+        'size_active': (
+            db.session.query(db.func.sum(AttachmentFile.size))
+            .filter(AttachmentFile.id == attachment_subq.file_id)
+            .scalar() or 0
+        ),
+        'size_total': (
+            db.session.query(db.func.sum(AttachmentFile.size))
+            .join(Attachment, AttachmentFile.attachment_id == Attachment.id)
+            .scalar() or 0
+        )
+    }
+
+
+def update_metrics(active_user_age: timedelta, cache: ScopedCache, heavy_cache_ttl: timedelta):
     """Update all metrics."""
     now = now_utc()
     num_events.set(Event.query.filter(~Event.is_deleted).count())
@@ -91,27 +111,16 @@ def update_metrics(active_user_age: timedelta):
     )
     num_categories.set(Category.query.filter(~Category.is_deleted).count())
 
-    num_active_attachment_files.set(get_attachment_query().count())
-    num_attachment_files.set(
-        AttachmentFile
-        .query
-        .join(Attachment, AttachmentFile.attachment_id == Attachment.id)
-        .count()
-    )
+    attachment_stats = cache.get('metrics_heavy')
+    if not attachment_stats:
+        attachment_stats = get_attachment_stats()
+        cache.set('metrics_heavy', attachment_stats, timeout=heavy_cache_ttl)
 
-    attachment_subq = db.aliased(Attachment, get_attachment_query().subquery('attachment'))
+    num_active_attachment_files.set(attachment_stats['num_active'])
+    num_attachment_files.set(attachment_stats['num_total'])
 
-    size_active_attachment_files.set(
-        db.session.query(db.func.sum(AttachmentFile.size))
-        .filter(AttachmentFile.id == attachment_subq.file_id)
-        .scalar() or 0
-    )
-
-    size_attachment_files.set(
-        db.session.query(db.func.sum(AttachmentFile.size))
-        .join(Attachment, AttachmentFile.attachment_id == Attachment.id)
-        .scalar() or 0
-    )
+    size_active_attachment_files.set(attachment_stats['size_active'])
+    size_attachment_files.set(attachment_stats['size_total'])
 
     if LIVESYNC_AVAILABLE:
         size_livesync_queues.set(LiveSyncQueueEntry.query.filter(~LiveSyncQueueEntry.processed).count())
