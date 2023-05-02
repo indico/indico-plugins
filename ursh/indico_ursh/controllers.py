@@ -6,11 +6,11 @@
 # see the LICENSE file for more details.
 
 import posixpath
+from urllib.parse import urlsplit
 
 from flask import jsonify, request, session
 from flask_pluginengine import render_plugin_template
 from werkzeug.exceptions import BadRequest, NotFound
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -30,14 +30,14 @@ class RHGetShortURL(RH):
 
     @staticmethod
     def _resolve_full_url(original_url):
-        if url_parse(original_url).host:
+        if urlsplit(original_url).hostname:
             return original_url
         original_url = original_url.lstrip('/')
         return posixpath.join(config.BASE_URL, original_url)
 
     @staticmethod
     def _check_host(full_url):
-        if url_parse(full_url).host != url_parse(config.BASE_URL).host:
+        if urlsplit(full_url).hostname != urlsplit(config.BASE_URL).hostname:
             raise BadRequest('Invalid host for URL shortening service')
 
     def _process(self):
@@ -73,7 +73,7 @@ class RHCustomShortURLPage(RHManageEventBase):
     def _process_args(self):
         from indico_ursh.plugin import UrshPlugin
         super()._process_args()
-        api_host = url_parse(UrshPlugin.settings.get('api_host'))
+        api_host = urlsplit(UrshPlugin.settings.get('api_host'))
         self.ursh_host = strip_end(api_host.to_url(), api_host.path[1:]).rstrip('/') + '/'
 
     def _process_GET(self):

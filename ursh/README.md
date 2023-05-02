@@ -13,6 +13,10 @@ human-friendly shortcuts pointing to an event (such as `https://indico.example.c
 
 ## Changelog
 
+### 3.2.1
+
+- Stop using deprecated URL utils from werkzeug
+
 ### 3.2
 
 - Update translations

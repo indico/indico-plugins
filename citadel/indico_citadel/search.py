@@ -7,11 +7,11 @@
 
 import base64
 import zlib
+from urllib.parse import urljoin
 
 import requests
 from flask import current_app
 from requests.exceptions import RequestException
-from werkzeug.urls import url_join
 
 from indico.modules.search.base import IndicoSearchProvider, SearchOption
 from indico.util.decorators import classproperty
@@ -28,7 +28,7 @@ class CitadelProvider(IndicoSearchProvider):
         super().__init__(*args, **kwargs)
         self.token = CitadelPlugin.settings.get('search_backend_token')
         self.backend_url = CitadelPlugin.settings.get('search_backend_url')
-        self.records_url = url_join(self.backend_url, 'api/records/')
+        self.records_url = urljoin(self.backend_url, 'api/records/')
 
     @classproperty
     @classmethod

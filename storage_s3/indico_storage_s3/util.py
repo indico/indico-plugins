@@ -6,8 +6,7 @@
 # see the LICENSE file for more details.
 
 import unicodedata
-
-from werkzeug.urls import url_quote
+from urllib.parse import quote
 
 
 def make_content_disposition_args(attachment_filename):
@@ -16,7 +15,7 @@ def make_content_disposition_args(attachment_filename):
     except UnicodeEncodeError:
         return {
             'filename': unicodedata.normalize('NFKD', attachment_filename).encode('ascii', 'ignore'),
-            'filename*': "UTF-8''%s" % url_quote(attachment_filename, safe=b''),
+            'filename*': "UTF-8''%s" % quote(attachment_filename, safe=b''),
         }
     else:
         return {'filename': attachment_filename}

@@ -10,6 +10,7 @@ import time
 from functools import cached_property
 from operator import attrgetter
 from pprint import pformat
+from urllib.parse import urljoin
 
 import requests
 from jinja2.filters import do_filesizeformat
@@ -23,7 +24,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.attributes import flag_modified
 from urllib3 import Retry
-from werkzeug.urls import url_join
 
 from indico.core.db import db
 from indico.modules.attachments import Attachment
@@ -62,7 +62,7 @@ class LiveSyncCitadelUploader(Uploader):
 
         self.categories = None
         self.search_app = self.backend.plugin.settings.get('search_backend_url')
-        self.endpoint_url = url_join(self.search_app, 'api/records/')
+        self.endpoint_url = urljoin(self.search_app, 'api/records/')
         self.headers = {
             'Authorization': 'Bearer {}'.format(self.backend.plugin.settings.get('search_backend_token'))
         }
@@ -75,23 +75,23 @@ class LiveSyncCitadelUploader(Uploader):
         return [
             EventRecordSchema(context={
                 'categories': self.categories,
-                'schema': url_join(self.search_app, 'schemas/indico/events_v1.0.0.json'),
+                'schema': urljoin(self.search_app, 'schemas/indico/events_v1.0.0.json'),
             }),
             ContributionRecordSchema(context={
                 'categories': self.categories,
-                'schema': url_join(self.search_app, 'schemas/indico/contributions_v1.0.0.json'),
+                'schema': urljoin(self.search_app, 'schemas/indico/contributions_v1.0.0.json'),
             }),
             SubContributionRecordSchema(context={
                 'categories': self.categories,
-                'schema': url_join(self.search_app, 'schemas/indico/subcontributions_v1.0.0.json'),
+                'schema': urljoin(self.search_app, 'schemas/indico/subcontributions_v1.0.0.json'),
             }),
             AttachmentRecordSchema(context={
                 'categories': self.categories,
-                'schema': url_join(self.search_app, 'schemas/indico/attachments_v1.0.0.json'),
+                'schema': urljoin(self.search_app, 'schemas/indico/attachments_v1.0.0.json'),
             }),
             EventNoteRecordSchema(context={
                 'categories': self.categories,
-                'schema': url_join(self.search_app, 'schemas/indico/notes_v1.0.0.json'),
+                'schema': urljoin(self.search_app, 'schemas/indico/notes_v1.0.0.json'),
             })
         ]
 
@@ -134,7 +134,7 @@ class LiveSyncCitadelUploader(Uploader):
         self.logger.debug('Updating record %d on citadel', citadel_id)
         assert data is not None
         try:
-            resp = session.put(url_join(self.search_app, f'api/record/{citadel_id}'), json=data)
+            resp = session.put(urljoin(self.search_app, f'api/record/{citadel_id}'), json=data)
             self.logger.debug('Updated %d on citadel', citadel_id)
             resp.raise_for_status()
             resp.close()
@@ -147,7 +147,7 @@ class LiveSyncCitadelUploader(Uploader):
     def _citadel_delete(self, session, citadel_id, *, delete_mapping):
         self.logger.debug('Deleting record %d from citadel', citadel_id)
         try:
-            resp = session.delete(url_join(self.search_app, f'api/record/{citadel_id}'))
+            resp = session.delete(urljoin(self.search_app, f'api/record/{citadel_id}'))
             self.logger.debug('Deleted %d from citadel', citadel_id)
             if resp.status_code == 410:
                 # gone - record was probably already deleted
@@ -194,7 +194,7 @@ class LiveSyncCitadelUploader(Uploader):
                               entry.attachment.file.filename, delta)
             ts = time.time()
             resp = session.put(
-                url_join(self.search_app, f'api/record/{entry.citadel_id}/files/attachment'),
+                urljoin(self.search_app, f'api/record/{entry.citadel_id}/files/attachment'),
                 data=file
             )
             delta = time.time() - ts

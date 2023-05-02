@@ -15,6 +15,14 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.2.1
+
+- Stop using deprecated URL utils from werkzeug
+
+### 3.2
+
+- Update translations
+
 ### 3.1.2
 
 - No technical changes, just fixing a mistake in the README change from 3.1.1
