@@ -28,12 +28,22 @@ def get_metrics(make_test_client):
     return _get_metrics
 
 
+@pytest.fixture
+def enable_plugin():
+    plugin_engine.get_plugin('prometheus').settings.set('enabled', True)
+
+
 @pytest.mark.usefixtures('db')
+def test_endpoint_disabled_by_default(get_metrics):
+    get_metrics(expect_status_code=503)
+
+
+@pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_works(get_metrics):
     get_metrics()
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_empty(get_metrics):
 
     metrics, _ = get_metrics()
@@ -46,7 +56,7 @@ def test_endpoint_empty(get_metrics):
     assert metrics['indico_num_active_attachment_files'] == 0.0
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_cached(get_metrics, create_event):
     metrics, headers = get_metrics()
     assert metrics['indico_num_events'] == 0.0
@@ -62,7 +72,7 @@ def test_endpoint_cached(get_metrics, create_event):
     assert headers['X-Cached'] == 'yes'
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_returning_data(get_metrics, create_event):
     # create an event
     create_event(title='Test event #1')
@@ -76,7 +86,7 @@ def test_endpoint_returning_data(get_metrics, create_event):
     assert metrics['indico_num_active_attachment_files'] == 0.0
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_authentication(get_metrics):
     plugin_engine.get_plugin('prometheus').settings.set('token', 'schnitzel_with_naughty_rice')
     get_metrics(expect_status_code=401)

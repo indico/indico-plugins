@@ -7,18 +7,25 @@
 
 from datetime import timedelta
 
+from wtforms.fields import BooleanField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin
 from indico.core.settings.converters import TimedeltaConverter
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, TimeDeltaField
+from indico.web.forms.widgets import SwitchWidget
 
 from indico_prometheus import _
 from indico_prometheus.blueprint import blueprint
 
 
 class PluginSettingsForm(IndicoForm):
+    enabled = BooleanField(
+        _("Enabled"), [DataRequired()],
+        description=_("Endpoint enabled. Turn this on once you set a proper bearer token."),
+        widget=SwitchWidget()
+    )
     global_cache_ttl = TimeDeltaField(
         _('Global Cache TTL'),
         [DataRequired()],
@@ -54,6 +61,7 @@ class PrometheusPlugin(IndicoPlugin):
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {
+        'enabled': False,
         'global_cache_ttl': timedelta(minutes=5),
         'heavy_cache_ttl': timedelta(minutes=30),
         'token': '',

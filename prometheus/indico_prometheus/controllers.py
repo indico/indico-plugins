@@ -9,7 +9,7 @@ from flask import make_response, request
 from flask_pluginengine import current_plugin
 from prometheus_client.exposition import _bake_output
 from prometheus_client.registry import REGISTRY
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import ServiceUnavailable, Unauthorized
 
 from indico.core.cache import make_scoped_cache
 from indico.web.rh import RH, custom_auth
@@ -23,6 +23,8 @@ cache = make_scoped_cache('prometheus_metrics')
 @custom_auth
 class RHMetrics(RH):
     def _check_access(self):
+        if not current_plugin.settings.get('enabled'):
+            raise ServiceUnavailable
         token = current_plugin.settings.get('token')
         if token and token != request.bearer_token:
             raise Unauthorized
