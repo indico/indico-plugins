@@ -77,6 +77,10 @@ num_ongoing_occurrences = metrics.Gauge('indico_num_ongoing_booking_occurrences'
 
 if LIVESYNC_AVAILABLE:
     size_livesync_queues = metrics.Gauge('indico_size_livesync_queues', 'Items in Livesync queues')
+    num_livesync_events_category_changes = metrics.Gauge(
+        'indico_num_livesync_events_category_changes',
+        'Number of event updates due to category changes queued up in Livesync'
+    )
 
 
 def get_attachment_stats():
@@ -124,6 +128,12 @@ def update_metrics(active_user_age: timedelta, cache: ScopedCache, heavy_cache_t
 
     if LIVESYNC_AVAILABLE:
         size_livesync_queues.set(LiveSyncQueueEntry.query.filter(~LiveSyncQueueEntry.processed).count())
+        num_livesync_events_category_changes.set(
+            db.session.query(db.func.sum(Category.deep_events_count))
+            .join(LiveSyncQueueEntry)
+            .filter(~LiveSyncQueueEntry.processed, LiveSyncQueueEntry.type == 1)
+            .scalar() or 0
+        )
 
     num_notes.set(get_note_query().count())
 
