@@ -6,7 +6,7 @@
 # see the LICENSE file for more details.
 
 import posixpath
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from flask import jsonify, request, session
 from flask_pluginengine import render_plugin_template
@@ -74,7 +74,7 @@ class RHCustomShortURLPage(RHManageEventBase):
         from indico_ursh.plugin import UrshPlugin
         super()._process_args()
         api_host = urlsplit(UrshPlugin.settings.get('api_host'))
-        self.ursh_host = strip_end(api_host.to_url(), api_host.path[1:]).rstrip('/') + '/'
+        self.ursh_host = strip_end(urlunsplit(api_host), api_host.path[1:]).rstrip('/') + '/'
 
     def _process_GET(self):
         original_url = self._make_absolute_url(request.args['original_url'])
