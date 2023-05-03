@@ -195,6 +195,7 @@ jobs:
           - plugin: payment_paypal
           - plugin: storage_s3
           - plugin: vc_zoom
+          - plugin: prometheus
 
     steps:
       - uses: actions/checkout@v3
@@ -224,7 +225,7 @@ jobs:
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
       - name: Install extra dependencies
-        if: matrix.plugin == 'citadel'
+        if: matrix.plugin == 'citadel' || matrix.plugin == 'prometheus'
         run: |
           pip install -e "${GITHUB_WORKSPACE}/livesync/"
 
