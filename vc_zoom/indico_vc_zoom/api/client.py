@@ -45,56 +45,40 @@ class APIException(Exception):
     pass
 
 
-class BaseComponent:
-    OAUTH_URI = 'https://zoom.us/oauth/token'
+class ZoomSession(Session):
+    def __init__(self, zoom_plugin_config):
+        super().__init__()
+        self.__zoom_plugin_config = zoom_plugin_config
+        self.__set_zoom_headers(self.__get_token())
 
+    def __get_token(self, *, force=False):
+        return get_zoom_token(self.__zoom_plugin_config, force=force)[0]
+
+    def __set_zoom_headers(self, token):
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+    def request(self, *args, **kwargs):
+        from indico_vc_zoom.plugin import ZoomPlugin
+        resp = super().request(*args, **kwargs)
+        if resp.status_code == 401:
+            ZoomPlugin.logger.warn('Request failed with invalid token; getting a new one')
+            self.__set_zoom_headers(self.__get_zoom_token(force=True))
+            resp = super().request(*args, **kwargs)
+        return resp
+
+
+class BaseComponent:
     def __init__(self, base_uri, config, timeout):
         self.base_uri = base_uri
         self.config = config
         self.timeout = timeout
 
     @property
-    def token(self):
-        from indico_vc_zoom.plugin import ZoomPlugin
-        account_id = self.config['account_id']
-        client_id = self.config['client_id']
-        client_secret = self.config['client_secret']
-        if account_id and client_id and client_secret:
-            ZoomPlugin.logger.debug('Using Server-to-Server-OAuth')
-            hash_key = '-'.join((account_id, client_id, client_secret))
-            cache_key = f'token-{crc32(hash_key)}'
-            if token := token_cache.get(cache_key):
-                ZoomPlugin.logger.debug('Using token from cache (%s)', cache_key)
-                return token
-            try:
-                resp = requests.post(self.OAUTH_URI,
-                                     params={'grant_type': 'account_credentials', 'account_id': account_id},
-                                     auth=(client_id, client_secret))
-                resp.raise_for_status()
-            except HTTPError as exc:
-                ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
-                raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
-            token_data = resp.json()
-            ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
-                                    token_data['scope'])
-            token_cache.set(cache_key, token_data['access_token'], int(token_data['expires_in'] * 0.8))
-            return token_data['access_token']
-        elif self.config['api_key'] and self.config['api_secret']:
-            ZoomPlugin.logger.warning('Using JWT (deprecated)')
-            header = {'alg': 'HS256', 'typ': 'JWT'}
-            payload = {'iss': self.config['api_key'], 'exp': int(time.time() + 3600)}
-            return jwt.encode(payload, self.config['api_secret'], algorithm='HS256', headers=header)
-        else:
-            raise Exception('Zoom authentication not configured')
-
-    @property
     def session(self):
-        session = Session()
-        session.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.token}'
-        }
-        return session
+        return ZoomSession(self.config)
 
 
 class MeetingComponent(BaseComponent):
@@ -269,3 +253,45 @@ class ZoomIndicoClient:
         if resp.status_code == 404 and silent:
             return None
         return _handle_response(resp)
+
+
+def get_zoom_token(config, *, force=False):
+    from indico_vc_zoom.plugin import ZoomPlugin
+
+    account_id = config['account_id']
+    client_id = config['client_id']
+    client_secret = config['client_secret']
+
+    if account_id and client_id and client_secret:
+        ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
+        hash_key = '-'.join((account_id, client_id, client_secret))
+        cache_key = f'token-{crc32(hash_key)}'
+        if not force and (token_data := token_cache.get(cache_key)):
+            expires_in = int(token_data['expires_at'] - time.time())
+            ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
+            return token_data['access_token'], token_data['expires_at']
+        try:
+            resp = requests.post(
+                'https://zoom.us/oauth/token',
+                params={'grant_type': 'account_credentials', 'account_id': account_id},
+                auth=(client_id, client_secret)
+            )
+            resp.raise_for_status()
+        except HTTPError as exc:
+            ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
+            raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
+        token_data = resp.json()
+        assert 'access_token' in token_data
+        ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
+                                token_data['scope'])
+        expires_at = int(time.time() + token_data['expires_in'])
+        token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
+        token_cache.set(cache_key, token_data, token_data['expires_in'])
+        return token_data['access_token'], token_data['expires_at']
+    elif config['api_key'] and config['api_secret']:
+        ZoomPlugin.logger.warning('Using JWT (deprecated)')
+        header = {'alg': 'HS256', 'typ': 'JWT'}
+        payload = {'iss': config['api_key'], 'exp': int(time.time() + 3600)}
+        return jwt.encode(payload, config['api_secret'], algorithm='HS256', headers=header), None
+    else:
+        raise Exception('Zoom authentication not configured')
