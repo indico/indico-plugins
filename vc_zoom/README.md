@@ -2,14 +2,18 @@
 
 ## Features
 
- * Creating Zoom meetings from Indico;
- * Sharing Zoom meetings between more than one Indico event;
- * Creating meetings on behalf of others;
- * Changes of host possible after creation;
+ * Creating Zoom meetings from Indico
+ * Sharing Zoom meetings between more than one Indico event
+ * Creating meetings on behalf of others
+ * Changes of host possible after creation
  * Protection of Zoom link (only logged in, everyone or no one)
- * Webinar mode;
+ * Webinar mode
 
 ## Changelog
+
+### 3.2.3
+
+- Support Zoom's Server-to-Server OAuth in addition to the (deprecated) JWT
 
 ### 3.2.2
 
@@ -118,9 +122,23 @@ These are the most relevant configuration options:
  * **Webhook token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
 
 
-### Zoom API key/secret (JWT)
+### Zoom Server-to-Server OAuth
 
-To obtain API key and API secret, please visit [https://marketplace.zoom.us/docs/guides/auth/jwt](https://marketplace.zoom.us/docs/guides/auth/jwt).
+See the [zoom documentation](https://marketplace.zoom.us/docs/guides/build/server-to-server-oauth-app/#create-a-server-to-server-oauth-app) on how to get the credentials for authenticating with the Zoom servers.
+
+The scopes to select when creating the app are:
+
+- `meeting:read:admin`
+- `meeting:write:admin`
+- `user:read:admin`
+- `webinar:read:admin` (optional, only needed when using webinars)
+- `webinar:write:admin` (optional, only needed when using webinars)
+
+
+### Zoom API key/secret (JWT, deprecated)
+
+Zoom deprecated JWTs in June 2023, existing ones still work but no new ones can be created.
+As soon as Zoom fully dropped them, JWT support will also be removed from this plugin.
 
 
 ## Intellectual Property
