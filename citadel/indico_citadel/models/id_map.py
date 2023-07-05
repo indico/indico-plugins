@@ -12,11 +12,11 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.string import format_repr
 
 
-class EntryType(int, IndicoEnum):
+class EntryType(IndicoIntEnum):
     event = 1
     contribution = 2
     subcontribution = 3

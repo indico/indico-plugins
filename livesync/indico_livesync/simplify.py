@@ -19,13 +19,13 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.models.events import Event
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.sessions import Session
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 
 from indico_livesync.models.queue import ChangeType, EntryType
 from indico_livesync.util import get_excluded_categories
 
 
-class SimpleChange(int, IndicoEnum):
+class SimpleChange(IndicoIntEnum):
     deleted = 1
     created = 2
     updated = 4

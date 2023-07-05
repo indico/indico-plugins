@@ -20,14 +20,14 @@ from indico.modules.users.util import get_user_by_email
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.enum import IndicoEnum, RichEnum
+from indico.util.enum import IndicoIntEnum, RichStrEnum
 from indico.util.user import principal_from_identifier
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
 
 
-class ZoomMeetingType(int, IndicoEnum):
+class ZoomMeetingType(IndicoIntEnum):
     instant_meeting = 1
     scheduled_meeting = 2
     recurring_meeting_no_time = 3
@@ -38,7 +38,7 @@ class ZoomMeetingType(int, IndicoEnum):
     recurring_webinar_fixed_time = 9
 
 
-class UserLookupMode(str, RichEnum):
+class UserLookupMode(RichStrEnum):
     __titles__ = {
         'all_emails': _('All emails'),
         'email_domains': _('Email domains'),
@@ -47,7 +47,7 @@ class UserLookupMode(str, RichEnum):
 
     @property
     def title(self):
-        return RichEnum.title.__get__(self, type(self))
+        return RichStrEnum.title.__get__(self, type(self))
 
     all_emails = 'all_emails'
     email_domains = 'email_domains'

@@ -11,14 +11,14 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories.models.categories import Category
 from indico.util.date_time import now_utc
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.string import format_repr
 
 from indico_livesync.models.agents import LiveSyncAgent
 from indico_livesync.util import obj_deref
 
 
-class ChangeType(int, IndicoEnum):
+class ChangeType(IndicoIntEnum):
     created = 1
     deleted = 2
     moved = 3
@@ -30,7 +30,7 @@ class ChangeType(int, IndicoEnum):
     unpublished = 9
 
 
-class EntryType(int, IndicoEnum):
+class EntryType(IndicoIntEnum):
     category = 1
     event = 2
     contribution = 3
