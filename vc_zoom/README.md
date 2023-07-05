@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.2.4
+
+- Adapt to Indico 3.2.6 changes
+
 ### 3.2.3
 
 - Support Zoom's Server-to-Server OAuth in addition to the (deprecated) JWT

@@ -5,6 +5,10 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 ## Changelog
 
+### 3.2.2
+
+- Adapt to Indico 3.2.6 changes
+
 ### 3.2.1
 
 - Stop using deprecated URL utils from werkzeug
