@@ -1,0 +1,67 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# 
+# Translators:
+# Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2022
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2022-08-24 10:09+0000\n"
+"Last-Translator: Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2022\n"
+"Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: indico_cloud_captchas/plugin.py:26
+msgid "None (use Indico's built-in CAPTCHA)"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:34
+msgid "Type"
+msgstr "Typ"
+
+#: indico_cloud_captchas/plugin.py:35
+msgid "Select which CAPTCHA provider you want to use"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:39
+msgid "reCAPTCHA site key"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:41
+msgid "The site key available in the reCAPTCHA admin dashboard"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:44
+msgid "reCAPTCHA secret key"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:46
+msgid "The secret key available in the reCAPTCHA admin dashboard"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:50
+msgid "hCaptcha site key"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:52
+msgid "The site key available in the hCaptcha admin dashboard"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:55
+msgid "hCAPTCHA secret key"
+msgstr ""
+
+#: indico_cloud_captchas/plugin.py:57
+msgid "The secret key available in the hCaptcha admin dashboard"
+msgstr ""

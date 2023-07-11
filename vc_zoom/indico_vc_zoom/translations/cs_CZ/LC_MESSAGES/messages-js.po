@@ -1,0 +1,31 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# 
+# Translators:
+# Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2021-06-25 16:11+0000\n"
+"Last-Translator: Vaclav Stepan <vaclav.stepan@gmail.com>, 2021\n"
+"Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: indico_vc_zoom/client/index.js:24
+msgid "Are you sure you want to be added as an alternative host?"
+msgstr "Jste si jisti, že chcete být přidán jako alternativní hostitel?"
+
+#: indico_vc_zoom/client/index.js:25
+msgid "Make me an alternative host"
+msgstr "Chci být alternativní hostitel"

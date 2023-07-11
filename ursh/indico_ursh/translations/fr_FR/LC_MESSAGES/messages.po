@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Thomas Baron <thomas.baron@cern.ch>, 2021
+# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023
 # 
 #, fuzzy
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-08-19 18:43+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
-"Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
+"Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023\n"
+"Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -102,7 +103,7 @@ msgstr "Créer un URL court personnalisé"
 #: indico_ursh/templates/ursh_footer.html:7
 #: indico_ursh/templates/ursh_shortener_page.html:6
 msgid "URL Shortener"
-msgstr "Raccourcisseur d'URL"
+msgstr "URL courte"
 
 #: indico_ursh/templates/ursh_link.html:28
 msgid "Obtain short URL"

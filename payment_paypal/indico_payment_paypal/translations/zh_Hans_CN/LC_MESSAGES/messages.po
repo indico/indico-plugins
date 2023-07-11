@@ -1,5 +1,5 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # 
 # Translators:
@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:54+0200\n"
-"PO-Revision-Date: 2020-08-21 02:01+0000\n"
-"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
-"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2020\n"
+"Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -27,25 +27,25 @@ msgstr "您的付款请求已处理。"
 msgid "You cancelled the payment process."
 msgstr "您取消了付款过程。"
 
-#: indico_payment_paypal/plugin.py:25
+#: indico_payment_paypal/plugin.py:24
 msgid "API URL"
 msgstr "API URL"
 
-#: indico_payment_paypal/plugin.py:25
+#: indico_payment_paypal/plugin.py:24
 msgid "URL of the PayPal HTTP API."
 msgstr "PayPal HTTP API 的 URL 。"
 
-#: indico_payment_paypal/plugin.py:26 indico_payment_paypal/plugin.py:32
+#: indico_payment_paypal/plugin.py:25 indico_payment_paypal/plugin.py:31
 msgid "Business"
 msgstr "商务"
 
-#: indico_payment_paypal/plugin.py:27
+#: indico_payment_paypal/plugin.py:26
 msgid ""
 "The default PayPal ID or email address associated with a PayPal account. "
 "Event managers will be able to override this."
 msgstr "与 PayPal 帐户关联的默认 PayPal ID 或电子邮件地址。事件管理员将能够覆盖它。"
 
-#: indico_payment_paypal/plugin.py:34
+#: indico_payment_paypal/plugin.py:33
 msgid "The PayPal ID or email address associated with a PayPal account."
 msgstr "与PayPal帐户关联的 PayPal ID 或电子邮件地址。"
 

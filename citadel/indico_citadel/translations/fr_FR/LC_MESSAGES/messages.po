@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
-# Thomas Baron <thomas.baron@cern.ch>, 2021
+# Thomas Baron <thomas.baron@cern.ch>, 2023
 # 
 #, fuzzy
 msgid ""
@@ -13,8 +13,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
-"Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2023\n"
+"Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,7 +45,7 @@ msgstr "Extensions de fichier"
 #: indico_citadel/plugin.py:29
 msgid "File extensions to upload for full-text search"
 msgstr ""
-"Extension de fichier à télécharger pour la recherche en texte intégral"
+"Extension de fichier à télédéposer pour la recherche en texte intégral"
 
 #: indico_citadel/plugin.py:30
 msgid "Max. file size"
@@ -59,13 +59,13 @@ msgid ""
 "time on larger instances. You may want to run a manual upload for the new "
 "file size first!"
 msgstr ""
-"Taille maximale (en MB) du téléchargement pour la recherche en texte "
-"intégral. Veuillez noter que l'augmentation de ce paramètre après l'export "
-"initial résultera dans le téléchargement de tous les fichiers qui n'ont pas "
-"encore été téléchargés pour indexation à la prochaine exécution de la file "
-"d'attente, ce qui pourrait prendre du temps sur les serveurs les plus "
-"importants. Vous voudrez peut-être d'abord exécuter un téléchargement manuel"
-" pour la nouvelle taille de fichier!"
+"Taille maximale (en MB) du télédépôt pour la recherche en texte intégral. "
+"Veuillez noter que l'augmentation de ce paramètre après l'export initial "
+"résultera dans le télédépôt de tous les fichiers qui n'ont pas encore été "
+"télédéposés pour indexation à la prochaine exécution de la file d'attente, "
+"ce qui pourrait prendre du temps sur les serveurs les plus importants. Vous "
+"voudrez peut-être d'abord exécuter un télédépôt manuel pour la nouvelle "
+"taille de fichier!"
 
 #: indico_citadel/plugin.py:37
 msgid "Parallel threads (records)"
@@ -73,8 +73,7 @@ msgstr "Processus parallèles (enregistrements)"
 
 #: indico_citadel/plugin.py:38
 msgid "Number of threads to use when uploading records."
-msgstr ""
-"Nombre de processus à utiliser lors du téléchargement des enregistrements."
+msgstr "Nombre de processus à utiliser lors du télédépôt des enregistrements."
 
 #: indico_citadel/plugin.py:39
 msgid "Parallel threads (records, initial export)"
@@ -84,7 +83,7 @@ msgstr "Processus parallèles (enregistrements, export initial)"
 msgid ""
 "Number of threads to use when uploading records during the initial export."
 msgstr ""
-"Nombre de processus à utiliser lors du téléchargement des fichiers pour "
+"Nombre de processus à utiliser lors du télédépôt des fichiers pour "
 "l'exportation initiale."
 
 #: indico_citadel/plugin.py:43
@@ -93,7 +92,7 @@ msgstr "Processus parallèles (fichiers)"
 
 #: indico_citadel/plugin.py:44
 msgid "Number of threads to use when uploading files."
-msgstr "Nombre de processus à utiliser lors du téléchargement des fichiers."
+msgstr "Nombre de processus à utiliser lors du télédépôt des fichiers."
 
 #: indico_citadel/plugin.py:45
 msgid "Parallel threads (files, initial export)"
@@ -103,7 +102,7 @@ msgstr "Processus parallèles (fichiers, export initial)"
 msgid ""
 "Number of threads to use when uploading files during the initial export."
 msgstr ""
-"Nombre de processus à utiliser lors du téléchargement des fichiers pour "
+"Nombre de processus à utiliser lors du télédépôt des fichiers pour "
 "l'exportation initiale."
 
 #: indico_citadel/plugin.py:49

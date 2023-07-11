@@ -1,0 +1,103 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# fri, 2017
+# Petr Vokac <vokac@fjfi.cvut.cz>, 2018
+# Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: Vaclav Stepan <vaclav.stepan@gmail.com>, 2021\n"
+"Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: indico_payment_paypal/controllers.py:110
+msgid "Your payment request has been processed."
+msgstr "Váš požadavek na platbu byl zpracován."
+
+#: indico_payment_paypal/controllers.py:118
+msgid "You cancelled the payment process."
+msgstr "Zrušil jste postup platby."
+
+#: indico_payment_paypal/plugin.py:24
+msgid "API URL"
+msgstr "Adresa (URL) API"
+
+#: indico_payment_paypal/plugin.py:24
+msgid "URL of the PayPal HTTP API."
+msgstr "Adresa (URL) API HTTP PayPal."
+
+#: indico_payment_paypal/plugin.py:25 indico_payment_paypal/plugin.py:31
+msgid "Business"
+msgstr "Obchod"
+
+#: indico_payment_paypal/plugin.py:26
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "PayPal ID nebo emailová adresa asociovaná s PayPal účtem. Správci akcí budou moci tuto hodnotu upravit."
+
+#: indico_payment_paypal/plugin.py:33
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "ID PayPalu nebo adresa e-mailu spojená s účtem PayPal."
+
+#: indico_payment_paypal/util.py:23
+msgid "Invalid email address / paypal ID"
+msgstr "Neplatná e-mailová adresa/ID pro PayPal"
+
+#: indico_payment_paypal/templates/event_payment_form.html:4
+msgid "First name"
+msgstr "Křestní jméno"
+
+#: indico_payment_paypal/templates/event_payment_form.html:6
+msgid "Last name"
+msgstr "Příjmení"
+
+#: indico_payment_paypal/templates/event_payment_form.html:8
+msgid "Total amount"
+msgstr "Celkové množství"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html:4
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "Prosím ujistěte se, že máte jako předvolené kódování v PayPal seller účtu nastaveno <strong>UTF-8</strong>, jinak některé platby nemusí být Indicem správně rozeznány!<br>Víc o správném nastavení najdete  %(link)szde%(endlink)s."
+
+#: indico_payment_paypal/templates/transaction_details.html:6
+msgid "Transaction ID"
+msgstr "ID transakce"
+
+#: indico_payment_paypal/templates/transaction_details.html:8
+msgid "Invoice ID"
+msgstr "ID faktury (účtu)"
+
+#: indico_payment_paypal/templates/transaction_details.html:10
+msgid "Payer e-mail"
+msgstr "E-mail plátce"
+
+#: indico_payment_paypal/templates/transaction_details.html:19
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "Zaplacená částka neodpovídá požadované. Kontaktujte prosím účastníka pro vyřešení této nesrovnalosti."
+
+#: indico_payment_paypal/templates/transaction_details.html:22
+msgid "Paid:"
+msgstr "Zaplaceno:"
+
+#: indico_payment_paypal/templates/transaction_details.html:26
+msgid "Required:"
+msgstr "Požadováno:"

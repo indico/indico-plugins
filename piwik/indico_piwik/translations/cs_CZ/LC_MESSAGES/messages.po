@@ -1,0 +1,239 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
+# fri, 2017
+# Petr Vokac <vokac@fjfi.cvut.cz>, 2018
+# Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"PO-Revision-Date: 2015-03-11 16:40+0000\n"
+"Last-Translator: Vaclav Stepan <vaclav.stepan@gmail.com>, 2021\n"
+"Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: indico_piwik/forms.py:18
+msgid "Track global visits"
+msgstr "Sledovat počty přístupů"
+
+#: indico_piwik/forms.py:19
+msgid "Track events"
+msgstr "Sledovat události"
+
+#: indico_piwik/forms.py:20
+msgid "Cache results"
+msgstr "Ukládat výsledky do vyrovnávací paměti"
+
+#: indico_piwik/forms.py:21
+msgid "Piwik server URL"
+msgstr "Adresa (URL) serveru Piwik"
+
+#: indico_piwik/forms.py:22
+msgid "Piwik API server URL"
+msgstr "Adresa (URL) serveru API Piwik"
+
+#: indico_piwik/forms.py:23
+msgid "Should be pointing to 'index.php'"
+msgstr "Má ukazovat na 'index.php'"
+
+#: indico_piwik/forms.py:24
+msgid "Piwik API token"
+msgstr "Symbol API Piwik"
+
+#: indico_piwik/forms.py:25
+msgid "Token to access the API. Do not share it!"
+msgstr "Znak pro přistupování k API. Nesdílet!"
+
+#: indico_piwik/forms.py:26
+msgid "Global statistics ID"
+msgstr "ID celkové statistiky"
+
+#: indico_piwik/forms.py:27
+msgid "Piwik site ID for global statistics"
+msgstr "ID stránky Piwik pro celkovou statistiku"
+
+#: indico_piwik/forms.py:28
+msgid "Event statistics ID"
+msgstr "ID statistiky události"
+
+#: indico_piwik/forms.py:29
+msgid "Piwik site ID for event statistics"
+msgstr "ID stránky Piwik pro statistiku události"
+
+#: indico_piwik/forms.py:30
+msgid "Result cache TTL (seconds)"
+msgstr "TTL vyrovnávací paměti výsledku (sekund)"
+
+#: indico_piwik/forms.py:31
+msgid "How long event reports are kept cached"
+msgstr "Po jakou dobu jsou přehledy událostí drženy ve vyrovnávací paměti"
+
+#: indico_piwik/forms.py:32
+msgid "Use Piwik server URL for all requests"
+msgstr "Použít adresu (URL) serveru Piwik pro všechny výsledky"
+
+#: indico_piwik/forms.py:36
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "Statistika události nemůže použít stejnou stránku Piwik jako celková statistika"
+
+#: indico_piwik/plugin.py:66
+msgid "Statistics"
+msgstr "Statistiky"
+
+#: indico_piwik/templates/statistics.html:8
+msgid "Selection Information"
+msgstr "Údaje o výběru"
+
+#: indico_piwik/templates/statistics.html:9
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s až %(end)s)"
+
+#: indico_piwik/templates/statistics.html:12
+#: indico_piwik/templates/statistics.html:14
+msgid "Modify Query"
+msgstr "Upravit dotaz"
+
+#: indico_piwik/templates/statistics.html:13
+msgid "Hide"
+msgstr "Skrýt"
+
+#: indico_piwik/templates/statistics.html:23
+msgid "View statistics between these dates"
+msgstr "Zobrazit statistiku mezi těmito daty"
+
+#: indico_piwik/templates/statistics.html:29
+msgid "to"
+msgstr "až"
+
+#: indico_piwik/templates/statistics.html:39
+msgid "Choose Event / Contribution"
+msgstr "Vybrat událost/příspěvek"
+
+#: indico_piwik/templates/statistics.html:41
+msgid "Event"
+msgstr "Událost"
+
+#: indico_piwik/templates/statistics.html:44
+msgid "Contribution"
+msgstr "Příspěvek"
+
+#: indico_piwik/templates/statistics.html:53
+msgid "Update Query"
+msgstr "Aktualizovat dotaz"
+
+#: indico_piwik/templates/statistics.html:64
+msgid "Visitor Hit Rates"
+msgstr "Počty návštěv"
+
+#: indico_piwik/templates/statistics.html:66
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "Vezměte na vědomí, že statistické údaje jsou shromažďovány od zapnutí příslušného pluginu. To znamená, že mohou chybět data pro akce pořádané dříve, což ale nutně neznamená, že by tyto akce byly bez aktivit."
+
+#: indico_piwik/templates/statistics.html:73
+msgid "Info"
+msgstr "Informace"
+
+#: indico_piwik/templates/statistics.html:86
+msgid "Overall Statistics"
+msgstr "Celková statistika"
+
+#: indico_piwik/templates/statistics.html:90
+msgid "Visitor Metrics"
+msgstr "Měření návštěv"
+
+#: indico_piwik/templates/statistics.html:94
+msgid "Visitors"
+msgstr "Návštěvníci"
+
+#: indico_piwik/templates/statistics.html:98
+msgid "Unique Visitors"
+msgstr "Jedineční návštěvníci"
+
+#: indico_piwik/templates/statistics.html:102
+msgid "Returning Visitors"
+msgstr "Vracející se návštěvníci"
+
+#: indico_piwik/templates/statistics.html:106
+msgid "Avg. Duration"
+msgstr "Průměrné trvání"
+
+#: indico_piwik/templates/statistics.html:111
+msgid "Peak Statistics"
+msgstr "Nejlepší statistika"
+
+#: indico_piwik/templates/statistics.html:115
+msgid "Peak Date"
+msgstr "Nejlepší datum"
+
+#: indico_piwik/templates/statistics.html:119
+msgid "Peak Users"
+msgstr "Nejlepší uživatelé"
+
+#: indico_piwik/templates/statistics.html:129
+msgid "Visitors Geography"
+msgstr "Poloha návštěvníků"
+
+#: indico_piwik/templates/statistics.html:133
+msgid "Visitor Origins"
+msgstr "Původ návštěvníků"
+
+#: indico_piwik/templates/statistics.html:144
+msgid "Top Referrers"
+msgstr "Nejlepší odkazovatelé"
+
+#: indico_piwik/templates/statistics.html:148
+msgid "Traffic Inbound Top 10"
+msgstr "Nejlepších 10 příchozích provozu"
+
+#: indico_piwik/templates/statistics.html:152
+msgid "Referrer"
+msgstr "Odkazovatel"
+
+#: indico_piwik/templates/statistics.html:153
+msgid "Visits"
+msgstr "Návštěvy"
+
+#: indico_piwik/templates/statistics.html:154
+msgid "Actions"
+msgstr "Činnosti"
+
+#: indico_piwik/templates/statistics.html:155
+msgid "Visit Length"
+msgstr "Délka návštěvy"
+
+#: indico_piwik/templates/statistics.html:172
+msgid "User Systems"
+msgstr "Systémy uživatelů"
+
+#: indico_piwik/templates/statistics.html:176
+msgid "Visitor Systems"
+msgstr "Systémy návštěvníků"
+
+#: indico_piwik/templates/statistics.html:183
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "Tento přehled byl vytvořen v: %(dt)s"
+
+#: indico_piwik/templates/statistics.html:191
+msgid "Unable to retrieve Graph Data"
+msgstr "Nelze získat údaje pro graf"
+
+#: indico_piwik/templates/statistics.html:193
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "Server neodpověděl ve stanoveném čase. Může to být zapříčiněno tím, že rozsah data je příliš velký."

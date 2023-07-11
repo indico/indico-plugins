@@ -1,204 +1,209 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
-# Lanxin Ma <ma@ihep.ac.cn>, 2021
+# Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2021
+# Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-28 09:56+0200\n"
+"POT-Creation-Date: 2022-08-24 12:05+0200\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2021\n"
-"Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
+"Last-Translator: Vaclav Stepan <vaclav.stepan@gmail.com>, 2021\n"
+"Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
-"Language: zh_CN.GB2312\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.10.3\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
-#: indico_vc_zoom/controllers.py:28
+#: indico_vc_zoom/controllers.py:29
 msgid "You were already an (alternative) host of this meeting"
-msgstr "你已经是这次会议的 (备选) 主持人了"
+msgstr "Už jste byli (alternativním) hostitelem této schůzky. "
 
-#: indico_vc_zoom/controllers.py:43
+#: indico_vc_zoom/controllers.py:44
 msgid "You are now an alternative host of room '{room}'"
-msgstr "您现在是会议室  '{room}' 的备选主持人"
+msgstr "Právě jste alternativním hostitelem místnosti '{room}'"
 
 #: indico_vc_zoom/forms.py:27 indico_vc_zoom/forms.py:61
 msgid "Passcode visibility"
-msgstr "密码可见性"
+msgstr "Viditelnost přístupového klíče"
 
 #: indico_vc_zoom/forms.py:28 indico_vc_zoom/forms.py:62
 msgid "Who should be able to know this meeting's passcode"
-msgstr "谁应该能够知道此会议的密码"
+msgstr "Kdo by měl znát přístupový klíč pro tuhle schůzku?"
 
 #: indico_vc_zoom/forms.py:31 indico_vc_zoom/forms.py:65
 msgid "Everyone"
-msgstr "所有人"
+msgstr "Každý"
 
 #: indico_vc_zoom/forms.py:32 indico_vc_zoom/forms.py:66
 msgid "Logged-in users"
-msgstr " 登陆用户"
+msgstr "Přihlášení uživatelé"
 
 #: indico_vc_zoom/forms.py:33 indico_vc_zoom/forms.py:67
 msgid "Registered participants"
-msgstr "已注册参会人"
+msgstr "Registrovaní účastníci"
 
 #: indico_vc_zoom/forms.py:34 indico_vc_zoom/forms.py:68
 msgid "No one"
-msgstr "无人"
+msgstr "Nikdo"
 
 #: indico_vc_zoom/forms.py:44
 msgid "Meeting Type"
-msgstr "会议类型"
+msgstr "Typ schůzky"
 
 #: indico_vc_zoom/forms.py:45
 msgid "The type of Zoom meeting to be created"
-msgstr "要创建的 Zoom 会议类型"
+msgstr "Vyberte typ schůzky aplikace Zoom, který má být vytvořený"
 
 #: indico_vc_zoom/forms.py:48
 msgid "Regular Meeting"
-msgstr "例行例会"
+msgstr "Běžná schůzka"
 
 #: indico_vc_zoom/forms.py:49 indico_vc_zoom/templates/room_labels.html:4
 msgid "Webinar"
-msgstr "网络研讨会"
+msgstr "Webinář"
 
 #: indico_vc_zoom/forms.py:51
 msgid "Meeting Host"
-msgstr "会议主持人"
+msgstr "Hostitel schůzky"
 
 #: indico_vc_zoom/forms.py:52
 msgid "Myself"
-msgstr "我自己"
+msgstr "Já"
 
 #: indico_vc_zoom/forms.py:52
 msgid "Someone else"
-msgstr "其他人"
+msgstr "Někdo jiný"
 
 #: indico_vc_zoom/forms.py:54
 msgid "User"
-msgstr "用户"
+msgstr "Uživatel"
 
 #: indico_vc_zoom/forms.py:57 indico_vc_zoom/templates/info_box.html:35
 #: indico_vc_zoom/templates/manage_event_info_box.html:41
 msgid "Passcode"
-msgstr "密码"
+msgstr "přístupový klíč"
 
 #: indico_vc_zoom/forms.py:59
 msgid "Meeting passcode (8-10 digits)"
-msgstr "会议密码(8-10位)"
+msgstr "Přístupový klíč (8-10 cifer)"
 
 #: indico_vc_zoom/forms.py:70 indico_vc_zoom/plugin.py:87
 msgid "Mute audio"
-msgstr "静音"
+msgstr "Ztlumit zvuk"
 
 #: indico_vc_zoom/forms.py:72 indico_vc_zoom/plugin.py:89
 msgid "Participants will join the VC room muted by default "
-msgstr "参会人将加入默认静音的VC室"
+msgstr "Účastníkům bude při vstupu do místnosti vypnut mikrofon"
 
 #: indico_vc_zoom/forms.py:74 indico_vc_zoom/plugin.py:91
 msgid "Mute video (host)"
-msgstr "静音视频 (主持人)"
+msgstr "Vypnout video (hostitel)"
 
 #: indico_vc_zoom/forms.py:76 indico_vc_zoom/plugin.py:93
 msgid "The host will join the VC room with video disabled"
-msgstr "主持人将以禁用视频的方式加入VC 室"
+msgstr "Předsedajícímu při připojení do místnosti vypnout kameru"
 
 #: indico_vc_zoom/forms.py:78 indico_vc_zoom/plugin.py:95
 msgid "Mute video (participants)"
-msgstr "静音视频 (参会人)"
+msgstr "Vypnout video (uživatelé)"
 
 #: indico_vc_zoom/forms.py:80 indico_vc_zoom/plugin.py:97
 msgid "Participants will join the VC room with video disabled"
-msgstr "参会人将以禁用视频的方式加入VC 室"
+msgstr "Účastníkům při připojení do místnosti vypnout kameru"
 
 #: indico_vc_zoom/forms.py:82 indico_vc_zoom/plugin.py:104
 msgid "Waiting room"
-msgstr "等候室"
+msgstr "Předsálí"
 
 #: indico_vc_zoom/forms.py:84 indico_vc_zoom/plugin.py:106
 msgid "Participants may be kept in a waiting room by the host"
-msgstr "参会人可能被主持人安排在等候室 "
+msgstr "Účastníci mohou být předsedajícím pozdrženi v předsálí"
 
 #: indico_vc_zoom/forms.py:86 indico_vc_zoom/templates/info_box.html:15
 #: indico_vc_zoom/templates/manage_event_info_box.html:9
 msgid "Description"
-msgstr "说明"
+msgstr "Popis"
 
 #: indico_vc_zoom/forms.py:86
 msgid "Optional description for this room"
-msgstr "此会议室可选说明"
+msgstr "Volitelný popis pro tuto místnost"
 
 #: indico_vc_zoom/forms.py:116
 msgid "This user has no Zoom account"
-msgstr "此用户没有 Zoom 帐号"
+msgstr "Tento uživatel nemá žádný Zoom účet"
 
 #: indico_vc_zoom/plugin.py:45
 msgid "API Credentials"
-msgstr "API 凭证"
+msgstr "Přístupové údaje rozhraní API"
 
 #: indico_vc_zoom/plugin.py:46
 msgid "Zoom Account"
-msgstr "Zoom 账号"
+msgstr "Zoom účet"
 
 #: indico_vc_zoom/plugin.py:48
 msgid "Room Settings"
-msgstr "会议室设置"
+msgstr "Nastavení místnosti"
 
 #: indico_vc_zoom/plugin.py:50
 msgid "Notifications"
-msgstr "通知"
+msgstr "Upozornění"
 
 #: indico_vc_zoom/plugin.py:51
 msgid "Access"
-msgstr "访问"
+msgstr "Přístup"
 
 #: indico_vc_zoom/plugin.py:54
 msgid "API Key"
-msgstr "API 秘钥"
+msgstr "Klíč API"
 
 #: indico_vc_zoom/plugin.py:56
 msgid "API Secret"
-msgstr "API 秘钥"
+msgstr "API Secret"
 
 #: indico_vc_zoom/plugin.py:58
 msgid "Webhook Token"
-msgstr "Webhook 令牌"
+msgstr "Webhook token"
 
 #: indico_vc_zoom/plugin.py:59
 msgid "Specify Zoom's webhook token if you want live updates"
-msgstr "如果您要实时更新请指定 Zoom 的 webhook 令牌"
+msgstr "Definujte webhook token aplikace Zoom, umožníte tím live update"
 
 #: indico_vc_zoom/plugin.py:61
 msgid "User lookup mode"
-msgstr "用户查找模式"
+msgstr "Jak hledat uživatele"
 
 #: indico_vc_zoom/plugin.py:62
 msgid ""
 "Specify how Indico should look up the zoom user that corresponds to an "
 "Indico user."
-msgstr "指定 Indico 应该如何查找与 Indico 用户相对应的 zoom  用户 。"
+msgstr ""
+"Určete, jak má Indico vyhledat uživatele aplikace Zoom, který odpovídá "
+"uživateli Indico"
 
 #: indico_vc_zoom/plugin.py:65
 msgid "E-mail domains"
-msgstr "电子邮件域"
+msgstr "E-mailové domény"
 
 #: indico_vc_zoom/plugin.py:67
 msgid ""
 "List of e-mail domains which can use the Zoom API. Indico attempts to find "
 "Zoom accounts using all email addresses of a user which use those domains."
-msgstr "可以使用 Zoom API 电子邮件域的列表。Indico 尝试找到使用这些域的用户的所有电子邮件地址来找到 Zoom 账号。"
+msgstr ""
+"Seznam e-mailových domén, které mohou používat API aplikace Zoom. Indico "
+"zkusí nalézt účty Zoom prostřednictvím e-mailových adres uživatelů.  "
 
 #: indico_vc_zoom/plugin.py:71
 msgid "Indico identity providers"
-msgstr "Indico 身份提供者"
+msgstr "Poskytovatelé identit pro Indico"
 
 #: indico_vc_zoom/plugin.py:73
 msgid ""
@@ -206,183 +211,185 @@ msgid ""
 "providers using the email addresses of the user and attempts to find Zoom "
 "accounts having an email address with the format username@enterprise-domain."
 msgstr ""
-"从中获取用户名的身份提供者。Indico 使用用户的电子邮件地址查询那些提供者，并尝试查找具有电子邮件地址格式为 username"
-"@enterprise-domain 的Zoom帐户。"
+"Poskytovatelé identit, ze kterých mají být získané uživatelské jména. Indico"
+" se pokusí prostřednictvím e-mailových adres uživatelů zjistit, jestli k "
+"daným uživatelům existují přidružené účty aplikace Zoom. Formát e-malových "
+"adres: username@enterprise-domain"
 
 #: indico_vc_zoom/plugin.py:78
 msgid "Enterprise domain"
-msgstr "企业域"
+msgstr "Doména (enterprise-domain)"
 
 #: indico_vc_zoom/plugin.py:80
 msgid ""
 "The domain name used together with the usernames from the Indico identity "
 "provider"
-msgstr "与来自Indico 身份提供者提供的用户名一起使用的域名"
+msgstr ""
+"Název domény používaný společně s uživatelskými jmény od poskytovatele "
+"identity Indico "
 
 #: indico_vc_zoom/plugin.py:83
 msgid "Allow Webinars (Experimental)"
-msgstr "允许网络研讨会 (实验性)"
+msgstr "Povolit webináře (experimentálně)"
 
 #: indico_vc_zoom/plugin.py:85
 msgid "Allow webinars to be created through Indico. Use at your own risk."
-msgstr "允许通过Indico创建网络研讨会。使用风险自负。"
+msgstr ""
+"Povolit vytvářet webináře prostřednictvím Indico. Použití této funkce je na "
+"vlastní riziko. "
 
 #: indico_vc_zoom/plugin.py:99
 msgid "Join Before Host"
-msgstr "先于主持人加入"
+msgstr "Připojit se před hostitelem"
 
 #: indico_vc_zoom/plugin.py:101
 msgid ""
 "Allow participants to join the meeting before the host starts the meeting. "
 "Only used for scheduled or recurring meetings."
-msgstr "允许参会人在主持人开始会议之前加入会议。仅用于预定或定期会议。"
+msgstr ""
+"Povolit připojení účastníků před tím, než hostitel spustí mítink. Povolení "
+"je možné pouze pro plánované nebo opakující se mítinky. "
 
 #: indico_vc_zoom/plugin.py:108
 msgid "Creation email footer"
-msgstr "创建电子邮件页脚"
+msgstr "Vytvoření zápatí e-mailu"
 
 #: indico_vc_zoom/plugin.py:109
 msgid "Footer to append to emails sent upon creation of a VC room"
-msgstr "添加到创建 VC 会议室时发送的电子邮件的页脚"
+msgstr ""
+"Zápatí, které bude připojené k e-mailům odeslaným po vytvoření virtuální "
+"konferenční místnosti."
 
 #: indico_vc_zoom/plugin.py:111
 msgid "Send host URL"
-msgstr "发送主办 URL"
+msgstr "Odeslat hostitelskou adresu URL"
 
 #: indico_vc_zoom/plugin.py:113
 msgid ""
 "Whether to send an e-mail with the Host URL to the meeting host upon "
 "creation of a meeting"
-msgstr "创建会议时是否发送带有主办方 URL 的电子邮件给会议主持人"
+msgstr ""
+"Má systém Indico odeslat e-mail s hostitelskou adresou URL po vytvoření "
+"virtuální konferenční místnosti?"
 
 #: indico_vc_zoom/plugin.py:116 indico_vc_zoom/templates/info_box.html:44
 msgid "Join via phone"
-msgstr "通过电话加入"
+msgstr "Telefonické připojení"
 
 #: indico_vc_zoom/plugin.py:117
 msgid "Link to instructions on joining a meeting via phone"
-msgstr "链接到通过电话加入会议的说明"
+msgstr "Odkaz na návod na připojení ke schůzce přes telefon"
 
 #: indico_vc_zoom/plugin.py:122
 msgid "Invalid identity providers: {}"
-msgstr "无效的身份提供者：{}"
+msgstr "Neplatný poskytovatel identity / nepltní poskytovatelé identit: {}"
 
-#: indico_vc_zoom/plugin.py:352
+#: indico_vc_zoom/plugin.py:353
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
-msgstr "无法在 Zoom 中创建会议室。如果错误持续请联系技术支持"
+msgstr ""
+"Vytvoření virtuální místnosti v aplikaci Zoom se nezdařilo. Pokud se problém"
+" opakuje, kontaktujte podporu. "
 
-#: indico_vc_zoom/plugin.py:437
+#: indico_vc_zoom/plugin.py:438
 msgid "Room didn't exist in Zoom anymore"
-msgstr "会议室在 Zoom 里不再存在"
+msgstr "Virtuální místnost v aplikaci Zoom již neexistuje. "
 
-#: indico_vc_zoom/plugin.py:440
+#: indico_vc_zoom/plugin.py:441
 msgid "Zoom Error: \"{}\""
-msgstr "Zoom 错误: \"{}\""
+msgstr "Chyba aplikace Zoom: \"{}\""
 
-#: indico_vc_zoom/plugin.py:443
+#: indico_vc_zoom/plugin.py:444
 msgid "Problem deleting room"
-msgstr "删除会议室时出现问题"
+msgstr "Při vymazávaní virtuální místnosti nastala chyba"
 
-#: indico_vc_zoom/plugin.py:467
+#: indico_vc_zoom/plugin.py:468
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
-msgstr "会议室在 \"{}\" 不再存在并已从事件中删除"
-
-#: indico_vc_zoom/plugin.py:535
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this event "
-"which were not automatically updated."
-msgstr "有一个或多个与此事件关联的预定的Zoom会议没有自动更新。"
-
-#: indico_vc_zoom/plugin.py:538
-msgid ""
-"There are one or more scheduled Zoom meetings associated with the "
-"contribution \"{}\" which  were not automatically updated."
-msgstr "有一个或多个与报告 \"{}\" 关联的预定的Zoom会议没有自动更新。"
-
-#: indico_vc_zoom/plugin.py:541
-msgid ""
-"There are one or more scheduled Zoom meetings associated with this session "
-"block which were not automatically updated."
-msgstr "有一个或多个与此分会关联的预定的Zoom会议没有自动更新。"
+msgstr ""
+"Virtuální místnost \"{}\" v aplikaci Zoom již neexistuje a byla odstraněna z"
+" Vámi plánované události."
 
 #: indico_vc_zoom/util.py:43
 msgid "All emails"
-msgstr "所有电子邮件"
+msgstr "Všechny e-maily"
 
 #: indico_vc_zoom/util.py:44
 msgid "Email domains"
-msgstr "电子邮件域"
+msgstr "E-mailové domény"
 
 #: indico_vc_zoom/util.py:45
 msgid "Authenticators"
-msgstr "认证者"
+msgstr "Autentizátory "
 
-#: indico_vc_zoom/util.py:125
+#: indico_vc_zoom/util.py:126
 msgid "This room has been deleted from Zoom"
-msgstr "此会议室已从 Zoom 删除"
+msgstr "Tato virtuální místnost byla odstraněná z aplikace Zoom"
 
-#: indico_vc_zoom/util.py:129
+#: indico_vc_zoom/util.py:130
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
-msgstr "从Zoom获取会议室时出现问题。 如果错误仍然存在请联系技术支持。"
+msgstr ""
+"Problém s načítáním místnosti prostřednictvím aplikace Zoom. Pokud chyba "
+"přetrvává, kontaktujte podporu. "
 
-#: indico_vc_zoom/util.py:151
+#: indico_vc_zoom/util.py:152
 msgid "Room no longer exists in Zoom"
-msgstr "会议室在 Zoom 里不再存在"
+msgstr "Virtuální místnost v aplikaci Zoom již neexistuje"
 
-#: indico_vc_zoom/util.py:153
+#: indico_vc_zoom/util.py:154
 msgid "Can't update meeting. Please contact support if the error persists."
-msgstr "无法更新会议。如果错误继续存在请联系技术支持。"
+msgstr ""
+"Schůzku nelze aktualizovat. Pokud problém přetrvává, kontaktujte podporu. "
 
-#: indico_vc_zoom/util.py:209
+#: indico_vc_zoom/util.py:210
 msgid "Could not find Zoom user for alternative host"
-msgstr "找不到替代主持的Zoom用户"
+msgstr ""
+"Uživatel aplikace Zoom pro alternativního hostitele nemohl být nalezen. "
 
 #: indico_vc_zoom/templates/buttons.html:9
 msgid "You will become an alternative host of this Zoom meeting"
-msgstr "你将成为这次会议的备选主持人"
+msgstr "Stanete se alternativním hostitelem schůzky v aplikaci Zoom. "
 
 #: indico_vc_zoom/templates/buttons.html:12
 msgid "Make me alternative host"
-msgstr "让我成为备选主持人"
+msgstr "Vytvoř alternativního hostitele"
 
 #: indico_vc_zoom/templates/buttons.html:26
 #: indico_vc_zoom/templates/buttons.html:32
 msgid "Join"
-msgstr "加入"
+msgstr "Připojit se"
 
 #: indico_vc_zoom/templates/buttons.html:30
 msgid "You will need a passcode to join this Zoom meeting"
-msgstr "您需要密码才能参加此Zoom会议"
+msgstr "Pro připojení k této Zoom schůzce budete potřebovat klíč/heslo."
 
 #: indico_vc_zoom/templates/buttons.html:38
 #: indico_vc_zoom/templates/buttons.html:44
 #: indico_vc_zoom/templates/buttons.html:50
 msgid "This Zoom Meeting can only be seen by registered participants"
-msgstr "此 Zoom 会议只有注册的参会人可见"
+msgstr "Tuhle schůzku uvidí jenom registrovaní uživatelé"
 
 #: indico_vc_zoom/templates/buttons.html:40
 msgid "Please register"
-msgstr "请注册"
+msgstr "Prosíme zaregistrujte se"
 
 #: indico_vc_zoom/templates/buttons.html:45
 msgid "Registration required"
-msgstr "需要注册"
+msgstr "Vyžaduje se registrace"
 
 #: indico_vc_zoom/templates/buttons.html:52
 msgid "Please log in and register"
-msgstr "请登录并注册"
+msgstr "Prosíme přihlaste se a zaregistrujte se"
 
 #: indico_vc_zoom/templates/buttons.html:57
 msgid "This Zoom Meeting can only be seen by logged in users"
-msgstr "此 Zoom 会议只有登录用户可见"
+msgstr "Tuto Zoom schůzku mohou vidět pouze přihlášení uživatelé"
 
 #: indico_vc_zoom/templates/buttons.html:59
 msgid "Please log in"
-msgstr "请登录"
+msgstr "Prosíme přihlaste se"
 
 #: indico_vc_zoom/templates/extra_delete_msg.html:2
 #, python-format
@@ -391,58 +398,62 @@ msgid ""
 " to delete this Zoom meeting from all events, please make sure that they do "
 "not use it for other events that may still need it!"
 msgstr ""
-"此 Zoom 会议主持人是 <strong> %(host)s </strong>。如果您要从所有事件中删除此 Zoom "
-"会议，请确保其他事件不再使用它！"
+"Hostitelem této schůzky aplikace Zoom je <strong>%(host)s </strong>. Pokud "
+"chcete odstranit tuto schůzku ze všech událostí, ujistěte se, že již není "
+"používaná"
 
 #: indico_vc_zoom/templates/info_box.html:12
 #: indico_vc_zoom/templates/manage_event_info_box.html:6
 msgid "Zoom Meeting ID"
-msgstr "Zoom 会议 ID"
+msgstr "ID schůzky v aplikaci Zoom"
 
 #: indico_vc_zoom/templates/info_box.html:19
 #: indico_vc_zoom/templates/manage_event_info_box.html:12
 msgid "Host"
-msgstr "主持人"
+msgstr "Hostitel"
 
 #: indico_vc_zoom/templates/info_box.html:24
 #: indico_vc_zoom/templates/manage_event_info_box.html:18
 msgid "Alternative host"
 msgid_plural "Alternative hosts"
-msgstr[0] "备选主持人"
+msgstr[0] "Alternativní hostitel"
+msgstr[1] "Alternativní hostitelé"
+msgstr[2] "Alternativní hostitelé"
+msgstr[3] "Alternativní hostitelé"
 
 #: indico_vc_zoom/templates/info_box.html:40
 msgid "Useful links"
-msgstr "有用的链接"
+msgstr "Užitečné odkazy"
 
 #: indico_vc_zoom/templates/info_box.html:48
 #: indico_vc_zoom/templates/manage_event_info_box.html:43
 msgid "Zoom URL"
-msgstr "Zoom URL"
+msgstr "URL aplikace Zoom"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:28
 msgid "Linked to"
-msgstr "链接到"
+msgstr "Spojené s"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:34
 msgid "the whole event"
-msgstr "整个事件"
+msgstr "celá událost"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:36
 msgid "Contribution"
-msgstr "报告"
+msgstr "Příspěvek"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:38
 msgid "Session"
-msgstr "分会"
+msgstr "Sekce"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:47
 msgid "Created on"
-msgstr "创建于"
+msgstr "Vytvořeno dne"
 
 #: indico_vc_zoom/templates/manage_event_info_box.html:50
 msgid "Modified on"
-msgstr "修改于"
+msgstr "Změněno dne"
 
 #: indico_vc_zoom/templates/room_labels.html:3
 msgid "This is a Zoom webinar"
-msgstr "这是Zoom网络研讨会"
+msgstr "Tohle je webinář aplikace Zoom"
