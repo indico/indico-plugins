@@ -14,6 +14,7 @@
 ### 3.2.4
 
 - Adapt to Indico 3.2.6 changes
+- Support Python 3.11
 
 ### 3.2.3
 

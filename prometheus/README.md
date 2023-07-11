@@ -27,6 +27,11 @@ If you're doing development you may want to add this under `scrape_configs`:
 
 ## Changelog
 
+### 3.2.1
+
+- Support Python 3.11
+- Use latest prometheus-client library
+
 ### 3.2
 
 - Initial release for Indico 3.2

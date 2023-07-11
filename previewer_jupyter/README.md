@@ -5,6 +5,10 @@ material to an Indico event.
 
 ## Changelog
 
+### 3.2.1
+
+- Support Python 3.11
+
 ### 3.2
 
 - Replace MathJax with Katex for auto math rendering

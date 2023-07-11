@@ -8,6 +8,7 @@ external services, typically to provide advanced search functionality.
 ### 3.2.1
 
 - Adapt to Indico 3.2.6 changes
+- Support Python 3.11
 
 ### 3.2
 

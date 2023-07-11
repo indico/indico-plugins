@@ -8,6 +8,7 @@ to provide advanced search functionality using an Elasticsearch backend.
 ### 3.2.2
 
 - Adapt to Indico 3.2.6 changes
+- Support Python 3.11
 
 ### 3.2.1
 

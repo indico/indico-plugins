@@ -9,6 +9,10 @@ plugins via the `indico-plugins` meta package.
 
 ## Changelog
 
+### 3.2
+
+- Support Python 3.11
+
 ### 3.1
 
 - Adapt to Indico 3.1 changes

@@ -22,6 +22,10 @@ it.
 
 ## Changelog
 
+### 3.2.2
+
+- Support Python 3.11
+
 ## 3.2.1
 
 - Disable the confirmation button in the 'add files' dialog if the File-picker

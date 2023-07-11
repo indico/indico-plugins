@@ -10,6 +10,10 @@ payment has been made and processed by PayPal.
 
 ## Changelog
 
+### 3.2.1
+
+- Support Python 3.11
+
 ### 3.2
 
 - Update translations

@@ -17,6 +17,10 @@ The following languages are supported:
 
 ## Changelog
 
+### 3.2.1
+
+- Support Python 3.11
+
 ### 3.2
 
 - Declare compatibility with Python 3.10
