@@ -78,7 +78,7 @@ jobs:
         uses: actions/setup-node@v3
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
-          node-version: '14.x'
+          node-version: '18.x'
 
       - name: Install Indico
         run: |
@@ -101,7 +101,7 @@ jobs:
 
   lint:
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -136,7 +136,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '18.x'
 
       - name: Download environment
         uses: actions/download-artifact@v3
@@ -172,7 +172,7 @@ jobs:
 
   test-plugin:
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -208,7 +208,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '18.x'
 
       - name: Download environment
         uses: actions/download-artifact@v3
