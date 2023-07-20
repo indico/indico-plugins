@@ -1,1 +1,3 @@
 vc_zoom/README.md merge=union
+*/*/translations/*.pot linguist-generated
+*/*/translations/*/LC_MESSAGES/* linguist-generated
