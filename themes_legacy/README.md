@@ -15,6 +15,10 @@ using it when an instance is upgraded to 3.0.
 
 ## Changelog
 
+### 3.3
+
+- Adapt to changes in Indico 3.3
+
 ### 3.2.1
 
 - Support Python 3.11

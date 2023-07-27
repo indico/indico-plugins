@@ -1,4 +1,4 @@
-@import 'base/palette';
+@use 'base/palette' as *;
 
 div.main {
   color: #000;

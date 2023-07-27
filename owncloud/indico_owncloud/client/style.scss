@@ -5,7 +5,7 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-@import 'base/palette';
+@use 'base/palette' as *;
 
 form#attachment-owncloudfilepicker-form.full-width .owncloudfilepicker {
   width: 770px;
