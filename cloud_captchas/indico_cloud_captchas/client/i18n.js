@@ -10,4 +10,4 @@ import {bindTranslateComponents} from 'indico/react/i18n';
 const {Translate, PluralTranslate} = bindTranslateComponents('cloud_captchas');
 
 export {Translate, PluralTranslate};
-export {Singular, Plural, Param} from 'react-jsx-i18n';
+export {Singular, Plural, Param} from 'indico/react/i18n';
