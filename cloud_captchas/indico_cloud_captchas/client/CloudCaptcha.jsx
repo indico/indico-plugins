@@ -13,7 +13,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import {Message, Form} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+
+import {Translate} from './i18n';
 
 import './CloudCaptcha.module.scss';
 
