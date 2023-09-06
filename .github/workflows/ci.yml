@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  PYTHON_VERSION: '3.11.5'
+
 on:
   push:
     branches:
@@ -41,7 +44,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install system dependencies
         run: sudo apt-get install postgresql-client libpq-dev
@@ -131,7 +134,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -203,7 +206,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
