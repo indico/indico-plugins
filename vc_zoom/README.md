@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3
+
+- Adapt to Indico 3.3 changes
+
 ### 3.2.5
 
 - Handle webhook validation request and use zoom webhook secret token for request verification

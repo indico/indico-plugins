@@ -26,7 +26,7 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
 from indico.web.forms.validators import HiddenUnless
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
@@ -109,7 +109,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
-    creation_email_footer = TextAreaField(_('Creation email footer'), widget=CKEditorWidget(),
+    creation_email_footer = TextAreaField(_('Creation email footer'), widget=TinyMCEWidget(),
                                           description=_('Footer to append to emails sent upon creation of a VC room'))
 
     send_host_url = BooleanField(_('Send host URL'),
