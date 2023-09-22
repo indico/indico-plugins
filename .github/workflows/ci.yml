@@ -161,9 +161,9 @@ jobs:
       - name: Check headers
         if: success() || failure()
         run: |
-          wget "https://raw.githubusercontent.com/indico/indico/${INDICO_BRANCH}/bin/maintenance/update_header.py" -O /tmp/update_header.py
+          pipx install unbeheader
           echo '::add-matcher::.github/matchers/headers-problem-matcher.json'
-          python /tmp/update_header.py --ci
+          unbehead --check
           echo '::remove-matcher owner=headers::'
 
       - name: Run flake8
