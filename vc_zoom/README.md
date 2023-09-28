@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.2.5
+
+- Handle webhook validation request and use zoom webhook secret token for request verification
+
 ### 3.2.4
 
 - Adapt to Indico 3.2.6 changes
@@ -109,7 +113,9 @@
 
 **URL:** `https://yourserver/api/plugin/zoom/webhook`
 
-(write down the "Verification Token", as you will need it in the plugin configuration below)
+Copy the "Secret Token", as you will need it in the plugin configuration below. Note that in order
+to actually create the webhook you need to validate the URL, which requires the token to saved in
+the Indico plugin configuration.
 
 Select the following "Event types":
  * `Meeting has been updated`
@@ -124,7 +130,7 @@ These are the most relevant configuration options:
 
  * **Notification email addresses** - Additional e-mails which will receive notifications
  * **E-mail domains** - List of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
- * **Webhook token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
+ * **Webhook Secret Token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
 
 
 ### Zoom Server-to-Server OAuth
