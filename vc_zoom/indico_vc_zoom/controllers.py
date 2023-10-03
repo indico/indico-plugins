@@ -5,13 +5,16 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import hashlib
+import hmac
+
 from flask import flash, jsonify, request, session
 from flask_pluginengine import current_plugin
 from marshmallow import EXCLUDE
 from sqlalchemy.orm.attributes import flag_modified
 from webargs import fields
 from webargs.flaskparser import use_kwargs
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, ServiceUnavailable
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
@@ -48,17 +51,44 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
 class RHWebhook(RH):
     CSRF_ENABLED = False
 
+    def _is_validation_event(self, event):
+        return event == 'endpoint.url_validation'
+
+    def _get_hmac(self, data):
+        webhook_token = current_plugin.settings.get('webhook_token')
+        if not webhook_token:
+            current_plugin.logger.warning('Tried to validate Zoom webhook, but no secret token has been configured')
+            raise ServiceUnavailable('No Zoom Webhook Secret Token configured')
+        return hmac.new(webhook_token.encode(), data, hashlib.sha256).hexdigest()
+
     def _check_access(self):
-        token = request.headers.get('Authorization')
-        expected_token = current_plugin.settings.get('webhook_token')
-        if not expected_token or not token or token != expected_token:
-            raise Forbidden
+        timestamp = request.headers.get('x-zm-request-timestamp')
+        zoom_signature_header = request.headers.get('x-zm-signature')
+        signature = self._get_hmac(b'v0:%s:%s' % (timestamp.encode(), request.data))
+        expected_header = f'v0={signature}'
+        if zoom_signature_header != expected_header:
+            current_plugin.logger.warning('Received request with invalid signature: Expected %s, got %s, payload %s',
+                                          expected_header, zoom_signature_header, request.data.decode())
+            raise Forbidden('Zoom signature verification failed')
 
     @use_kwargs({
         'event': fields.String(required=True),
         'payload': fields.Dict(required=True)
     }, unknown=EXCLUDE)
     def _process(self, event, payload):
+        if self._is_validation_event(event):
+            return self._handle_validation(payload)
+        return self._handle_zoom_event(event, payload)
+
+    def _handle_validation(self, payload):
+        plain_token = payload['plainToken']
+        signed_token = self._get_hmac(plain_token.encode())
+        return jsonify({
+            'plainToken': plain_token,
+            'encryptedToken': signed_token
+        })
+
+    def _handle_zoom_event(self, event, payload):
         meeting_id = payload['object']['id']
         vc_room = VCRoom.query.filter(VCRoom.data.contains({'zoom_id': meeting_id})).first()
 
