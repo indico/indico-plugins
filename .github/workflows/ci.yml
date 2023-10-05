@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  PYTHON_VERSION: '3.11.5'
+  PYTHON_VERSION: '3.12.0'
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Create virtualenv
         run: |
-          python3.11 -m venv .venv
+          python3.12 -m venv .venv
           source .venv/bin/activate
           pip install -U pip setuptools wheel
 
@@ -69,7 +69,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip|${{ runner.os }}|3.11|${{ hashFiles('**/setup.cfg') }}
+          key: pip|${{ runner.os }}|3.12|${{ hashFiles('**/setup.cfg') }}
 
       - uses: actions/cache@v3
         id: cache-npm
