@@ -12,7 +12,7 @@ from collections import defaultdict
 from functools import wraps
 
 from flask import current_app
-from flask.globals import _app_ctx_stack
+from flask.globals import _cv_app
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalPermissionsMixin, PrincipalType
@@ -29,7 +29,7 @@ def parallelize(func, entries, batch_size=200):
         finished = threading.Event()
         results = []
         app = current_app._get_current_object()
-        main_app_context = _app_ctx_stack.top
+        main_app_context = _cv_app.get(None)
         worker_exc_info = None
 
         def worker(iterator):
