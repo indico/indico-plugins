@@ -8,6 +8,10 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 The major/minor version of this package should match the Indico version you
 are using. So if you have Indico 3.0.x, then you should install version 3.0.x
 of the `indico-plugins` package.

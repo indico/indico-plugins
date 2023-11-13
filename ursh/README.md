@@ -13,6 +13,10 @@ human-friendly shortcuts pointing to an event (such as `https://indico.example.c
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.2
 
 - Support Python 3.11

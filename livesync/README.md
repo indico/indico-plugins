@@ -5,6 +5,10 @@ external services, typically to provide advanced search functionality.
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.1
 
 - Adapt to Indico 3.2.6 changes

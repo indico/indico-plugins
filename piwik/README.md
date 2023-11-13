@@ -5,6 +5,10 @@ gather statistics about the users accessing Indico or specific Indico events.
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.1
 
 - Support Python 3.11

@@ -19,6 +19,10 @@ When using hCaptcha the keys can be created on the [hCaptcha dashboard][hcaptcha
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.1
 
 - Support Python 3.11

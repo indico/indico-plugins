@@ -18,6 +18,7 @@ using it when an instance is upgraded to 3.0.
 ### 3.3
 
 - Adapt to changes in Indico 3.3
+- Support Python 3.12
 
 ### 3.2.1
 

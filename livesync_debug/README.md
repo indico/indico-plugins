@@ -8,6 +8,10 @@ plugins via the `indico-plugins` meta package.
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2
 
 - Support Python 3.11

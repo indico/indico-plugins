@@ -27,6 +27,10 @@ If you're doing development you may want to add this under `scrape_configs`:
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.1
 
 - Support Python 3.11

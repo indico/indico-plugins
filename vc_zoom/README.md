@@ -14,6 +14,7 @@
 ### 3.3
 
 - Adapt to Indico 3.3 changes
+- Support Python 3.12
 
 ### 3.2.5
 

@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.3
+
+- Support Python 3.12
+
 ### 3.2.1
 
 - Support Python 3.11
