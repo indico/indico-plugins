@@ -136,6 +136,11 @@ jobs:
           unbehead --check
           echo '::remove-matcher owner=headers::'
 
+      - name: Run ruff
+        if: success() || failure()
+        run: |
+          ruff check --output-format github .
+
       - name: Run flake8
         if: success() || failure()
         run: |
