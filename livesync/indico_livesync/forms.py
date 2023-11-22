@@ -15,4 +15,4 @@ from indico_livesync import _
 
 class AgentForm(IndicoForm):
     name = StringField(_('Name'), [DataRequired()],
-                       description=_("The name of the agent. Only used in the administration interface."))
+                       description=_('The name of the agent. Only used in the administration interface.'))

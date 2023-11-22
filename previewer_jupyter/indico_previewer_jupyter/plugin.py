@@ -25,7 +25,7 @@ register_custom_mimetypes()
 
 
 class NotebookPreviewer(Previewer):
-    ALLOWED_CONTENT_TYPE = re.compile(r"^application/x-ipynb\+json$")
+    ALLOWED_CONTENT_TYPE = re.compile(r'^application/x-ipynb\+json$')
 
     @classmethod
     def generate_content(cls, attachment):

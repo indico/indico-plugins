@@ -84,4 +84,4 @@ class PiwikQueryReportEventMetricPeakDateAndVisitors(PiwikQueryReportEventMetric
             date, value = max(result.items(), key=itemgetter(1))
             return {'date': date, 'users': value}
         else:
-            return {'date': "No Data", 'users': 0}
+            return {'date': 'No Data', 'users': 0}

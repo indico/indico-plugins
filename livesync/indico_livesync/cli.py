@@ -62,17 +62,17 @@ def agents():
     print(table.table)
     if not all(a.initial_data_exported for a in agent_list):
         print()
-        print("You need to perform the initial data export for some agents.")
-        print(cformat("To do so, run "
-                      "%{yellow!}indico livesync initial-export %{reset}%{yellow}<agent_id>%{reset} for those agents."))
+        print('You need to perform the initial data export for some agents.')
+        print(cformat('To do so, run '
+                      '%{yellow!}indico livesync initial-export %{reset}%{yellow}<agent_id>%{reset} for those agents.'))
 
 
 @cli.command()
 @click.argument('agent_id', type=int)
-@click.option('--retry', '-r', is_flag=True, help="Restart automatically after a failure")
-@click.option('--force', '-f', is_flag=True, help="Perform export even if it has already been done once.")
-@click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
-@click.option('--batch', type=int, default=5000, help="The amount of records yielded per export batch.",
+@click.option('--retry', '-r', is_flag=True, help='Restart automatically after a failure')
+@click.option('--force', '-f', is_flag=True, help='Perform export even if it has already been done once.')
+@click.option('--verbose', '-v', is_flag=True, help='Be more verbose (what this does is up to the backend)')
+@click.option('--batch', type=int, default=5000, help='The amount of records yielded per export batch.',
               show_default=True, metavar='N')
 def initial_export(agent_id, batch, force, verbose, retry):
     """Performs the initial data export for an agent."""
@@ -116,8 +116,8 @@ def initial_export(agent_id, batch, force, verbose, retry):
 
 @cli.command()
 @click.argument('agent_id', type=int, required=False)
-@click.option('--force', '-f', is_flag=True, help="Run even if initial export was not done")
-@click.option('--verbose', '-v', is_flag=True, help="Be more verbose (what this does is up to the backend)")
+@click.option('--force', '-f', is_flag=True, help='Run even if initial export was not done')
+@click.option('--verbose', '-v', is_flag=True, help='Be more verbose (what this does is up to the backend)')
 @click.option('--allow-category', '-c', 'allowed_categories', multiple=True, type=int,
               help="Process changes for the specified category id even if 'Skip category changes' is enabled. "
                    "This setting can be used multiple times.")

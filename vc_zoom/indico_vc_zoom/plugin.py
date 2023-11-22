@@ -59,8 +59,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     client_secret = IndicoPasswordField(_('Client Secret'), [], toggle=True)
 
     webhook_token = IndicoPasswordField(_('Webhook Secret Token'), toggle=True,
-                                        description=_("Specify the \"Secret Token\" of your Zoom Webhook if you want "
-                                                      "live updates in case of modified/deleted Zoom meetings."))
+                                        description=_('Specify the "Secret Token" of your Zoom Webhook if you want '
+                                                      'live updates in case of modified/deleted Zoom meetings.'))
 
     user_lookup_mode = IndicoEnumSelectField(_('User lookup mode'), [DataRequired()], enum=UserLookupMode,
                                              description=_('Specify how Indico should look up the zoom user that '

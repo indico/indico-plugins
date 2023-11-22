@@ -51,6 +51,6 @@ class RHEventPreviewIPyNB(RH):
         response.headers['Content-Security-Policy'] = csp_header
         response.headers['X-Webkit-CSP'] = csp_header
         # IE10 doesn't have proper CSP support, so we need to be more strict
-        response.headers['X-Content-Security-Policy'] = "sandbox allow-same-origin;"
+        response.headers['X-Content-Security-Policy'] = 'sandbox allow-same-origin;'
 
         return response

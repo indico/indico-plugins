@@ -65,9 +65,9 @@ class PiwikRequest:
         try:
             response = requests.get(query_url, timeout=timeout)
         except socket.timeout:
-            current_plugin.logger.warning("Timeout contacting Piwik server")
+            current_plugin.logger.warning('Timeout contacting Piwik server')
             return default_response
         except Exception:
-            current_plugin.logger.exception("Unable to connect")
+            current_plugin.logger.exception('Unable to connect')
             return default_response
         return response.content

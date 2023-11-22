@@ -34,7 +34,7 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
     configurable = True
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
-    friendly_name = "Dummy"
+    friendly_name = 'Dummy'
 
     @property
     def logo_url(self):

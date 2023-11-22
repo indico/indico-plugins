@@ -22,8 +22,8 @@ from indico_prometheus.blueprint import blueprint
 
 class PluginSettingsForm(IndicoForm):
     enabled = BooleanField(
-        _("Enabled"), [DataRequired()],
-        description=_("Endpoint enabled. Turn this on once you set a proper bearer token."),
+        _('Enabled'), [DataRequired()],
+        description=_('Endpoint enabled. Turn this on once you set a proper bearer token.'),
         widget=SwitchWidget()
     )
     global_cache_ttl = TimeDeltaField(

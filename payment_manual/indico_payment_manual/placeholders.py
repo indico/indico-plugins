@@ -35,19 +35,19 @@ class EscapablePlaceholder(ParametrizedPlaceholder):
 
 class FirstNamePlaceholder(EscapablePlaceholder):
     name = 'first_name'
-    basic_description = _("First name of the registrant")
+    basic_description = _('First name of the registrant')
     field = 'first_name'
 
 
 class LastNamePlaceholder(EscapablePlaceholder):
     name = 'last_name'
-    basic_description = _("Last name of the registrant")
+    basic_description = _('Last name of the registrant')
     field = 'last_name'
 
 
 class EmailPlaceholder(EscapablePlaceholder):
     name = 'email'
-    basic_description = _("Email address of the registrant")
+    basic_description = _('Email address of the registrant')
     field = 'email'
 
 
@@ -57,7 +57,7 @@ class RegistrationIDPlaceholder(IDPlaceholder):
 
 class RegistrationDatabaseIDPlaceholder(Placeholder):
     name = 'registration_db_id'
-    description = _("The database ID of the registration")
+    description = _('The database ID of the registration')
 
     @classmethod
     def render(cls, regform, registration):
@@ -66,7 +66,7 @@ class RegistrationDatabaseIDPlaceholder(Placeholder):
 
 class RegistrationFormIDPlaceholder(Placeholder):
     name = 'registration_form_id'
-    description = _("The ID of the registration form")
+    description = _('The ID of the registration form')
 
     @classmethod
     def render(cls, regform, registration):
@@ -75,7 +75,7 @@ class RegistrationFormIDPlaceholder(Placeholder):
 
 class EventIDPlaceholder(Placeholder):
     name = 'event_id'
-    description = _("The ID of the event")
+    description = _('The ID of the event')
 
     @classmethod
     def render(cls, regform, registration):
@@ -98,14 +98,14 @@ class PricePlaceholder(ParametrizedPlaceholder):
 
     @classmethod
     def iter_param_info(cls, regform, registration):
-        yield None, _("The price the registrant needs to pay (e.g. 100.00 or 100.25)")
-        yield 'short', _("The price without cents if possible (e.g. 100 or 100.25)")
-        yield 'int', _("The price formatted as an integer (e.g. 10000 or 10025)")
+        yield None, _('The price the registrant needs to pay (e.g. 100.00 or 100.25)')
+        yield 'short', _('The price without cents if possible (e.g. 100 or 100.25)')
+        yield 'int', _('The price formatted as an integer (e.g. 10000 or 10025)')
 
 
 class CurrencyPlaceholder(Placeholder):
     name = 'currency'
-    description = _("The currency used in the registration")
+    description = _('The currency used in the registration')
 
     @classmethod
     def render(cls, regform, registration):

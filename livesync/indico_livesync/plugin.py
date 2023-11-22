@@ -23,15 +23,15 @@ from indico_livesync.handler import connect_signals
 
 class SettingsForm(IndicoForm):
     queue_entry_ttl = IntegerField(_('Queue entry TTL'), [NumberRange(min=0)],
-                                   description=_("How many days should processed entries be kept in the queue. "
-                                                 "The time counts from the creation of the queue entries, so if the "
-                                                 "LiveSync task is not running for some time, queue entries may be "
-                                                 "deleted during the next run after processing them. Setting it to 0 "
-                                                 "disables automatic deletion."))
+                                   description=_('How many days should processed entries be kept in the queue. '
+                                                 'The time counts from the creation of the queue entries, so if the '
+                                                 'LiveSync task is not running for some time, queue entries may be '
+                                                 'deleted during the next run after processing them. Setting it to 0 '
+                                                 'disables automatic deletion.'))
     excluded_categories = MultipleItemsField(_('Excluded categories'),
-                                             fields=[{'id': 'id', 'caption': _("Category ID"), 'required': True}],
-                                             description=_("Changes to objects inside these categories or any of their "
-                                                           "subcategories are excluded."))
+                                             fields=[{'id': 'id', 'caption': _('Category ID'), 'required': True}],
+                                             description=_('Changes to objects inside these categories or any of their '
+                                                           'subcategories are excluded.'))
     disable_queue_runs = BooleanField(_('Disable queue runs'), widget=SwitchWidget(),
                                       description=_('Disable all scheduled queue runs.'))
     skip_category_changes = BooleanField(_('Skip category changes'), widget=SwitchWidget(),

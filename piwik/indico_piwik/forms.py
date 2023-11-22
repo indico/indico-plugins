@@ -15,21 +15,21 @@ from indico_piwik import _
 
 
 class SettingsForm(IndicoForm):
-    enabled = BooleanField(_("Track global visits"), widget=SwitchWidget())
-    enabled_for_events = BooleanField(_("Track events"), widget=SwitchWidget())
-    cache_enabled = BooleanField(_("Cache results"), widget=SwitchWidget())
-    server_url = StringField(_("Piwik server URL"))
-    server_api_url = StringField(_("Piwik API server URL"),
+    enabled = BooleanField(_('Track global visits'), widget=SwitchWidget())
+    enabled_for_events = BooleanField(_('Track events'), widget=SwitchWidget())
+    cache_enabled = BooleanField(_('Cache results'), widget=SwitchWidget())
+    server_url = StringField(_('Piwik server URL'))
+    server_api_url = StringField(_('Piwik API server URL'),
                                  description=_("Should be pointing to 'index.php'"))
-    server_token = StringField(_("Piwik API token"),
-                               description=_("Token to access the API. Do not share it!"))
-    site_id_general = StringField(_("Global statistics ID"),
-                                  description=_("Piwik site ID for global statistics"))
-    site_id_events = StringField(_("Event statistics ID"),
-                                 description=_("Piwik site ID for event statistics"))
-    cache_ttl = IntegerField(_("Result cache TTL (seconds)"),
-                             description=_("How long event reports are kept cached"))
-    use_only_server_url = BooleanField(_("Use Piwik server URL for all requests"))
+    server_token = StringField(_('Piwik API token'),
+                               description=_('Token to access the API. Do not share it!'))
+    site_id_general = StringField(_('Global statistics ID'),
+                                  description=_('Piwik site ID for global statistics'))
+    site_id_events = StringField(_('Event statistics ID'),
+                                 description=_('Piwik site ID for event statistics'))
+    cache_ttl = IntegerField(_('Result cache TTL (seconds)'),
+                             description=_('How long event reports are kept cached'))
+    use_only_server_url = BooleanField(_('Use Piwik server URL for all requests'))
 
     def validate_site_id_events(self, field):
         if self.site_id_general is not None and field is not None and self.site_id_general.data == field.data:

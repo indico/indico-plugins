@@ -63,7 +63,7 @@ class PiwikPlugin(IndicoPlugin):
     def add_sidemenu_item(self, sender, event, **kwargs):
         if not event.can_manage(session.user) or not PiwikPlugin.settings.get('site_id_events'):
             return
-        return SideMenuItem('statistics', _("Statistics"), url_for_plugin('piwik.view', event), section='reports')
+        return SideMenuItem('statistics', _('Statistics'), url_for_plugin('piwik.view', event), section='reports')
 
     def get_blueprints(self):
         return blueprint

@@ -34,22 +34,22 @@ class CppHighlighter(Preprocessor):
 
         # Build regular expressions to catch language extensions or switches and choose
         # an adequate pygments lexer
-        any_magic = "|".join(self.magics)
-        self.re_magic_language = re.compile(fr"^\s*({any_magic}).*", re.DOTALL)
+        any_magic = '|'.join(self.magics)
+        self.re_magic_language = re.compile(fr'^\s*({any_magic}).*', re.DOTALL)
 
     def matches(self, source, reg_expr):
         return bool(reg_expr.match(source))
 
     def _preprocess_cell_python(self, cell, resources, cell_index):
         # Mark %%cpp and %%dcl code cells as cpp
-        if cell.cell_type == "code" and self.matches(cell.source, self.re_magic_language):
+        if cell.cell_type == 'code' and self.matches(cell.source, self.re_magic_language):
             cell['metadata']['magics_language'] = self.cpp
 
         return cell, resources
 
     def _preprocess_cell_cpp(self, cell, resources, cell_index):
         # Mark all code cells as cpp
-        if cell.cell_type == "code":
+        if cell.cell_type == 'code':
             cell['metadata']['magics_language'] = self.cpp
 
         return cell, resources
@@ -57,7 +57,7 @@ class CppHighlighter(Preprocessor):
     def preprocess(self, nb, resources):
         self.preprocess_cell = self._preprocess_cell_python
         try:
-            if nb.metadata.kernelspec.language == "c++":
+            if nb.metadata.kernelspec.language == 'c++':
                 self.preprocess_cell = self._preprocess_cell_cpp
         except Exception:
             # if no language metadata, keep python as default

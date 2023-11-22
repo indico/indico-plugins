@@ -30,19 +30,19 @@ from indico_storage_s3.storage import (DynamicS3Storage, ReadOnlyDynamicS3Storag
 
 
 class SettingsForm(IndicoForm):
-    bucket_info_enabled = BooleanField(_("Bucket info API"), widget=SwitchWidget())
-    username = StringField(_("Username"), [HiddenUnless('bucket_info_enabled', preserve_data=True), DataRequired()],
-                           description=_("The username to access the S3 bucket info endpoint"))
+    bucket_info_enabled = BooleanField(_('Bucket info API'), widget=SwitchWidget())
+    username = StringField(_('Username'), [HiddenUnless('bucket_info_enabled', preserve_data=True), DataRequired()],
+                           description=_('The username to access the S3 bucket info endpoint'))
     password = IndicoPasswordField(_('Password'),
                                    [HiddenUnless('bucket_info_enabled', preserve_data=True), DataRequired()],
                                    toggle=True,
-                                   description=_("The password to access the S3 bucket info endpoint"))
+                                   description=_('The password to access the S3 bucket info endpoint'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         url = Markup('<strong><code>{}</code></strong>').format(url_for_plugin('storage_s3.buckets'))
-        self.bucket_info_enabled.description = _("Enables an API on {url} that returns information on all S3 buckets "
-                                                 "currently in use, including dynamically-named ones.").format(url=url)
+        self.bucket_info_enabled.description = _('Enables an API on {url} that returns information on all S3 buckets '
+                                                 'currently in use, including dynamically-named ones.').format(url=url)
 
 
 class S3StoragePlugin(IndicoPlugin):

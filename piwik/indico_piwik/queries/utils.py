@@ -51,4 +51,4 @@ def stringify_seconds(seconds=0):
         ti['m'] = minutes % 60
         ti['h'] = minutes / 60
 
-    return "%dh %dm %ds" % (ti['h'], ti['m'], ti['s'])
+    return '%dh %dm %ds' % (ti['h'], ti['m'], ti['s'])

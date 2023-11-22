@@ -46,18 +46,18 @@ class RHPaypalIPN(RH):
         verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.items()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':
-            current_plugin.logger.warning("Paypal IPN string %s did not validate (%s)", verify_params, result)
+            current_plugin.logger.warning('Paypal IPN string %s did not validate (%s)', verify_params, result)
             return
         if self._is_transaction_duplicated():
-            current_plugin.logger.info("Payment not recorded because transaction was duplicated\nData received: %s",
+            current_plugin.logger.info('Payment not recorded because transaction was duplicated\nData received: %s',
                                        request.form)
             return
         payment_status = request.form.get('payment_status')
         if payment_status == 'Failed':
-            current_plugin.logger.info("Payment failed (status: %s)\nData received: %s", payment_status, request.form)
+            current_plugin.logger.info('Payment failed (status: %s)\nData received: %s', payment_status, request.form)
             return
         if payment_status == 'Refunded' or float(request.form.get('mc_gross')) <= 0:
-            current_plugin.logger.warning("Payment refunded (status: %s)\nData received: %s",
+            current_plugin.logger.warning('Payment refunded (status: %s)\nData received: %s',
                                           payment_status, request.form)
             return
         if payment_status not in paypal_transaction_action_mapping:
@@ -79,7 +79,7 @@ class RHPaypalIPN(RH):
                       request.form.get('receiver_email', '').lower()}
         if expected in candidates:
             return True
-        current_plugin.logger.warning("Unexpected business: %s not in %r (request data: %r)", expected, candidates,
+        current_plugin.logger.warning('Unexpected business: %s not in %r (request data: %r)', expected, candidates,
                                       request.form)
         return False
 

@@ -26,12 +26,12 @@ def cli():
 
 
 @cli.command()
-@click.option('--force', '-f', is_flag=True, help="Upload even if it has already been done once.")
-@click.option('--retry', '-r', is_flag=True, help="Restart automatically after a failure")
+@click.option('--force', '-f', is_flag=True, help='Upload even if it has already been done once.')
+@click.option('--retry', '-r', is_flag=True, help='Restart automatically after a failure')
 @click.option('--batch', type=int, default=1000, show_default=True, metavar='N',
-              help="The amount of records yielded per upload batch.")
+              help='The amount of records yielded per upload batch.')
 @click.option('--max-size', type=int, metavar='SIZE',
-              help="The max size (in MB) of files to upload. Defaults to the size from the plugin settings.")
+              help='The max size (in MB) of files to upload. Defaults to the size from the plugin settings.')
 def upload(batch, force, max_size, retry):
     """Upload file contents for full text search."""
     agent = LiveSyncAgent.query.filter(LiveSyncAgent.backend_name == 'citadel').first()
