@@ -57,7 +57,7 @@ def upload(batch, force, max_size, retry):
         traceback.print_exc()
         print('Restarting in 2 seconds\a')
         time.sleep(2)
-        os.execl(sys.argv[0], *sys.argv)
+        os.execl(sys.argv[0], *sys.argv)  # noqa: S606
         return  # exec doesn't return but just in case...
 
     if not errors and not aborted:

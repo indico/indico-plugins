@@ -256,7 +256,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                                          if room_assoc.link_object.start_dt
                                          else {})
                     meeting = fetch_zoom_meeting(vc_room)
-                    current_schedule_args = {k: meeting[k] for k in {'start_time', 'duration'} if k in meeting}
+                    current_schedule_args = {k: meeting[k] for k in ('start_time', 'duration') if k in meeting}
 
                     # check whether the start time / duration of the scheduled meeting differs
                     if new_schedule_args != current_schedule_args:
@@ -521,7 +521,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_vc_room_attach_form_defaults(self, event):
         defaults = super().get_vc_room_attach_form_defaults(event)
-        defaults['password_visibility'] = 'logged_in'
+        defaults['password_visibility'] = 'logged_in'  # noqa: S105
         return defaults
 
     def can_manage_vc_room(self, user, room):

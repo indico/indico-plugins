@@ -10,7 +10,7 @@ import pytest
 from indico_citadel.util import _flatten, format_aggregations, format_query, remove_none_entries
 
 
-@pytest.mark.parametrize(('query', 'expected'), [
+@pytest.mark.parametrize(('query', 'expected'), (
     ('title:"my event" ola person:john ola some:yes ola',
      'title:"my event" ola person:john ola some\\:yes ola'),
     ('title:"my title:something"', 'title:"my title\\:something"'),
@@ -24,29 +24,29 @@ from indico_citadel.util import _flatten, format_aggregations, format_query, rem
     ('"section meeting" OR "group meeting"', '"section meeting" OR "group meeting"'),
     ('title:meeting AND "indico"', 'title:meeting AND "indico"'),
     ('title:valid stringtitle:valid foo:bar', 'title:valid stringtitle\\:valid foo\\:bar')
-])
+))
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
     assert format_query(query, placeholders) == expected
 
 
-@pytest.mark.parametrize(('val', 'expected'), [
+@pytest.mark.parametrize(('val', 'expected'), (
     ({'a': 0, 'b': None, 'c': {'c1': None, 'c2': 0, 'c3': {'c3a': None}}},
      {'a': 0, 'c': {'c2': 0, 'c3': {}}}),
     ({'a': 0, 'b': [None, {'b1': None, 'b2': 'test'}]},
      {'a': 0, 'b': [None, {'b2': 'test'}]}),
     (None, None),
-])
+))
 def test_remove_none_entries(val, expected):
     assert remove_none_entries(val) == expected
 
 
-@pytest.mark.parametrize(('val', 'expected'), [
+@pytest.mark.parametrize(('val', 'expected'), (
     ({'person': {'name': {'buckets': []}, 'affiliation': {'buckets': []}}, 'other': {'other': {'buckets': []}}},
      {'person_name', 'person_affiliation', 'other_other'}),
     ({'other': {'other': {'other': {'other': {'buckets': []}}}}},
      {'other_other_other_other'})
-])
+))
 def test_flatten(val, expected):
     assert {key for key, _ in _flatten(val)} == expected
 

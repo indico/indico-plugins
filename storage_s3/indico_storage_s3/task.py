@@ -32,7 +32,7 @@ def create_bucket():
             bucket_date = today + relativedelta(weeks=1)
             bucket = storage._get_bucket_name(bucket_date)
             storage._create_bucket(bucket)
-        elif placeholders == {'<year>', '<month>'} or placeholders == {'<year>'}:
+        elif placeholders in ({'<year>', '<month>'}, {'<year>'}):
             if '<month>' in placeholders or today.month == 12:
                 bucket_date = today + relativedelta(months=1)
                 bucket = storage._get_bucket_name(bucket_date)

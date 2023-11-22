@@ -70,7 +70,7 @@ class ReportBase:
         if self.end_date is None:
             today = now_utc().date()
             end_date = self.event.end_dt.date()
-            self.end_date = end_date if end_date < today else today
+            self.end_date = min(today, end_date)
         if self.start_date is None:
             self.start_date = self.end_date - timedelta(days=ReportBase.default_report_interval)
 

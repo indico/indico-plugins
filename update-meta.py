@@ -40,7 +40,7 @@ def _find_plugins():
 def _get_config():
     rv = {'extras': {}, 'skip': []}
     try:
-        f = open('_meta/meta.yaml')
+        f = open('_meta/meta.yaml')  # noqa: SIM115
     except OSError as exc:
         if exc.errno != errno.ENOENT:
             raise
@@ -84,17 +84,14 @@ def cli(nextver):
         else:
             plugins_require.append(pkgspec)
 
-    output = []
-    for entry in plugins_require:
-        output.append(f'    {entry}')
+    output = [f'    {entry}' for entry in plugins_require]
     if extras_require:
         if output:
             output.append('')
         output.append('[options.extras_require]')
         for extra, pkgspecs in sorted(extras_require.items()):
             output.append(f'{extra} =')
-            for pkg in sorted(pkgspecs):
-                output.append(f'    {pkg}')
+            output.extend(f'    {pkg}' for pkg in sorted(pkgspecs))
 
     if _update_meta('\n'.join(output)):
         click.secho('Updated meta package', fg='green')

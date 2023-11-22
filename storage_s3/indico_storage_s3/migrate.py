@@ -135,7 +135,7 @@ class S3Importer:
                   for model, total in models.items()}
         max_length = max(len(x) for x in labels.values())
         labels = {model: label.ljust(max_length) for model, label in labels.items()}
-        for model, total in sorted(list(models.items()), key=itemgetter(1)):
+        for model, total in sorted(models.items(), key=itemgetter(1)):
             with click.progressbar(self.query_chunked(model, 1000), length=total, label=labels[model],
                                    show_percent=True, show_pos=True) as objects:
                 for obj in self.flush_rclone_iterator(objects, 1000):
@@ -342,7 +342,7 @@ def apply_changes(data_file, revert=False):
               for model, total in models.items()}
     max_length = max(len(x) for x in labels.values())
     labels = {model: label.ljust(max_length) for model, label in labels.items()}
-    for model, total in sorted(list(models.items()), key=itemgetter(1)):
+    for model, total in sorted(models.items(), key=itemgetter(1)):
         pks = inspect(model).primary_key
         with click.progressbar(data[model.__name__], length=total, label=labels[model],
                                show_percent=True, show_pos=True) as entries:
@@ -469,7 +469,7 @@ def copy(source_backend_names, bucket_names, static_bucket_name, s3_endpoint, s3
     code.append('    backend = backend.replace("<week>", dt.strftime("%W"))')
     code.append('    return bucket, backend')
     d = {}
-    exec('\n'.join(code), d)
+    exec('\n'.join(code), d)  # noqa: S102
     if not source_backend_names:
         source_backend_names = [x for x in config.STORAGE_BACKENDS if not isinstance(get_storage(x), S3StorageBase)]
     if rclone:

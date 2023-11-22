@@ -39,7 +39,6 @@ def test_ipn_verify_business(formdata, expected, dummy_event):
     ('13.37', 'EUR', True),
     ('13.37', 'CHF', False),
     ('10.00', 'CHF', False),
-    ('10.00', 'CHF', False),
 ))
 def test_ipn_verify_amount(mocker, amount, currency, expected):
     nai = mocker.patch('indico_payment_paypal.controllers.notify_amount_inconsistency')

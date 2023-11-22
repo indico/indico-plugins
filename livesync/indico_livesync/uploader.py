@@ -35,17 +35,17 @@ class Uploader:
         if self.from_cli:
             simplified = self._make_verbose(simplified, total)
         try:
-            self.logger.info(f'{self_name} uploading %d changes from %d records', total, len(records))
+            self.logger.info(f'{self_name} uploading %d changes from %d records', total, len(records))  # noqa: G004
             if not self.upload_records(simplified):
                 self.logger.warning('uploader indicated a failure')
                 return
         except Exception:
-            self.logger.exception(f'{self_name} failed')
+            self.logger.exception(f'{self_name} failed')  # noqa: G004
             if self.from_cli:
                 raise
             return
         self.processed_records(records)
-        self.logger.info(f'{self_name} finished (%d total changes from %d records)', total, len(records))
+        self.logger.info(f'{self_name} finished (%d total changes from %d records)', total, len(records))  # noqa: G004
 
     def run_initial(self, records, total):
         """Runs the initial batch upload

@@ -62,9 +62,9 @@ class ACLSchema:
         manager_list = set(linked_object.get_manager_list(recursive=True))
 
         if attachment.is_self_protected:
-            return _get_identifiers({e for e in attachment.acl} | manager_list)
+            return _get_identifiers(set(attachment.acl) | manager_list)
         elif attachment.is_inheriting and attachment.folder.is_self_protected:
-            return _get_identifiers({e for e in attachment.folder.acl} | manager_list)
+            return _get_identifiers(set(attachment.folder.acl) | manager_list)
         else:
             return self._get_acl(linked_object)
 
@@ -84,7 +84,7 @@ class ACLSchema:
         elif isinstance(object, EventNote):
             obj_acl = self._get_acl(object.object)
         else:
-            raise ValueError(f'unknown object {object}')
+            raise TypeError(f'unknown object {object}')
 
         acl = {
             'owner': [default_acl],
@@ -92,7 +92,7 @@ class ACLSchema:
             'delete': [default_acl]
         }
         if obj_acl is not None:
-            acl['read'] = [default_acl] + obj_acl
+            acl['read'] = [default_acl, *obj_acl]
 
         return acl
 

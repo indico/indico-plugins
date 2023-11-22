@@ -121,7 +121,10 @@ class LiveSyncCitadelUploader(Uploader):
             # XXX this should no longer happen under any circumstances!
             # if we already have a mapping entry, delete the newly created record and
             # update the existing one in case something changed in the meantime
-            self.logger.error(f'{object_type.name.title()} %d already in citadel; deleting+updating', object_id)
+            self.logger.error(
+                f'{object_type.name.title()} %d already in citadel; deleting+updating',  # noqa: G004
+                object_id
+            )
             db.session.rollback()
             self._citadel_delete(session, new_citadel_id, delete_mapping=False)
             existing_citadel_id = CitadelIdMap.get_citadel_id(object_type, object_id)
@@ -313,12 +316,14 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
     def process_queue(self, uploader, allowed_categories=()):
         super().process_queue(uploader, allowed_categories)
         uploader_name = type(uploader).__name__
-        self.plugin.logger.info(f'{uploader_name} starting file upload')
+        self.plugin.logger.info(f'{uploader_name} starting file upload')  # noqa: G004
         total, errors, aborted = self.run_export_files(verbose=False)
         if aborted:
-            self.plugin.logger.info(f'{uploader_name} aborted after uploading %d files (%d failed)', total, errors)
+            self.plugin.logger.info(f'{uploader_name} aborted after uploading %d files (%d failed)',  # noqa: G004
+                                    total, errors)
         else:
-            self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)', total, errors)
+            self.plugin.logger.info(f'{uploader_name} finished uploading %d files (%d failed)',  # noqa: G004
+                                    total, errors)
 
     def run_initial_export(self, batch_size, force=False, verbose=False):
         if not super().run_initial_export(batch_size, force, verbose):
@@ -363,7 +368,7 @@ class LiveSyncCitadelBackend(LiveSyncBackendBase):
                                            lambda obj: re.sub(r'\s+', ' ', strip_control_chars(obj.attachment.title)),
                                            print_total_time=True)
         else:
-            self.plugin.logger.info(f'{total} files need to be uploaded')
+            self.plugin.logger.info('%d files need to be uploaded', total)
         total, errors, aborted = uploader.upload_files(attachments, initial=initial)
         return total, errors, aborted
 

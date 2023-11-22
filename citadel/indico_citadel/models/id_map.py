@@ -60,7 +60,7 @@ def _make_checks():
 
 class CitadelIdMap(db.Model):
     __tablename__ = 'id_map'
-    __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_citadel'},)
+    __table_args__ = (*_make_checks(), {'schema': 'plugin_citadel'})
 
     id = db.Column(
         db.Integer,

@@ -95,7 +95,7 @@ class VCRoomForm(VCRoomFormBase):
         allow_webinars = current_plugin.settings.get('allow_webinars')
 
         if allow_webinars:
-            for field_name in {'mute_audio', 'mute_participant_video', 'waiting_room'}:
+            for field_name in ('mute_audio', 'mute_participant_video', 'waiting_room'):
                 inject_validators(self, field_name, [HiddenUnless('meeting_type', 'regular')])
 
         super().__init__(*args, **kwargs)

@@ -46,7 +46,7 @@ def test_endpoint_works(get_metrics):
 @pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_empty(get_metrics):
 
-    metrics, _ = get_metrics()
+    metrics = get_metrics()[0]
 
     assert metrics['indico_num_users'] == 1.0
     assert metrics['indico_num_active_users'] == 0.0
@@ -77,7 +77,7 @@ def test_endpoint_returning_data(get_metrics, create_event):
     # create an event
     create_event(title='Test event #1')
 
-    metrics, _ = get_metrics()
+    metrics = get_metrics()[0]
     assert metrics['indico_num_users'] == 2.0
     assert metrics['indico_num_active_users'] == 0.0
     assert metrics['indico_num_events'] == 1.0

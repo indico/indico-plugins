@@ -28,8 +28,7 @@ def rooms(status=None):
     if status:
         room_query = room_query.filter(VCRoom.status == VCRoomStatus.get(status))
 
-    for room in room_query:
-        table_data.append([str(room.id), room.name, room.status.name, str(room.data['zoom_id'])])
+    table_data.extend([str(room.id), room.name, room.status.name, str(room.data['zoom_id'])] for room in room_query)
 
     table = AsciiTable(table_data)
     for col in (0, 3, 4):

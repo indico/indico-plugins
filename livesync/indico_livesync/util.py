@@ -39,7 +39,7 @@ def obj_ref(obj):
     elif isinstance(obj, Attachment):
         ref = {'type': EntryType.attachment, 'attachment_id': obj.id}
     else:
-        raise ValueError(f'Unexpected object: {obj.__class__.__name__}')
+        raise TypeError(f'Unexpected object: {obj.__class__.__name__}')
     return ImmutableDict(ref)
 
 

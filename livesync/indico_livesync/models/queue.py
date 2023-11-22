@@ -64,7 +64,7 @@ def _make_checks():
 
 class LiveSyncQueueEntry(db.Model):
     __tablename__ = 'queues'
-    __table_args__ = tuple(_make_checks()) + ({'schema': 'plugin_livesync'},)
+    __table_args__ = (*_make_checks(), {'schema': 'plugin_livesync'})
 
     #: Entry ID
     id = db.Column(
@@ -267,7 +267,7 @@ class LiveSyncQueueEntry(db.Model):
                            note_id=None, attachment_id=None)
 
     @classmethod
-    def create(cls, changes, ref, excluded_categories=set()):
+    def create(cls, changes, ref, excluded_categories=None):
         """Create a new change in all queues.
 
         :param changes: the change types, an iterable containing
@@ -277,6 +277,9 @@ class LiveSyncQueueEntry(db.Model):
         :param excluded_categories: set of categories (IDs) whose items
                                     will not be tracked
         """
+        if excluded_categories is None:
+            excluded_categories = set()
+
         ref = dict(ref)
         obj = obj_deref(ref)
 

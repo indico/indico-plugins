@@ -107,7 +107,7 @@ def initial_export(agent_id, batch, force, verbose, retry):
         traceback.print_exc()
         print('Restarting in 2 seconds')
         time.sleep(2)
-        os.execl(sys.argv[0], *sys.argv)
+        os.execl(sys.argv[0], *sys.argv)  # noqa: S606
         return  # exec doesn't return but just in case...
 
     agent.initial_data_exported = True
@@ -197,7 +197,7 @@ def reset(agent_id):
         for i in range(5):
             print(cformat('\rResetting in %{white!}{}%{reset}s (CTRL+C to abort)').format(5 - i), end='')
             time.sleep(1)
-        print('')
+        print()
 
     backend.reset()
     db.session.commit()

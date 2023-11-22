@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from datetime import date
 from enum import Enum
 from io import BytesIO
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from urllib.parse import quote
 
@@ -172,8 +173,7 @@ class S3StorageBase(Storage):
         if self.bucket_versioning:
             self.client.put_bucket_versioning(Bucket=name, VersioningConfiguration={'Status': 'Enabled'})
         if self.bucket_policy_file:
-            with open(self.bucket_policy_file) as f:
-                policy = f.read()
+            policy = Path(self.bucket_policy_file).read_text()
             self.client.put_bucket_policy(Bucket=name, Policy=policy)
 
     def _bucket_exists(self, name):
@@ -248,8 +248,7 @@ class DynamicS3Storage(S3StorageBase):
     def _replace_bucket_placeholders(self, name, date):
         name = name.replace('<year>', date.strftime('%Y'))
         name = name.replace('<month>', date.strftime('%m'))
-        name = name.replace('<week>', date.strftime('%W'))
-        return name
+        return name.replace('<week>', date.strftime('%W'))
 
     def save(self, name, content_type, filename, fileobj):
         try:
