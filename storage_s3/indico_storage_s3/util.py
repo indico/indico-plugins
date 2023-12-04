@@ -11,11 +11,12 @@ from urllib.parse import quote
 
 def make_content_disposition_args(attachment_filename):
     try:
-        attachment_filename = attachment_filename.encode('ascii')
+        attachment_filename.encode('ascii')
     except UnicodeEncodeError:
-        return {
-            'filename': unicodedata.normalize('NFKD', attachment_filename).encode('ascii', 'ignore'),
-            'filename*': "UTF-8''%s" % quote(attachment_filename, safe=b''),
-        }
+        simple = unicodedata.normalize('NFKD', attachment_filename)
+        simple = simple.encode('ascii', 'ignore').decode('ascii')
+        # safe = RFC 5987 attr-char
+        quoted = quote(attachment_filename, safe='!#$&+-.^_`|~')
+        return {'filename': simple, 'filename*': f"UTF-8''{quoted}"}
     else:
         return {'filename': attachment_filename}

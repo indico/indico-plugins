@@ -18,6 +18,7 @@ to local storage (but it would of course be possible to write a script for this)
 ### 3.3
 
 - Support Python 3.12
+- Fix incorrect download filename formatting when using signed URLs or nginx proxying
 
 ### 3.2.2
 
