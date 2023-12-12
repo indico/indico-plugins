@@ -52,7 +52,7 @@ def test_dump_event(db, dummy_user, dummy_event):
             'site': 'http://localhost',
             'title': 'dummy#0'
         },
-        'category_id': 1,
+        'category_id': category_id,
         'category_path': [
             {'id': 0, 'title': 'Home', 'url': '/'},
             {'id': category_id, 'title': 'dummy', 'url': f'/category/{category_id}/'},
