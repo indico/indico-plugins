@@ -47,7 +47,7 @@ class UserLookupMode(RichStrEnum):
 
     @property
     def title(self):
-        return RichStrEnum.title.__get__(self, type(self))
+        return RichStrEnum.title.__get__(self, type(self))  # noqa: PLC2801
 
     all_emails = 'all_emails'
     email_domains = 'email_domains'
