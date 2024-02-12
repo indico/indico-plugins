@@ -18,6 +18,7 @@ from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
 from indico_citadel.cli import cli
 from indico_livesync import LiveSyncPluginBase
+from indico_citadel.util import check_event_categories
 
 
 class CitadelSettingsForm(IndicoForm):
@@ -51,6 +52,12 @@ class CitadelSettingsForm(IndicoForm):
                                                 'is used, the internal Indico search interface will be used. This may '
                                                 'be useful when you are still running a larger initial export and do '
                                                 'not want people to get incomplete search results during that time.'))
+    large_category_warning_threshold = IntegerField(_('Large Category Warning Threshold'),
+                                                    [NumberRange(min=0)],
+                                                    description=_('This shows a warning message to admins when '
+                                                                  'the number of events in a category surpasses '
+                                                                  'the threshold set here. You can set the '
+                                                                  'threshold to 0 to suppress this warning.'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -75,6 +82,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         'num_threads_files': 5,
         'num_threads_files_initial': 25,
         'disable_search': False,
+        'large_category_warning_threshold': 0,
     }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
 
@@ -82,6 +90,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         super().init()
         self.connect(signals.core.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.template_hook('category-protection-page', check_event_categories)
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider

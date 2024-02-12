@@ -13,6 +13,7 @@ from functools import wraps
 
 from flask import current_app
 from flask.globals import _cv_app
+from flask_pluginengine.plugin import render_plugin_template
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalPermissionsMixin, PrincipalType
@@ -215,3 +216,13 @@ def get_user_access(user, admin_override_enabled=False):
                             for x in user.iter_all_multipass_groups()]
         access += _include_capitalized_groups(multipass_groups)
     return access
+
+
+def check_event_categories(category):
+    from indico_citadel.plugin import CitadelPlugin
+
+    threshold = CitadelPlugin.settings.get('large_category_warning_threshold')
+    num_events = category.deep_events_count
+
+    if threshold and num_events > threshold:
+        return render_plugin_template('event_category_warning.html', category=category, threshold=threshold)
