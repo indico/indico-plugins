@@ -5,6 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from flask_pluginengine.plugin import render_plugin_template
 from wtforms.fields import BooleanField, IntegerField, URLField
 from wtforms.validators import URL, DataRequired, NumberRange
 
@@ -18,7 +19,6 @@ from indico_citadel import _
 from indico_citadel.backend import LiveSyncCitadelBackend
 from indico_citadel.cli import cli
 from indico_livesync import LiveSyncPluginBase
-from indico_citadel.util import check_event_categories
 
 
 class CitadelSettingsForm(IndicoForm):
@@ -90,7 +90,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         super().init()
         self.connect(signals.core.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.template_hook('category-protection-page', check_event_categories)
+        self.template_hook('category-protection-page', self.check_event_categories)
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider
@@ -98,3 +98,10 @@ class CitadelPlugin(LiveSyncPluginBase):
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
+
+    def check_event_categories(self, category):
+        threshold = self.settings.get('large_category_warning_threshold')
+        num_events = category.deep_events_count
+
+        if threshold and num_events > threshold:
+            return render_plugin_template('event_category_warning.html')
