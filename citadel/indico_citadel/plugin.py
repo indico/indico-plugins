@@ -54,10 +54,11 @@ class CitadelSettingsForm(IndicoForm):
                                                 'not want people to get incomplete search results during that time.'))
     large_category_warning_threshold = IntegerField(_('Large Category Warning Threshold'),
                                                     [NumberRange(min=0)],
-                                                    description=_('This shows a warning message to admins when '
-                                                                  'the number of events in a category surpasses '
-                                                                  'the threshold set here. You can set the '
-                                                                  'threshold to 0 to suppress this warning.'))
+                                                    description=_('Displays a warning to category managers when '
+                                                                  'changing the ACL of big categories that would '
+                                                                  'result in sending a large amount of data to '
+                                                                  'the Citadel server. You can set the threshold '
+                                                                  'to 0 to suppress this warning.'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -90,7 +91,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         super().init()
         self.connect(signals.core.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-        self.template_hook('category-protection-page', self.check_event_categories)
+        self.template_hook('category-protection-page', self._check_event_categories)
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider
@@ -99,7 +100,7 @@ class CitadelPlugin(LiveSyncPluginBase):
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
 
-    def check_event_categories(self, category):
+    def _check_event_categories(self, category):
         threshold = self.settings.get('large_category_warning_threshold')
         num_events = category.deep_events_count
 

@@ -1,10 +1,8 @@
 {% from 'message_box.html' import message_box %}
 
 {% call message_box('warning', large_icon=true, fixed_width=true) %}
-    {% trans -%}
-        <b>This category contains a large number of events.</b>
-        <br/>
-        Please consider using groups instead of individual users when granting access or management privileges
-        since any change to the access control list requires re-synchronizing all events with Indico's search engine.
-    {%- endtrans %}
+    <strong>{% trans -%}This category contains a large number of events.{%- endtrans %}</strong>
+    <br>
+    {% trans -%}Please consider using groups instead of individual users when granting access to management privileges
+    since any change to the ACL requires re-synchronizing all events with Indico's search engine.{%- endtrans %}
 {% endcall %}
