@@ -102,7 +102,5 @@ class CitadelPlugin(LiveSyncPluginBase):
 
     def _check_event_categories(self, category):
         threshold = self.settings.get('large_category_warning_threshold')
-        num_events = category.deep_events_count
-
-        if threshold and num_events > threshold:
+        if threshold and category.deep_events_count > threshold:
             return render_plugin_template('event_category_warning.html')
