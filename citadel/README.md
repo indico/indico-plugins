@@ -9,6 +9,8 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 - Adapt to Indico 3.3 changes
 - Support Python 3.12
+- Add option to show a warning in large categories, encourating managers to use groups instead of
+  individual ACL entries (to avoid having to re-send huge amounts of data to the backend)
 
 ### 3.2.2
 

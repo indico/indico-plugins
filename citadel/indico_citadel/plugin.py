@@ -5,6 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from flask_pluginengine.plugin import render_plugin_template
 from wtforms.fields import BooleanField, IntegerField, URLField
 from wtforms.validators import URL, DataRequired, NumberRange
 
@@ -51,6 +52,13 @@ class CitadelSettingsForm(IndicoForm):
                                                 'is used, the internal Indico search interface will be used. This may '
                                                 'be useful when you are still running a larger initial export and do '
                                                 'not want people to get incomplete search results during that time.'))
+    large_category_warning_threshold = IntegerField(_('Large Category Warning Threshold'),
+                                                    [NumberRange(min=0)],
+                                                    description=_('Displays a warning to category managers when '
+                                                                  'changing the ACL of big categories that would '
+                                                                  'result in sending a large amount of data to '
+                                                                  'the Citadel server. You can set the threshold '
+                                                                  'to 0 to suppress this warning.'))
 
 
 class CitadelPlugin(LiveSyncPluginBase):
@@ -75,6 +83,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         'num_threads_files': 5,
         'num_threads_files_initial': 25,
         'disable_search': False,
+        'large_category_warning_threshold': 0,
     }
     backend_classes = {'citadel': LiveSyncCitadelBackend}
 
@@ -82,6 +91,7 @@ class CitadelPlugin(LiveSyncPluginBase):
         super().init()
         self.connect(signals.core.get_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.template_hook('category-protection-page', self._check_event_categories)
 
     def get_search_providers(self, sender, **kwargs):
         from indico_citadel.search import CitadelProvider
@@ -89,3 +99,8 @@ class CitadelPlugin(LiveSyncPluginBase):
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
+
+    def _check_event_categories(self, category):
+        threshold = self.settings.get('large_category_warning_threshold')
+        if threshold and category.deep_events_count > threshold:
+            return render_plugin_template('event_category_warning.html')

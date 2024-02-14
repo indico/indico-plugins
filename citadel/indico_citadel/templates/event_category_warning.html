@@ -1,0 +1,10 @@
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('warning', large_icon=true, fixed_width=true) %}
+    <strong>{% trans %}This category contains a large number of events.{% endtrans %}</strong>
+    <br>
+    {% trans -%}
+        Please consider using groups instead of individual users when granting access or management permissions
+        since any change to the list below requires re-synchronizing all events with Indico's search engine.
+    {%- endtrans %}
+{% endcall %}
