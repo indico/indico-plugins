@@ -17,6 +17,7 @@ CORE = sys.argv[1]
 SCOPE = sys.argv[2]
 CORE_USER, CORE_REPO = CORE.split('/')
 
+
 def lookup_via_referenced_prs():
     this_pr_body = os.environ['PR_BODY']
     this_base_ref = os.environ['PR_BASE_REF']
