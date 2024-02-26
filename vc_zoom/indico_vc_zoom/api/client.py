@@ -255,31 +255,31 @@ def get_zoom_token(config, *, force=False):
     client_id = config['client_id']
     client_secret = config['client_secret']
 
-    if account_id and client_id and client_secret:
-        ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
-        hash_key = '-'.join((account_id, client_id, client_secret))
-        cache_key = f'token-{crc32(hash_key)}'
-        if not force and (token_data := token_cache.get(cache_key)):
-            expires_in = int(token_data['expires_at'] - time.time())
-            ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
-            return token_data['access_token'], token_data['expires_at']
-        try:
-            resp = requests.post(
-                'https://zoom.us/oauth/token',
-                params={'grant_type': 'account_credentials', 'account_id': account_id},
-                auth=(client_id, client_secret)
-            )
-            resp.raise_for_status()
-        except HTTPError as exc:
-            ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
-            raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
-        token_data = resp.json()
-        assert 'access_token' in token_data
-        ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
-                                token_data['scope'])
-        expires_at = int(time.time() + token_data['expires_in'])
-        token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
-        token_cache.set(cache_key, token_data, token_data['expires_in'])
-        return token_data['access_token'], token_data['expires_at']
-    else:
+    if not (account_id and client_id and client_secret):
         raise Exception('Zoom authentication not configured')
+
+    ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
+    hash_key = '-'.join((account_id, client_id, client_secret))
+    cache_key = f'token-{crc32(hash_key)}'
+    if not force and (token_data := token_cache.get(cache_key)):
+        expires_in = int(token_data['expires_at'] - time.time())
+        ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
+        return token_data['access_token'], token_data['expires_at']
+    try:
+        resp = requests.post(
+            'https://zoom.us/oauth/token',
+            params={'grant_type': 'account_credentials', 'account_id': account_id},
+            auth=(client_id, client_secret)
+        )
+        resp.raise_for_status()
+    except HTTPError as exc:
+        ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
+        raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
+    token_data = resp.json()
+    assert 'access_token' in token_data
+    ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
+                            token_data['scope'])
+    expires_at = int(time.time() + token_data['expires_in'])
+    token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
+    token_cache.set(cache_key, token_data, token_data['expires_in'])
+    return token_data['access_token'], token_data['expires_at']
