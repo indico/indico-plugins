@@ -15,7 +15,7 @@
 
 - Adapt to Indico 3.3 changes
 - Support Python 3.12
-- Drop support for JWT authentication
+- Drop support for discontinued JWT authentication
 
 ### 3.2.5
 
