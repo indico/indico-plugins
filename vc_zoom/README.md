@@ -15,6 +15,7 @@
 
 - Adapt to Indico 3.3 changes
 - Support Python 3.12
+- Drop support for discontinued JWT authentication
 
 ### 3.2.5
 
@@ -149,12 +150,6 @@ The scopes to select when creating the app are:
 - `user:read:admin`
 - `webinar:read:admin` (optional, only needed when using webinars)
 - `webinar:write:admin` (optional, only needed when using webinars)
-
-
-### Zoom API key/secret (JWT, deprecated)
-
-Zoom deprecated JWTs in June 2023, existing ones still work but no new ones can be created.
-As soon as Zoom fully dropped them, JWT support will also be removed from this plugin.
 
 
 ## Intellectual Property

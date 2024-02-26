@@ -42,8 +42,7 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
-        (_('API Credentials (Server-to-Server OAuth)'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
-        (_('API Credentials (Legacy JWT, deprecated)'), ['api_key', 'api_secret']),
+        (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
                              'allow_webinars', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
@@ -52,8 +51,6 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         (_('Access'), ['managers', 'acl'])
     ]
 
-    api_key = StringField(_('API Key'), [])
-    api_secret = IndicoPasswordField(_('API Secret'), [], toggle=True)
     account_id = StringField(_('Account ID'), [])
     client_id = StringField(_('Client ID'), [])
     client_secret = IndicoPasswordField(_('Client Secret'), [], toggle=True)
@@ -137,8 +134,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
     default_settings = VCPluginMixin.default_settings | {
-        'api_key': '',
-        'api_secret': '',
         'account_id': '',
         'client_id': '',
         'client_secret': '',
