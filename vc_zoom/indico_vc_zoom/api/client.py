@@ -7,7 +7,6 @@
 
 import time
 
-import jwt
 import requests
 from pytz import utc
 from requests import Session
@@ -172,11 +171,9 @@ class ZoomClient:
         'webinar': WebinarComponent
     }
 
-    def __init__(self, api_key, api_secret, account_id, client_id, client_secret, timeout=15):
+    def __init__(self, account_id, client_id, client_secret, timeout=15):
         """Create a new Zoom client.
 
-        :param api_key: the Zoom JWT API key
-        :param api_secret: the Zoom JWT API Secret
         :param account_id: the Zoom Server OAuth Account ID
         :param client_id: the Zoom Server OAuth Client ID
         :param client_secret: the Zoom Server OAuth Client Secret
@@ -184,8 +181,6 @@ class ZoomClient:
         """
         # Setup the config details
         config = {
-            'api_key': api_key,
-            'api_secret': api_secret,
             'account_id': account_id,
             'client_id': client_id,
             'client_secret': client_secret,
@@ -217,8 +212,6 @@ class ZoomIndicoClient:
     def __init__(self):
         from indico_vc_zoom.plugin import ZoomPlugin
         self.client = ZoomClient(
-            ZoomPlugin.settings.get('api_key'),
-            ZoomPlugin.settings.get('api_secret'),
             ZoomPlugin.settings.get('account_id'),
             ZoomPlugin.settings.get('client_id'),
             ZoomPlugin.settings.get('client_secret'),
@@ -288,10 +281,5 @@ def get_zoom_token(config, *, force=False):
         token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
         token_cache.set(cache_key, token_data, token_data['expires_in'])
         return token_data['access_token'], token_data['expires_at']
-    elif config['api_key'] and config['api_secret']:
-        ZoomPlugin.logger.warning('Using JWT (deprecated)')
-        header = {'alg': 'HS256', 'typ': 'JWT'}
-        payload = {'iss': config['api_key'], 'exp': int(time.time() + 3600)}
-        return jwt.encode(payload, config['api_secret'], algorithm='HS256', headers=header), None
     else:
         raise Exception('Zoom authentication not configured')
