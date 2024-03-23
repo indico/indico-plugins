@@ -11,6 +11,9 @@ from pathlib import Path
 
 def _validate_manifest(plugin_dir: Path):
     pkg_dir = plugin_dir / f'indico_{plugin_dir.name}'
+    pkg_file = plugin_dir / f'indico_{plugin_dir.name}.py'
+    if not pkg_dir.exists() and pkg_file.exists():
+        return True
     data_dirs = [
         sub.name
         for sub in pkg_dir.iterdir()
