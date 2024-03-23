@@ -126,7 +126,11 @@ jobs:
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
+      - name: Check manifests
+        run: python .github/utils/check_manifests.py
+
       - name: Check import sorting
+        if: success() || failure()
         run: isort --diff --check-only .
 
       - name: Check headers
