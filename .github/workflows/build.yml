@@ -1,0 +1,168 @@
+name: Build
+
+env:
+  PYTHON_VERSION: '3.12'
+  TZ: Europe/Zurich
+
+on:
+  push:
+    branches:
+      - 'master'
+      - '*.x'
+  pull_request:
+      branches:
+        - 'master'
+        - '*.x'
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - labeled
+
+permissions:
+  contents: read
+
+jobs:
+  list-plugins:
+    name: Get plugin list 📃
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'build-wheel')
+    outputs:
+      PLUGINS_MATRIX: ${{ steps.list-plugins.outputs.PLUGINS_MATRIX }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 🐍
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install deps
+        run: pip install --user setuptools
+      - name: Generate matrix
+        id: list-plugins
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event_name == 'pull_request' && github.event.pull_request.number }}
+        run: python .github/utils/generate_matrix.py
+
+  build:
+    name: Build ${{ matrix.plugin }} 🛠
+    needs: list-plugins
+    runs-on: ubuntu-22.04
+    if: >-
+      needs.list-plugins.outputs.PLUGINS_MATRIX != '' &&
+      (github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'build-wheel'))
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.list-plugins.outputs.PLUGINS_MATRIX) }}
+    steps:
+      - name: Fail build if manifest is invalid
+        if: matrix.invalid_manifest
+        run: |
+          echo ::error::Plugin has invalid manifest
+          exit 1
+
+      - name: Checkout plugins
+        uses: actions/checkout@v4
+        with:
+          path: plugins
+          # prefer head commit over merge commit in case of PRs
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
+
+      - name: Pick Indico core repo
+        id: core-repo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event_name == 'pull_request' && github.event.pull_request.body }}
+          PR_BASE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref }}
+        run: python plugins/.github/utils/get_core_repo.py indico/indico INDICO
+
+      - name: Checkout core
+        uses: actions/checkout@v4
+        with:
+          path: indico
+          repository: indico/indico
+          ref: ${{ steps.core-repo.outputs.INDICO_BRANCH }}
+
+      - name: Set up Python 🐍
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            indico/requirements*.txt
+            plugins/**/setup.cfg
+
+      - name: Setup Node
+        if: matrix.assets
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: indico/package-lock.json
+
+      - name: Install build deps 🔧
+        working-directory: indico
+        run: |
+          sudo apt-get install libpq-dev
+          pip install --user -U pip setuptools wheel
+          pip install --user -e '.[dev]'
+
+      - name: Install npm deps ☕
+        if: matrix.assets
+        working-directory: indico
+        run: npm ci
+
+      - name: Install plugin deps 🔧
+        if: matrix.install && toJson(matrix.deps) != '[]'
+        working-directory: plugins
+        run: |
+          for dep in ${{ join(matrix.deps, ' ') }}; do
+            pip install --user -e $dep/
+          done
+
+      - name: Install plugin 🔧
+        if: matrix.install
+        working-directory: plugins
+        run: pip install --user -e ${{ matrix.plugin }}/
+
+      # XXX this is already done by build-wheel.py (but w/o react i18n which we don't use in plugins yet)
+      # - name: Compile translations 🏴‍☠️
+      #   if: matrix.i18n
+      #   working-directory: indico
+      #   run: indico i18n compile plugin ../plugins/${{ matrix.plugin }}
+
+      - name: Build wheel 🏗
+        working-directory: indico
+        run: ./bin/maintenance/build-wheel.py plugin ../plugins/${{ matrix.plugin }} --add-version-suffix
+
+      - uses: actions/upload-artifact@v4
+        name: Upload build artifacts 📦
+        with:
+          name: plugin-wheel-${{ matrix.plugin }}
+          retention-days: 7
+          path: ./indico/dist
+
+  bundle:
+    name: Bundle all wheels 📦
+    needs: build
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'build-wheel')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: plugin-wheel-*
+          path: dist
+      - name: List artifacts 📃
+        run: ls -al dist/
+      - uses: actions/upload-artifact@v4
+        name: Upload build artifacts 📦
+        with:
+          name: plugin-wheels
+          retention-days: 7
+          path: dist
+      - name: Delete individual artifacts 🚮
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: plugin-wheel-*

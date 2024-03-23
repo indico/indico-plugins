@@ -90,9 +90,11 @@ def main():
         print(f'Uncommon branch {branch}; defaulting to master')
         branch = 'master'
 
-    with open(os.environ['GITHUB_ENV'], 'a') as f:
-        f.write(f'{SCOPE}_REPO={full_repo}\n')
-        f.write(f'{SCOPE}_BRANCH={branch}\n')
+    for fn in (os.environ['GITHUB_ENV'], os.environ['GITHUB_OUTPUT']):
+        with open(fn, 'a') as f:
+            f.write(f'{SCOPE}_REPO={full_repo}\n')
+            f.write(f'{SCOPE}_BRANCH={branch}\n')
+
     return 0
 
 
