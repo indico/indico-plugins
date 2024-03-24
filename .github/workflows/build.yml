@@ -1,0 +1,54 @@
+name: Build
+
+env:
+  PYTHON_VERSION: '3.12'
+  TZ: Europe/Zurich
+
+on:
+  push:
+    branches:
+      - 'master'
+      - '*.x'
+  pull_request:
+      branches:
+        - 'master'
+        - '*.x'
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - labeled
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build plugins 🏗
+    uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
+    with:
+      scripts-repo: indico/indico-gh-actions
+
+  bundle:
+    name: Bundle wheels 📦
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: plugin-wheel-*
+          path: dist
+      - name: List artifacts 📃
+        run: ls -al dist/
+      - uses: actions/upload-artifact@v4
+        name: Upload build artifacts 📦
+        with:
+          name: plugin-wheels
+          retention-days: 7
+          path: dist
+      - name: Delete individual artifacts 🚮
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: plugin-wheel-*
