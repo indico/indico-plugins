@@ -27,7 +27,7 @@ jobs:
     name: Build plugins 🏗
     uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
     with:
-      scripts-repo: indico/indico-gh-actions
+      directory: public
 
   bundle:
     name: Bundle wheels 📦
