@@ -29,7 +29,7 @@ If you're doing development you may want to add this under `scrape_configs`:
 
 ### 3.3
 
-- Support Python 3.12
+- Support (and require) Python 3.12
 
 ### 3.2.1
 
