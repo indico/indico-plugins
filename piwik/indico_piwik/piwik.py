@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import socket
 from urllib.parse import urlparse
 
 import requests
@@ -64,7 +63,7 @@ class PiwikRequest:
         """Returns the raw results from the API"""
         try:
             response = requests.get(query_url, timeout=timeout)
-        except socket.timeout:
+        except TimeoutError:
             current_plugin.logger.warning('Timeout contacting Piwik server')
             return default_response
         except Exception:
