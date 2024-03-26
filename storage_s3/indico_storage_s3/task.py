@@ -38,5 +38,6 @@ def create_bucket():
                 bucket = storage._get_bucket_name(bucket_date)
                 storage._create_bucket(bucket)
         else:
-            raise RuntimeError('Invalid placeholder combination in bucket name template: {}'
-                               .format(storage.bucket_name_template))
+            raise RuntimeError(
+                f'Invalid placeholder combination in bucket name template: {storage.bucket_name_template}'
+            )
