@@ -19,7 +19,7 @@ The following languages are supported:
 
 ### 3.3
 
-- Support Python 3.12
+- Support (and require) Python 3.12
 
 ### 3.2.1
 

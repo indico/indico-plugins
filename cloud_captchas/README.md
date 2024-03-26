@@ -21,7 +21,7 @@ When using hCaptcha the keys can be created on the [hCaptcha dashboard][hcaptcha
 
 ### 3.3
 
-- Support Python 3.12
+- Support (and require) Python 3.12
 
 ### 3.2.1
 

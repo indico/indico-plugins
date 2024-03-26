@@ -7,7 +7,7 @@ external services, typically to provide advanced search functionality.
 
 ### 3.3
 
-- Support Python 3.12
+- Support (and require) Python 3.12
 
 ### 3.2.1
 
