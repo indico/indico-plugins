@@ -1,0 +1,140 @@
+name: PyPI release 🐍 📦
+
+env:
+  PYTHON_VERSION: '3.12'
+  TZ: Europe/Zurich
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '!v0.*'
+      - '!v1.*'
+      - '!v2.*'
+      - '!v3.0'
+      - '!v3.0.*'
+      - '!v3.1'
+      - '!v3.1.*'
+      - '!v3.2'
+      - '!v3.2.*'
+      - '!*\+docs'
+
+permissions:
+  contents: read
+
+jobs:
+  check-version:
+    name: Check version
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        name: Set up Python 🐍
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Check version 🔍
+        run: python .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
+
+  build:
+    name: Build plugins 🏗
+    needs: check-version
+    uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
+    with:
+      directory: public
+      add-version-suffix: false
+
+  test-install:
+    name: Test installing plugins
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download build artifacts 📦
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: plugin-wheel-*
+          path: wheels
+
+      - name: Set up Python 🐍
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Indico 🔧
+        run: |
+          sudo apt-get install libpq-dev
+          pip install setuptools wheel
+          pip install indico
+
+      - name: Install plugins 🧩
+        run: pip install wheels/*.whl
+
+      - name: List plugins 🧩
+        run: indico setup list-plugins
+
+  create-github-release:
+    name: Create GitHub release 🐙
+    # Upload wheel to a GitHub release. It remains available as a build artifact for a while as well.
+    needs:
+      - build
+      - test-install
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifacts 📦
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: plugin-wheel-*
+          path: dist
+      - name: Create draft release 🐙
+        run: >-
+          gh release create
+          --draft
+          --repo ${{ github.repository }}
+          --title ${{ github.ref_name }}
+          ${{ github.ref_name }}
+          dist/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  publish-pypi:
+    name: Publish 🚀
+    needs:
+      - build
+      - test-install
+      - create-github-release
+    # Wait for approval before attempting to upload to PyPI. This allows reviewing the
+    # files in the draft release.
+    environment: publish
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: plugin-wheel-*
+          path: dist
+      # Try uploading to Test PyPI first, in case something fails.
+      - name: Publish to Test PyPI 🧪
+        uses: pypa/gh-action-pypi-publish@v1.8.14
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+          skip-existing: true
+      - name: Publish to PyPI 🚀
+        uses: pypa/gh-action-pypi-publish@v1.8.14
+        with:
+          packages-dir: dist/
+          skip-existing: true
+      - name: Publish GitHub release 🐙
+        run: >-
+          gh release edit
+          --draft=false
+          --repo ${{ github.repository }}
+          ${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ github.token }}
