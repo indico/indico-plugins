@@ -2,6 +2,6 @@
   "private": true,
   "name": "indico-plugin-previewer-jupyter",
   "dependencies": {
-    "katex": "^0.15.3"
+    "katex": "^0.16.10"
   }
 }
