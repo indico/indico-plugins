@@ -18,6 +18,12 @@ on:
       - reopened
       - synchronize
       - labeled
+  workflow_dispatch:
+    inputs:
+      add-version-suffix:
+        type: boolean
+        default: true
+        description: Append version suffix
 
 permissions:
   contents: read
@@ -28,6 +34,7 @@ jobs:
     uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
     with:
       directory: public
+      add-version-suffix: ${{ github.event_name != 'workflow_dispatch' || inputs.add-version-suffix }}
 
   bundle:
     name: Bundle wheels 📦
