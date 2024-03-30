@@ -10,14 +10,14 @@ on:
       - 'master'
       - '*.x'
   pull_request:
-      branches:
-        - 'master'
-        - '*.x'
-      types:
-        - opened
-        - reopened
-        - synchronize
-        - labeled
+    branches:
+      - 'master'
+      - '*.x'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
 
 permissions:
   contents: read
