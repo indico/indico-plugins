@@ -29,7 +29,7 @@ class PiwikRequest:
     @property
     def api_url(self):
         url = urlparse(self.server_url)
-        scheme = url.scheme if url.scheme else 'https'
+        scheme = url.scheme or 'https'
         return f'{scheme}://{url.netloc}{url.path}{self.query_script}'
 
     def call(self, default_response=None, **query_params):

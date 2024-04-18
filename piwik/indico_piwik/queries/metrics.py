@@ -26,7 +26,7 @@ class PiwikQueryReportEventMetricVisitsBase(PiwikQueryReportEventMetricBase):
         result = get_json_from_remote_server(self.call)
         if reduced:
             return int(reduce_json(result)) if result else 0
-        return result if result else {}
+        return result or {}
 
 
 class PiwikQueryReportEventMetricReferrers(PiwikQueryReportEventMetricBase):
