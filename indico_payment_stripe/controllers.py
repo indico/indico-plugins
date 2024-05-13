@@ -10,8 +10,9 @@
 
 import stripe
 from flask_pluginengine import current_plugin
-from flask import flash, redirect, request, Markup
+from flask import flash, redirect, request
 from werkzeug.exceptions import BadRequest
+from markupsafe import Markup
 
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
