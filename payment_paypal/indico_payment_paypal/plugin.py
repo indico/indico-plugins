@@ -18,6 +18,9 @@ from indico.web.forms.validators import UsedIf
 from indico_payment_paypal import _
 from indico_payment_paypal.blueprint import blueprint
 from indico_payment_paypal.util import validate_business
+from indico_payment_paypal.util import validate_paypal_fixed_fee
+from indico_payment_paypal.util import validate_paypal_percent_fee
+import re
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -31,6 +34,12 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     business = StringField(_('Business'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
                                            validate_business],
                            description=_('The PayPal ID or email address associated with a PayPal account.'))
+    paypal_fixed_fee = StringField(_('PayPal Fixed Transaction Fee'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
+                                           validate_paypal_fixed_fee],
+                           description=_('The PayPal transaction fixed fee.'))
+    paypal_percent_fee = StringField(_('PayPal Percentage Transaction Fee'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
+                                           validate_paypal_percent_fee],
+                           description=_('The PayPal transaction percentage fee.'))
 
 
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
@@ -46,7 +55,9 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                         'business': ''}
     default_event_settings = {'enabled': False,
                               'method_name': None,
-                              'business': None}
+                              'business': None,
+                              'paypal_fixed_fee': "0.0",
+                              'paypal_percent_fee': "0%"}
 
     def init(self):
         super().init()
@@ -61,6 +72,7 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def adjust_payment_form_data(self, data):
         event = data['event']
+        event_settings_form = data['event_settings']
         registration = data['registration']
         plain_name = str_to_ascii(remove_accents(registration.full_name))
         plain_title = str_to_ascii(remove_accents(event.title))
@@ -68,6 +80,19 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         data['return_url'] = url_for_plugin('payment_paypal.success', registration.locator.uuid, _external=True)
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
         data['notify_url'] = url_for_plugin('payment_paypal.notify', registration.locator.uuid, _external=True)
+        # Add Paypal fees
+        amount = float(data['amount'])
+        data['paypal_amount'] = amount
+        paypal_fixed_fee = float(event_settings_form['paypal_fixed_fee'])
+        paypal_percent_fee = float(re.findall(r'^([0-9]+(\.[0-9]+)?)(%)?', event_settings_form['paypal_percent_fee'])[0][0])
+        amount_with_paypal_fees = round (( amount + paypal_fixed_fee ) / ( 1 - ( paypal_percent_fee / 100 )), 2)
+        data['amount'] = amount_with_paypal_fees
+        fees = amount_with_paypal_fees - amount
+        if fees > 0.0:
+            data['paypal_fees'] = str(amount_with_paypal_fees - amount)
+        else:
+            data['paypal_fees'] = ''
+
 
     def _get_encoding_warning(self, plugin=None, event=None):
         if plugin == self:

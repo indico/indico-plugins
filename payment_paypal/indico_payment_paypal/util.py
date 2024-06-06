@@ -21,3 +21,19 @@ def validate_business(form, field):
     """
     if not is_valid_mail(field.data, multi=False) and not re.match(r'^[a-zA-Z0-9]{13}$', field.data):
         raise ValidationError(_('Invalid email address / paypal ID'))
+
+def validate_paypal_fixed_fee(form, field):
+    """Validates a PayPal fixed fee value.
+
+    It can either any float number greater or equal 0
+    """
+    if not re.match(r'^[0-9]+(\.[0-9]+)?$', field.data):
+        raise ValidationError(_('Invalid PayPal Fixed Fee value'))
+
+def validate_paypal_percent_fee(form, field):
+    """Validates a PayPal percent fee value.
+
+    It can either any float number greater or equal 0 followed by an optional %
+    """
+    if not re.match(r'^[0-9]+(\.[0-9]+)?(%)?$', field.data):
+        raise ValidationError(_('Invalid PayPal Percent Fee value'))
