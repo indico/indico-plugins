@@ -5,24 +5,25 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import re
+import time
 from itertools import chain
 
 import requests
-from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
-from werkzeug.exceptions import BadRequest
 
+from indico.core.db import db
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import register_transaction, TransactionStatus
+from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
+from flask import flash, redirect, request
 from indico_payment_paypal import _
-import re
-import time
-from indico.core.db import db
+from werkzeug.exceptions import BadRequest
+
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
 
@@ -48,7 +49,7 @@ class RHPaypalIPN(RH):
         verify_params = list(chain(IPN_VERIFY_EXTRA_PARAMS, request.form.items()))
         result = requests.post(current_plugin.settings.get('url'), data=verify_params).text
         if result != 'VERIFIED':
-            current_plugin.logger.warning('Paypal IPN string %s did not validate (%s)', verify_params, result)
+            current_plugin.logger.debug('Paypal IPN string %s did not validate (%s)', verify_params, result)
             return
         if self._is_transaction_duplicated():
             current_plugin.logger.info('Payment not recorded because transaction was duplicated\nData received: %s',
@@ -67,14 +68,14 @@ class RHPaypalIPN(RH):
                                           payment_status, request.form)
             return
         self._verify_amount()
-        current_plugin.logger.warning("Payment verify ok, now register transaction...")
+        current_plugin.logger.debug('Payment verify ok, now register transaction...')
         register_transaction(registration=self.registration,
                              amount=float(request.form['mc_gross']),
                              currency=request.form['mc_currency'],
                              action=paypal_transaction_action_mapping[payment_status],
                              provider='paypal',
                              data=request.form)
-        current_plugin.logger.warning("Payment process finished")
+        current_plugin.logger.debug('Payment process finished')
 
     def _verify_business(self):
         expected = current_plugin.event_settings.get(self.registration.registration_form.event, 'business').lower()
@@ -88,15 +89,15 @@ class RHPaypalIPN(RH):
         return False
 
     def _verify_amount(self):
-        paypal_fixed_fee = float(current_plugin.event_settings.get(self.registration.registration_form.event, 'paypal_fixed_fee'))
-        paypal_percent_fee = float(re.findall(r'^([0-9]+(\.[0-9]+)?)(%)?', current_plugin.event_settings.get(self.registration.registration_form.event, 'paypal_percent_fee'))[0][0])
-
+        paypal_fixed_fee = float(current_plugin.event_settings.get(self.registration.registration_form.event,
+            'paypal_fixed_fee'))
+        paypal_percent_fee = float(current_plugin.event_settings.get(self.registration.registration_form.event,
+            'paypal_percent_fee'))
         expected_amount = float(self.registration.price)
-
-        current_plugin.logger.info("Checking PayPal payment applying fees to expected amount: %s fixed: %s percent: %s", expected_amount, paypal_fixed_fee, paypal_percent_fee)
-
-        expected_amount_with_paypal_fees = round (( expected_amount + paypal_fixed_fee ) / ( 1 - ( paypal_percent_fee / 100 )), 2)
-
+        current_plugin.logger.info('Checking PayPal payment applying fees to expected amount: %s fixed: %s percent: %s',
+                expected_amount, paypal_fixed_fee, paypal_percent_fee)
+        expected_amount_with_paypal_fees = round((expected_amount + paypal_fixed_fee) / 
+                (1-( paypal_percent_fee/100)), 2)
         expected_currency = self.registration.currency
         amount = float(request.form['mc_gross'])
         currency = request.form['mc_currency']
@@ -122,17 +123,16 @@ class RHPaypalSuccess(RHPaypalIPN):
         # Force check on transaction
         sleeps=0
         registration = Registration.query.filter_by(uuid=self.token).first()
-
         while ((not registration.is_paid) and (sleeps < 30)):
-            current_plugin.logger.warning("Waiting for transaction registration %s",sleeps)
+            current_plugin.logger.debug('Waiting for transaction registration %s',sleeps)
             time.sleep(1)
             sleeps=sleeps+1
             db.session.expire(registration)
             registration = Registration.query.filter_by(uuid=self.token).first()
-
         flash(_('Your payment request has been processed.'), 'success')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+"&utime="+str(time.time())
-        current_plugin.logger.warning("Payment success, now redirect to %s",redir_url)
+        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+ \
+            "&utime="+str(time.time())
+        current_plugin.logger.debug('Payment success, now redirect to %s',redir_url)
         return redirect(redir_url)
 
 
@@ -141,6 +141,7 @@ class RHPaypalCancel(RHPaypalIPN):
 
     def _process(self):
         flash(_('You cancelled the payment process.'), 'info')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+"&utime="+str(time.time())
-        current_plugin.logger.warning("Payment cancelled, now redirect to %s",redir_url)
+        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+ \
+            "&utime="+str(time.time())
+        current_plugin.logger.warning('Payment cancelled, now redirect to %s',redir_url)
         return redirect(redir_url)

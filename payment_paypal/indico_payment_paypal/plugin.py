@@ -5,9 +5,10 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import re
+from decimal import Decimal
+
 from flask_pluginengine import render_plugin_template
-from wtforms.fields import StringField, URLField
-from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
@@ -18,9 +19,9 @@ from indico.web.forms.validators import UsedIf
 from indico_payment_paypal import _
 from indico_payment_paypal.blueprint import blueprint
 from indico_payment_paypal.util import validate_business
-from indico_payment_paypal.util import validate_paypal_fixed_fee
-from indico_payment_paypal.util import validate_paypal_percent_fee
-import re
+from wtforms.fields import DecimalField, StringField, URLField
+from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.widgets import NumberInput
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
@@ -34,13 +35,15 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     business = StringField(_('Business'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
                                            validate_business],
                            description=_('The PayPal ID or email address associated with a PayPal account.'))
-    paypal_fixed_fee = StringField(_('PayPal Fixed Transaction Fee'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
-                                           validate_paypal_fixed_fee],
-                           description=_('The PayPal transaction fixed fee.'))
-    paypal_percent_fee = StringField(_('PayPal Percentage Transaction Fee'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
-                                           validate_paypal_percent_fee],
-                           description=_('The PayPal transaction percentage fee.'))
 
+    paypal_fixed_fee = DecimalField(_('PayPal Fixed Transaction fee'),
+                              [NumberRange(min=Decimal('0.00'), max=999999999.99), Optional()],
+                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'),
+                              description=_('The paypal fixed fee applied to the transaction.'))
+    paypal_percent_fee = DecimalField(_('PayPal Percentage Transaction fee'),
+                              [NumberRange(min=Decimal('0.00'), max=999999999.99), Optional()],
+                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'),
+                              description=_('The paypal percentage fee applied to the transaction.'))
 
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """PayPal
@@ -56,8 +59,8 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     default_event_settings = {'enabled': False,
                               'method_name': None,
                               'business': None,
-                              'paypal_fixed_fee': "0.0",
-                              'paypal_percent_fee': "0%"}
+                              'paypal_fixed_fee': Decimal('0.0'),
+                              'paypal_percent_fee': Decimal('0.0')}
 
     def init(self):
         super().init()
@@ -84,15 +87,11 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         amount = float(data['amount'])
         data['paypal_amount'] = amount
         paypal_fixed_fee = float(event_settings_form['paypal_fixed_fee'])
-        paypal_percent_fee = float(re.findall(r'^([0-9]+(\.[0-9]+)?)(%)?', event_settings_form['paypal_percent_fee'])[0][0])
+        paypal_percent_fee = float(event_settings_form['paypal_percent_fee'])
         amount_with_paypal_fees = round (( amount + paypal_fixed_fee ) / ( 1 - ( paypal_percent_fee / 100 )), 2)
         data['amount'] = amount_with_paypal_fees
         fees = amount_with_paypal_fees - amount
-        if fees > 0.0:
-            data['paypal_fees'] = str(amount_with_paypal_fees - amount)
-        else:
-            data['paypal_fees'] = ''
-
+        data['paypal_fees'] = str(amount_with_paypal_fees - amount)
 
     def _get_encoding_warning(self, plugin=None, event=None):
         if plugin == self:
