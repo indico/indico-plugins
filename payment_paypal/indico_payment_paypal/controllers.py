@@ -128,8 +128,8 @@ class RHPaypalSuccess(RHPaymentBase):
                                                       regform=self.regform, registration=self.registration)
 
         flash(_('Your payment has been processed.'), 'success')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+ \
-            "&utime="+str(time.time())
+        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
+            utime=str(time.time()))
         current_plugin.logger.info('Payment success, now redirect to %s',redir_url)
         return redirect(redir_url)
 
@@ -138,8 +138,8 @@ class RHPaypalCancel(RHPaypalIPN):
 
     def _process(self):
         flash(_('You cancelled the payment process.'), 'info')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+ \
-            "&utime="+str(time.time())
+        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
+            utime=str(time.time()))
         current_plugin.logger.warning('Payment cancelled, now redirect to %s',redir_url)
         return redirect(redir_url)
 
