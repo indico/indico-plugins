@@ -130,7 +130,7 @@ class RHPaypalSuccess(RHPaymentBase):
         flash(_('Your payment has been processed.'), 'success')
         redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
             utime=str(time.time()))
-        current_plugin.logger.info('Payment success, now redirect to %s',redir_url)
+        current_plugin.logger.debug('Payment success, now redirect to %s',redir_url)
         return redirect(redir_url)
 
 class RHPaypalCancel(RHPaypalIPN):
@@ -140,7 +140,7 @@ class RHPaypalCancel(RHPaypalIPN):
         flash(_('You cancelled the payment process.'), 'info')
         redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
             utime=str(time.time()))
-        current_plugin.logger.warning('Payment cancelled, now redirect to %s',redir_url)
+        current_plugin.logger.debug('Payment cancelled, now redirect to %s',redir_url)
         return redirect(redir_url)
 
 
@@ -155,6 +155,5 @@ class RHPaypalCheckIndicoTransaction(RHPaymentBase):
         registration = Registration.query.filter_by(uuid=self.token).first()
         is_pending = not registration.is_paid
 
-        current_plugin.logger.warning('Payment is_pending %s',is_pending)
-        #is_pending = txn is not None and txn.status == TransactionStatus.pending
+        current_plugin.logger.debug('Payment is_pending %s',is_pending)
         return jsonify(pending=is_pending)
