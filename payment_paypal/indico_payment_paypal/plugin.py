@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import re
 from decimal import Decimal
 
 from flask_pluginengine import render_plugin_template
@@ -32,18 +31,23 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
+    @property
+    def data(self):
+        return {k: str(v) for k, v in super().data.items()}
+
     business = StringField(_('Business'), [UsedIf(lambda form, _: form.enabled.data), DataRequired(),
                                            validate_business],
                            description=_('The PayPal ID or email address associated with a PayPal account.'))
 
     paypal_fixed_fee = DecimalField(_('PayPal Fixed Transaction fee'),
-                              [NumberRange(min=Decimal('0.00'), max=999999999.99), Optional()],
-                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'),
+                              [NumberRange(min=Decimal('0.00'), max=999999999.99), Optional()], 
+                              filters=[lambda x: Decimal(x) if x is not None else 0], widget=NumberInput(step='0.01'),
                               description=_('The paypal fixed fee applied to the transaction.'))
     paypal_percent_fee = DecimalField(_('PayPal Percentage Transaction fee'),
                               [NumberRange(min=Decimal('0.00'), max=999999999.99), Optional()],
-                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'),
-                              description=_('The paypal percentage fee applied to the transaction.'))
+                              filters=[lambda x: Decimal(x) if x is not None else 0], widget=NumberInput(step='0.01'),
+                              description=_('The paypal percentage fee applied to the transaction %.'))
+
 
 class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """PayPal
@@ -84,11 +88,11 @@ class PaypalPaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         data['cancel_url'] = url_for_plugin('payment_paypal.cancel', registration.locator.uuid, _external=True)
         data['notify_url'] = url_for_plugin('payment_paypal.notify', registration.locator.uuid, _external=True)
         # Add Paypal fees
-        amount = float(data['amount'])
+        amount = Decimal(data['amount'])
         data['paypal_amount'] = amount
-        paypal_fixed_fee = float(event_settings_form['paypal_fixed_fee'])
-        paypal_percent_fee = float(event_settings_form['paypal_percent_fee'])
-        amount_with_paypal_fees = round (( amount + paypal_fixed_fee ) / ( 1 - ( paypal_percent_fee / 100 )), 2)
+        paypal_fixed_fee = Decimal(event_settings_form['paypal_fixed_fee'])
+        paypal_percent_fee = Decimal(event_settings_form['paypal_percent_fee']) 
+        amount_with_paypal_fees = Decimal(round(( amount + paypal_fixed_fee ) / ( 1 - ( paypal_percent_fee / 100 )),2))
         data['amount'] = amount_with_paypal_fees
         fees = amount_with_paypal_fees - amount
         data['paypal_fees'] = str(amount_with_paypal_fees - amount)

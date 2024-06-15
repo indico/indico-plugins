@@ -5,23 +5,25 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import re
 import time
+from decimal import Decimal
 from itertools import chain
 
 import requests
-from flask_pluginengine import current_plugin
+from flask_pluginengine import current_plugin, render_plugin_template
 
 from indico.core.db import db
+from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import register_transaction
+from indico.modules.events.payment.util import TransactionStatus, register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
-from flask import flash, redirect, request
+from flask import flash, jsonify, redirect, render_template, request
 from indico_payment_paypal import _
+from indico_payment_paypal.views import WPPaymentEventPaypal
 from werkzeug.exceptions import BadRequest
 
 
@@ -59,7 +61,7 @@ class RHPaypalIPN(RH):
         if payment_status == 'Failed':
             current_plugin.logger.info('Payment failed (status: %s)\nData received: %s', payment_status, request.form)
             return
-        if payment_status == 'Refunded' or float(request.form.get('mc_gross')) <= 0:
+        if payment_status == 'Refunded' or Decimal(request.form.get('mc_gross')) <= 0:
             current_plugin.logger.warning('Payment refunded (status: %s)\nData received: %s',
                                           payment_status, request.form)
             return
@@ -70,7 +72,7 @@ class RHPaypalIPN(RH):
         self._verify_amount()
         current_plugin.logger.debug('Payment verify ok, now register transaction...')
         register_transaction(registration=self.registration,
-                             amount=float(request.form['mc_gross']),
+                             amount=Decimal(request.form['mc_gross']),
                              currency=request.form['mc_currency'],
                              action=paypal_transaction_action_mapping[payment_status],
                              provider='paypal',
@@ -89,17 +91,17 @@ class RHPaypalIPN(RH):
         return False
 
     def _verify_amount(self):
-        paypal_fixed_fee = float(current_plugin.event_settings.get(self.registration.registration_form.event,
+        paypal_fixed_fee = Decimal(current_plugin.event_settings.get(self.registration.registration_form.event,
             'paypal_fixed_fee'))
-        paypal_percent_fee = float(current_plugin.event_settings.get(self.registration.registration_form.event,
+        paypal_percent_fee = Decimal(current_plugin.event_settings.get(self.registration.registration_form.event,
             'paypal_percent_fee'))
-        expected_amount = float(self.registration.price)
+        expected_amount = Decimal(self.registration.price)
         current_plugin.logger.info('Checking PayPal payment applying fees to expected amount: %s fixed: %s percent: %s',
                 expected_amount, paypal_fixed_fee, paypal_percent_fee)
-        expected_amount_with_paypal_fees = round((expected_amount + paypal_fixed_fee) / 
-                (1-( paypal_percent_fee/100)), 2)
+        expected_amount_with_paypal_fees = Decimal(round(( expected_amount + paypal_fixed_fee ) /  \
+                ( 1 - ( paypal_percent_fee / 100 )),2))
         expected_currency = self.registration.currency
-        amount = float(request.form['mc_gross'])
+        amount = Decimal(request.form['mc_gross'])
         currency = request.form['mc_currency']
         if expected_amount_with_paypal_fees == amount and expected_currency == currency:
             return True
@@ -116,25 +118,20 @@ class RHPaypalIPN(RH):
                 transaction.data['txn_id'] == request.form.get('txn_id'))
 
 
-class RHPaypalSuccess(RHPaypalIPN):
+class RHPaypalSuccess(RHPaymentBase):
     """Confirmation message after successful payment"""
 
     def _process(self):
-        # Force check on transaction
-        sleeps=0
         registration = Registration.query.filter_by(uuid=self.token).first()
-        while ((not registration.is_paid) and (sleeps < 30)):
-            current_plugin.logger.debug('Waiting for transaction registration %s',sleeps)
-            time.sleep(1)
-            sleeps=sleeps+1
-            db.session.expire(registration)
-            registration = Registration.query.filter_by(uuid=self.token).first()
-        flash(_('Your payment request has been processed.'), 'success')
+        if (not registration.is_paid):
+            return WPPaymentEventPaypal.render_template('check_indico_transaction.html', self.event,
+                                                      regform=self.regform, registration=self.registration)
+
+        flash(_('Your payment has been processed.'), 'success')
         redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant)+ \
             "&utime="+str(time.time())
-        current_plugin.logger.debug('Payment success, now redirect to %s',redir_url)
+        current_plugin.logger.info('Payment success, now redirect to %s',redir_url)
         return redirect(redir_url)
-
 
 class RHPaypalCancel(RHPaypalIPN):
     """Cancellation message"""
@@ -145,3 +142,19 @@ class RHPaypalCancel(RHPaypalIPN):
             "&utime="+str(time.time())
         current_plugin.logger.warning('Payment cancelled, now redirect to %s',redir_url)
         return redirect(redir_url)
+
+
+class RHPaypalCheckIndicoTransaction(RHPaymentBase):
+    """Check if the registration's transaction is still pending.
+
+    This is used on the return page to poll whether to send the user back to the
+    registration page or keep checking.
+    """
+
+    def _process(self):
+        registration = Registration.query.filter_by(uuid=self.token).first()
+        is_pending = not registration.is_paid
+
+        current_plugin.logger.warning('Payment is_pending %s',is_pending)
+        #is_pending = txn is not None and txn.status == TransactionStatus.pending
+        return jsonify(pending=is_pending)
