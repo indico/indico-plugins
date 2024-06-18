@@ -98,7 +98,7 @@ class RHPaypalIPN(RH):
         current_plugin.logger.info('Checking PayPal payment applying fees to expected amount: %s fixed: %s percent: %s',
                                    expected_amount, paypal_fixed_fee, paypal_percent_fee)
         expected_amount_with_paypal_fees = Decimal(round((expected_amount + paypal_fixed_fee)/
-                                                   (1 - (paypal_percent_fee / 100)),2))
+                                                   (1 - (paypal_percent_fee / 100)) ,2))
         expected_currency = self.registration.currency
         amount = Decimal(request.form['mc_gross'])
         currency = request.form['mc_currency']
@@ -127,17 +127,18 @@ class RHPaypalSuccess(RHPaymentBase):
                                                       regform=self.regform, registration=self.registration)
 
         flash(_('Your payment has been processed.'), 'success')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
+        redir_url = url_for('event_registration.display_regform', self.registration.locator.registrant, 
             utime=str(time.time()))
-        current_plugin.logger.debug('Payment success, now redirect to %s',redir_url)
+        current_plugin.logger.debug('Payment success, now redirect to %s', redir_url)
         return redirect(redir_url)
+
 
 class RHPaypalCancel(RHPaypalIPN):
     """Cancellation message"""
 
     def _process(self):
         flash(_('You cancelled the payment process.'), 'info')
-        redir_url=url_for('event_registration.display_regform', self.registration.locator.registrant, \
+        redir_url = url_for('event_registration.display_regform', self.registration.locator.registrant, 
             utime=str(time.time()))
         current_plugin.logger.debug('Payment cancelled, now redirect to %s',redir_url)
         return redirect(redir_url)
