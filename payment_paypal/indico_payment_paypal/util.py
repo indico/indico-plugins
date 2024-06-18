@@ -7,10 +7,11 @@
 
 import re
 
+from wtforms import ValidationError
+
 from indico.util.string import is_valid_mail
 
 from indico_payment_paypal import _
-from wtforms import ValidationError
 
 
 def validate_business(form, field):

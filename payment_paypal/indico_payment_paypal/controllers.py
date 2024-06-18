@@ -10,21 +10,20 @@ from decimal import Decimal
 from itertools import chain
 
 import requests
-from flask_pluginengine import current_plugin, render_plugin_template
+from flask import flash, jsonify, redirect, request
+from flask_pluginengine import current_plugin
+from werkzeug.exceptions import BadRequest
 
-from indico.core.db import db
 from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import TransactionStatus, register_transaction
+from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
-from flask import flash, jsonify, redirect, render_template, request
 from indico_payment_paypal import _
 from indico_payment_paypal.views import WPPaymentEventPaypal
-from werkzeug.exceptions import BadRequest
 
 
 IPN_VERIFY_EXTRA_PARAMS = (('cmd', '_notify-validate'),)
@@ -92,14 +91,14 @@ class RHPaypalIPN(RH):
 
     def _verify_amount(self):
         paypal_fixed_fee = Decimal(current_plugin.event_settings.get(self.registration.registration_form.event,
-            'paypal_fixed_fee'))
+                                   'paypal_fixed_fee'))
         paypal_percent_fee = Decimal(current_plugin.event_settings.get(self.registration.registration_form.event,
-            'paypal_percent_fee'))
+                                     'paypal_percent_fee'))
         expected_amount = Decimal(self.registration.price)
         current_plugin.logger.info('Checking PayPal payment applying fees to expected amount: %s fixed: %s percent: %s',
-                expected_amount, paypal_fixed_fee, paypal_percent_fee)
-        expected_amount_with_paypal_fees = Decimal(round(( expected_amount + paypal_fixed_fee ) /  \
-                ( 1 - ( paypal_percent_fee / 100 )),2))
+                                   expected_amount, paypal_fixed_fee, paypal_percent_fee)
+        expected_amount_with_paypal_fees = Decimal(round((expected_amount + paypal_fixed_fee)/
+                                                   (1 - (paypal_percent_fee / 100)),2))
         expected_currency = self.registration.currency
         amount = Decimal(request.form['mc_gross'])
         currency = request.form['mc_currency']

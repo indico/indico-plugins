@@ -8,6 +8,9 @@
 from decimal import Decimal
 
 from flask_pluginengine import render_plugin_template
+from wtforms.fields import DecimalField, StringField, URLField
+from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms.widgets import NumberInput
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
@@ -18,9 +21,6 @@ from indico.web.forms.validators import UsedIf
 from indico_payment_paypal import _
 from indico_payment_paypal.blueprint import blueprint
 from indico_payment_paypal.util import validate_business
-from wtforms.fields import DecimalField, StringField, URLField
-from wtforms.validators import DataRequired, NumberRange, Optional
-from wtforms.widgets import NumberInput
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
