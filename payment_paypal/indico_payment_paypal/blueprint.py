@@ -7,7 +7,8 @@
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_payment_paypal.controllers import RHPaypalCancel, RHPaypalIPN, RHPaypalSuccess
+from indico_payment_paypal.controllers import (RHPaypalCancel, RHPaypalCheckIndicoTransaction, RHPaypalIPN,
+                                               RHPaypalSuccess)
 
 
 blueprint = IndicoPluginBlueprint(
@@ -19,3 +20,5 @@ blueprint.add_url_rule('/cancel', 'cancel', RHPaypalCancel, methods=('GET', 'POS
 blueprint.add_url_rule('/success', 'success', RHPaypalSuccess, methods=('GET', 'POST'))
 # Used by PayPal to send an asynchronous notification for the transaction (pending, successful, etc)
 blueprint.add_url_rule('/ipn', 'notify', RHPaypalIPN, methods=('POST',))
+# Used to check PayPal asynchronous notification to indico
+blueprint.add_url_rule('/check-transaction', 'check_transaction', RHPaypalCheckIndicoTransaction)

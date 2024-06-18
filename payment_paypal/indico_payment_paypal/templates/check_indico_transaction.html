@@ -1,0 +1,60 @@
+{% if event.type == 'conference' %}
+    {% extends 'events/registration/display/_event_registration_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+{% endif %}
+
+
+{% block subtitle %}
+    {{ regform.title }}:
+    {% trans %}Payment{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="info-message-box">
+        <div class="message-text">
+            <p>
+                {% trans -%}
+                    Your payment is currently being processed. Please wait a moment. You will be automatically
+                    redirected once processing has finished.
+                {%- endtrans %}
+            </p>
+
+            <p>
+                {% set link_start -%}
+                    <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
+                {%- endset %}
+                {% set link_end -%}
+                    </a>
+                {%- endset %}
+                {% trans -%}
+                    Sometimes it can take a few minutes until a payment has been fully cleared by PayPal.
+                    If you are tired of waiting, you can also {{ link_start }}return to your registration{{ link_end }}.
+                    You will receive an email notification once the payment has been successfully processed.
+                {%- endtrans %}
+            </p>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            // Yes... I did not want to add a full-blown webpack bundle for this tiny snippet of JS! ¯\_(ツ)_/¯
+            const url = {{ url_for('.check_transaction', registration.locator.registrant) | tojson }};
+            const interval = setInterval(async () => {
+                const resp = await fetch(url);
+                let payload;
+                try {
+                    payload = await resp.json();
+                } catch (exc) {
+                    console.warn(`Could not check transaction status: ${exc}`);
+                    return;
+                }
+                // explicit check so we don't get a reload loop if we get some unexpected json payload
+                if (payload.pending === false) {
+                    clearInterval(interval);
+                    location.reload();
+                }
+            }, 2000);
+        })();
+    </script>
+{% endblock %}
