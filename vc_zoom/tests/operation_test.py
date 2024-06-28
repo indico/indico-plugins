@@ -5,17 +5,37 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-def test_room_creation(create_event_with_zoom, zoom_api):
-    _event, vc_room = create_event_with_zoom()
+
+TZ = ZoneInfo('Europe/Zurich')
+
+
+def test_room_creation(create_zoom_meeting, zoom_api, create_event):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+    vc_room = create_zoom_meeting(event, 'event')
     assert vc_room.data['url'] == 'https://example.com/kitties'
     assert vc_room.data['host'] == 'User:1'
     assert zoom_api['create_meeting'].called
 
 
-def test_password_change(create_user, mocker, create_event_with_zoom, zoom_plugin, zoom_api):
-    create_user(2, email='joe.bidon@megacorp.xyz')
-    _event, vc_room = create_event_with_zoom()
+def test_password_change(create_user, mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
     vc_room.data['password'] = '12341234'
 
     # simulate changes between calls of "GET meeting"
