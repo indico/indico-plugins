@@ -5,4 +5,4 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-pytest_plugins = 'indico'
+pytest_plugins = ['indico', 'indico_vc_zoom.fixtures']

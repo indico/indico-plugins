@@ -5,103 +5,18 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import pytest
 
-from indico.core.plugins import plugin_engine
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
-
-from indico_vc_zoom.plugin import ZoomPlugin
-
-
-@pytest.fixture
-def zoom_plugin(app):
-    """Return a callable which lets you create dummy Zoom room occurrences."""
-    plugin = ZoomPlugin(plugin_engine, app)
-    plugin.settings.set('email_domains', 'megacorp.xyz')
-    return plugin
-
-
-@pytest.fixture
-def create_meeting(create_user, dummy_event, db, zoom_plugin):
-    def _create_meeting(name='New Room'):
-        user_joe = create_user(1, email='don.orange@megacorp.xyz')
-
-        vc_room = VCRoom(
-            type='zoom',
-            status=VCRoomStatus.created,
-            name=name,
-            created_by_id=0,
-            data={
-                'description': 'something something',
-                'password': '1234',
-                'host': user_joe.identifier,
-                'meeting_type': 'meeting',
-                'mute_host_video': False,
-                'mute_audio': False,
-                'mute_participant_video': False,
-                'waiting_room': False
-            }
-        )
-        VCRoomEventAssociation(linked_event=dummy_event, vc_room=vc_room, link_type=VCRoomLinkType.event, data={})
-        db.session.flush()
-        zoom_plugin.create_room(vc_room, dummy_event)
-        return vc_room
-    return _create_meeting
-
-
-@pytest.fixture
-def zoom_api(create_user, mocker):
-    """Mock some Zoom API endpoints."""
-    api_create_meeting = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.create_meeting')
-    api_create_meeting.return_value = {
-        'id': '12345abc',
-        'join_url': 'https://example.com/kitties',
-        'start_url': 'https://example.com/puppies',
-        'password': '1234',
-        'host_id': 'don.orange@megacorp.xyz',
-        'topic': 'New Room',
-        'agenda': 'something something',
-        'settings': {
-            'host_video': True,
-            'mute_upon_entry': False,
-            'participant_video': True,
-            'waiting_room': False
-        }
-    }
-
-    api_update_meeting = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.update_meeting')
-    api_update_meeting.return_value = {}
-
-    create_user(1, email='don.orange@megacorp.xyz')
-
-    api_get_user = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.get_user')
-    api_get_user.return_value = {
-        'id': '7890abcd',
-        'email': 'don.orange@megacorp.xyz'
-    }
-
-    api_get_meeting = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.get_meeting')
-    api_get_meeting.return_value = api_create_meeting.return_value
-
-    return {
-        'create_meeting': api_create_meeting,
-        'get_meeting': api_get_meeting,
-        'update_meeting': api_update_meeting,
-        'get_user': api_get_user
-    }
-
-
-def test_room_creation(create_meeting, zoom_api):
-    vc_room = create_meeting()
+def test_room_creation(create_event_with_zoom, zoom_api):
+    _event, vc_room = create_event_with_zoom()
     assert vc_room.data['url'] == 'https://example.com/kitties'
     assert vc_room.data['host'] == 'User:1'
     assert zoom_api['create_meeting'].called
 
 
-def test_password_change(create_user, mocker, create_meeting, zoom_plugin, zoom_api):
+def test_password_change(create_user, mocker, create_event_with_zoom, zoom_plugin, zoom_api):
     create_user(2, email='joe.bidon@megacorp.xyz')
-    vc_room = create_meeting()
-    vc_room.data['password'] = '1337'
+    _event, vc_room = create_event_with_zoom()
+    vc_room.data['password'] = '12341234'
 
     # simulate changes between calls of "GET meeting"
     def _get_meeting(self, meeting_id):
@@ -109,14 +24,14 @@ def test_password_change(create_user, mocker, create_meeting, zoom_plugin, zoom_
             'id': meeting_id,
             'join_url': 'https://example.com/llamas' if _get_meeting.called else 'https://example.com/kitties',
             'start_url': 'https://example.com/puppies',
-            'password': '1337' if _get_meeting.called else '1234',
+            'password': '12341234' if _get_meeting.called else '13371337',
             'host_id': 'don.orange@megacorp.xyz',
-            'topic': 'New Room',
-            'agenda': 'something something',
+            'topic': 'Zoom Meeting',
+            'agenda': 'nothing to add',
             'settings': {
-                'host_video': True,
-                'mute_upon_entry': False,
-                'participant_video': True,
+                'host_video': False,
+                'mute_upon_entry': True,
+                'participant_video': False,
                 'waiting_room': False
             }
         }
@@ -128,8 +43,8 @@ def test_password_change(create_user, mocker, create_meeting, zoom_plugin, zoom_
     zoom_plugin.update_room(vc_room, vc_room.events[0].event)
 
     zoom_api['update_meeting'].assert_called_with('12345abc', {
-        'password': '1337'
+        'password': '12341234',
     })
 
-    assert vc_room.data['password'] == '1337'
+    assert vc_room.data['password'] == '12341234'
     assert vc_room.data['url'] == 'https://example.com/llamas'
