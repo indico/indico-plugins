@@ -5,6 +5,12 @@ Clicking on the <strong>Pay now</strong> button you will get redirected to the P
     <dd>{{ registration.first_name }}</dd>
     <dt>{% trans %}Last name{% endtrans %}</dt>
     <dd>{{ registration.last_name }}</dd>
+    {% if paypal_fees %}
+    	<dt>{% trans %}Registration amount{% endtrans %}</dt>
+    	<dd>{{ format_currency(paypal_amount, currency, locale=session.lang) }}</dd>
+    	<dt>{% trans %}PayPal fees{% endtrans %}</dt>
+    	<dd>{{ format_currency(paypal_fees, currency, locale=session.lang) }}</dd>
+    {% endif %}
     <dt>{% trans %}Total amount{% endtrans %}</dt>
     <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
     <dt></dt>
