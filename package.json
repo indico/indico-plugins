@@ -5,6 +5,7 @@
   "repository": "https://github.com/indico/indico-plugins",
   "author": "Indico Team <indico-team@cern.ch>",
   "devDependencies": {
+    "@babel/core": "^7.24.7",
     "@babel/eslint-parser": "^7.18.2",
     "eslint": "^8.17.0",
     "eslint-cli": "^1.1.1",
