@@ -29,8 +29,7 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
     def _process(self):
         new_identifier = session.user.identifier
         if new_identifier == self.vc_room.data['host'] or new_identifier in self.vc_room.data['alternative_hosts']:
-            flash(_('You were already an (alternative) host of this meeting'), 'warning')
-            return jsonify(success=False)
+            raise UserValueError(_('You were already an (alternative) host of this meeting'))
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
@@ -43,9 +42,7 @@ class RHRoomAlternativeHost(RHVCSystemEventBase):
         except VCRoomError:
             db.session.rollback()
             raise
-        else:
-            flash(_("You are now an alternative host of room '{room}'").format(room=self.vc_room.name), 'success')
-        return jsonify(success=True)
+        return '', 204
 
 
 class RHWebhook(RH):

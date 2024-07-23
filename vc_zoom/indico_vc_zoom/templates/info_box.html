@@ -8,46 +8,52 @@
     (session.user and event_vc_room.data.password_visibility == 'logged_in') or
     (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user))
 ) %}
-<dl>
-    <dt>{% trans %}Zoom Meeting ID{% endtrans %}</dt>
-    <dd>{{ vc_room.data.zoom_id }}</dd>
+<div class="ui list">
+    <div class="item">
+        <div class="header">{% trans %}Zoom Meeting ID{% endtrans %}</div>
+        {{ vc_room.data.zoom_id }}
+    </div>
     {% if vc_room.data.description %}
-        <dt>{% trans %}Description{% endtrans %}</dt>
-        <dd>{{ vc_room.data.description }}</dd>
+        <div class="item">
+            <div class="header">{% trans %}Description{% endtrans %}</div>
+            {{ vc_room.data.description }}
+        </div>
     {% endif %}
     {% if host %}
-        <dt>{% trans %}Host{% endtrans %}</dt>
-        <dd>{{ (host|decodeprincipal).full_name }}</dd>
+        <div class="item">
+            <div class="header">{% trans %}Host{% endtrans %}</div>
+            {{ (host|decodeprincipal).full_name }}
+        </div>
     {% endif %}
     {% if alt_hosts %}
-        <dt>
-            {% trans count=alt_hosts|length -%}
-                Alternative host
-            {%- pluralize -%}
-                Alternative hosts
-            {%- endtrans %}
-        </dt>
-        <dd>
+        <div class="item">
+            <div class="header">
+                {% trans count=alt_hosts|length -%}
+                    Alternative host
+                {%- pluralize -%}
+                    Alternative hosts
+                {%- endtrans %}
+            </div>
             {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
-        </dd>
+        </div>
     {% endif %}
     {% if passcode_visible %}
-        <dt>{% trans %}Passcode{% endtrans %}</dt>
-        <dd>{{ vc_room.data.password }}</dd>
+        <div class="item">
+            <div class="header">{% trans %}Passcode{% endtrans %}</div>
+            {{ vc_room.data.password }}
+        </div>
     {% endif %}
     {% if phone_link %}
-        <dt>
-            {% trans %}Useful links{% endtrans %}
-        </dt>
-        <dd>
+        <div class="item">
+            <div class="header">{% trans %}Useful links{% endtrans %}</div>
             <a href="{{ phone_link }}" target="_blank">
                 {% trans %}Join via phone{% endtrans %}
             </a>
-        </dd>
+        </div>
     {% endif %}
-    <dt class="large-row">{% trans %}Zoom URL{% endtrans %}</dt>
-    <dd class="large-row">
+    <div class="item">
+        <div class="header">{% trans %}Zoom URL{% endtrans %}</div>
         {{ clipboard_input(vc_room.data.url if passcode_visible else vc_room.data.public_url,
-                           name="vc-room-url-%s"|format(event_vc_room.id)) }}
-    </dd>
-</dl>
+                        name="vc-room-url-%s"|format(event_vc_room.id)) }}
+    </div>
+</div>

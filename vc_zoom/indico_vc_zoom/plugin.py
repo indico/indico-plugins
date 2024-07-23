@@ -163,14 +163,18 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.inject_bundle('main.js', WPVCEventPage)
         self.inject_bundle('main.js', WPVCManageEvent)
         self.inject_bundle('main.js', WPConferenceDisplay)
+        self.inject_bundle('main.css', WPSimpleEventDisplay)
+        self.inject_bundle('main.css', WPVCEventPage)
+        self.inject_bundle('main.css', WPVCManageEvent)
+        self.inject_bundle('main.css', WPConferenceDisplay)
 
     @property
     def logo_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.png')
+        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.svg')
 
     @property
     def icon_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.png')
+        return url_for_plugin(self.name + '.static', filename='images/zoom_icon.svg')
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Override the default room form creation mechanism."""
