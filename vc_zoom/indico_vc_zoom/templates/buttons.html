@@ -1,62 +1,64 @@
-{% macro render_make_me_owner(event, vc_room, event_vc_room, extra_classes='') %}
-    {% if session.user.identifier != vc_room.data['host']
-          and session.user.identifier not in vc_room.data.get('alternative_hosts', [])
-          and event.can_manage(session.user) %}
-        <a class="i-button highlight arrow {{ extra_classes }}" data-toggle="dropdown"></a>
-        <ul class="i-dropdown" data-level="level1">
-            <li>
-                <a href="#"
-                   title="{% trans %}You will become an alternative host of this Zoom meeting{% endtrans %}"
-                   class="action-make-host"
-                   data-href="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}">
-                    {% trans %}Make me alternative host{% endtrans %}
-                </a>
-            </li>
-        </ul>
-    {% endif %}
-{% endmacro %}
-
-{% macro render_join_button(vc_room, event_vc_room, extra_classes='') %}
-    {% if event_vc_room.data.password_visibility == 'everyone' or
-        event_vc_room.event.can_manage(session.user) or
-        (session.user and event_vc_room.data.password_visibility == 'logged_in') or
-        (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user)) %}
-        <a class="i-button icon-play highlight {{ extra_classes }}"
-           href="{{ vc_room.data.url }}" target="_blank">
-            {% trans %}Join{% endtrans %}
-        </a>
-    {% elif event_vc_room.data.password_visibility == 'no_one' %}
-        <a class="i-button icon-lock-center warning {{ extra_classes }}"
-           title="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
-           href="{{ vc_room.data.public_url }}">
-            {% trans %}Join{% endtrans %}
-        </a>
-    {% elif event_vc_room.data.password_visibility == 'registered' %}
-        {% if session.user %}
-            {% if event_vc_room.event.type == 'conference' %}
-                <a class="i-button icon-ticket {{ extra_classes }}"
-                   title="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
-                   href="{{ url_for('event_registration.display_regform_list', event_vc_room.event) }}">
-                    {% trans %}Please register{% endtrans %}
-                </a>
+{% macro render_join_button(vc_room, event_vc_room, show_logo=false, extra_classes='') %}
+    {% set event = event_vc_room.event %}
+    {% set plugin = vc_room.plugin %}
+    <ind-vc-zoom-join-button
+        {% if event_vc_room.data.password_visibility == 'everyone' or
+            event.can_manage(session.user) or
+            (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+            (session.user and event_vc_room.data.password_visibility == 'registered' and event.is_user_registered(session.user)) %}
+            classes = "blue {{ extra_classes }}"
+            description="{% trans %}Join the Zoom Meeting{% endtrans %}"
+            href="{{ vc_room.data.url }}"
+            target="_blank"
+            icon="play"
+            caption="{% trans %}Join{% endtrans %}""
+        {% elif event_vc_room.data.password_visibility == 'no_one' %}
+            classes = "orange {{ extra_classes }}"
+            description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
+            href="{{ vc_room.data.public_url }}">
+            icon="lock"
+            caption="{% trans %}Join{% endtrans %}"
+        {% elif event_vc_room.data.password_visibility == 'registered' %}
+            {% if session.user %}
+                {% if event.type == 'conference' %}
+                    classes = "blue {{ extra_classes }}"
+                    description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
+                    href="{{ url_for('event_registration.display_regform_list', event) }}"
+                    icon="ticket"
+                    caption="{% trans %}Please register{% endtrans %}"
+                {% else %}
+                    classes = "disabled {{ extra_classes }}"
+                    description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
+                    icon="ticket"
+                    caption="{% trans %}Registration required{% endtrans %}"
+                {% endif %}
             {% else %}
-                <a class="i-button icon-ticket disabled {{ extra_classes }}"
-                   title="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}">
-                    {% trans %}Registration required{% endtrans %}
-                </a>
+                classes = "blue {{ extra_classes }}"
+                description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
+                href="{{ url_for_login(request.relative_url) }}"
+                icon="ticket"
+                caption="{% trans %}Please log in and register{% endtrans %}"
             {% endif %}
         {% else %}
-            <a class="i-button icon-ticket {{ extra_classes }}"
-               title="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
-               href="{{ url_for_login(request.relative_url) }}">
-                {% trans %}Please log in and register{% endtrans %}
-            </a>
+            classes = "orange {{ extra_classes }}"
+            description="{% trans %}This Zoom Meeting can only be seen by logged in users{% endtrans %}"
+            href="{{ url_for_login(request.relative_url) }}"
+            icon="lock"
+            caption="{% trans %}Please log in{% endtrans %}""
         {% endif %}
-    {% else %}
-        <a class="i-button icon-lock-center {{ extra_classes }}"
-           title="{% trans %}This Zoom Meeting can only be seen by logged in users{% endtrans %}"
-           href="{{ url_for_login(request.relative_url) }}">
-            {% trans %}Please log in{% endtrans %}
-        </a>
-    {% endif %}
+
+        {% if session.user.identifier != vc_room.data['host']
+           and session.user.identifier not in vc_room.data.get('alternative_hosts', [])
+           and event.can_manage(session.user) %}
+           alt-host-url="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}"
+        {% endif %}
+
+        meeting-title = "{{ vc_room.name }}"
+
+        {% if show_logo %}
+            meeting-data-html = "{{ plugin.render_info_box(vc_room, event_vc_room, event) | escape }}"
+        {% endif %}
+    >
+        {{ caller() }}
+    </ind-vc-zoom-join-button>
 {% endmacro %}

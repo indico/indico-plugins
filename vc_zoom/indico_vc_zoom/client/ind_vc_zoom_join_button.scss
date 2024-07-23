@@ -5,4 +5,8 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-import './ind_vc_zoom_join_button';
+ind-vc-zoom-join-button {
+  display: flex;
+  gap: 0.2em;
+  margin-right: 0.2em;
+}
