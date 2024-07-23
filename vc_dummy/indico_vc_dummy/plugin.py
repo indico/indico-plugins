@@ -38,11 +38,11 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
 
     @property
     def logo_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/dummy_logo.png')
+        return url_for_plugin(self.name + '.static', filename='images/dummy_logo.svg')
 
     @property
     def icon_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/dummy_icon.png')
+        return url_for_plugin(self.name + '.static', filename='images/dummy_icon.svg')
 
     def get_blueprints(self):
         return IndicoPluginBlueprint('vc_dummy', __name__)
