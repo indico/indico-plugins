@@ -1,12 +1,13 @@
 /* eslint-disable import/no-commonjs, import/unambiguous */
 /* global module:false, __dirname:false */
 
-const path = require('path');
-const fs = require('fs');
 const {execSync} = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const yaml = require('js-yaml');
 const _ = require('lodash');
 const resolve = require('resolve');
-const yaml = require('js-yaml');
 
 // Returns the path to the Indico source package/repo
 const PATH_COMMAND = `python -c 'from flask.helpers import get_root_path; print(get_root_path("indico"))'`;
@@ -63,7 +64,7 @@ module.exports = _.merge(defaultConfig, {
   },
   parserOptions: {
     babelOptions: {
-      configFile: babelConfigFile
-    }
-  }
+      configFile: babelConfigFile,
+    },
+  },
 });
