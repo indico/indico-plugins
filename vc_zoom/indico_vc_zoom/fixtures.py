@@ -5,10 +5,11 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import itertools
+
 import pytest
 
 from indico.core.plugins import plugin_engine
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
 
 
 @pytest.fixture
@@ -73,7 +74,6 @@ def create_zoom_meeting(db, test_client, no_csrf_check, smtp, zoom_api):
 
 
 JSON_DATA = {
-    'id': '12345abc',
     'join_url': 'https://example.com/kitties',
     'start_url': 'https://example.com/puppies',
     'password': '13371337',
@@ -94,8 +94,13 @@ JSON_DATA = {
 @pytest.fixture
 def zoom_api(zoom_plugin, create_user, mocker):
     """Mock some Zoom API endpoints."""
+    meeting_ids = iter(f'zmeeting{n}' for n in itertools.count(start=1, step=1))
+
+    def _create_meeting(*args, **kwargs):
+        return dict(JSON_DATA, id=next(meeting_ids))
+
     api_create_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.create_meeting')
-    api_create_meeting.return_value = JSON_DATA
+    api_create_meeting.side_effect = _create_meeting
 
     api_update_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.update_meeting')
     api_update_meeting.return_value = {}
@@ -105,8 +110,11 @@ def zoom_api(zoom_plugin, create_user, mocker):
     api_get_user = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_user')
     api_get_user.return_value = {'id': '7890abcd', 'email': 'don.orange@megacorp.xyz'}
 
+    def _get_meeting(id_, *args, **kwargs):
+        return dict(JSON_DATA, id=id_)
+
     api_get_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_meeting')
-    api_get_meeting.return_value = api_create_meeting.return_value
+    api_get_meeting.side_effect = _get_meeting
 
     api_delete_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.delete_meeting')
     api_delete_meeting.return_value = {}

@@ -62,7 +62,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 
     zoom_plugin.update_room(vc_room, vc_room.events[0].event)
 
-    zoom_api['update_meeting'].assert_called_with('12345abc', {
+    zoom_api['update_meeting'].assert_called_with('zmeeting1', {
         'password': '12341234',
     })
 
