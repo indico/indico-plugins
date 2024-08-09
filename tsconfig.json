@@ -1,0 +1,10 @@
+{
+  "extends": "../../src/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../../src",
+  },
+  "include": [
+    "../../src/indico/web/client/js/types",
+    "vc_zoom/indico_vc_zoom/client/**/*",
+  ]
+}

@@ -8,16 +8,13 @@ charset=utf-8
 trim_trailing_whitespace=true
 insert_final_newline=true
 
-[{*.js,*.jsx}]
+[{*.js,*.jsx,*.ts,*.tsx}]
 indent_size=2
 
 [{*.css,*.scss}]
 indent_size=2
 
-[{*.yml,*.yaml}]
-indent_size=2
-
-[package.json]
+[{*.yml,*.yaml,*.json}]
 indent_size=2
 
 [Makefile]
