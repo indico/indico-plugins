@@ -5,4 +5,9 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-import './ind_vc_zoom_join_button';
+.button-label:global(.ui.image.label) {
+  > img {
+    margin: 0;
+    height: 1.5em !important;
+  }
+}
