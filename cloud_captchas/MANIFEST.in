@@ -1,4 +1,0 @@
-graft indico_cloud_captchas/static
-graft indico_cloud_captchas/translations
-
-global-exclude *.pyc __pycache__ .keep

@@ -1,4 +1,0 @@
-graft indico_payment_sixpay/templates
-graft indico_payment_sixpay/translations
-
-global-exclude *.pyc __pycache__ .keep

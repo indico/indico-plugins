@@ -1,5 +1,0 @@
-graft indico_payment_manual/static
-graft indico_payment_manual/templates
-graft indico_payment_manual/translations
-
-global-exclude *.pyc __pycache__ .keep

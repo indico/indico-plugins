@@ -15,7 +15,7 @@ fi
 
 ACTION="$1"
 LOCALE="$2"
-PLUGINS=$(find . -name setup.py -exec sh -c 'basename $(dirname $0)' {} \;)
+PLUGINS=$(find . -name pyproject.toml -exec sh -c 'basename $(dirname $0)' {} \;)
 
 if [[ "$ACTION" == "extract" ]]; then
     PLUGINSINPARAMS=${@:2}

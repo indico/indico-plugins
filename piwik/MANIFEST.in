@@ -1,5 +1,0 @@
-graft indico_piwik/static
-graft indico_piwik/templates
-graft indico_piwik/translations
-
-global-exclude *.pyc __pycache__ .keep

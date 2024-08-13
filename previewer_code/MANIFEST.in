@@ -1,3 +1,0 @@
-graft indico_previewer_code/templates
-
-global-exclude *.pyc __pycache__ .keep

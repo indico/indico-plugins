@@ -1,5 +1,0 @@
-graft indico_citadel/migrations
-graft indico_citadel/templates
-graft indico_citadel/translations
-
-global-exclude *.pyc __pycache__ .keep
