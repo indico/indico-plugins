@@ -1,0 +1,41 @@
+[project]
+name = 'indico-plugins'
+description = 'A meta-package containing the official Indico plugins'
+readme = 'README.md'
+version = '3.3'
+license = 'MIT'
+authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
+classifiers = [
+    'Environment :: Plugins',
+    'Environment :: Web Environment',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.12',
+]
+requires-python = '>=3.12.2, <3.13'
+dependencies = [
+    'indico>=3.3',
+    'indico-plugin-citadel>=3.3,<3.4.dev0',
+    'indico-plugin-cloud-captchas>=3.3,<3.4.dev0',
+    'indico-plugin-livesync>=3.3,<3.4.dev0',
+    'indico-plugin-owncloud>=3.3,<3.4.dev0',
+    'indico-plugin-payment-manual>=3.3,<3.4.dev0',
+    'indico-plugin-payment-paypal>=3.3,<3.4.dev0',
+    'indico-plugin-payment-sixpay>=3.3,<3.4.dev0',
+    'indico-plugin-piwik>=3.3,<3.4.dev0',
+    'indico-plugin-previewer-code>=3.3,<3.4.dev0',
+    'indico-plugin-previewer-jupyter>=3.3,<3.4.dev0',
+    'indico-plugin-prometheus>=3.3,<3.4.dev0',
+    'indico-plugin-storage-s3>=3.3,<3.4.dev0',
+    'indico-plugin-ursh>=3.3,<3.4.dev0',
+    'indico-plugin-vc-zoom>=3.3,<3.4.dev0',
+]
+
+[project.urls]
+GitHub = 'https://github.com/indico/indico-plugins'
+
+[build-system]
+requires = ['hatchling==1.25.0']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true

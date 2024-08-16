@@ -1,3 +1,0 @@
-graft indico_storage_s3/translations
-
-global-exclude *.pyc __pycache__ .keep

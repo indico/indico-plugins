@@ -1,5 +1,0 @@
-graft indico_previewer_jupyter/client
-graft indico_previewer_jupyter/static
-graft indico_previewer_jupyter/templates
-
-global-exclude *.pyc __pycache__ .keep

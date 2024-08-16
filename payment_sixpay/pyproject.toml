@@ -1,0 +1,51 @@
+[project]
+name = 'indico-plugin-payment-sixpay'
+description = 'SIXPay/Saferpay payments for Indico event registration fees'
+readme = 'README.md'
+version = '3.3'
+license = 'MIT'
+authors = [
+    { name = 'Indico Team', email = 'indico-team@cern.ch' },
+    { name = 'Max Fischer', email = 'maxfischer2781@gmail.com' },
+    { name = 'Martin Claus', email = 'mclaus@geomar.de' },
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Environment :: Web Environment',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.12',
+]
+requires-python = '>=3.12.2, <3.13'
+dependencies = ['indico>=3.3', 'iso4217==1.6.20180829']
+
+[project.urls]
+GitHub = 'https://github.com/indico/indico-plugins'
+
+[project.entry-points.'indico.plugins']
+payment_sixpay = 'indico_payment_sixpay.plugin:SixpayPaymentPlugin'
+
+[build-system]
+requires = ['hatchling==1.25.0']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build]
+packages = ['indico_payment_sixpay']
+exclude = [
+    '*.no-header',
+    '.keep',
+    # exclude original client sources (they are all included in source maps anyway)
+    'indico_*/client/',
+    # no need for tests outside development
+    'test_snapshots/',
+    'tests/',
+    '*_test.py',
+]
+artifacts = [
+    'indico_*/translations/**/messages-react.json',
+    'indico_*/translations/**/*.mo',
+    'indico_*/static/dist/',
+]
+
+[tool.hatch.build.targets.sdist.hooks.custom]
+path = '../hatch_build.py'
+dependencies = ['babel==2.14.0']

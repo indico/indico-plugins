@@ -5,17 +5,20 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import difflib
 import errno
 import os
-import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 import click
+import tomlkit
 import yaml
 from packaging.version import Version
-from setuptools.config.setupcfg import read_configuration
+from pygments import highlight
+from pygments.formatters.terminal256 import Terminal256Formatter
+from pygments.lexers.diff import DiffLexer
 
 
 START_MARKER = '# BEGIN GENERATED REQUIREMENTS'
@@ -24,12 +27,12 @@ END_MARKER = '# END GENERATED REQUIREMENTS'
 
 def _find_plugins():
     subdirs = sorted(Path(x) for x in next(os.walk('.'))[1]
-                     if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'setup.cfg')))
+                     if x[0] != '.' and x != '_meta' and os.path.exists(os.path.join(x, 'pyproject.toml')))
     for subdir in subdirs:
-        path = subdir / 'setup.cfg'
-        metadata = read_configuration(path)['metadata']
-        name = metadata['name']
-        version = metadata['version']
+        path = subdir / 'pyproject.toml'
+        data = tomlkit.parse(path.read_text())
+        name = data['project']['name']
+        version = data['project']['version']
         if name is None or version is None:
             click.secho(f'Could not extract name/version from {path}', fg='red', bold=True)
             continue
@@ -50,14 +53,19 @@ def _get_config():
     return rv
 
 
-def _update_meta(data):
-    path = Path('_meta/setup.cfg')
-    content = path.read_text()
-    new_content = re.sub(fr'(?<={re.escape(START_MARKER)}\n).*(?=\n{re.escape(END_MARKER)})', data, content,
-                         flags=re.DOTALL)
+def _show_diff(old, new, filename):
+    diff = difflib.unified_diff(old.splitlines(), new.splitlines(), filename, filename, lineterm='')
+    diff = '\n'.join(diff)
+    print(highlight(diff, DiffLexer(), Terminal256Formatter(style='native')))
+
+
+def _update_meta(pyproject: Path, data):
+    content = pyproject.read_text()
+    new_content = tomlkit.dumps(data)
     if content == new_content:
         return False
-    path.write_text(new_content)
+    _show_diff(content, new_content, pyproject.name)
+    pyproject.write_text(new_content)
     return True
 
 
@@ -84,16 +92,23 @@ def cli(nextver):
         else:
             plugins_require.append(pkgspec)
 
-    output = [f'    {entry}' for entry in plugins_require]
-    if extras_require:
-        if output:
-            output.append('')
-        output.append('[options.extras_require]')
-        for extra, pkgspecs in sorted(extras_require.items()):
-            output.append(f'{extra} =')
-            output.extend(f'    {pkg}' for pkg in sorted(pkgspecs))
+    pyproject = Path('_meta/pyproject.toml')
+    data = tomlkit.parse(pyproject.read_text())
+    data['project']['dependencies'] = [
+        *(x for x in data['project']['dependencies'] if not x.startswith('indico-plugin-')),
+        *(tomlkit.string(name, literal=True) for name in plugins_require)
+    ]
+    data['project']['dependencies'].multiline(True)
 
-    if _update_meta('\n'.join(output)):
+    if extras_require:
+        optional_deps = tomlkit.table()
+        for extra, pkgspecs in sorted(extras_require.items()):
+            optional_deps[extra] = tomlkit.array(sorted(tomlkit.string(x, literal=True) for x in pkgspecs))
+        data['project']['optional-dependencies'] = optional_deps
+    else:
+        data['project'].pop('optional-dependencies', None)
+
+    if _update_meta(pyproject, data):
         click.secho('Updated meta package', fg='green')
     else:
         click.secho('Meta package already up to date', fg='yellow')
