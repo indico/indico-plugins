@@ -5,6 +5,10 @@ material to an Indico event.
 
 ## Changelog
 
+### 3.3.1
+
+- Use the latest `nbconvert` version
+
 ### 3.3
 
 - Support (and require) Python 3.12
