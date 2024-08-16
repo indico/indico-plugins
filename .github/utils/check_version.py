@@ -6,12 +6,12 @@
 # see the LICENSE file for more details.
 
 import sys
-from configparser import ConfigParser
+import tomllib
+from pathlib import Path
 
 
-cp = ConfigParser()
-cp.read('_meta/setup.cfg')
-version = cp['metadata']['version']
+data = tomllib.loads(Path('_meta/pyproject.toml').read_text())
+version = data['project']['version']
 tag_version = sys.argv[1]
 
 if tag_version != version:
