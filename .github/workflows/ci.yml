@@ -58,7 +58,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip|${{ runner.os }}|3.12|${{ hashFiles('**/setup.cfg') }}
+          key: pip|${{ runner.os }}|3.12|${{ hashFiles('**/pyproject.toml') }}
 
       - uses: actions/cache@v4
         id: cache-npm
