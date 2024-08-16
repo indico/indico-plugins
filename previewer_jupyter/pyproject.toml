@@ -12,7 +12,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
 ]
 requires-python = '>=3.12.2, <3.13'
-dependencies = ['indico>=3.3', 'nbconvert==6.5.0']
+dependencies = ['indico>=3.3', 'nbconvert==6.5.1']
 
 [project.urls]
 GitHub = 'https://github.com/indico/indico-plugins'
