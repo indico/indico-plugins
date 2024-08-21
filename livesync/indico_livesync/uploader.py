@@ -79,11 +79,11 @@ class Uploader:
         change_by_obj = {}
         for obj, change in records.items():
             by_model[type(obj)].add(obj.id)
-            change_by_obj[type(obj), obj.id] = change
+            change_by_obj[(type(obj), obj.id)] = change
         rv = {}
         for model, ids in by_model.items():
             for obj in self.backend.get_data_query(model, ids).yield_per(5000):
-                rv[obj] = change_by_obj[model, obj.id]
+                rv[obj] = change_by_obj[(model, obj.id)]
         assert len(records) == len(rv)
         return rv
 

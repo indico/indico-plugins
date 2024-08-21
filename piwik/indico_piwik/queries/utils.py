@@ -44,11 +44,11 @@ def stringify_seconds(seconds=0):
     """
     seconds = int(seconds)
     minutes = seconds / 60
-    ti = {'h': 0, 'm': 0, 's': 0}
 
+    h = m = s = 0
     if seconds > 0:
-        ti['s'] = seconds % 60
-        ti['m'] = minutes % 60
-        ti['h'] = minutes / 60
+        s = seconds % 60
+        m = minutes % 60
+        h = minutes / 60
 
-    return '%dh %dm %ds' % (ti['h'], ti['m'], ti['s'])
+    return f'{h}h {m}m {s}s'

@@ -159,6 +159,9 @@ allow-dunder-method-names = [
     '__clause_element__',
 ]
 
+[lint.ruff]
+parenthesize-tuple-in-subscript = true
+
 [lint.per-file-ignores]
 # allow stuff that's useful in tests
 '*/*_test.py' = ['E221', 'E241', 'E272', 'N802', 'S105', 'S106', 'PLC1901']
