@@ -9,6 +9,7 @@ from wtforms import BooleanField, IntegerField, StringField
 from wtforms.validators import ValidationError
 
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoPasswordField
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_piwik import _
@@ -19,10 +20,10 @@ class SettingsForm(IndicoForm):
     enabled_for_events = BooleanField(_('Track events'), widget=SwitchWidget())
     cache_enabled = BooleanField(_('Cache results'), widget=SwitchWidget())
     server_url = StringField(_('Piwik server URL'))
-    server_api_url = StringField(_('Piwik API server URL'),
-                                 description=_("Should be pointing to 'index.php'"))
-    server_token = StringField(_('Piwik API token'),
-                               description=_('Token to access the API. Do not share it!'))
+    server_api_url = StringField(_('Piwik API server URL'))
+    server_token = IndicoPasswordField(_('Piwik API token'),
+                                       toggle=True,
+                                       description=_('Token to access the API. Do not share it!'))
     site_id_general = StringField(_('Global statistics ID'),
                                   description=_('Piwik site ID for global statistics'))
     site_id_events = StringField(_('Event statistics ID'),

@@ -38,31 +38,27 @@ class PiwikRequest:
         :param default_response: Return value in case the query fails
         :param query_params: Dictionary with the parameters of the query
         """
-        query_url = self.get_query_url(**query_params)
-        return self._perform_call(query_url, default_response)
+        return self._perform_call(self.api_url, self.get_query(query_params), default_response)
 
     def get_query(self, query_params=None):
         """Return a query string"""
         if query_params is None:
             query_params = {}
-        query = ''
+        query = {}
         query_params['idSite'] = self.site_id
         if self.api_token is not None:
             query_params['token_auth'] = self.api_token
         for key, value in query_params.items():
             if isinstance(value, list):
                 value = ','.join(value)
-            query += f'{key}={value}&'
-        return query[:-1]
+            query[key] = value
+        return query
 
-    def get_query_url(self, **query_params):
-        """Return the url for a Piwik API query"""
-        return f'{self.api_url}?{self.get_query(query_params)}'
-
-    def _perform_call(self, query_url, default_response=None, timeout=10):
+    def _perform_call(self, query_url, query_params, default_response=None, timeout=10):
         """Returns the raw results from the API"""
+        payload = self.get_query(query_params)
         try:
-            response = requests.get(query_url, timeout=timeout)
+            response = requests.post(query_url, data=payload, timeout=timeout)
         except TimeoutError:
             current_plugin.logger.warning('Timeout contacting Piwik server')
             return default_response
