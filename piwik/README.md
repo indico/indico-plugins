@@ -5,6 +5,10 @@ gather statistics about the users accessing Indico or specific Indico events.
 
 ## Changelog
 
+### 3.3.1
+
+- Pass `token_auth` via POST instead of query string (more secure, and required by modern Matomo versions)
+
 ### 3.3
 
 - Support (and require) Python 3.12
