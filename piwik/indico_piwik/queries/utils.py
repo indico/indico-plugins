@@ -6,9 +6,12 @@
 # see the LICENSE file for more details.
 
 import json
+from datetime import timedelta
 from functools import reduce
 
 from flask_pluginengine import current_plugin
+
+from indico.util.date_time import format_human_timedelta
 
 
 def get_json_from_remote_server(func, **kwargs):
@@ -37,18 +40,6 @@ def reduce_json(data):
     return reduce(lambda x, y: int(x) + int(y), list(data.values()))
 
 
-def stringify_seconds(seconds=0):
-    """
-    Takes time as a value of seconds and deduces the delta in human-readable
-    HHh MMm SSs format.
-    """
-    seconds = int(seconds)
-    minutes = seconds / 60
-
-    h = m = s = 0
-    if seconds > 0:
-        s = seconds % 60
-        m = minutes % 60
-        h = minutes / 60
-
-    return f'{h}h {m}m {s}s'
+def stringify_seconds(seconds):
+    """Format seconds in a compact HHh MMm SSs format."""
+    return format_human_timedelta(timedelta(seconds=seconds), narrow=True)
