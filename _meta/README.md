@@ -8,6 +8,11 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.1
+
+- Update `indico-plugin-piwik`
+- Update `indico-plugin-jupyter`
+
 ### 3.3
 
 - Support (and require) Python 3.12
