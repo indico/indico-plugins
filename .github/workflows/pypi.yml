@@ -120,13 +120,13 @@ jobs:
           path: dist
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
-        uses: pypa/gh-action-pypi-publish@v1.10.0
+        uses: pypa/gh-action-pypi-publish@v1.10.1
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: dist/
           skip-existing: true
       - name: Publish to PyPI 🚀
-        uses: pypa/gh-action-pypi-publish@v1.10.0
+        uses: pypa/gh-action-pypi-publish@v1.10.1
         with:
           packages-dir: dist/
           skip-existing: true
