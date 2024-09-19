@@ -2,7 +2,7 @@
 name = 'indico-plugin-payment-sixpay'
 description = 'SIXPay/Saferpay payments for Indico event registration fees'
 readme = 'README.md'
-version = '3.3'
+version = '3.3.1'
 license = 'MIT'
 authors = [
     { name = 'Indico Team', email = 'indico-team@cern.ch' },
@@ -16,7 +16,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
 ]
 requires-python = '>=3.12.2, <3.13'
-dependencies = ['indico>=3.3', 'iso4217==1.6.20180829']
+dependencies = ['indico>=3.3', 'iso4217==1.12.20240625']
 
 [project.urls]
 GitHub = 'https://github.com/indico/indico-plugins'

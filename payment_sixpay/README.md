@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.3.1
+
+- Update iso4217 dependency
+
 ### 3.3
 
 - Support (and require) Python 3.12
