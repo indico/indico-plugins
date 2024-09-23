@@ -110,10 +110,10 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
         label=_('Account ID'),
         validators=[
             Optional(),
-            IndicoRegexp(r'^[0-9-]{0,15}$')
+            IndicoRegexp(r'^[0-9-]{0,16}$')
         ],
         description=_(
-            'Default Saferpay account ID, such as "123456-12345678". '
+            'Default Saferpay account ID, such as "1234567-12345678". '
             'Event managers will be able to override this.'
         )
     )
@@ -154,9 +154,9 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         label=_('Account ID'),
         validators=[
             DataRequired(),
-            IndicoRegexp(r'^[0-9-]{0,15}$')
+            IndicoRegexp(r'^[0-9-]{0,16}$')
         ],
-        description=_('The Saferpay account ID, such as "123456-12345678".')
+        description=_('The Saferpay account ID, such as "1234567-12345678".')
     )
     order_description = StringField(
         label=_('Order Description'),
