@@ -11,6 +11,7 @@ they are automatically sent back to Indico.
 ### 3.3.1
 
 - Update iso4217 dependency
+- Support longer Saferpay account IDs
 
 ### 3.3
 
