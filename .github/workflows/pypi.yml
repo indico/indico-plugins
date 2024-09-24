@@ -18,6 +18,31 @@ on:
       - '!v3.2'
       - '!v3.2.*'
       - '!*\+docs'
+  workflow_dispatch:
+    inputs:
+      plugin-name:
+        description: Plugin name
+        required: true
+        type: choice
+        options:
+          - ''  # this is invalid for a `required` dropdown so we force a choice instead of preselecting the first one
+          - citadel
+          - cloud_captchas
+          - livesync
+          - livesync_debug
+          - owncloud
+          - payment_manual
+          - payment_paypal
+          - payment_sixpay
+          - piwik
+          - previewer_code
+          - previewer_jupyter
+          - prometheus
+          - storage_s3
+          - themes_legacy
+          - ursh
+          - vc_dummy
+          - vc_zoom
 
 permissions:
   contents: read
@@ -26,6 +51,7 @@ jobs:
   check-version:
     name: Check version
     runs-on: ubuntu-22.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,14 +64,17 @@ jobs:
   build:
     name: Build plugins 🏗
     needs: check-version
+    if: ${{ !cancelled() && !failure() }}
     uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
     with:
       directory: public
       add-version-suffix: false
+      plugin: ${{ github.event_name == 'workflow_dispatch' && inputs.plugin-name }}
 
   test-install:
     name: Test installing plugins
     needs: build
+    if: ${{ !cancelled() && !failure() && needs.build.result == 'success' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Download build artifacts 📦
@@ -78,6 +107,7 @@ jobs:
     needs:
       - build
       - test-install
+    if: ${{ !cancelled() && !failure() && github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -105,6 +135,7 @@ jobs:
       - build
       - test-install
       - create-github-release
+    if: ${{ !cancelled() && !failure() && needs.build.result == 'success' }}
     # Wait for approval before attempting to upload to PyPI. This allows reviewing the
     # files in the draft release.
     environment: publish
@@ -131,6 +162,7 @@ jobs:
           packages-dir: dist/
           skip-existing: true
       - name: Publish GitHub release 🐙
+        if: github.event_name != 'workflow_dispatch'
         run: >-
           gh release edit
           --draft=false
