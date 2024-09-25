@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-09-24 17:14+0200\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"MIME-Version: 1.0\n"
+"Generated-By: react-jsx-i18n-extract\n"
+
+#: indico_cloud_captchas/client/CloudCaptcha.jsx:97
+#: indico_cloud_captchas/client/CloudCaptcha.jsx:141
+msgid "Confirm that you are not a robot"
+msgstr ""
