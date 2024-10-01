@@ -142,13 +142,6 @@ jobs:
         run: |
           ruff check --output-format github .
 
-      - name: Run flake8
-        if: success() || failure()
-        run: |
-          echo '::add-matcher::.github/matchers/flake8-problem-matcher.json'
-          flake8 --format '%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
-          echo '::remove-matcher owner=flake8::'
-
   test-plugin:
     needs: setup
     runs-on: ubuntu-22.04
