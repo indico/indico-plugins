@@ -6,14 +6,14 @@
             event.can_manage(session.user) or
             (session.user and event_vc_room.data.password_visibility == 'logged_in') or
             (session.user and event_vc_room.data.password_visibility == 'registered' and event.is_user_registered(session.user)) %}
-            classes = "blue {{ extra_classes }}"
+            classes="blue {{ extra_classes }}"
             description="{% trans %}Join the Zoom Meeting{% endtrans %}"
             href="{{ vc_room.data.url }}"
             target="_blank"
             icon="play"
             caption="{% trans %}Join{% endtrans %}""
         {% elif event_vc_room.data.password_visibility == 'no_one' %}
-            classes = "orange {{ extra_classes }}"
+            classes="orange {{ extra_classes }}"
             description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
             href="{{ vc_room.data.public_url }}">
             icon="lock"
@@ -21,26 +21,26 @@
         {% elif event_vc_room.data.password_visibility == 'registered' %}
             {% if session.user %}
                 {% if event.type == 'conference' %}
-                    classes = "blue {{ extra_classes }}"
+                    classes="blue {{ extra_classes }}"
                     description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
                     href="{{ url_for('event_registration.display_regform_list', event) }}"
                     icon="ticket"
                     caption="{% trans %}Please register{% endtrans %}"
                 {% else %}
-                    classes = "disabled {{ extra_classes }}"
+                    classes="disabled {{ extra_classes }}"
                     description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
                     icon="ticket"
                     caption="{% trans %}Registration required{% endtrans %}"
                 {% endif %}
             {% else %}
-                classes = "blue {{ extra_classes }}"
+                classes="blue {{ extra_classes }}"
                 description="{% trans %}This Zoom Meeting can only be seen by registered participants{% endtrans %}"
                 href="{{ url_for_login(request.relative_url) }}"
                 icon="ticket"
                 caption="{% trans %}Please log in and register{% endtrans %}"
             {% endif %}
         {% else %}
-            classes = "orange {{ extra_classes }}"
+            classes="orange {{ extra_classes }}"
             description="{% trans %}This Zoom Meeting can only be seen by logged in users{% endtrans %}"
             href="{{ url_for_login(request.relative_url) }}"
             icon="lock"
@@ -50,13 +50,13 @@
         {% if session.user.identifier != vc_room.data['host']
            and session.user.identifier not in vc_room.data.get('alternative_hosts', [])
            and event.can_manage(session.user) %}
-           alt-host-url="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}"
+             alt-host-url="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}"
         {% endif %}
 
-        meeting-title = "{{ vc_room.name }}"
+        meeting-title="{{ vc_room.name }}"
 
         {% if show_logo %}
-            meeting-data-html = "{{ plugin.render_info_box(vc_room, event_vc_room, event) | escape }}"
+            meeting-data-html="{{ plugin.render_info_box(vc_room, event_vc_room, event) | escape }}"
         {% endif %}
     >
         {{ caller() }}
