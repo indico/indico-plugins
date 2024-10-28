@@ -62,6 +62,6 @@
             meeting-data-html="{{ plugin.render_info_box(vc_room, event_vc_room, event) | escape }}"
         {% endif %}
     >
-        {{ caller() }}
+        {{ caller() if caller is defined }}
     </ind-vc-zoom-join-button>
 {% endmacro %}
