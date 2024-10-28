@@ -1,11 +1,14 @@
 {% macro render_join_button(vc_room, event_vc_room, show_logo=false, extra_classes='') %}
     {% set event = event_vc_room.event %}
     {% set plugin = vc_room.plugin %}
+    {% set show_full_join_link = (
+        event_vc_room.data.password_visibility == 'everyone' or
+        event.can_manage(session.user) or
+        (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+        (session.user and event_vc_room.data.password_visibility == 'registered' and event.is_user_registered(session.user))
+    ) %}
     <ind-vc-zoom-join-button
-        {% if event_vc_room.data.password_visibility == 'everyone' or
-            event.can_manage(session.user) or
-            (session.user and event_vc_room.data.password_visibility == 'logged_in') or
-            (session.user and event_vc_room.data.password_visibility == 'registered' and event.is_user_registered(session.user)) %}
+        {% if show_full_join_link %}
             classes="blue {{ extra_classes }}"
             description="{% trans %}Join the Zoom Meeting{% endtrans %}"
             href="{{ vc_room.data.url }}"
