@@ -77,6 +77,7 @@ function OptionsButton({url, onMadeAltHost}: OptionsButtonProps) {
         open={isConfirmOpen}
         onConfirm={makeAlternativeHost}
         onCancel={() => setConfirmOpen(false)}
+        size="tiny"
       />
     </>
   );
