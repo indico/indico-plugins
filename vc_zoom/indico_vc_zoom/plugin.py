@@ -159,14 +159,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
-        self.inject_bundle('main.js', WPSimpleEventDisplay)
-        self.inject_bundle('main.js', WPVCEventPage)
-        self.inject_bundle('main.js', WPVCManageEvent)
-        self.inject_bundle('main.js', WPConferenceDisplay)
-        self.inject_bundle('main.css', WPSimpleEventDisplay)
-        self.inject_bundle('main.css', WPVCEventPage)
-        self.inject_bundle('main.css', WPVCManageEvent)
-        self.inject_bundle('main.css', WPConferenceDisplay)
+        for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
+            self.inject_bundle('main.js', wp)
+            self.inject_bundle('main.css', wp)
 
     @property
     def logo_url(self):
