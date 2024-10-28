@@ -11,7 +11,7 @@
             href="{{ vc_room.data.url }}"
             target="_blank"
             icon="play"
-            caption="{% trans %}Join{% endtrans %}""
+            caption="{% trans %}Join{% endtrans %}"
         {% elif event_vc_room.data.password_visibility == 'no_one' %}
             classes="orange {{ extra_classes }}"
             description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
@@ -44,7 +44,7 @@
             description="{% trans %}This Zoom Meeting can only be seen by logged in users{% endtrans %}"
             href="{{ url_for_login(request.relative_url) }}"
             icon="lock"
-            caption="{% trans %}Please log in{% endtrans %}""
+            caption="{% trans %}Please log in{% endtrans %}"
         {% endif %}
 
         {% if session.user.identifier != vc_room.data['host']
