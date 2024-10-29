@@ -8,7 +8,7 @@
 import hashlib
 import hmac
 
-from flask import flash, jsonify, request, session
+from flask import jsonify, request, session
 from flask_pluginengine import current_plugin
 from marshmallow import EXCLUDE
 from sqlalchemy.orm.attributes import flag_modified
