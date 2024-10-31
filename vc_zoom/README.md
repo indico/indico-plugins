@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.3.1
+
+- Adapt to Indico 3.3.5 changes
+- Modernize UI elements
+
 ### 3.3
 
 - Adapt to Indico 3.3 changes
