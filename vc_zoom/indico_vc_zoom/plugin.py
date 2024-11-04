@@ -159,18 +159,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
-        self.inject_bundle('main.js', WPSimpleEventDisplay)
-        self.inject_bundle('main.js', WPVCEventPage)
-        self.inject_bundle('main.js', WPVCManageEvent)
-        self.inject_bundle('main.js', WPConferenceDisplay)
+        for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
+            self.inject_bundle('main.js', wp)
+            self.inject_bundle('main.css', wp)
 
     @property
     def logo_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.png')
+        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.svg')
 
     @property
     def icon_url(self):
-        return url_for_plugin(self.name + '.static', filename='images/zoom_logo.png')
+        return url_for_plugin(self.name + '.static', filename='images/zoom_icon.svg')
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Override the default room form creation mechanism."""
@@ -218,16 +217,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_association(self, event, vc_room, room_assoc, data):
         # XXX: This feels slightly hacky. Maybe we should change the API on the core?
         association_is_new = room_assoc.vc_room is None
-        old_link = room_assoc.link_object
 
         # in a new room, `meeting_type` comes in `data`, otherwise it's already in the VCRoom
         is_webinar = data.get('meeting_type', vc_room.data and vc_room.data.get('meeting_type')) == 'webinar'
 
-        super().update_data_association(event, vc_room, room_assoc, data)
+        assoc_has_changed = super().update_data_association(event, vc_room, room_assoc, data)
 
         if vc_room.data:
             try:
-                # this is not a new room
                 if association_is_new:
                     self.refresh_room(vc_room, event)
                     if vc_room.data.get('registration_required'):
@@ -245,7 +242,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                             else ZoomMeetingType.recurring_meeting_no_time
                         )
                     })
-                elif room_assoc.link_object != old_link:
+                elif assoc_has_changed:
                     # the booking should now be linked to something else
                     new_schedule_args = (get_schedule_args(room_assoc.link_object)
                                          if room_assoc.link_object.start_dt
@@ -273,8 +270,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         room_assoc.data['password_visibility'] = data.pop('password_visibility')
         flag_modified(room_assoc, 'data')
 
+        return assoc_has_changed
+
     def update_data_vc_room(self, vc_room, data, is_new=False):
-        super().update_data_vc_room(vc_room, data)
+        super().update_data_vc_room(vc_room, data, is_new=is_new)
         fields = {'description', 'password'}
 
         # we may end up not getting a meeting_type from the form
