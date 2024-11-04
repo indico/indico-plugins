@@ -28,5 +28,8 @@
     "stylelint-prettier": "^1.2.0",
     "stylelint-scss": "^5.3.2",
     "stylelint-stylistic": "^0.4.5"
+  },
+  "dependencies": {
+    "typescript": "^5.6.3"
   }
 }
