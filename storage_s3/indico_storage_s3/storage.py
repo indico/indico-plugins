@@ -204,10 +204,10 @@ class S3Storage(S3StorageBase):
     def _parse_file_id(self, file_id):
         return self.bucket_name, file_id
 
-    def save(self, name, content_type, filename, fileobj):
+    def save(self, name, content_type, filename, fileobj, *, dry_run=False):
         try:
             bucket = self._get_current_bucket_name()
-            checksum = self._save(bucket, name, content_type, fileobj)
+            checksum = self._save(bucket, name, content_type, fileobj) if not dry_run else None
             return name, checksum
         except Exception as exc:
             raise StorageError(f'Could not save "{name}": {exc}') from exc
@@ -250,10 +250,10 @@ class DynamicS3Storage(S3StorageBase):
         name = name.replace('<month>', date.strftime('%m'))
         return name.replace('<week>', date.strftime('%W'))
 
-    def save(self, name, content_type, filename, fileobj):
+    def save(self, name, content_type, filename, fileobj, *, dry_run=False):
         try:
             bucket = self._get_current_bucket_name()
-            checksum = self._save(bucket, name, content_type, fileobj)
+            checksum = self._save(bucket, name, content_type, fileobj) if not dry_run else None
             file_id = f'{bucket}//{name}'
             return file_id, checksum
         except Exception as exc:

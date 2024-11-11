@@ -15,6 +15,11 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.3.2
+
+- Adapt to Indico 3.3.6 changes
+- Add file import handler for event export/import operations that require copying many files on S3
+
 ### 3.3.1
 
 - Update translations
