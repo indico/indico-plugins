@@ -1,7 +1,9 @@
 name: CI
 
 env:
-  PYTHON_VERSION: '3.12.2'
+  TZ: Europe/Zurich
+  PYTHON_VERSION: '3.12.7'
+  NODE_VERSION: '22.x'
 
 on:
   push:
@@ -70,7 +72,7 @@ jobs:
         uses: actions/setup-node@v4
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
-          node-version: '18.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Indico
         run: |
@@ -110,7 +112,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
         uses: actions/download-artifact@v4
@@ -180,7 +182,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
         uses: actions/download-artifact@v4
