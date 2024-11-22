@@ -25,7 +25,7 @@ def create_bucket():
         if not isinstance(storage, DynamicS3Storage) or isinstance(storage, ReadOnlyStorageMixin):
             continue
         today = date.today()
-        placeholders = set(re.findall('<.*?>', storage.bucket_name_template))
+        placeholders = set(re.findall(r'<.*?>', storage.bucket_name_template))
         if not placeholders:
             continue
         elif placeholders == {'<year>', '<week>'}:
