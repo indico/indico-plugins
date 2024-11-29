@@ -7,9 +7,9 @@ source_file = vc_zoom/indico_vc_zoom/translations/messages.pot
 source_lang = en
 type = PO
 
-[o:indico:p:indico:r:vc-zoom-messages-js]
-file_filter = vc_zoom/indico_vc_zoom/translations/<lang>/LC_MESSAGES/messages-js.po
-source_file = vc_zoom/indico_vc_zoom/translations/messages-js.pot
+[o:indico:p:indico:r:vc-zoom-messages-react]
+file_filter = vc_zoom/indico_vc_zoom/translations/<lang>/LC_MESSAGES/messages-react.po
+source_file = vc_zoom/indico_vc_zoom/translations/messages-react.pot
 source_lang = en
 type = PO
 
