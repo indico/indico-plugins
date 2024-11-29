@@ -8,7 +8,17 @@
 import staticURL from 'indico-url:plugin_vc_zoom.static';
 
 import React, {useState} from 'react';
-import {Button, ButtonGroup, Confirm, Dropdown, Icon, Label, Loader, Popup, SemanticICONS} from 'semantic-ui-react';
+import {
+  Button,
+  ButtonGroup,
+  Confirm,
+  Dropdown,
+  Icon,
+  Label,
+  Loader,
+  Popup,
+  SemanticICONS,
+} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
@@ -43,11 +53,11 @@ function OptionsButton({url, onMadeAltHost}: OptionsButtonProps) {
   const icons = new Map<string, SemanticICONS>([
     ['idle', 'cog'],
     ['submitting', null],
-    ['success', 'checkmark']
+    ['success', 'checkmark'],
   ]);
 
   const trigger =
-    state == 'submitting' ? (
+    state === 'submitting' ? (
       <Loader active inline size="mini" />
     ) : (
       <Icon
@@ -56,16 +66,16 @@ function OptionsButton({url, onMadeAltHost}: OptionsButtonProps) {
         color={state === 'success' ? 'green' : undefined}
         name={icons.get(state)}
       />
-  );
+    );
 
   return (
     <>
       <Dropdown trigger={trigger} className="mini button icon">
         <Dropdown.Menu>
           <Dropdown.Item
-              title={Translate.string('You will become an alternative host of this Zoom meeting')}
-              onClick={() => setConfirmOpen(true)}
-            >
+            title={Translate.string('You will become an alternative host of this Zoom meeting')}
+            onClick={() => setConfirmOpen(true)}
+          >
             <Icon name="star" />
             <Translate>Make me alternative host</Translate>
           </Dropdown.Item>
