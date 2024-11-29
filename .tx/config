@@ -84,3 +84,9 @@ file_filter = themes_legacy/indico_themes_legacy/translations/<lang>/LC_MESSAGES
 source_file = themes_legacy/indico_themes_legacy/translations/messages.pot
 source_lang = en
 type = PO
+
+[o:indico:p:indico:r:owncloud-messages]
+file_filter = owncloud/indico_owncloud/translations/<lang>/LC_MESSAGES/messages.po
+source_file = owncloud/indico_owncloud/translations/messages.pot
+source_lang = en
+type = PO
