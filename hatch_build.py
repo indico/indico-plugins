@@ -37,6 +37,8 @@ def _compile_languages(translations_dir: Path):
 def _compile_languages_react(translations_dir: Path):
     # we assume a ..../indico/{src,plugins/whatever}/ structure for indico and plugin repos
     indico_root = Path('../../../src/').absolute().resolve()
+    if not indico_root.exists() and 'CI' in os.environ:
+        indico_root = Path('../../../indico/').absolute().resolve()
     for subdir in translations_dir.absolute().iterdir():
         po_file = subdir / 'LC_MESSAGES' / 'messages-react.po'
         json_file = subdir / 'LC_MESSAGES' / 'messages-react.json'
