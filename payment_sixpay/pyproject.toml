@@ -2,7 +2,7 @@
 name = 'indico-plugin-payment-sixpay'
 description = 'SIXPay/Saferpay payments for Indico event registration fees'
 readme = 'README.md'
-version = '3.3.1'
+version = '3.3.2'
 license = 'MIT'
 authors = [
     { name = 'Indico Team', email = 'indico-team@cern.ch' },

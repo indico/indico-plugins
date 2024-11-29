@@ -5,6 +5,10 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 ## Changelog
 
+### 3.3.1
+
+- Update translations
+
 ### 3.3
 
 - Adapt to Indico 3.3 changes

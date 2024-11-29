@@ -15,6 +15,7 @@
 
 - Adapt to Indico 3.3.5 changes
 - Modernize UI elements
+- Update translations
 
 ### 3.3
 

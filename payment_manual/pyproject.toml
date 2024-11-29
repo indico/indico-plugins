@@ -2,7 +2,7 @@
 name = 'indico-plugin-payment-manual'
 description = 'Payment plugin for Indico that can be used for custom payment information/links'
 readme = 'README.md'
-version = '3.3'
+version = '3.3.1'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [

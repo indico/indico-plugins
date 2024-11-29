@@ -8,6 +8,10 @@ integration with Indico.
 
 ## Changelog
 
+### 3.3.1
+
+- Update translations
+
 ### 3.3
 
 - Support (and require) Python 3.12

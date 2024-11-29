@@ -2,7 +2,7 @@
 name = 'indico-plugin-citadel'
 description = 'Indico search+livesync backend using Citadel+ElasticSearch'
 readme = 'README.md'
-version = '3.3'
+version = '3.3.1'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [

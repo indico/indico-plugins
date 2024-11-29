@@ -22,6 +22,10 @@ it.
 
 ## Changelog
 
+### 3.3.1
+
+- Update translations
+
 ### 3.3
 
 - Adapt to changes in Indico 3.3

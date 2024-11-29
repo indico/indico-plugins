@@ -2,7 +2,7 @@
 name = 'indico-plugin-livesync'
 description = 'Legacy themes for Indico'
 readme = 'README.md'
-version = '3.3'
+version = '3.3.1'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [
