@@ -1,0 +1,19 @@
+# 
+# Translators:
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2024\n"
+"Language-Team: Ukrainian (Ukraine) (https://app.transifex.com/indico/teams/6478/uk_UA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: uk_UA\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: indico_cloud_captchas/client/CloudCaptcha.jsx
+msgid "Confirm that you are not a robot"
+msgstr "Підтвердити що ви не робот"

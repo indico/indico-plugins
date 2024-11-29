@@ -1,0 +1,51 @@
+# Translations template for indico-plugin-storage-s3.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-storage-s3 project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-storage-s3 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2020\n"
+"Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_storage_s3/plugin.py
+msgid "Bucket info API"
+msgstr "Gyűjtőinformáció API"
+
+#: indico_storage_s3/plugin.py
+msgid "Username"
+msgstr "Felhasználónév"
+
+#: indico_storage_s3/plugin.py
+msgid "The username to access the S3 bucket info endpoint"
+msgstr "Az S3 gyűjtőinformáció-végpont eléréséhez szükséges felhasználónév"
+
+#: indico_storage_s3/plugin.py
+msgid "Password"
+msgstr "Jelszó"
+
+#: indico_storage_s3/plugin.py
+msgid "The password to access the S3 bucket info endpoint"
+msgstr "Az S3 gyűjtőinformáció-végpont eléréséhez szükséges jelszó"
+
+#: indico_storage_s3/plugin.py
+msgid ""
+"Enables an API on {url} that returns information on all S3 buckets currently"
+" in use, including dynamically-named ones."
+msgstr ""
+"Engedélyezi a(z) {url} API-t, amely a jelenleg használatban lévő összes "
+"S3-gyűjtőadatait adja vissza, beleértve a dinamikusan elnevezett eket is."

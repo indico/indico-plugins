@@ -1,0 +1,35 @@
+# 
+# Translators:
+# Pierpaolo Gallo, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: Pierpaolo Gallo, 2024\n"
+"Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Actions you can perform on your Zoom meeting"
+msgstr ""
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "You will become an alternative host of this Zoom meeting"
+msgstr "Diventerai co-host di questo meeting Zoom"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me alternative host"
+msgstr "Rendimi co-host"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me an alternative host"
+msgstr "Rendimi co-host"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Are you sure you want to be added as an alternative host?"
+msgstr "Sei sicuro di voler essere aggiunto come co-host dell'evento?"

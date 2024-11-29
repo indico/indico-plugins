@@ -1,0 +1,103 @@
+# Translations template for indico-plugin-payment-paypal.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-paypal project.
+# 
+# Translators:
+# michele michelotto <michelotto@pd.infn.it>, 2018
+# Pierpaolo Gallo, 2023
+# Segreteria AIUM <segreteria@aium.it>, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: Segreteria AIUM <segreteria@aium.it>, 2023\n"
+"Language-Team: Italian (Italy) (http://app.transifex.com/indico/indico/language/it_IT/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_payment_paypal/controllers.py
+msgid "Your payment request has been processed."
+msgstr "La tua richiesta di pagamento è stata elaborata."
+
+#: indico_payment_paypal/controllers.py
+msgid "You cancelled the payment process."
+msgstr "Hai interrotto la procedura di pagamento."
+
+#: indico_payment_paypal/plugin.py
+msgid "API URL"
+msgstr "API URL"
+
+#: indico_payment_paypal/plugin.py
+msgid "URL of the PayPal HTTP API."
+msgstr "URL dell'API HTTP di Paypal"
+
+#: indico_payment_paypal/plugin.py
+msgid "Business"
+msgstr "Impresa"
+
+#: indico_payment_paypal/plugin.py
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "Il PayPal ID di default oppure l'indirizzo email associato con un account PayPal. Chi gestisce l'evento può sovrascrivere questo campo."
+
+#: indico_payment_paypal/plugin.py
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "Il PayPal ID di default oppure l'indirizzo email associato con un account PayPal."
+
+#: indico_payment_paypal/util.py
+msgid "Invalid email address / paypal ID"
+msgstr "Indirizzo email / PayPal ID non valido"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "First name"
+msgstr "Nome"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Last name"
+msgstr "Cognome"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Total amount"
+msgstr "Totale"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "Assicurati che il tuo account PayPal da venditore sia configurato in modo da utilizzare <strong>UTF-8</strong>come impostazione predefinita, altrimenti alcune transazioni potrebbero non essere riconosciute da Indico! Per sapere come configurarlo, %(link)sclicca qui%(endlink)s."
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Transaction ID"
+msgstr "ID della transazione"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Invoice ID"
+msgstr "ID della ricevuta"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Payer e-mail"
+msgstr "E-mail di chi paga"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "L'ammontare pagato non corrisponde con l'ammontare richiesto. Per favore contatta l'utente per risolvere il problema. "
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Paid:"
+msgstr "Pagato:"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Required:"
+msgstr "Obbligatorio:"

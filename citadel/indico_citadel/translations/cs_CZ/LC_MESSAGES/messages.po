@@ -1,59 +1,60 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# Translations template for indico-plugin-citadel.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-citadel project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
 # Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
 # Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2021
-# fri, 2022
+# fri, 2024
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: indico-plugin-citadel 3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: fri, 2022\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
-#: indico_citadel/plugin.py:24
+#: indico_citadel/plugin.py
 msgid "Citadel URL"
 msgstr "Adresa (URL) Citadel"
 
-#: indico_citadel/plugin.py:25
+#: indico_citadel/plugin.py
 msgid "The URL of the Citadel server"
 msgstr "Adresa (URL) serveru Citadel"
 
-#: indico_citadel/plugin.py:26
+#: indico_citadel/plugin.py
 msgid "Citadel API token"
 msgstr "API známka pro Citadel"
 
-#: indico_citadel/plugin.py:27
+#: indico_citadel/plugin.py
 msgid "The authentication token to access Citadel"
 msgstr "Opravňovací známka pro přístup do Citadel"
 
-#: indico_citadel/plugin.py:28
+#: indico_citadel/plugin.py
 msgid "File extensions"
 msgstr "Přípony souborů"
 
-#: indico_citadel/plugin.py:29
+#: indico_citadel/plugin.py
 msgid "File extensions to upload for full-text search"
 msgstr ""
 "Přípony souborů pro nahrání souborů umožňujících celotextové vyhledávání"
 
-#: indico_citadel/plugin.py:30
+#: indico_citadel/plugin.py
 msgid "Max. file size"
 msgstr "Nej. velikost souboru"
 
-#: indico_citadel/plugin.py:32
+#: indico_citadel/plugin.py
 msgid ""
 "Maximum size (in MB) to upload for full-text search. Note that increasing "
 "this after the initial export will upload all files for indexing that have "
@@ -62,55 +63,55 @@ msgid ""
 "file size first!"
 msgstr ""
 "Největší velikost souboru 9 (v MB) pro celotextové vyhledávání. Všimněte si,"
-" že zvýšením této hodnoty po počátečním exportu dojde k nahrání všech "
+" že zvýšením této hodnoty po počátečním uložení dojde k nahrání všech "
 "souborů k rejstříkování, které dosud nebyly nahrány během dalšího spuštění "
 "řady, což může u větších instancí trvat dlouho. Možná budete chtít nejprve "
 "spustit ruční nahrání pro novou velikost souboru!"
 
-#: indico_citadel/plugin.py:37
+#: indico_citadel/plugin.py
 msgid "Parallel threads (records)"
 msgstr "Souběžná vlákna (záznamy)"
 
-#: indico_citadel/plugin.py:38
+#: indico_citadel/plugin.py
 msgid "Number of threads to use when uploading records."
 msgstr ""
 "Počet pararelních vláken, která mají být použita pro nahrání záznamů. "
 
-#: indico_citadel/plugin.py:39
+#: indico_citadel/plugin.py
 msgid "Parallel threads (records, initial export)"
 msgstr "Parerelní vlákna (záznamy, prvotní export)"
 
-#: indico_citadel/plugin.py:41
+#: indico_citadel/plugin.py
 msgid ""
 "Number of threads to use when uploading records during the initial export."
 msgstr ""
 "Počet vláken, která mají být použita pro nahrání záznamů při prvotním "
 "exportu."
 
-#: indico_citadel/plugin.py:43
+#: indico_citadel/plugin.py
 msgid "Parallel threads (files)"
 msgstr "Paralelní vlákna (soubory)"
 
-#: indico_citadel/plugin.py:44
+#: indico_citadel/plugin.py
 msgid "Number of threads to use when uploading files."
 msgstr "Počet vláken, která mají být použita pro nahrání záznamů záznamů. "
 
-#: indico_citadel/plugin.py:45
+#: indico_citadel/plugin.py
 msgid "Parallel threads (files, initial export)"
 msgstr "Paralelní vlákna (soubory, úvodní export)"
 
-#: indico_citadel/plugin.py:47
+#: indico_citadel/plugin.py
 msgid ""
 "Number of threads to use when uploading files during the initial export."
 msgstr ""
 "Počet vláken, která mají být použita pro nahrání záznamů záznamů během "
 "prvotního exportu. "
 
-#: indico_citadel/plugin.py:49
+#: indico_citadel/plugin.py
 msgid "Disable search"
 msgstr "Vypnout vyhledávání"
 
-#: indico_citadel/plugin.py:50
+#: indico_citadel/plugin.py
 msgid ""
 "This disables the search integration of the plugin. When this option is "
 "used, the internal Indico search interface will be used. This may be useful "
@@ -120,86 +121,108 @@ msgstr ""
 "Zakázat vyhledávání prostřednictvím přídavného modulu Citadel. Bude použit "
 "jenom vnitřní vyhledávací modul Indico. "
 
-#: indico_citadel/search.py:92
+#: indico_citadel/plugin.py
+msgid "Large Category Warning Threshold"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Displays a warning to category managers when changing the ACL of big "
+"categories that would result in sending a large amount of data to the "
+"Citadel server. You can set the threshold to 0 to suppress this warning."
+msgstr ""
+
+#: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
 msgstr "Název události, příspěvku atd. "
 
-#: indico_citadel/search.py:93
+#: indico_citadel/search.py
 msgid "A speaker, author or event chair's name"
 msgstr "Jméno přednášejícího, autora nebo předsedajícího"
 
-#: indico_citadel/search.py:94
+#: indico_citadel/search.py
 msgid "A speaker, author or event chair's affiliation"
 msgstr "Příslušnost přednášejícího, autora nebo předsedajícího"
 
-#: indico_citadel/search.py:95
+#: indico_citadel/search.py
 msgid "An entry type (such as conference, meeting, file, etc.)"
 msgstr "Typ položky (jako např. konference, schůzka, soubor, atd.)"
 
-#: indico_citadel/search.py:96
+#: indico_citadel/search.py
 msgid "Name of the venue"
 msgstr "Název místa konání události"
 
-#: indico_citadel/search.py:97
+#: indico_citadel/search.py
 msgid "Name of the room"
 msgstr "Místnost"
 
-#: indico_citadel/search.py:98
+#: indico_citadel/search.py
 msgid "Address of the venue"
 msgstr "Adresa místa konání"
 
-#: indico_citadel/search.py:99
+#: indico_citadel/search.py
 msgid "Name of the attached file"
 msgstr "Název přiloženého souboru"
 
-#: indico_citadel/search.py:100
+#: indico_citadel/search.py
 msgid "A keyword associated with an event"
 msgstr "Klíčové slovo spojené s událostí"
 
-#: indico_citadel/search.py:101
+#: indico_citadel/search.py
 msgid "The category of an event"
 msgstr "Skupina události"
 
-#: indico_citadel/search.py:109
+#: indico_citadel/search.py
 msgid "Most relevant"
 msgstr "Nejzávažnější"
 
-#: indico_citadel/search.py:110
+#: indico_citadel/search.py
 msgid "Newest first"
 msgstr "Od nejnovějších"
 
-#: indico_citadel/search.py:111
+#: indico_citadel/search.py
 msgid "Oldest first"
 msgstr "Od nejstarších"
 
-#: indico_citadel/search.py:115
+#: indico_citadel/search.py
 msgid "Affiliation"
 msgstr "Příslušnost"
 
-#: indico_citadel/search.py:116
+#: indico_citadel/search.py
 msgid "Person"
 msgstr "Osoba"
 
-#: indico_citadel/search.py:117
+#: indico_citadel/search.py
 msgid "Type"
 msgstr "Typ"
 
-#: indico_citadel/search.py:118
+#: indico_citadel/search.py
 msgid "Location"
-msgstr "Místo"
+msgstr "Umístění"
 
-#: indico_citadel/search.py:119
+#: indico_citadel/search.py
 msgid "Date"
 msgstr "Datum"
 
-#: indico_citadel/search.py:120
+#: indico_citadel/search.py
 msgid "Category"
 msgstr "Skupina"
 
-#: indico_citadel/search.py:121
+#: indico_citadel/search.py
 msgid "Category ID"
 msgstr "ID skupiny"
 
-#: indico_citadel/search.py:122
+#: indico_citadel/search.py
 msgid "Event ID"
 msgstr "ID události"
+
+#: indico_citadel/templates/event_category_warning.html
+msgid "This category contains a large number of events."
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid ""
+"Please consider using groups instead of individual users when granting "
+"access or management permissions since any change to the list below requires"
+" re-synchronizing all events with Indico's search engine."
+msgstr ""

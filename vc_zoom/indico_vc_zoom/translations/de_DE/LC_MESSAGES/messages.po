@@ -1,7 +1,7 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# Translations template for indico-plugin-vc-zoom.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-vc-zoom project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
 # Ina Gante Gaspar <ina.gaspar@uni-muenster.de>, 2021
@@ -9,185 +9,186 @@
 # HRZ SHK <indico1@uni-bonn.de>, 2022
 # markus heuchert <m.heuchert@uni-muenster.de>, 2022
 # Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2022
-# bbbuserde, 2022
+# bbbuserde, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: bbbuserde, 2022\n"
+"Last-Translator: bbbuserde, 2024\n"
 "Language-Team: German (Germany) (https://app.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: indico_vc_zoom/controllers.py:29
+#: indico_vc_zoom/controllers.py
 msgid "You were already an (alternative) host of this meeting"
 msgstr "Sie sind bereits ein Veranstalter dieses Meetings"
 
-#: indico_vc_zoom/controllers.py:44
-msgid "You are now an alternative host of room '{room}'"
-msgstr "Sie sind nun ein Veranstalter vom Raum '{room}'"
-
-#: indico_vc_zoom/forms.py:27 indico_vc_zoom/forms.py:61
+#: indico_vc_zoom/forms.py
 msgid "Passcode visibility"
 msgstr "Sichtbarkeit des Passcodes"
 
-#: indico_vc_zoom/forms.py:28 indico_vc_zoom/forms.py:62
+#: indico_vc_zoom/forms.py
 msgid "Who should be able to know this meeting's passcode"
 msgstr "Wer sollte den Passcode dieses Meetings kennen?"
 
-#: indico_vc_zoom/forms.py:31 indico_vc_zoom/forms.py:65
+#: indico_vc_zoom/forms.py
 msgid "Everyone"
 msgstr "Jeder"
 
-#: indico_vc_zoom/forms.py:32 indico_vc_zoom/forms.py:66
+#: indico_vc_zoom/forms.py
 msgid "Logged-in users"
 msgstr "Angemeldete Nutzer"
 
-#: indico_vc_zoom/forms.py:33 indico_vc_zoom/forms.py:67
+#: indico_vc_zoom/forms.py
 msgid "Registered participants"
 msgstr "Angemeldete Teilnehmer"
 
-#: indico_vc_zoom/forms.py:34 indico_vc_zoom/forms.py:68
+#: indico_vc_zoom/forms.py
 msgid "No one"
 msgstr "Niemand"
 
-#: indico_vc_zoom/forms.py:44
+#: indico_vc_zoom/forms.py
 msgid "Meeting Type"
 msgstr "Besprechung Typ"
 
-#: indico_vc_zoom/forms.py:45
+#: indico_vc_zoom/forms.py
 msgid "The type of Zoom meeting to be created"
 msgstr "Der Typ des zu erstellenden Zoom Meetings"
 
-#: indico_vc_zoom/forms.py:48
+#: indico_vc_zoom/forms.py
 msgid "Regular Meeting"
 msgstr "Reguläres Meeting"
 
-#: indico_vc_zoom/forms.py:49 indico_vc_zoom/templates/room_labels.html:4
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/room_labels.html
 msgid "Webinar"
 msgstr "Webinar"
 
-#: indico_vc_zoom/forms.py:51
+#: indico_vc_zoom/forms.py
 msgid "Meeting Host"
 msgstr "Meeting Veranstalter"
 
-#: indico_vc_zoom/forms.py:52
+#: indico_vc_zoom/forms.py
 msgid "Myself"
 msgstr "Mich"
 
-#: indico_vc_zoom/forms.py:52
+#: indico_vc_zoom/forms.py
 msgid "Someone else"
 msgstr "Jemand anders"
 
-#: indico_vc_zoom/forms.py:54
+#: indico_vc_zoom/forms.py
 msgid "User"
 msgstr "Benutzer"
 
-#: indico_vc_zoom/forms.py:57 indico_vc_zoom/templates/info_box.html:35
-#: indico_vc_zoom/templates/manage_event_info_box.html:41
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Passcode"
 msgstr "Passcode"
 
-#: indico_vc_zoom/forms.py:59
+#: indico_vc_zoom/forms.py
 msgid "Meeting passcode (8-10 digits)"
 msgstr "Meeting Passcode (8-10 Zeichen)"
 
-#: indico_vc_zoom/forms.py:70 indico_vc_zoom/plugin.py:87
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute audio"
 msgstr "Ton stummschalten"
 
-#: indico_vc_zoom/forms.py:72 indico_vc_zoom/plugin.py:89
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Participants will join the VC room muted by default "
 msgstr "Teilnehmer betreten den VC Raum standardmäßig stummgeschaltet"
 
-#: indico_vc_zoom/forms.py:74 indico_vc_zoom/plugin.py:91
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (host)"
 msgstr "Video stummschalten (Veranstalter)"
 
-#: indico_vc_zoom/forms.py:76 indico_vc_zoom/plugin.py:93
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "The host will join the VC room with video disabled"
 msgstr "Veranstalter tritt dem Konferenzraum mit abgeschaltetem Video bei"
 
-#: indico_vc_zoom/forms.py:78 indico_vc_zoom/plugin.py:95
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (participants)"
 msgstr "Video stummschalten (Teilnehmer)"
 
-#: indico_vc_zoom/forms.py:80 indico_vc_zoom/plugin.py:97
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Participants will join the VC room with video disabled"
 msgstr "Teilnehmer treten dem Konferenzraum mit abgeschaltetem Video bei"
 
-#: indico_vc_zoom/forms.py:82 indico_vc_zoom/plugin.py:104
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Waiting room"
 msgstr "Warteraum"
 
-#: indico_vc_zoom/forms.py:84 indico_vc_zoom/plugin.py:106
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Participants may be kept in a waiting room by the host"
 msgstr ""
 "Die Teilnehmer können vom Gastgeber in einem Warteraum gehalten werden"
 
-#: indico_vc_zoom/forms.py:86 indico_vc_zoom/templates/info_box.html:15
-#: indico_vc_zoom/templates/manage_event_info_box.html:9
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Description"
 msgstr "Beschreibung"
 
-#: indico_vc_zoom/forms.py:86
+#: indico_vc_zoom/forms.py
 msgid "Optional description for this room"
 msgstr "Optionale Beschreibung für diesen Raum"
 
-#: indico_vc_zoom/forms.py:116
+#: indico_vc_zoom/forms.py
 msgid "This user has no Zoom account"
 msgstr "Dieser Benutzer hat kein Zoom-Konto."
 
-#: indico_vc_zoom/plugin.py:45
+#: indico_vc_zoom/plugin.py
 msgid "API Credentials"
 msgstr "API-Kennung"
 
-#: indico_vc_zoom/plugin.py:46
+#: indico_vc_zoom/plugin.py
 msgid "Zoom Account"
 msgstr "Zoom Konto"
 
-#: indico_vc_zoom/plugin.py:48
+#: indico_vc_zoom/plugin.py
 msgid "Room Settings"
 msgstr "Raumeinstellungen"
 
-#: indico_vc_zoom/plugin.py:50
+#: indico_vc_zoom/plugin.py
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
-#: indico_vc_zoom/plugin.py:51
+#: indico_vc_zoom/plugin.py
 msgid "Access"
 msgstr "Zugriff"
 
-#: indico_vc_zoom/plugin.py:54
-msgid "API Key"
-msgstr "API-Schlüssel"
+#: indico_vc_zoom/plugin.py
+msgid "Account ID"
+msgstr "Konto ID"
 
-#: indico_vc_zoom/plugin.py:56
-msgid "API Secret"
-msgstr "API-Geheim"
-
-#: indico_vc_zoom/plugin.py:58
-msgid "Webhook Token"
-msgstr "Webhook Token"
-
-#: indico_vc_zoom/plugin.py:59
-msgid "Specify Zoom's webhook token if you want live updates"
+#: indico_vc_zoom/plugin.py
+msgid "Client ID"
 msgstr ""
-"Geben Sie das Webhook-Token von Zoom an, wenn Sie Live-Updates wünschen"
 
-#: indico_vc_zoom/plugin.py:61
+#: indico_vc_zoom/plugin.py
+msgid "Client Secret"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Webhook Secret Token"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Specify the \"Secret Token\" of your Zoom Webhook if you want live updates "
+"in case of modified/deleted Zoom meetings."
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
 msgid "User lookup mode"
 msgstr "Modus der Benutzersuche"
 
-#: indico_vc_zoom/plugin.py:62
+#: indico_vc_zoom/plugin.py
 msgid ""
 "Specify how Indico should look up the zoom user that corresponds to an "
 "Indico user."
@@ -195,11 +196,11 @@ msgstr ""
 "Geben Sie an, wie Indico den Zoom-Benutzer suchen soll, der einem Indico-"
 "Benutzer entspricht."
 
-#: indico_vc_zoom/plugin.py:65
+#: indico_vc_zoom/plugin.py
 msgid "E-mail domains"
 msgstr "E-Mail Domänen"
 
-#: indico_vc_zoom/plugin.py:67
+#: indico_vc_zoom/plugin.py
 msgid ""
 "List of e-mail domains which can use the Zoom API. Indico attempts to find "
 "Zoom accounts using all email addresses of a user which use those domains."
@@ -208,11 +209,11 @@ msgstr ""
 "versucht, Zoom-Konten mit allen E-Mail-Adressen eines Benutzers zu finden, "
 "die diese Domänen verwenden."
 
-#: indico_vc_zoom/plugin.py:71
+#: indico_vc_zoom/plugin.py
 msgid "Indico identity providers"
 msgstr "Indico identity providers"
 
-#: indico_vc_zoom/plugin.py:73
+#: indico_vc_zoom/plugin.py
 msgid ""
 "Identity providers from which to get usernames. Indico queries those "
 "providers using the email addresses of the user and attempts to find Zoom "
@@ -223,11 +224,11 @@ msgstr ""
 "Zoom-Konten zu finden, die eine E-Mail-Adresse mit dem Format "
 "username@enterprise-domain haben."
 
-#: indico_vc_zoom/plugin.py:78
+#: indico_vc_zoom/plugin.py
 msgid "Enterprise domain"
 msgstr "Unternehmens domain"
 
-#: indico_vc_zoom/plugin.py:80
+#: indico_vc_zoom/plugin.py
 msgid ""
 "The domain name used together with the usernames from the Indico identity "
 "provider"
@@ -235,21 +236,21 @@ msgstr ""
 "Der Domänenname, der zusammen mit den Benutzernamen des Indico-"
 "Identitätsanbieters verwendet wird"
 
-#: indico_vc_zoom/plugin.py:83
+#: indico_vc_zoom/plugin.py
 msgid "Allow Webinars (Experimental)"
 msgstr "Webinare erlauben (experimentell)"
 
-#: indico_vc_zoom/plugin.py:85
+#: indico_vc_zoom/plugin.py
 msgid "Allow webinars to be created through Indico. Use at your own risk."
 msgstr ""
 "Erlauben Sie das Erstellen von Webinaren über Indico. Die Nutzung erfolgt "
 "auf eigene Gefahr."
 
-#: indico_vc_zoom/plugin.py:99
+#: indico_vc_zoom/plugin.py
 msgid "Join Before Host"
 msgstr "Beitreten vor dem Gastgeber"
 
-#: indico_vc_zoom/plugin.py:101
+#: indico_vc_zoom/plugin.py
 msgid ""
 "Allow participants to join the meeting before the host starts the meeting. "
 "Only used for scheduled or recurring meetings."
@@ -258,19 +259,19 @@ msgstr ""
 " Meeting startet. Wird nur für geplante oder wiederkehrende Veranstaltungen "
 "verwendet."
 
-#: indico_vc_zoom/plugin.py:108
+#: indico_vc_zoom/plugin.py
 msgid "Creation email footer"
 msgstr "Erstellung einer Fußzeile in der E-Mail"
 
-#: indico_vc_zoom/plugin.py:109
+#: indico_vc_zoom/plugin.py
 msgid "Footer to append to emails sent upon creation of a VC room"
 msgstr "Fußzeile, die in E-Mails angehangen wird bei Erstlelung eines Raums"
 
-#: indico_vc_zoom/plugin.py:111
+#: indico_vc_zoom/plugin.py
 msgid "Send host URL"
 msgstr "Sende Host URL"
 
-#: indico_vc_zoom/plugin.py:113
+#: indico_vc_zoom/plugin.py
 msgid ""
 "Whether to send an e-mail with the Host URL to the meeting host upon "
 "creation of a meeting"
@@ -278,19 +279,25 @@ msgstr ""
 "Beim Erstellen eines Meetings eine E-Mail mit der Host-URL an den Host des "
 "Meetings senden oder nicht senden"
 
-#: indico_vc_zoom/plugin.py:116 indico_vc_zoom/templates/info_box.html:44
+#: indico_vc_zoom/plugin.py indico_vc_zoom/templates/info_box.html
 msgid "Join via phone"
 msgstr "Beitritt über Telefon"
 
-#: indico_vc_zoom/plugin.py:117
+#: indico_vc_zoom/plugin.py
 msgid "Link to instructions on joining a meeting via phone"
 msgstr "Link für Anleitungen zur Teilnahme an Treffen per Telefon"
 
-#: indico_vc_zoom/plugin.py:122
+#: indico_vc_zoom/plugin.py
 msgid "Invalid identity providers: {}"
 msgstr "Ungültiger Identity Provider: {}"
 
-#: indico_vc_zoom/plugin.py:353
+#: indico_vc_zoom/plugin.py
+msgid ""
+"The room \"{}\" is using Zoom registration and thus cannot be attached to "
+"another event"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
 msgid ""
 "Could not create the room in Zoom. Please contact support if the error "
 "persists"
@@ -298,41 +305,47 @@ msgstr ""
 "Der Raum konnte in Zoom nicht erstellt werden. Bitte kontaktieren Sie den "
 "Support, wenn der Fehler weiterhin besteht"
 
-#: indico_vc_zoom/plugin.py:438
+#: indico_vc_zoom/plugin.py
 msgid "Room didn't exist in Zoom anymore"
 msgstr "Der Raum existierte nicht mehr in Zoom"
 
-#: indico_vc_zoom/plugin.py:441
+#: indico_vc_zoom/plugin.py
 msgid "Zoom Error: \"{}\""
 msgstr "Zoom Fehler: \"{}\""
 
-#: indico_vc_zoom/plugin.py:444
+#: indico_vc_zoom/plugin.py
 msgid "Problem deleting room"
 msgstr "Problem beim Löschen des Raums"
 
-#: indico_vc_zoom/plugin.py:468
+#: indico_vc_zoom/plugin.py
 msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
 "Der Raum \"{}\" existiert nicht mehr in Zoom und wurde aus dem "
 "Veranstaltungstermin entfernt"
 
-#: indico_vc_zoom/util.py:43
+#: indico_vc_zoom/plugin.py
+msgid ""
+"The room \"{}\" is using Zoom registration and thus cannot be attached to "
+"the new event"
+msgstr ""
+
+#: indico_vc_zoom/util.py
 msgid "All emails"
 msgstr "Alle E-Mails"
 
-#: indico_vc_zoom/util.py:44
+#: indico_vc_zoom/util.py
 msgid "Email domains"
 msgstr "E-Mail-Domänen"
 
-#: indico_vc_zoom/util.py:45
+#: indico_vc_zoom/util.py
 msgid "Authenticators"
 msgstr "Authentifizierer"
 
-#: indico_vc_zoom/util.py:126
+#: indico_vc_zoom/util.py
 msgid "This room has been deleted from Zoom"
 msgstr "Dieser Raum wurde aus Zoom gelöscht"
 
-#: indico_vc_zoom/util.py:130
+#: indico_vc_zoom/util.py
 msgid ""
 "Problem fetching room from Zoom. Please contact support if the error "
 "persists."
@@ -340,66 +353,59 @@ msgstr ""
 "Problem beim Abrufen des Raums von Zoom. Bitte kontaktieren Sie den Support,"
 " wenn der Fehler weiterhin besteht."
 
-#: indico_vc_zoom/util.py:152
+#: indico_vc_zoom/util.py
 msgid "Room no longer exists in Zoom"
 msgstr "Raum existiert nicht mehr in Zoom"
 
-#: indico_vc_zoom/util.py:154
+#: indico_vc_zoom/util.py
 msgid "Can't update meeting. Please contact support if the error persists."
 msgstr ""
 "Das Meeting kann nicht aktualisiert werden. Bitte kontaktieren Sie den "
 "Support, wenn der Fehler weiterhin besteht."
 
-#: indico_vc_zoom/util.py:210
+#: indico_vc_zoom/util.py
 msgid "Could not find Zoom user for alternative host"
 msgstr "Zoom-Benutzer für alternativen Host konnte nicht gefunden werden"
 
-#: indico_vc_zoom/templates/buttons.html:9
-msgid "You will become an alternative host of this Zoom meeting"
-msgstr "Sie werden ein alternativer Gastgeber dieses Zoom Meetings"
+#: indico_vc_zoom/templates/buttons.html
+msgid "Join the Zoom Meeting"
+msgstr ""
 
-#: indico_vc_zoom/templates/buttons.html:12
-msgid "Make me alternative host"
-msgstr "Machen Sie mich zum alternativen Gastgeber"
-
-#: indico_vc_zoom/templates/buttons.html:26
-#: indico_vc_zoom/templates/buttons.html:32
+#: indico_vc_zoom/templates/buttons.html
 msgid "Join"
 msgstr "Teilnehmen"
 
-#: indico_vc_zoom/templates/buttons.html:30
+#: indico_vc_zoom/templates/buttons.html
 msgid "You will need a passcode to join this Zoom meeting"
 msgstr ""
 "Sie benötigen einen Passcode, um an diesem Zoom Meeting teilnehmen zu können"
 
-#: indico_vc_zoom/templates/buttons.html:38
-#: indico_vc_zoom/templates/buttons.html:44
-#: indico_vc_zoom/templates/buttons.html:50
+#: indico_vc_zoom/templates/buttons.html
 msgid "This Zoom Meeting can only be seen by registered participants"
 msgstr ""
 "Dieses Zoom Meeting kann nur von registrierten Teilnehmern gesehen werden"
 
-#: indico_vc_zoom/templates/buttons.html:40
+#: indico_vc_zoom/templates/buttons.html
 msgid "Please register"
 msgstr "Bitte anmelden"
 
-#: indico_vc_zoom/templates/buttons.html:45
+#: indico_vc_zoom/templates/buttons.html
 msgid "Registration required"
 msgstr "Registrierung erforderlich"
 
-#: indico_vc_zoom/templates/buttons.html:52
+#: indico_vc_zoom/templates/buttons.html
 msgid "Please log in and register"
 msgstr "Bitte einloggen und anmelden"
 
-#: indico_vc_zoom/templates/buttons.html:57
+#: indico_vc_zoom/templates/buttons.html
 msgid "This Zoom Meeting can only be seen by logged in users"
 msgstr "Dieses Zoom Meeting kann nur von eingeloggten Nutzern gesehen werden"
 
-#: indico_vc_zoom/templates/buttons.html:59
+#: indico_vc_zoom/templates/buttons.html
 msgid "Please log in"
 msgstr "Bitte einloggen"
 
-#: indico_vc_zoom/templates/extra_delete_msg.html:2
+#: indico_vc_zoom/templates/extra_delete_msg.html
 #, python-format
 msgid ""
 "The host of this Zoom meeting is <strong>%(host)s</strong>. In case you want"
@@ -411,56 +417,56 @@ msgstr ""
 "bitte sicher, dass es nicht für andere Veranstaltungen verwendet wird, die "
 "es möglicherweise noch benötigen!"
 
-#: indico_vc_zoom/templates/info_box.html:12
-#: indico_vc_zoom/templates/manage_event_info_box.html:6
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Zoom Meeting ID"
 msgstr "Zoom Meeting ID"
 
-#: indico_vc_zoom/templates/info_box.html:19
-#: indico_vc_zoom/templates/manage_event_info_box.html:12
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Host"
 msgstr "Host"
 
-#: indico_vc_zoom/templates/info_box.html:24
-#: indico_vc_zoom/templates/manage_event_info_box.html:18
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Alternative host"
 msgid_plural "Alternative hosts"
 msgstr[0] "Alternative host"
 msgstr[1] "Alternative hosts"
 
-#: indico_vc_zoom/templates/info_box.html:40
+#: indico_vc_zoom/templates/info_box.html
 msgid "Useful links"
 msgstr "Nützliche Verknüpfungen"
 
-#: indico_vc_zoom/templates/info_box.html:48
-#: indico_vc_zoom/templates/manage_event_info_box.html:43
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Zoom URL"
 msgstr "Zoom URL"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:28
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Linked to"
 msgstr "Verlinkt zu"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:34
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "the whole event"
 msgstr "die gesamte Veranstaltung"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:36
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Contribution"
 msgstr "Beitrag"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:38
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Session"
 msgstr "Sitzung"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:47
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Created on"
 msgstr "Erstellt am"
 
-#: indico_vc_zoom/templates/manage_event_info_box.html:50
+#: indico_vc_zoom/templates/manage_event_info_box.html
 msgid "Modified on"
 msgstr "Geändert am"
 
-#: indico_vc_zoom/templates/room_labels.html:3
+#: indico_vc_zoom/templates/room_labels.html
 msgid "This is a Zoom webinar"
 msgstr "Dies ist ein Zoom Webinar"

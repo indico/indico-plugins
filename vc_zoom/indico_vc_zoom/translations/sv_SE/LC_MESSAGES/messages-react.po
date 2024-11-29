@@ -1,0 +1,35 @@
+# 
+# Translators:
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Language-Team: Swedish (Sweden) (https://app.transifex.com/indico/teams/6478/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Actions you can perform on your Zoom meeting"
+msgstr ""
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "You will become an alternative host of this Zoom meeting"
+msgstr "Du kommer att bli en alternativ värd för detta Zoom-möte"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me alternative host"
+msgstr "Gör mig till alternativ värd"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me an alternative host"
+msgstr ""
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Are you sure you want to be added as an alternative host?"
+msgstr ""

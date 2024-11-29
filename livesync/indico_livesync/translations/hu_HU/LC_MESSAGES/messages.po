@@ -1,0 +1,186 @@
+# Translations template for indico-plugin-livesync.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-livesync project.
+# 
+# Translators:
+# Adrian, 2024
+# Anna Szabó, 2024
+# Miklós Timár, 2018
+# Miklós Timár, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Adrian, 2024\n"
+"Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_livesync/controllers.py
+msgid "Agent deleted"
+msgstr "Ügynök törölve"
+
+#: indico_livesync/controllers.py
+msgid "This backend is already in use"
+msgstr "Ez a háttértár már használatban van"
+
+#: indico_livesync/controllers.py
+msgid "Agent added"
+msgstr "Ügynök hozzáadva"
+
+#: indico_livesync/controllers.py
+msgid "Don't forget to run the initial export!"
+msgstr "Ne felejtsd el futtatni az kinduló exportot!"
+
+#: indico_livesync/controllers.py
+msgid "Cannot edit an agent that is not loaded"
+msgstr "Nem lehet olyan ügynököt szerkeszteni, amely nincs betöltve"
+
+#: indico_livesync/controllers.py
+msgid "Agent updated"
+msgstr "Ügynök frissítve"
+
+#: indico_livesync/forms.py
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Name"
+msgstr "Név"
+
+#: indico_livesync/forms.py
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "Az ügynök neve. Csak az adminisztrációs felületen használt."
+
+#: indico_livesync/plugin.py
+msgid "Queue entry TTL"
+msgstr "Sorbejegyzés TTL"
+
+#: indico_livesync/plugin.py
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "Hány napot kell megőrizni a feldolgozott bejegyzéseket a sorban. Az idõ a sorbejegyzés létrehozásától számít, tehát ha a LiveSync feladat egy ideig nem fut, a sorbejegyzéseket a feldolgozás után a következõ futtatáskor törölhetjük. Ha 0-ra állítja, letiltja az automatikus törlést."
+
+#: indico_livesync/plugin.py
+msgid "Excluded categories"
+msgstr "Kizárt kategóriák"
+
+#: indico_livesync/plugin.py
+msgid "Category ID"
+msgstr "Kategória azonosító"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "Az ezen kategóriákon vagy alkategóriákon belüli objektumok változásait nem vesszük figyelembe."
+
+#: indico_livesync/plugin.py
+msgid "Disable queue runs"
+msgstr "A várólistás futtatások letiltása"
+
+#: indico_livesync/plugin.py
+msgid "Disable all scheduled queue runs."
+msgstr "Az összes ütemezett várólistás futtatás letiltása."
+
+#: indico_livesync/plugin.py
+msgid "Skip category changes"
+msgstr "Kategóriaváltozások kihagyása"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr "A várólista feldolgozása során a kategóriaváltozások kihagyása. Ez akkor lehet hasznos, ha nagy kategóriáknak jelentős változásai vannak, így elkerülhető azok azonnali feldolgozása."
+
+#: indico_livesync/templates/edit_agent.html
+msgid "Cancel"
+msgstr "Mégsem"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "A %(backend)s ügynökének hozzáadása"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "LiveSync Agents"
+msgstr "LiveSync ügynökök"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "ID"
+msgstr "Azonosító"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Backend"
+msgstr "Backend"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Last Run"
+msgstr "Utolsó futtatás"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Queue"
+msgstr "Várólista"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Status"
+msgstr "Állapot"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Actions"
+msgstr "Művelet"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "Nincsenek betöltve: %(name)s"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Never"
+msgstr "Soha"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Ready"
+msgstr "Kész"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "n/a"
+msgstr "nem elérhető"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Delete this agent?"
+msgstr "Törli ezt az ügynököt?"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "Biztosan törölni szeretné ezt az ügynököt és az összes várólista-bejegyzését?"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Edit LiveSync agent"
+msgstr "LiveSync ügynök szerkesztése"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No agents have been added yet."
+msgstr "Még nem adtak hozzá ügynököket."
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No backend plugins enabled"
+msgstr "Nincs engedélyezve backend-bővítmény"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Add"
+msgstr "Hozzáadás"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "Még mindig el kell végeznie az egyes ügynökök kezdeti exportálását az alábbi parancsok végrehajtásával egy shell-ben. <br> Felhívjuk figyelmét, hogy ez nagyon hosszú időt vehet igénybe, ha sok esemény van Indicóban!"

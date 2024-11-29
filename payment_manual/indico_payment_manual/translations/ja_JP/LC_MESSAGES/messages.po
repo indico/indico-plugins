@@ -1,0 +1,77 @@
+# Translations template for indico-plugin-payment-manual.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-manual project.
+# 
+# Translators:
+# Martin Meadows, 2023
+# SAITO Jun, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:48+0000\n"
+"Last-Translator: SAITO Jun, 2023\n"
+"Language-Team: Japanese (Japan) (http://app.transifex.com/indico/indico/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_payment_manual/placeholders.py
+msgid "escaped for URLs"
+msgstr "URLエスケープ"
+
+#: indico_payment_manual/placeholders.py
+msgid "First name of the registrant"
+msgstr "登録者の名"
+
+#: indico_payment_manual/placeholders.py
+msgid "Last name of the registrant"
+msgstr "登録者の姓"
+
+#: indico_payment_manual/placeholders.py
+msgid "Email address of the registrant"
+msgstr "登録者のメールアドレス"
+
+#: indico_payment_manual/placeholders.py
+msgid "The database ID of the registration"
+msgstr "登録のデータベースID"
+
+#: indico_payment_manual/placeholders.py
+msgid "The ID of the registration form"
+msgstr "登録フォームのID"
+
+#: indico_payment_manual/placeholders.py
+msgid "The ID of the event"
+msgstr "イベントID"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "登録者が支払う金額（e.g. 100.00 or 100.25）"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "不要な端数を除いた金額（e.g. 100 or 100.25）"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "整数値で表示された金額（e.g. 10000 or 10025）"
+
+#: indico_payment_manual/placeholders.py
+msgid "The currency used in the registration"
+msgstr "登録に使用する通貨"
+
+#: indico_payment_manual/plugin.py
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "ユーザーが支払いを行うために必要な詳細情報です。これには通常、銀行口座の詳細、IBAN、支払い参照番号が含まれます。 また、別途用意した決済サイトにリンクすることもできます。この場合、利用可能であれば必ずURLエスケープされたプレースホルダーを使用してください。"
+
+#: indico_payment_manual/plugin.py
+msgid "Payment details"
+msgstr "支払いの詳細"

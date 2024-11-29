@@ -1,7 +1,7 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# Translations template for indico-plugin-cloud-captchas.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-cloud-captchas project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
 # Jesús Martín <jesusmartin@sallep.net>, 2022
@@ -9,62 +9,62 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: indico-plugin-cloud-captchas 3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2022-08-24 10:09+0000\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2022\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: indico_cloud_captchas/plugin.py:26
+#: indico_cloud_captchas/plugin.py
 msgid "None (use Indico's built-in CAPTCHA)"
 msgstr "Ninguno (utilizar el CAPTCHA integrado de Indico)"
 
-#: indico_cloud_captchas/plugin.py:34
+#: indico_cloud_captchas/plugin.py
 msgid "Type"
 msgstr "Tipo"
 
-#: indico_cloud_captchas/plugin.py:35
+#: indico_cloud_captchas/plugin.py
 msgid "Select which CAPTCHA provider you want to use"
 msgstr "Seleccione qué proveedor de CAPTCHA desea utilizar"
 
-#: indico_cloud_captchas/plugin.py:39
+#: indico_cloud_captchas/plugin.py
 msgid "reCAPTCHA site key"
 msgstr "clave del sitio reCAPTCHA"
 
-#: indico_cloud_captchas/plugin.py:41
+#: indico_cloud_captchas/plugin.py
 msgid "The site key available in the reCAPTCHA admin dashboard"
 msgstr ""
 "La clave del sitio disponible en el panel de administración de reCAPTCHA"
 
-#: indico_cloud_captchas/plugin.py:44
+#: indico_cloud_captchas/plugin.py
 msgid "reCAPTCHA secret key"
 msgstr "clave secreta reCAPTCHA"
 
-#: indico_cloud_captchas/plugin.py:46
+#: indico_cloud_captchas/plugin.py
 msgid "The secret key available in the reCAPTCHA admin dashboard"
 msgstr ""
 "La clave secreta disponible en el panel de administración de reCAPTCHA"
 
-#: indico_cloud_captchas/plugin.py:50
+#: indico_cloud_captchas/plugin.py
 msgid "hCaptcha site key"
 msgstr "Clave secreta hCaptcha"
 
-#: indico_cloud_captchas/plugin.py:52
+#: indico_cloud_captchas/plugin.py
 msgid "The site key available in the hCaptcha admin dashboard"
 msgstr ""
 "La clave del sitio disponible en el panel de administración de hCaptcha"
 
-#: indico_cloud_captchas/plugin.py:55
+#: indico_cloud_captchas/plugin.py
 msgid "hCAPTCHA secret key"
 msgstr "Clave secreta hCAPTCHA"
 
-#: indico_cloud_captchas/plugin.py:57
+#: indico_cloud_captchas/plugin.py
 msgid "The secret key available in the hCaptcha admin dashboard"
 msgstr "La clave secreta disponible en el panel de administración de hCaptcha"

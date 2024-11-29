@@ -1,0 +1,103 @@
+# Translations template for indico-plugin-payment-paypal.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-paypal project.
+# 
+# Translators:
+# Hideto D. Harashima, 2023
+# Masanori Ogino <masanori.ogino@gmail.com>, 2018
+# SAITO Jun, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: SAITO Jun, 2023\n"
+"Language-Team: Japanese (Japan) (http://app.transifex.com/indico/indico/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_payment_paypal/controllers.py
+msgid "Your payment request has been processed."
+msgstr "支払いが処理されました。"
+
+#: indico_payment_paypal/controllers.py
+msgid "You cancelled the payment process."
+msgstr "支払い処理をキャンセルしました。"
+
+#: indico_payment_paypal/plugin.py
+msgid "API URL"
+msgstr "API URL"
+
+#: indico_payment_paypal/plugin.py
+msgid "URL of the PayPal HTTP API."
+msgstr "ペイパルHTTP APIのURL"
+
+#: indico_payment_paypal/plugin.py
+msgid "Business"
+msgstr "商用"
+
+#: indico_payment_paypal/plugin.py
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr "ペイパルのアカウントに紐付いたデフォルトのペイパルIDまたはメールアドレス。イベント管理者はこれを上書きすることができます。"
+
+#: indico_payment_paypal/plugin.py
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr "ペイパルのアカウントに紐付いたデフォルトのペイパルIDまたはメールアドレス。"
+
+#: indico_payment_paypal/util.py
+msgid "Invalid email address / paypal ID"
+msgstr "無効なメールアドレスまたはペイパルID"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "First name"
+msgstr "名"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Last name"
+msgstr "姓"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Total amount"
+msgstr "合計"
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr "デフォルトで<strong>UTF-8</strong>を使用するペイパルの販売者アカウントを持っていることを確認してください。そうでなければ、Indicoが取引を承認できない場合があるかもしれません！ 設定の方法は %(link)sこちら%(endlink)s で見ることができます。"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Transaction ID"
+msgstr "取引ID"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Invoice ID"
+msgstr "請求書ID"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Payer e-mail"
+msgstr "支払者のメール"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr "支払額が請求額と一致しません。この問題を解決するために、登録者に連絡してください。"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Paid:"
+msgstr "支払額:"
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Required:"
+msgstr "請求額:"

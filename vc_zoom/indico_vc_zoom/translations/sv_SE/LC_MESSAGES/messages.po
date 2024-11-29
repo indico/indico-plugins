@@ -1,0 +1,459 @@
+# Translations template for indico-plugin-vc-zoom.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-vc-zoom project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-11-25 15:06+0000\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Language-Team: Swedish (Sweden) (https://app.transifex.com/indico/teams/6478/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_vc_zoom/controllers.py
+msgid "You were already an (alternative) host of this meeting"
+msgstr "Du var redan en (alternativ) värd för detta möte"
+
+#: indico_vc_zoom/forms.py
+msgid "Passcode visibility"
+msgstr "Synlig kod för lösenord"
+
+#: indico_vc_zoom/forms.py
+msgid "Who should be able to know this meeting's passcode"
+msgstr "Vem ska känna till mötets lösenord"
+
+#: indico_vc_zoom/forms.py
+msgid "Everyone"
+msgstr "Alla"
+
+#: indico_vc_zoom/forms.py
+msgid "Logged-in users"
+msgstr "Inloggade användare"
+
+#: indico_vc_zoom/forms.py
+msgid "Registered participants"
+msgstr "Registrerade deltagare"
+
+#: indico_vc_zoom/forms.py
+msgid "No one"
+msgstr "Ingen."
+
+#: indico_vc_zoom/forms.py
+msgid "Meeting Type"
+msgstr "Typ av möte"
+
+#: indico_vc_zoom/forms.py
+msgid "The type of Zoom meeting to be created"
+msgstr "Den typ av Zoom-möte som ska skapas"
+
+#: indico_vc_zoom/forms.py
+msgid "Regular Meeting"
+msgstr "Ordinarie möte"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/room_labels.html
+msgid "Webinar"
+msgstr "Webbinarium"
+
+#: indico_vc_zoom/forms.py
+msgid "Meeting Host"
+msgstr "Värd för mötet"
+
+#: indico_vc_zoom/forms.py
+msgid "Myself"
+msgstr "Mig själv"
+
+#: indico_vc_zoom/forms.py
+msgid "Someone else"
+msgstr "Någon annan"
+
+#: indico_vc_zoom/forms.py
+msgid "User"
+msgstr "Användare"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Passcode"
+msgstr "Lösenord"
+
+#: indico_vc_zoom/forms.py
+msgid "Meeting passcode (8-10 digits)"
+msgstr "Lösenord för möte (8-10 siffror)"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Mute audio"
+msgstr "Stäng av ljudet"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Participants will join the VC room muted by default "
+msgstr ""
+"Deltagarna kommer att ansluta till VC-rummet med ljuddämpare som standard "
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Mute video (host)"
+msgstr "Stäng av video (värd)"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "The host will join the VC room with video disabled"
+msgstr "Värden kommer att ansluta till VC-rummet med videohandikappade"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Mute video (participants)"
+msgstr "Stäng av video (deltagare)"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Participants will join the VC room with video disabled"
+msgstr "Deltagarna kommer att ansluta till VC-rummet med videoavstängning"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Waiting room"
+msgstr "Väntrum"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
+msgid "Participants may be kept in a waiting room by the host"
+msgstr "Deltagarna kan hållas kvar i ett väntrum av värden"
+
+#: indico_vc_zoom/forms.py indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Description"
+msgstr "Beskrivning"
+
+#: indico_vc_zoom/forms.py
+msgid "Optional description for this room"
+msgstr "Valfri beskrivning för detta rum"
+
+#: indico_vc_zoom/forms.py
+msgid "This user has no Zoom account"
+msgstr "Denna användare har inget Zoom-konto"
+
+#: indico_vc_zoom/plugin.py
+msgid "API Credentials"
+msgstr "API-autentiseringsuppgifter"
+
+#: indico_vc_zoom/plugin.py
+msgid "Zoom Account"
+msgstr "Zoom-konto"
+
+#: indico_vc_zoom/plugin.py
+msgid "Room Settings"
+msgstr "Inställningar för rum"
+
+#: indico_vc_zoom/plugin.py
+msgid "Notifications"
+msgstr "Meddelanden"
+
+#: indico_vc_zoom/plugin.py
+msgid "Access"
+msgstr "Tillgång"
+
+#: indico_vc_zoom/plugin.py
+msgid "Account ID"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Client ID"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Client Secret"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Webhook Secret Token"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Specify the \"Secret Token\" of your Zoom Webhook if you want live updates "
+"in case of modified/deleted Zoom meetings."
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "User lookup mode"
+msgstr "Läge för användaruppslagning"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Specify how Indico should look up the zoom user that corresponds to an "
+"Indico user."
+msgstr ""
+"Ange hur Indico ska leta upp den zoomanvändare som motsvarar en Indico-"
+"användare."
+
+#: indico_vc_zoom/plugin.py
+msgid "E-mail domains"
+msgstr "E-postdomäner"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"List of e-mail domains which can use the Zoom API. Indico attempts to find "
+"Zoom accounts using all email addresses of a user which use those domains."
+msgstr ""
+"Lista över e-postdomäner som kan använda Zoom API. Indico försöker hitta "
+"Zoom-konton med hjälp av alla e-postadresser till en användare som använder "
+"dessa domäner."
+
+#: indico_vc_zoom/plugin.py
+msgid "Indico identity providers"
+msgstr "Indico identitetsleverantörer"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Identity providers from which to get usernames. Indico queries those "
+"providers using the email addresses of the user and attempts to find Zoom "
+"accounts having an email address with the format username@enterprise-domain."
+msgstr ""
+"Identitetsleverantörer från vilka man kan få användarnamn. Indico frågar "
+"dessa leverantörer med hjälp av användarens e-postadresser och försöker "
+"hitta Zoom-konton som har en e-postadress med formatet username@enterprise-"
+"domain."
+
+#: indico_vc_zoom/plugin.py
+msgid "Enterprise domain"
+msgstr "Företagsdomän"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"The domain name used together with the usernames from the Indico identity "
+"provider"
+msgstr ""
+"Domännamnet som används tillsammans med användarnamnen från "
+"identitetsleverantören Indico"
+
+#: indico_vc_zoom/plugin.py
+msgid "Allow Webinars (Experimental)"
+msgstr "Tillåt webbseminarier (experimentell)"
+
+#: indico_vc_zoom/plugin.py
+msgid "Allow webinars to be created through Indico. Use at your own risk."
+msgstr "Tillåt att webbseminarier skapas via Indico. Använd på egen risk."
+
+#: indico_vc_zoom/plugin.py
+msgid "Join Before Host"
+msgstr "Bli medlem innan du blir värd"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Allow participants to join the meeting before the host starts the meeting. "
+"Only used for scheduled or recurring meetings."
+msgstr ""
+"Tillåt deltagare att ansluta till mötet innan värden startar mötet. Används "
+"endast för schemalagda eller återkommande möten."
+
+#: indico_vc_zoom/plugin.py
+msgid "Creation email footer"
+msgstr "Skapa sidfot för e-post"
+
+#: indico_vc_zoom/plugin.py
+msgid "Footer to append to emails sent upon creation of a VC room"
+msgstr ""
+"Sidfot att bifoga till e-postmeddelanden som skickas vid skapande av ett VC-"
+"rum"
+
+#: indico_vc_zoom/plugin.py
+msgid "Send host URL"
+msgstr "Skicka värd-URL"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Whether to send an e-mail with the Host URL to the meeting host upon "
+"creation of a meeting"
+msgstr ""
+"Om ett e-postmeddelande med värd-URL:en ska skickas till mötesvärden när ett"
+" möte skapas"
+
+#: indico_vc_zoom/plugin.py indico_vc_zoom/templates/info_box.html
+msgid "Join via phone"
+msgstr "Anslut via telefon"
+
+#: indico_vc_zoom/plugin.py
+msgid "Link to instructions on joining a meeting via phone"
+msgstr "Länk till instruktioner för att delta i ett möte via telefon"
+
+#: indico_vc_zoom/plugin.py
+msgid "Invalid identity providers: {}"
+msgstr "Ogiltiga identitetsleverantörer: {}"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"The room \"{}\" is using Zoom registration and thus cannot be attached to "
+"another event"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Could not create the room in Zoom. Please contact support if the error "
+"persists"
+msgstr ""
+"Det gick inte att skapa rummet i Zoom. Vänligen kontakta support om felet "
+"kvarstår"
+
+#: indico_vc_zoom/plugin.py
+msgid "Room didn't exist in Zoom anymore"
+msgstr "Rummet fanns inte längre i Zoom"
+
+#: indico_vc_zoom/plugin.py
+msgid "Zoom Error: \"{}\""
+msgstr "Zoomfel: \"{}\""
+
+#: indico_vc_zoom/plugin.py
+msgid "Problem deleting room"
+msgstr "Problem med att ta bort rum"
+
+#: indico_vc_zoom/plugin.py
+msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
+msgstr "Rummet \"{}\" finns inte längre i Zoom och togs bort från händelsen"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"The room \"{}\" is using Zoom registration and thus cannot be attached to "
+"the new event"
+msgstr ""
+
+#: indico_vc_zoom/util.py
+msgid "All emails"
+msgstr "Alla e-postmeddelanden"
+
+#: indico_vc_zoom/util.py
+msgid "Email domains"
+msgstr "E-postdomäner"
+
+#: indico_vc_zoom/util.py
+msgid "Authenticators"
+msgstr "Autentiserare"
+
+#: indico_vc_zoom/util.py
+msgid "This room has been deleted from Zoom"
+msgstr "Detta rum har tagits bort från Zoom"
+
+#: indico_vc_zoom/util.py
+msgid ""
+"Problem fetching room from Zoom. Please contact support if the error "
+"persists."
+msgstr ""
+"Problem med att hämta rum från Zoom. Vänligen kontakta support om felet "
+"kvarstår."
+
+#: indico_vc_zoom/util.py
+msgid "Room no longer exists in Zoom"
+msgstr "Rummet finns inte längre i Zoom"
+
+#: indico_vc_zoom/util.py
+msgid "Can't update meeting. Please contact support if the error persists."
+msgstr "Det går inte att uppdatera mötet. Kontakta support om felet kvarstår."
+
+#: indico_vc_zoom/util.py
+msgid "Could not find Zoom user for alternative host"
+msgstr "Kunde inte hitta Zoom-användare för alternativ värd"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Join the Zoom Meeting"
+msgstr ""
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Join"
+msgstr "Gå med"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "You will need a passcode to join this Zoom meeting"
+msgstr "Du behöver en lösenkod för att delta i detta Zoom-möte"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "This Zoom Meeting can only be seen by registered participants"
+msgstr "Detta Zoom-möte kan endast ses av registrerade deltagare"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Please register"
+msgstr "Vänligen registrera dig"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Registration required"
+msgstr "Registrering krävs"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Please log in and register"
+msgstr "Vänligen logga in och registrera dig"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "This Zoom Meeting can only be seen by logged in users"
+msgstr "Detta Zoom-möte kan endast ses av inloggade användare"
+
+#: indico_vc_zoom/templates/buttons.html
+msgid "Please log in"
+msgstr "Vänligen logga in"
+
+#: indico_vc_zoom/templates/extra_delete_msg.html
+#, python-format
+msgid ""
+"The host of this Zoom meeting is <strong>%(host)s</strong>. In case you want"
+" to delete this Zoom meeting from all events, please make sure that they do "
+"not use it for other events that may still need it!"
+msgstr ""
+"Värd för detta Zoom-möte är <strong>%(host)s</strong>. Om du vill ta bort "
+"det här Zoom-mötet från alla evenemang, se till att de inte använder det för"
+" andra evenemang som fortfarande kan behöva det!"
+
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Zoom Meeting ID"
+msgstr "ID för Zoom-möte"
+
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Host"
+msgstr "Värd"
+
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Alternative host"
+msgid_plural "Alternative hosts"
+msgstr[0] "Alternativ värd"
+msgstr[1] "Alternativa värdar"
+
+#: indico_vc_zoom/templates/info_box.html
+msgid "Useful links"
+msgstr "Användbara länkar"
+
+#: indico_vc_zoom/templates/info_box.html
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Zoom URL"
+msgstr "URL för zoom"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Linked to"
+msgstr "Kopplad till"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "the whole event"
+msgstr "hela evenemanget"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Contribution"
+msgstr "Bidrag"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Session"
+msgstr "Session"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Created on"
+msgstr "Skapad på"
+
+#: indico_vc_zoom/templates/manage_event_info_box.html
+msgid "Modified on"
+msgstr "Ändrad på"
+
+#: indico_vc_zoom/templates/room_labels.html
+msgid "This is a Zoom webinar"
+msgstr "Detta är ett Zoom-webbinarium"

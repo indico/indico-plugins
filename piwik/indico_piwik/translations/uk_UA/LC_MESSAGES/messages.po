@@ -1,6 +1,6 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for indico-plugin-piwik.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-piwik project.
 # 
 # Translators:
 # Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018
@@ -8,132 +8,127 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2015-03-11 16:40+0000\n"
 "Last-Translator: Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: indico_piwik/forms.py:18
+#: indico_piwik/forms.py
 msgid "Track global visits"
 msgstr "Відслідковувати глобальні візити"
 
-#: indico_piwik/forms.py:19
+#: indico_piwik/forms.py
 msgid "Track events"
 msgstr "Відслідковувати події"
 
-#: indico_piwik/forms.py:20
+#: indico_piwik/forms.py
 msgid "Cache results"
 msgstr "Кешувати результати"
 
-#: indico_piwik/forms.py:21
+#: indico_piwik/forms.py
 msgid "Piwik server URL"
 msgstr "URL серверу Piwik"
 
-#: indico_piwik/forms.py:22
+#: indico_piwik/forms.py
 msgid "Piwik API server URL"
 msgstr "URL серверу Piwik API"
 
-#: indico_piwik/forms.py:23
-msgid "Should be pointing to 'index.php'"
-msgstr "Має вказувати на “index.php”"
-
-#: indico_piwik/forms.py:24
+#: indico_piwik/forms.py
 msgid "Piwik API token"
 msgstr "Мітка Piwik API"
 
-#: indico_piwik/forms.py:25
+#: indico_piwik/forms.py
 msgid "Token to access the API. Do not share it!"
 msgstr "Мітка для доступу до API. Не розголошуйте її!"
 
-#: indico_piwik/forms.py:26
+#: indico_piwik/forms.py
 msgid "Global statistics ID"
 msgstr "ID глобальної статистики"
 
-#: indico_piwik/forms.py:27
+#: indico_piwik/forms.py
 msgid "Piwik site ID for global statistics"
 msgstr "ID сайту Piwik для глобальної статистики"
 
-#: indico_piwik/forms.py:28
+#: indico_piwik/forms.py
 msgid "Event statistics ID"
 msgstr "ID статистики подій"
 
-#: indico_piwik/forms.py:29
+#: indico_piwik/forms.py
 msgid "Piwik site ID for event statistics"
 msgstr "ID сайту Piwik для статистики подій"
 
-#: indico_piwik/forms.py:30
+#: indico_piwik/forms.py
 msgid "Result cache TTL (seconds)"
 msgstr "TTL кешу результатів (секунди)"
 
-#: indico_piwik/forms.py:31
+#: indico_piwik/forms.py
 msgid "How long event reports are kept cached"
 msgstr "Як довго звіти подій зберігаються у кеші"
 
-#: indico_piwik/forms.py:32
+#: indico_piwik/forms.py
 msgid "Use Piwik server URL for all requests"
 msgstr "Використовувати URL серверу Piwik для всіх запитів"
 
-#: indico_piwik/forms.py:36
+#: indico_piwik/forms.py
 msgid "Event statistics can't use the same Piwik site as global statistics"
 msgstr "Статистика подій не може використовувати такий самий сайт Piwik, як і глобальна статистика"
 
-#: indico_piwik/plugin.py:66
+#: indico_piwik/plugin.py
 msgid "Statistics"
 msgstr "Статистика"
 
-#: indico_piwik/templates/statistics.html:8
+#: indico_piwik/templates/statistics.html
 msgid "Selection Information"
 msgstr "Інформація про вибір"
 
-#: indico_piwik/templates/statistics.html:9
+#: indico_piwik/templates/statistics.html
 #, python-format
 msgid "(%(start)s to %(end)s)"
 msgstr "(%(start)s по %(end)s)"
 
-#: indico_piwik/templates/statistics.html:12
-#: indico_piwik/templates/statistics.html:14
+#: indico_piwik/templates/statistics.html
 msgid "Modify Query"
 msgstr "Змінити запит"
 
-#: indico_piwik/templates/statistics.html:13
+#: indico_piwik/templates/statistics.html
 msgid "Hide"
 msgstr "Приховати"
 
-#: indico_piwik/templates/statistics.html:23
+#: indico_piwik/templates/statistics.html
 msgid "View statistics between these dates"
 msgstr "Показати статистику між цими датами"
 
-#: indico_piwik/templates/statistics.html:29
+#: indico_piwik/templates/statistics.html
 msgid "to"
 msgstr "до"
 
-#: indico_piwik/templates/statistics.html:39
+#: indico_piwik/templates/statistics.html
 msgid "Choose Event / Contribution"
 msgstr "Оберіть подію / внесок"
 
-#: indico_piwik/templates/statistics.html:41
+#: indico_piwik/templates/statistics.html
 msgid "Event"
 msgstr "Подія"
 
-#: indico_piwik/templates/statistics.html:44
+#: indico_piwik/templates/statistics.html
 msgid "Contribution"
 msgstr "Внесок"
 
-#: indico_piwik/templates/statistics.html:53
+#: indico_piwik/templates/statistics.html
 msgid "Update Query"
 msgstr "Оновити запит"
 
-#: indico_piwik/templates/statistics.html:64
+#: indico_piwik/templates/statistics.html
 msgid "Visitor Hit Rates"
 msgstr "Інтенсивність переглядів відвідувачами"
 
-#: indico_piwik/templates/statistics.html:66
+#: indico_piwik/templates/statistics.html
 msgid ""
 "Please note, statistics have only been collected since the plugin's "
 "introduction. This means that there is no data present for the earlier "
@@ -141,96 +136,96 @@ msgid ""
 "activity in the event at that time."
 msgstr "Врахуйте, що статистика збиралася від часу ввімкнення плагіну. Тому дані за попередні періоди деяких подій відсутні, але це не означає, що в них не було жодної активності."
 
-#: indico_piwik/templates/statistics.html:73
+#: indico_piwik/templates/statistics.html
 msgid "Info"
 msgstr "Інформація"
 
-#: indico_piwik/templates/statistics.html:86
+#: indico_piwik/templates/statistics.html
 msgid "Overall Statistics"
 msgstr "Повна статистика"
 
-#: indico_piwik/templates/statistics.html:90
+#: indico_piwik/templates/statistics.html
 msgid "Visitor Metrics"
 msgstr "Метрики відвідувачів"
 
-#: indico_piwik/templates/statistics.html:94
+#: indico_piwik/templates/statistics.html
 msgid "Visitors"
 msgstr "Відвідувачі"
 
-#: indico_piwik/templates/statistics.html:98
+#: indico_piwik/templates/statistics.html
 msgid "Unique Visitors"
 msgstr "Унікальні відвідувачі"
 
-#: indico_piwik/templates/statistics.html:102
+#: indico_piwik/templates/statistics.html
 msgid "Returning Visitors"
 msgstr "Відвідувачі, які повернулись"
 
-#: indico_piwik/templates/statistics.html:106
+#: indico_piwik/templates/statistics.html
 msgid "Avg. Duration"
 msgstr "Середня тривалість"
 
-#: indico_piwik/templates/statistics.html:111
+#: indico_piwik/templates/statistics.html
 msgid "Peak Statistics"
 msgstr "Пікова статистика"
 
-#: indico_piwik/templates/statistics.html:115
+#: indico_piwik/templates/statistics.html
 msgid "Peak Date"
 msgstr "Дата макс. навантаження"
 
-#: indico_piwik/templates/statistics.html:119
+#: indico_piwik/templates/statistics.html
 msgid "Peak Users"
 msgstr "Макс. користувачів"
 
-#: indico_piwik/templates/statistics.html:129
+#: indico_piwik/templates/statistics.html
 msgid "Visitors Geography"
 msgstr "Географія відвідувачів"
 
-#: indico_piwik/templates/statistics.html:133
+#: indico_piwik/templates/statistics.html
 msgid "Visitor Origins"
 msgstr "Походження відвідувачів"
 
-#: indico_piwik/templates/statistics.html:144
+#: indico_piwik/templates/statistics.html
 msgid "Top Referrers"
 msgstr "Топ реферерів"
 
-#: indico_piwik/templates/statistics.html:148
+#: indico_piwik/templates/statistics.html
 msgid "Traffic Inbound Top 10"
 msgstr "Top 10 трафіку, який повертається"
 
-#: indico_piwik/templates/statistics.html:152
+#: indico_piwik/templates/statistics.html
 msgid "Referrer"
 msgstr "Реферер"
 
-#: indico_piwik/templates/statistics.html:153
+#: indico_piwik/templates/statistics.html
 msgid "Visits"
 msgstr "Візитів"
 
-#: indico_piwik/templates/statistics.html:154
+#: indico_piwik/templates/statistics.html
 msgid "Actions"
 msgstr "Дій"
 
-#: indico_piwik/templates/statistics.html:155
+#: indico_piwik/templates/statistics.html
 msgid "Visit Length"
 msgstr "Тривалість візиту"
 
-#: indico_piwik/templates/statistics.html:172
+#: indico_piwik/templates/statistics.html
 msgid "User Systems"
 msgstr "Системи користувачів"
 
-#: indico_piwik/templates/statistics.html:176
+#: indico_piwik/templates/statistics.html
 msgid "Visitor Systems"
 msgstr "Системи відвідувачів"
 
-#: indico_piwik/templates/statistics.html:183
+#: indico_piwik/templates/statistics.html
 #, python-format
 msgid "This report was generated at: %(dt)s"
 msgstr "Цей репорт згенеровано о %(dt)s"
 
-#: indico_piwik/templates/statistics.html:191
+#: indico_piwik/templates/statistics.html
 msgid "Unable to retrieve Graph Data"
 msgstr "Неможливо видобути дані графу"
 
-#: indico_piwik/templates/statistics.html:193
+#: indico_piwik/templates/statistics.html
 msgid ""
 "The server did not respond in a timely manner. It may be the case that the "
 "date-range is too large."

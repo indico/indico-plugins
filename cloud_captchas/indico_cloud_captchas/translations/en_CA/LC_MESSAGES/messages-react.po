@@ -1,0 +1,15 @@
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Language-Team: English (Canada) (https://app.transifex.com/indico/teams/6478/en_CA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: en_CA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_cloud_captchas/client/CloudCaptcha.jsx
+msgid "Confirm that you are not a robot"
+msgstr ""

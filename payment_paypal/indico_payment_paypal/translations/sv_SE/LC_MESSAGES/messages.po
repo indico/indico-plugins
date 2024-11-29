@@ -1,0 +1,100 @@
+# Translations template for indico-plugin-payment-paypal.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-paypal project.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:45+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Swedish (Sweden) (http://app.transifex.com/indico/indico/language/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_payment_paypal/controllers.py
+msgid "Your payment request has been processed."
+msgstr ""
+
+#: indico_payment_paypal/controllers.py
+msgid "You cancelled the payment process."
+msgstr ""
+
+#: indico_payment_paypal/plugin.py
+msgid "API URL"
+msgstr ""
+
+#: indico_payment_paypal/plugin.py
+msgid "URL of the PayPal HTTP API."
+msgstr ""
+
+#: indico_payment_paypal/plugin.py
+msgid "Business"
+msgstr ""
+
+#: indico_payment_paypal/plugin.py
+msgid ""
+"The default PayPal ID or email address associated with a PayPal account. "
+"Event managers will be able to override this."
+msgstr ""
+
+#: indico_payment_paypal/plugin.py
+msgid "The PayPal ID or email address associated with a PayPal account."
+msgstr ""
+
+#: indico_payment_paypal/util.py
+msgid "Invalid email address / paypal ID"
+msgstr ""
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "First name"
+msgstr "Förnamn"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Last name"
+msgstr "Efternamn"
+
+#: indico_payment_paypal/templates/event_payment_form.html
+msgid "Total amount"
+msgstr ""
+
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html
+#, python-format
+msgid ""
+"Please make sure that you have your PayPal seller account configured to use "
+"<strong>UTF-8</strong> by default, otherwise some transactions may end up "
+"not being acknowledged by Indico!<br> You can find out how to set this up "
+"%(link)shere%(endlink)s."
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Transaction ID"
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Invoice ID"
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Payer e-mail"
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid ""
+"The paid amount does not match the required amount. Please contact the "
+"registrant to solve the issue."
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Paid:"
+msgstr ""
+
+#: indico_payment_paypal/templates/transaction_details.html
+msgid "Required:"
+msgstr ""

@@ -1,6 +1,6 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for indico-plugin-payment-manual.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-manual project.
 # 
 # Translators:
 # Thomas Baron <thomas.baron@cern.ch>, 2015,2017,2020,2022
@@ -8,62 +8,62 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2015-03-11 16:48+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017,2020,2022\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: indico_payment_manual/placeholders.py:33
+#: indico_payment_manual/placeholders.py
 msgid "escaped for URLs"
 msgstr "échappé pour les URLs"
 
-#: indico_payment_manual/placeholders.py:38
+#: indico_payment_manual/placeholders.py
 msgid "First name of the registrant"
 msgstr "Prénom du participant"
 
-#: indico_payment_manual/placeholders.py:44
+#: indico_payment_manual/placeholders.py
 msgid "Last name of the registrant"
 msgstr "Nom du participant"
 
-#: indico_payment_manual/placeholders.py:50
+#: indico_payment_manual/placeholders.py
 msgid "Email address of the registrant"
 msgstr "Adresse électronique du participant"
 
-#: indico_payment_manual/placeholders.py:60
+#: indico_payment_manual/placeholders.py
 msgid "The database ID of the registration"
 msgstr "L'identifiant de base de donnée de l'inscription"
 
-#: indico_payment_manual/placeholders.py:69
+#: indico_payment_manual/placeholders.py
 msgid "The ID of the registration form"
 msgstr "L'identifiant du formulaire d'inscription"
 
-#: indico_payment_manual/placeholders.py:78
+#: indico_payment_manual/placeholders.py
 msgid "The ID of the event"
 msgstr "L'identifiant de l'événement"
 
-#: indico_payment_manual/placeholders.py:101
+#: indico_payment_manual/placeholders.py
 msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
 msgstr "Le prix à payer pour le participant (par ex. 100.00 ou 100.25)"
 
-#: indico_payment_manual/placeholders.py:102
+#: indico_payment_manual/placeholders.py
 msgid "The price without cents if possible (e.g. 100 or 100.25)"
 msgstr "Le prix sans les centimes si possible (par ex. 100 ou 100.25)"
 
-#: indico_payment_manual/placeholders.py:103
+#: indico_payment_manual/placeholders.py
 msgid "The price formatted as an integer (e.g. 10000 or 10025)"
 msgstr "Le prix formatté comme un nombre entier (par ex. 10000 ou 10025)"
 
-#: indico_payment_manual/placeholders.py:108
+#: indico_payment_manual/placeholders.py
 msgid "The currency used in the registration"
 msgstr "La monnaie utilisée pour l'inscription"
 
-#: indico_payment_manual/plugin.py:21
+#: indico_payment_manual/plugin.py
 msgid ""
 "The details the user needs to make their payment. This usually includes the "
 "bank account details, the IBAN and payment reference.  You can also link to "
@@ -71,6 +71,6 @@ msgid ""
 "versions of the placeholders where available."
 msgstr "Les détails nécessaires aux utilisateurs pour effectuer leur paiement. Ceci inclut en général les détails du compte bancaire, l'IBAN et la référence du paiement. Vous pouvez également ajouter ici un lien vers un site de paiement personnalisé. Dans ce cas assurez-vous d'utiliser les versions \"échappées\" des paramètres de substitution quand il sont disponibles."
 
-#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+#: indico_payment_manual/plugin.py
 msgid "Payment details"
 msgstr "Informations pour le paiement"

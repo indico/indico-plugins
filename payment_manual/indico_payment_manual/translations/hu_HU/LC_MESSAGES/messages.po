@@ -1,0 +1,78 @@
+# Translations template for indico-plugin-payment-manual.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-manual project.
+# 
+# Translators:
+# Anna Szabó, 2024
+# Miklós Timár, 2018
+# Miklós Timár, 2018
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:48+0000\n"
+"Last-Translator: Anna Szabó, 2024\n"
+"Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_payment_manual/placeholders.py
+msgid "escaped for URLs"
+msgstr "megszökött az URL-ek"
+
+#: indico_payment_manual/placeholders.py
+msgid "First name of the registrant"
+msgstr "A regisztráló utóneve"
+
+#: indico_payment_manual/placeholders.py
+msgid "Last name of the registrant"
+msgstr "A regisztráló családi neve"
+
+#: indico_payment_manual/placeholders.py
+msgid "Email address of the registrant"
+msgstr "A regisztráló e-mail címe"
+
+#: indico_payment_manual/placeholders.py
+msgid "The database ID of the registration"
+msgstr "A regisztráció adatbázis-azonosítója"
+
+#: indico_payment_manual/placeholders.py
+msgid "The ID of the registration form"
+msgstr "A regisztrációs űrlap azonosítója"
+
+#: indico_payment_manual/placeholders.py
+msgid "The ID of the event"
+msgstr "Az esemény azonosítója"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
+msgstr "A regisztráló által fizetendő ár (pl. 100,00 vagy 100,25)"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price without cents if possible (e.g. 100 or 100.25)"
+msgstr "Az ár fillér nélkül, ha lehetséges (pl. 100 vagy 100,25)"
+
+#: indico_payment_manual/placeholders.py
+msgid "The price formatted as an integer (e.g. 10000 or 10025)"
+msgstr "Egész számként formázott ár (pl. 10000 vagy 10025)"
+
+#: indico_payment_manual/placeholders.py
+msgid "The currency used in the registration"
+msgstr "A regisztrációhoz használt pénznem"
+
+#: indico_payment_manual/plugin.py
+msgid ""
+"The details the user needs to make their payment. This usually includes the "
+"bank account details, the IBAN and payment reference.  You can also link to "
+"a custom payment site. In this case make sure to use the URL-escaped "
+"versions of the placeholders where available."
+msgstr "A felhasználónak szükséges fizetési információk. Ez általában tartalmazza a bankszámla részletes adatait, az IBAN számot és az átutalás közleményét. Megadhat egy linket egy személyreszabott fizetési honlaphoz. Ebben az esetben - amennyiben rendelkezésre áll - használja az escaped URL-t."
+
+#: indico_payment_manual/plugin.py
+msgid "Payment details"
+msgstr "Fizetés részletei"

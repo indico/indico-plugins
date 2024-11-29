@@ -1,0 +1,217 @@
+# Translations template for indico-plugin-citadel.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-citadel project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Ken <ken.oyama.nagasaki@gmail.com>, 2022
+# Thom Rawson <thomw@niu.ac.jp>, 2023
+# SAITO Jun, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: SAITO Jun, 2023\n"
+"Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_citadel/plugin.py
+msgid "Citadel URL"
+msgstr "Citadel URL"
+
+#: indico_citadel/plugin.py
+msgid "The URL of the Citadel server"
+msgstr "CitadelサーバーのURL"
+
+#: indico_citadel/plugin.py
+msgid "Citadel API token"
+msgstr "Citadel APIトークン"
+
+#: indico_citadel/plugin.py
+msgid "The authentication token to access Citadel"
+msgstr "Citadelにアクセスするための認証トークン"
+
+#: indico_citadel/plugin.py
+msgid "File extensions"
+msgstr "ファイル拡張子"
+
+#: indico_citadel/plugin.py
+msgid "File extensions to upload for full-text search"
+msgstr "全文検索のためにアップロードするファイル拡張子"
+
+#: indico_citadel/plugin.py
+msgid "Max. file size"
+msgstr "最大ファイルサイズ"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+"全文検索のためにアップロードする最大サイズ "
+"(MB単位)。初期エクスポートの後にこれを増加させると、次のキューの実行時にそれまでアップロードされていなかったすべてのファイルをインデックス作成のためにアップロードすることになり、大きなインスタンスでは長い時間がかかる可能性があることに注意してください。新しいファイルサイズに対して、最初に手動アップロードを実行するとよいでしょう！"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records)"
+msgstr "並列スレッド（レコード）"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading records."
+msgstr "レコードをアップロードする際に使用するスレッド数。"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records, initial export)"
+msgstr "並列スレッド（レコード、初期エクスポート）"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr "初期エクスポートでレコードをアップロードする際に使用するスレッド数。"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files)"
+msgstr "並列スレッド（ファイル）"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading files."
+msgstr "ファイルをアップロードする際に使用するスレッド数。"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files, initial export)"
+msgstr "並列スレッド（ファイル、初期エクスポート）"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr "初期エクスポートでファイルをアップロードする際に使用するスレッド数。"
+
+#: indico_citadel/plugin.py
+msgid "Disable search"
+msgstr "検索を無効にする"
+
+#: indico_citadel/plugin.py
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+"これはプラグインの検索統合を無効にします。このオプションを使用すると、内部のIndico検索インターフェイスが使用されます。これは、大きな初期エクスポートの実行中に不完全な検索結果を表示させたくない場合に便利でしょう。"
+
+#: indico_citadel/plugin.py
+msgid "Large Category Warning Threshold"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Displays a warning to category managers when changing the ACL of big "
+"categories that would result in sending a large amount of data to the "
+"Citadel server. You can set the threshold to 0 to suppress this warning."
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "The title of an event, contribution, etc."
+msgstr "イベントや投稿などのタイトル"
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's name"
+msgstr "発表者、著者、または座長の名前"
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's affiliation"
+msgstr "発表者、著者、または座長の所属"
+
+#: indico_citadel/search.py
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "エントリーのタイプ（会議、ミーティング、ファイルなど）"
+
+#: indico_citadel/search.py
+msgid "Name of the venue"
+msgstr "会場名"
+
+#: indico_citadel/search.py
+msgid "Name of the room"
+msgstr "部屋名"
+
+#: indico_citadel/search.py
+msgid "Address of the venue"
+msgstr "会場の住所"
+
+#: indico_citadel/search.py
+msgid "Name of the attached file"
+msgstr "添付ファイル名"
+
+#: indico_citadel/search.py
+msgid "A keyword associated with an event"
+msgstr "イベントに関連するキーワード"
+
+#: indico_citadel/search.py
+msgid "The category of an event"
+msgstr "イベントのカテゴリー"
+
+#: indico_citadel/search.py
+msgid "Most relevant"
+msgstr "関連順"
+
+#: indico_citadel/search.py
+msgid "Newest first"
+msgstr "新しい順"
+
+#: indico_citadel/search.py
+msgid "Oldest first"
+msgstr "古い順"
+
+#: indico_citadel/search.py
+msgid "Affiliation"
+msgstr "所属"
+
+#: indico_citadel/search.py
+msgid "Person"
+msgstr "人物"
+
+#: indico_citadel/search.py
+msgid "Type"
+msgstr "タイプ"
+
+#: indico_citadel/search.py
+msgid "Location"
+msgstr "場所"
+
+#: indico_citadel/search.py
+msgid "Date"
+msgstr "日付"
+
+#: indico_citadel/search.py
+msgid "Category"
+msgstr "カテゴリー"
+
+#: indico_citadel/search.py
+msgid "Category ID"
+msgstr "カテゴリーID"
+
+#: indico_citadel/search.py
+msgid "Event ID"
+msgstr "イベントID"
+
+#: indico_citadel/templates/event_category_warning.html
+msgid "This category contains a large number of events."
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid ""
+"Please consider using groups instead of individual users when granting "
+"access or management permissions since any change to the list below requires"
+" re-synchronizing all events with Indico's search engine."
+msgstr ""

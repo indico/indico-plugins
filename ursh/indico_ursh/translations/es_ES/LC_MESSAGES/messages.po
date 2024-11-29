@@ -1,7 +1,7 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# Translations template for indico-plugin-ursh.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-ursh project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
 # Jesús Martín <jesusmartin@sallep.net>, 2021
@@ -9,106 +9,105 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: indico-plugin-ursh 3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2020-08-19 18:43+0000\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2021\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: indico_ursh/controllers.py:68
+#: indico_ursh/controllers.py
 msgid "Shortcut already exists"
 msgstr "El acceso directo ya existe"
 
-#: indico_ursh/controllers.py:70
+#: indico_ursh/controllers.py
 msgid "Malformed shortcut"
 msgstr "Acceso directo mal elaborado"
 
-#: indico_ursh/plugin.py:22
+#: indico_ursh/plugin.py
 msgid "API key"
 msgstr "Clave API"
 
-#: indico_ursh/plugin.py:23
+#: indico_ursh/plugin.py
 msgid "The API key to access the <tt>ursh</tt> service"
 msgstr "La clave API para acceder al servicio <tt>ursh</tt>"
 
-#: indico_ursh/plugin.py:24
+#: indico_ursh/plugin.py
 msgid "API host"
 msgstr "Host API"
 
-#: indico_ursh/plugin.py:25
+#: indico_ursh/plugin.py
 msgid ""
 "The <tt>ursh</tt> API host, providing the interface to generate short URLs"
 msgstr ""
 "El host de la API de <tt>ursh</tt>, que proporciona la interfaz para generar"
 " URL cortas"
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:6
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Create custom shortcut"
 msgstr "Crear atajo personalizado"
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:14
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Custom URL creation failed:"
 msgstr "Error al crear la URL personalizada:"
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:21
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Custom URL created successfully"
 msgstr "URL personalizada creada correctamente"
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:25
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Creating a custom shortcut for the following URL:"
 msgstr "Creando un acceso directo personalizado para la siguiente URL:"
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:29
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Please enter the desired shortcut below (at least 5 chars)."
 msgstr ""
 "Ingrese el acceso directo deseado a continuación (al menos 5 caracteres)."
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:39
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Enter a shortcut..."
 msgstr "Introducir un acceso directo..."
 
-#: indico_ursh/templates/ursh_custom_shortener_page.html:41
+#: indico_ursh/templates/ursh_custom_shortener_page.html
 msgid "Create"
 msgstr "Crear"
 
-#: indico_ursh/templates/ursh_dropdown.html:2
-#: indico_ursh/templates/ursh_link.html:5
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
 msgid "Short URL options"
 msgstr "Opciones de URL corta"
 
-#: indico_ursh/templates/ursh_dropdown.html:7
-#: indico_ursh/templates/ursh_link.html:9
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
 msgid "Get short URL"
 msgstr "Conseguir URL corta"
 
-#: indico_ursh/templates/ursh_dropdown.html:14
-#: indico_ursh/templates/ursh_link.html:16
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
 msgid "Create short URL"
 msgstr "Crear URL corta"
 
-#: indico_ursh/templates/ursh_dropdown.html:19
-#: indico_ursh/templates/ursh_link.html:21
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
 msgid "Create custom short URL"
 msgstr "Crear URL corta personalizada"
 
-#: indico_ursh/templates/ursh_footer.html:2
-#: indico_ursh/templates/ursh_footer.html:7
-#: indico_ursh/templates/ursh_shortener_page.html:6
+#: indico_ursh/templates/ursh_footer.html
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid "URL Shortener"
 msgstr "Acortador de URL"
 
-#: indico_ursh/templates/ursh_link.html:28
+#: indico_ursh/templates/ursh_link.html
 msgid "Obtain short URL"
 msgstr "Obtener URL corta"
 
-#: indico_ursh/templates/ursh_shortener_page.html:11
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid ""
 "In this page, you can generate short links for any Indico URL. Just enter "
 "the URL below and click \"Shorten\"."
@@ -116,19 +115,19 @@ msgstr ""
 "En esta página, puede generar enlaces cortos para cualquier URL de Indico. "
 "Para ello introduzca la URL a continuación y pulse en \"Acortar\"."
 
-#: indico_ursh/templates/ursh_shortener_page.html:20
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid "Enter an Indico URL to shorten..."
 msgstr "Introduzca una URL de Indico para acortar..."
 
-#: indico_ursh/templates/ursh_shortener_page.html:21
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid "Shorten"
 msgstr "Acortar"
 
-#: indico_ursh/templates/ursh_shortener_page.html:27
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid "Copy to clipboard"
 msgstr "Copiar al portapapeles"
 
-#: indico_ursh/templates/ursh_shortener_page.html:31
+#: indico_ursh/templates/ursh_shortener_page.html
 msgid ""
 "<strong>Tip:</strong> You can also generate short links by using the quick-"
 "links in various places within Indico! Just look for the <span class=\"icon-"

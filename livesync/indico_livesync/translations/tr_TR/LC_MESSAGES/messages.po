@@ -1,63 +1,64 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for indico-plugin-livesync.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-livesync project.
 # 
 # Translators:
+# Emre JILTA <jilta.e@gmail.com>, 2024
 # Gökhan Kalayci <gkmediagokhan@gmail.com>, 2017
 # selcuk bilmis <selcukbilmis@gmail.com>, 2021-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2015-03-11 16:53+0000\n"
-"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021-2022\n"
+"Last-Translator: Emre JILTA <jilta.e@gmail.com>, 2024\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: indico_livesync/controllers.py:41
+#: indico_livesync/controllers.py
 msgid "Agent deleted"
 msgstr "Araç silindi"
 
-#: indico_livesync/controllers.py:55
+#: indico_livesync/controllers.py
 msgid "This backend is already in use"
 msgstr "Bu arka uç zaten kullanımda"
 
-#: indico_livesync/controllers.py:64
+#: indico_livesync/controllers.py
 msgid "Agent added"
 msgstr "Araç eklendi"
 
-#: indico_livesync/controllers.py:65
+#: indico_livesync/controllers.py
 msgid "Don't forget to run the initial export!"
 msgstr "İlk dışa aktarmayı çalıştırmayı unutmayın!"
 
-#: indico_livesync/controllers.py:77
+#: indico_livesync/controllers.py
 msgid "Cannot edit an agent that is not loaded"
 msgstr "Yüklü olmayan bir aracı düzenleyemiyoruz"
 
-#: indico_livesync/controllers.py:88
+#: indico_livesync/controllers.py
 msgid "Agent updated"
 msgstr "Araç güncellendi"
 
-#: indico_livesync/forms.py:17
-#: indico_livesync/templates/plugin_details_extra.html:26
+#: indico_livesync/forms.py
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Name"
 msgstr "Ad"
 
-#: indico_livesync/forms.py:18
+#: indico_livesync/forms.py
 msgid "The name of the agent. Only used in the administration interface."
 msgstr "Araç adı. Yalnızca yönetim arayüzünde kullanılır."
 
-#: indico_livesync/plugin.py:25
+#: indico_livesync/plugin.py
 msgid "Queue entry TTL"
 msgstr "Sıra girişi TTL"
 
-#: indico_livesync/plugin.py:26
+#: indico_livesync/plugin.py
 msgid ""
 "How many days should processed entries be kept in the queue. The time counts"
 " from the creation of the queue entries, so if the LiveSync task is not "
@@ -65,119 +66,118 @@ msgid ""
 "after processing them. Setting it to 0 disables automatic deletion."
 msgstr "İşlenmiş girişler kaç gün kuyrukta tutulmalıdır. Zaman, kuyruk girdilerinin oluşturulmasından itibaren geçer; bu nedenle, LiveSync görevi bir süre çalışmıyorsa, kuyruk girdileri, onları işledikten sonra bir sonraki çalıştırmada silinebilir. 0 olarak ayarlamak, otomatik silme işlemini devre dışı bırakır."
 
-#: indico_livesync/plugin.py:31
+#: indico_livesync/plugin.py
 msgid "Excluded categories"
 msgstr "Hariç tutulan kategoriler"
 
-#: indico_livesync/plugin.py:32
+#: indico_livesync/plugin.py
 msgid "Category ID"
 msgstr "Kategori ID"
 
-#: indico_livesync/plugin.py:33
+#: indico_livesync/plugin.py
 msgid ""
 "Changes to objects inside these categories or any of their subcategories are"
 " excluded."
 msgstr "Bu kategorilerdeki veya alt kategorilerindeki nesnelerdeki değişiklikler hariç tutulur."
 
-#: indico_livesync/plugin.py:35
+#: indico_livesync/plugin.py
 msgid "Disable queue runs"
 msgstr "Kuyruk çalıştırmalarını devre dışı bırak"
 
-#: indico_livesync/plugin.py:36
+#: indico_livesync/plugin.py
 msgid "Disable all scheduled queue runs."
 msgstr "Zamanlanmış tüm kuyruk çalıştırmalarını devre dışı bırak"
 
-#: indico_livesync/plugin.py:37
+#: indico_livesync/plugin.py
 msgid "Skip category changes"
 msgstr "Kategori değişikliklerini atla"
 
-#: indico_livesync/plugin.py:38
+#: indico_livesync/plugin.py
 msgid ""
 "Skip category changes when processing the queue. This can be useful in large"
 " instances when there are significant changes to large categories in order "
 "to avoid processing those immediately."
-msgstr ""
+msgstr "Kuyruk işlenirken kategori değişikliklerini atlayın. Bu, büyük kategorilerde önemli değişikliklerin olduğu büyük durumlarda, bunların hemen işlenmesini önlemek için yararlı olabilir."
 
-#: indico_livesync/templates/edit_agent.html:9
+#: indico_livesync/templates/edit_agent.html
 msgid "Cancel"
 msgstr "İptal"
 
-#: indico_livesync/templates/plugin_details_extra.html:7
-#: indico_livesync/templates/plugin_details_extra.html:11
+#: indico_livesync/templates/plugin_details_extra.html
 #, python-format
 msgid "Add %(backend)s agent"
 msgstr "%(backend)s aracı ekle"
 
-#: indico_livesync/templates/plugin_details_extra.html:18
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "LiveSync Agents"
 msgstr "LiveSync Araçları"
 
-#: indico_livesync/templates/plugin_details_extra.html:25
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "ID"
 msgstr "ID"
 
-#: indico_livesync/templates/plugin_details_extra.html:27
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Backend"
 msgstr "Arka uç"
 
-#: indico_livesync/templates/plugin_details_extra.html:28
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Last Run"
 msgstr "Son Çalıştırma"
 
-#: indico_livesync/templates/plugin_details_extra.html:29
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Queue"
 msgstr "Kuyruk"
 
-#: indico_livesync/templates/plugin_details_extra.html:30
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Status"
 msgstr "Durum"
 
-#: indico_livesync/templates/plugin_details_extra.html:31
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Actions"
 msgstr "Eylemler"
 
-#: indico_livesync/templates/plugin_details_extra.html:43
+#: indico_livesync/templates/plugin_details_extra.html
 #, python-format
 msgid "Not loaded: %(name)s"
 msgstr "Yüklenemedi: %(name)s"
 
-#: indico_livesync/templates/plugin_details_extra.html:50
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Never"
 msgstr "Asla"
 
-#: indico_livesync/templates/plugin_details_extra.html:58
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Ready"
 msgstr "Hazır"
 
-#: indico_livesync/templates/plugin_details_extra.html:63
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "n/a"
 msgstr "Mevcut değil"
 
-#: indico_livesync/templates/plugin_details_extra.html:70
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Delete this agent?"
 msgstr "Bu araç silinsin mi?"
 
-#: indico_livesync/templates/plugin_details_extra.html:71
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Do you really want to delete this agent and all its queue entries?"
 msgstr "Bu aracı ve tüm sıra girişlerini gerçekten silmek istiyor musunuz?"
 
-#: indico_livesync/templates/plugin_details_extra.html:77
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Edit LiveSync agent"
 msgstr "LiveSync aracını düzenle"
 
-#: indico_livesync/templates/plugin_details_extra.html:88
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "No agents have been added yet."
 msgstr "Henüz hiçbir araç eklenmedi."
 
-#: indico_livesync/templates/plugin_details_extra.html:99
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "No backend plugins enabled"
 msgstr "Etkin arka uç eklentisi yok"
 
-#: indico_livesync/templates/plugin_details_extra.html:100
+#: indico_livesync/templates/plugin_details_extra.html
 msgid "Add"
 msgstr "Ekle"
 
-#: indico_livesync/templates/plugin_details_extra.html:113
+#: indico_livesync/templates/plugin_details_extra.html
 msgid ""
 "You still need to run the initial export for some agents by executing the "
 "commands below in a shell.<br> Please note that this may take a very long "

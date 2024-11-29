@@ -1,0 +1,187 @@
+# Translations template for indico-plugin-payment-sixpay.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-sixpay project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Adrian, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2021-07-29 12:01+0000\n"
+"Last-Translator: Adrian, 2023\n"
+"Language-Team: English (Canada) (https://app.transifex.com/indico/teams/6478/en_CA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: en_CA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_payment_sixpay/controllers.py
+msgid "You cancelled the payment."
+msgstr ""
+
+#: indico_payment_sixpay/controllers.py
+msgid "Your payment has failed."
+msgstr ""
+
+#: indico_payment_sixpay/controllers.py
+msgid ""
+"Your payment could not be confirmed. Please contact the event organizers."
+msgstr ""
+"Your payment could not be confirmed. Please contact the event organisers."
+
+#: indico_payment_sixpay/controllers.py
+msgid "Your payment has been confirmed."
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Invalid format string key: {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Malformed format string: {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"Format string too long: shortest replacement with {len}, expected {max}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"This field may only contain alphanumeric chars, dots, colons, hyphens and "
+"underscores."
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "API URL"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "URL to contact the Saferpay JSON API"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "API username"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "The username to access the SaferPay JSON API"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "API password"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "The password to access the SaferPay JSON API"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Account ID"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"Default Saferpay account ID, such as \"1234567-12345678\". Event managers "
+"will be able to override this."
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Order Description"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"The default description of each order in a human readable way. It is "
+"presented to the registrant during the transaction with Saferpay. Event "
+"managers will be able to override this. Supported placeholders: {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Order Identifier"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"The default identifier of each order for further processing. Event managers "
+"will be able to override this. Supported placeholders: {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "Notification Email"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"Email address to receive notifications of transactions. This is independent "
+"of Indico's own payment notifications. Event managers will be able to "
+"override this."
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid "The Saferpay account ID, such as \"1234567-12345678\"."
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"The description of each order in a human readable way. It is presented to "
+"the registrant during the transaction with Saferpay. Supported placeholders:"
+" {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"The default identifier of each order for further processing. Supported "
+"placeholders: {}"
+msgstr ""
+
+#: indico_payment_sixpay/forms.py
+msgid ""
+"Email address to receive notifications of transactions. This is independent "
+"of Indico's own payment notifications."
+msgstr ""
+
+#: indico_payment_sixpay/util.py
+msgid "Unsupported currency '{}' for SIXPay. Please contact the organizers"
+msgstr "Unsupported currency '{}' for SIXPay. Please contact the organisers"
+
+#: indico_payment_sixpay/util.py
+msgid "Unknown currency '{}' for SIXPay. Please contact the organizers"
+msgstr "Unknown currency '{}' for SIXPay. Please contact the organisers"
+
+#: indico_payment_sixpay/templates/event_payment_form.html
+msgid ""
+"Clicking on the <strong>Pay Now</strong> button will redirect you to the "
+"SIXPay Saferpay site in order to complete your payment."
+msgstr ""
+
+#: indico_payment_sixpay/templates/event_payment_form.html
+msgid "First name"
+msgstr ""
+
+#: indico_payment_sixpay/templates/event_payment_form.html
+msgid "Last name"
+msgstr ""
+
+#: indico_payment_sixpay/templates/event_payment_form.html
+msgid "Total amount"
+msgstr ""
+
+#: indico_payment_sixpay/templates/event_payment_form.html
+msgid "Pay Now"
+msgstr ""
+
+#: indico_payment_sixpay/templates/transaction_details.html
+msgid "Transaction ID"
+msgstr ""
+
+#: indico_payment_sixpay/templates/transaction_details.html
+msgid "Order ID"
+msgstr ""

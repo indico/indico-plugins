@@ -14,6 +14,7 @@ wheelhouse/
 .cache/
 .pytest_cache/
 *.mo
+messages-react.json
 webpack-build-config.json
 .indico_source
 .jsconfig.json

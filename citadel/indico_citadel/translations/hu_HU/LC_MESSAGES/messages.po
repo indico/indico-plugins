@@ -1,0 +1,227 @@
+# Translations template for indico-plugin-citadel.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-citadel project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Beáta Bréda, 2022
+# Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2022
+# Anna Szabó, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: Anna Szabó, 2024\n"
+"Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_citadel/plugin.py
+msgid "Citadel URL"
+msgstr "Citadel URL"
+
+#: indico_citadel/plugin.py
+msgid "The URL of the Citadel server"
+msgstr "A Citadel szerver URL címe"
+
+#: indico_citadel/plugin.py
+msgid "Citadel API token"
+msgstr "Citadel API token"
+
+#: indico_citadel/plugin.py
+msgid "The authentication token to access Citadel"
+msgstr "A hitelesítési token a Citadel-hez való hozzáféréshez"
+
+#: indico_citadel/plugin.py
+msgid "File extensions"
+msgstr "Fájl kiterjesztések"
+
+#: indico_citadel/plugin.py
+msgid "File extensions to upload for full-text search"
+msgstr "Teljes szöveges kereséshez feltölthető fájlkiterjesztések"
+
+#: indico_citadel/plugin.py
+msgid "Max. file size"
+msgstr "Max. fájl méret"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+"A teljes szöveges kereséshez feltölthető maximális méret (MB-ban). Felhívjuk"
+" a figyelmét arra, hogy ha ezt az értéket a kezdeti exportálás után "
+"megnöveli, akkor a következő sorfuttatás során az összes olyan fájl "
+"indexelésre kerül feltöltésre, amelyekre korábban még nem került sor. Ez "
+"nagyobb példányok esetén hosszú időt vehet igénybe. Érdemes először manuális"
+" feltöltést futtatni az új fájlmérethez!"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records)"
+msgstr "Párhuzamos szálak (rekordok)"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading records."
+msgstr "A rekordok feltöltésekor használandó szálak száma."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records, initial export)"
+msgstr "Párhuzamos szálak (rekordok, kezdeti export)"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr ""
+"A kezdeti exportálás során a rekordok feltöltésekor használandó szálak "
+"száma."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files)"
+msgstr "Párhuzamos szálak (fájlok)"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading files."
+msgstr "A fájlok feltöltésekor használandó szálak száma."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files, initial export)"
+msgstr "Párhuzamos szálak (fájlok, kezdeti export)"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr ""
+"A kezdeti exportálás során a fájlok feltöltésekor használandó szálak száma."
+
+#: indico_citadel/plugin.py
+msgid "Disable search"
+msgstr "Keresés letiltása"
+
+#: indico_citadel/plugin.py
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+"Ez kikapcsolja a bővítmény keresőintegrációját. Ha ezt az opciót használja, "
+"a belső Indico keresőfelületet fogja használni. Ez akkor lehet hasznos, ha "
+"még mindig egy nagyobb kezdeti exportálást végez, és nem szeretné, hogy az "
+"emberek ez idő alatt hiányos keresési eredményeket kapjanak."
+
+#: indico_citadel/plugin.py
+msgid "Large Category Warning Threshold"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Displays a warning to category managers when changing the ACL of big "
+"categories that would result in sending a large amount of data to the "
+"Citadel server. You can set the threshold to 0 to suppress this warning."
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "The title of an event, contribution, etc."
+msgstr "Egy esemény, hozzájárulás stb. címe."
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's name"
+msgstr "Egy előadó, szerző vagy esemény elnökének neve"
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's affiliation"
+msgstr "Egy előadó, szerző vagy esemény elnökének affiliációja"
+
+#: indico_citadel/search.py
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "Egy bejegyzés típus (például konferencia, értekezlet, fájl stb.)"
+
+#: indico_citadel/search.py
+msgid "Name of the venue"
+msgstr "A helyszín neve"
+
+#: indico_citadel/search.py
+msgid "Name of the room"
+msgstr "A terem neve"
+
+#: indico_citadel/search.py
+msgid "Address of the venue"
+msgstr "A helyszín címe"
+
+#: indico_citadel/search.py
+msgid "Name of the attached file"
+msgstr "Csatolt fájlnév"
+
+#: indico_citadel/search.py
+msgid "A keyword associated with an event"
+msgstr "Eseményhez társított kulcsszó"
+
+#: indico_citadel/search.py
+msgid "The category of an event"
+msgstr "Eseménykategória"
+
+#: indico_citadel/search.py
+msgid "Most relevant"
+msgstr "Legrelevánsabb"
+
+#: indico_citadel/search.py
+msgid "Newest first"
+msgstr "Legújabb legelöl"
+
+#: indico_citadel/search.py
+msgid "Oldest first"
+msgstr "Legrégibb legelöl"
+
+#: indico_citadel/search.py
+msgid "Affiliation"
+msgstr "Munkahely"
+
+#: indico_citadel/search.py
+msgid "Person"
+msgstr "Személy"
+
+#: indico_citadel/search.py
+msgid "Type"
+msgstr "Típus"
+
+#: indico_citadel/search.py
+msgid "Location"
+msgstr "Hely"
+
+#: indico_citadel/search.py
+msgid "Date"
+msgstr "Dátum"
+
+#: indico_citadel/search.py
+msgid "Category"
+msgstr "Kategória"
+
+#: indico_citadel/search.py
+msgid "Category ID"
+msgstr "Kategória azonosító"
+
+#: indico_citadel/search.py
+msgid "Event ID"
+msgstr "Esemény azonosító"
+
+#: indico_citadel/templates/event_category_warning.html
+msgid "This category contains a large number of events."
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid ""
+"Please consider using groups instead of individual users when granting "
+"access or management permissions since any change to the list below requires"
+" re-synchronizing all events with Indico's search engine."
+msgstr ""

@@ -1,70 +1,70 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for indico-plugin-payment-manual.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-manual project.
 # 
 # Translators:
-# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020-2021
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020-2021,2024
 # Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2015-03-11 16:48+0000\n"
-"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020-2021\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020-2021,2024\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: indico_payment_manual/placeholders.py:33
+#: indico_payment_manual/placeholders.py
 msgid "escaped for URLs"
 msgstr "екрановано для URL"
 
-#: indico_payment_manual/placeholders.py:38
+#: indico_payment_manual/placeholders.py
 msgid "First name of the registrant"
 msgstr "Ім'я реєстранта"
 
-#: indico_payment_manual/placeholders.py:44
+#: indico_payment_manual/placeholders.py
 msgid "Last name of the registrant"
 msgstr "Прізвище реєстранта"
 
-#: indico_payment_manual/placeholders.py:50
+#: indico_payment_manual/placeholders.py
 msgid "Email address of the registrant"
 msgstr "Адреса електронної пошти реєстранта"
 
-#: indico_payment_manual/placeholders.py:60
+#: indico_payment_manual/placeholders.py
 msgid "The database ID of the registration"
-msgstr ""
+msgstr "Ідентифікатор бази даних реєстрації"
 
-#: indico_payment_manual/placeholders.py:69
+#: indico_payment_manual/placeholders.py
 msgid "The ID of the registration form"
-msgstr ""
+msgstr "Ідентифікатор реєстраційної форми"
 
-#: indico_payment_manual/placeholders.py:78
+#: indico_payment_manual/placeholders.py
 msgid "The ID of the event"
 msgstr "ID події"
 
-#: indico_payment_manual/placeholders.py:101
+#: indico_payment_manual/placeholders.py
 msgid "The price the registrant needs to pay (e.g. 100.00 or 100.25)"
 msgstr "Сума, яку необхідно сплатити (100.00 або 100.25, н-д)"
 
-#: indico_payment_manual/placeholders.py:102
+#: indico_payment_manual/placeholders.py
 msgid "The price without cents if possible (e.g. 100 or 100.25)"
 msgstr "Сума без копійок, якщо можливо (100 або 100.25 н-д)"
 
-#: indico_payment_manual/placeholders.py:103
+#: indico_payment_manual/placeholders.py
 msgid "The price formatted as an integer (e.g. 10000 or 10025)"
 msgstr "Сума як ціле число (10000 або 10025, н-д)"
 
-#: indico_payment_manual/placeholders.py:108
+#: indico_payment_manual/placeholders.py
 msgid "The currency used in the registration"
 msgstr "Зараз використовується при реєстрації"
 
-#: indico_payment_manual/plugin.py:21
+#: indico_payment_manual/plugin.py
 msgid ""
 "The details the user needs to make their payment. This usually includes the "
 "bank account details, the IBAN and payment reference.  You can also link to "
@@ -72,6 +72,6 @@ msgid ""
 "versions of the placeholders where available."
 msgstr "Дані, необхідні користувачу для оплати. Зазвичай, включає банківські реквізити, IBAN та призначення платежу. Ви також можете перенаправити користувача на власний сайт для оплати. У такому випадку впевнітьcя, що використовуєте екрановану URL версію плейсхолдерів усюди, де можливо."
 
-#: indico_payment_manual/plugin.py:27 indico_payment_manual/plugin.py:36
+#: indico_payment_manual/plugin.py
 msgid "Payment details"
 msgstr "Подробиці оплати"

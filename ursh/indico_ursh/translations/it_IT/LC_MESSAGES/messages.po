@@ -1,0 +1,137 @@
+# Translations template for indico-plugin-ursh.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-ursh project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Pierpaolo Gallo, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-ursh 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Pierpaolo Gallo, 2023\n"
+"Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_ursh/controllers.py
+msgid "Shortcut already exists"
+msgstr "Shortcut già esistente"
+
+#: indico_ursh/controllers.py
+msgid "Malformed shortcut"
+msgstr "Shortcut difettoso o non corretto"
+
+#: indico_ursh/plugin.py
+msgid "API key"
+msgstr "Chiave API"
+
+#: indico_ursh/plugin.py
+msgid "The API key to access the <tt>ursh</tt> service"
+msgstr "Chiave API per accedere al servizio <tt>ursh</tt>"
+
+#: indico_ursh/plugin.py
+msgid "API host"
+msgstr "API host"
+
+#: indico_ursh/plugin.py
+msgid ""
+"The <tt>ursh</tt> API host, providing the interface to generate short URLs"
+msgstr ""
+"L'host API <tt>ursh</tt> che fornisce l'interfaccia per la generazione di "
+"URL brevi"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create custom shortcut"
+msgstr "Crea shortcut personalizzato"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL creation failed:"
+msgstr "Errore nella creazione del custom URL"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL created successfully"
+msgstr "Custom URL creato con successo"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Creating a custom shortcut for the following URL:"
+msgstr "Crea uno shortcut custom per l'URL:"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Please enter the desired shortcut below (at least 5 chars)."
+msgstr "Inserire di seguito lo shortcut desiderato (almeno 5 caratteri)."
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Enter a shortcut..."
+msgstr "Inserire uno shortcut..."
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create"
+msgstr "Crea"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Short URL options"
+msgstr "Short URL options"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Get short URL"
+msgstr "preleva short URL"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create short URL"
+msgstr "Crea short URL"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create custom short URL"
+msgstr "Crea short URL custom"
+
+#: indico_ursh/templates/ursh_footer.html
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "URL Shortener"
+msgstr "URL Shortener"
+
+#: indico_ursh/templates/ursh_link.html
+msgid "Obtain short URL"
+msgstr "Ottieni uno short URL"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"In this page, you can generate short links for any Indico URL. Just enter "
+"the URL below and click \"Shorten\"."
+msgstr ""
+"In questa pagina è possibile generare short URL per qualsiasi URL di Indico."
+" Basta inserire l'URL qui sotto e cliccare su \"Accorcia\"."
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Enter an Indico URL to shorten..."
+msgstr "Inserisci un URL Indico da accorciare..."
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Shorten"
+msgstr "Shorten"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Copy to clipboard"
+msgstr "Copia negli appunti"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"<strong>Tip:</strong> You can also generate short links by using the quick-"
+"links in various places within Indico! Just look for the <span class=\"icon-"
+"link\"></span> icon."
+msgstr ""
+"<strong>Suggerimento</strong>: è possibile generare collegamenti brevi anche"
+" utilizzando i collegamenti rapidi presenti in vari punti di Indico! Basta "
+"cercare l'icona <span class=\"icon-link\"></span>."

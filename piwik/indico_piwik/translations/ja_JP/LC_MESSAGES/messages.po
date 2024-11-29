@@ -1,0 +1,235 @@
+# Translations template for indico-plugin-piwik.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-piwik project.
+# 
+# Translators:
+# Ken <ken.oyama.nagasaki@gmail.com>, 2019
+# Ken <ken.oyama.nagasaki@gmail.com>, 2024
+# Ken <ken.oyama.nagasaki@gmail.com>, 2021
+# Martin Meadows, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:40+0000\n"
+"Last-Translator: Ken <ken.oyama.nagasaki@gmail.com>, 2024\n"
+"Language-Team: Japanese (Japan) (http://app.transifex.com/indico/indico/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_piwik/forms.py
+msgid "Track global visits"
+msgstr "サイト訪問の追跡"
+
+#: indico_piwik/forms.py
+msgid "Track events"
+msgstr "イベントを追跡する"
+
+#: indico_piwik/forms.py
+msgid "Cache results"
+msgstr "結果をキャッシュする"
+
+#: indico_piwik/forms.py
+msgid "Piwik server URL"
+msgstr "PiwikサーバーのURL"
+
+#: indico_piwik/forms.py
+msgid "Piwik API server URL"
+msgstr "Piwik APIサーバーのURL"
+
+#: indico_piwik/forms.py
+msgid "Piwik API token"
+msgstr "Piwik API トークン"
+
+#: indico_piwik/forms.py
+msgid "Token to access the API. Do not share it!"
+msgstr " APIにアクセスするためのトークン。共有しないこと！"
+
+#: indico_piwik/forms.py
+msgid "Global statistics ID"
+msgstr "グローバル統計ID"
+
+#: indico_piwik/forms.py
+msgid "Piwik site ID for global statistics"
+msgstr "グローバル統計用のPiwikサイトID"
+
+#: indico_piwik/forms.py
+msgid "Event statistics ID"
+msgstr "イベント統計ID"
+
+#: indico_piwik/forms.py
+msgid "Piwik site ID for event statistics"
+msgstr "イベント統計用のPiwikサイトID"
+
+#: indico_piwik/forms.py
+msgid "Result cache TTL (seconds)"
+msgstr "結果キャッシュのTTL（秒）"
+
+#: indico_piwik/forms.py
+msgid "How long event reports are kept cached"
+msgstr "イベントレポートのキャッシュ保存期間"
+
+#: indico_piwik/forms.py
+msgid "Use Piwik server URL for all requests"
+msgstr "すべてのリクエストにPiwikサーバーのURLを使用する"
+
+#: indico_piwik/forms.py
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "イベント統計は、グローバル統計と同じPiwikサイトを使用できない"
+
+#: indico_piwik/plugin.py
+msgid "Statistics"
+msgstr "統計データ"
+
+#: indico_piwik/templates/statistics.html
+msgid "Selection Information"
+msgstr "選択の情報"
+
+#: indico_piwik/templates/statistics.html
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s から %(end)sまで)"
+
+#: indico_piwik/templates/statistics.html
+msgid "Modify Query"
+msgstr "クエリを変換する"
+
+#: indico_piwik/templates/statistics.html
+msgid "Hide"
+msgstr "隠す"
+
+#: indico_piwik/templates/statistics.html
+msgid "View statistics between these dates"
+msgstr "この日付の間の統計データを見る"
+
+#: indico_piwik/templates/statistics.html
+msgid "to"
+msgstr "から"
+
+#: indico_piwik/templates/statistics.html
+msgid "Choose Event / Contribution"
+msgstr "イベントまたは投稿を選択"
+
+#: indico_piwik/templates/statistics.html
+msgid "Event"
+msgstr "イベント"
+
+#: indico_piwik/templates/statistics.html
+msgid "Contribution"
+msgstr "投稿"
+
+#: indico_piwik/templates/statistics.html
+msgid "Update Query"
+msgstr "クエリを更新する"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Hit Rates"
+msgstr "訪問者ヒット率"
+
+#: indico_piwik/templates/statistics.html
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "統計はプラグイン導入以降にのみ収集されていることにご注意ください。このため、一部のイベントについては、それ以前の期間のデータが存在しませんが、これは必ずしも、その時点でイベントがなかったことを意味するものではありません。"
+
+#: indico_piwik/templates/statistics.html
+msgid "Info"
+msgstr "情報"
+
+#: indico_piwik/templates/statistics.html
+msgid "Overall Statistics"
+msgstr "総合統計データ"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Metrics"
+msgstr "訪問者の測定基準"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitors"
+msgstr "訪問者"
+
+#: indico_piwik/templates/statistics.html
+msgid "Unique Visitors"
+msgstr "ユニーク訪問者"
+
+#: indico_piwik/templates/statistics.html
+msgid "Returning Visitors"
+msgstr "リピーター"
+
+#: indico_piwik/templates/statistics.html
+msgid "Avg. Duration"
+msgstr "平均訪問持続時間"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Statistics"
+msgstr "ピーク時の統計情報"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Date"
+msgstr "ピーク時の日付"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Users"
+msgstr "最大ユーザー数"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitors Geography"
+msgstr "ビジターマップ"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Origins"
+msgstr "国"
+
+#: indico_piwik/templates/statistics.html
+msgid "Top Referrers"
+msgstr "トップリファラー"
+
+#: indico_piwik/templates/statistics.html
+msgid "Traffic Inbound Top 10"
+msgstr "トラフィック インバウンド 上位10位"
+
+#: indico_piwik/templates/statistics.html
+msgid "Referrer"
+msgstr "リファラー"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visits"
+msgstr "訪問数"
+
+#: indico_piwik/templates/statistics.html
+msgid "Actions"
+msgstr "操作"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visit Length"
+msgstr "滞在期間"
+
+#: indico_piwik/templates/statistics.html
+msgid "User Systems"
+msgstr "ユーザーのオペレーティングシステム"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Systems"
+msgstr "訪問者のオペレーティングシステム"
+
+#: indico_piwik/templates/statistics.html
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "本レポートは %(dt)sに作成されました。"
+
+#: indico_piwik/templates/statistics.html
+msgid "Unable to retrieve Graph Data"
+msgstr "グラフデータの取得ができない"
+
+#: indico_piwik/templates/statistics.html
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "サーバーがタイムリーに応答しなかった。検索する日付の範囲が大きすぎることが考えられます。"

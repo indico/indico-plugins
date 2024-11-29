@@ -1,6 +1,6 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# Translations template for indico-plugin-payment-paypal.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-paypal project.
 # 
 # Translators:
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020
@@ -10,64 +10,64 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2015-03-11 16:45+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2020\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: indico_payment_paypal/controllers.py:110
+#: indico_payment_paypal/controllers.py
 msgid "Your payment request has been processed."
 msgstr "Ваш запит на оплату опрацьовано"
 
-#: indico_payment_paypal/controllers.py:118
+#: indico_payment_paypal/controllers.py
 msgid "You cancelled the payment process."
 msgstr "Ви відмінили оплату."
 
-#: indico_payment_paypal/plugin.py:24
+#: indico_payment_paypal/plugin.py
 msgid "API URL"
 msgstr "API URL"
 
-#: indico_payment_paypal/plugin.py:24
+#: indico_payment_paypal/plugin.py
 msgid "URL of the PayPal HTTP API."
 msgstr "URL від PayPal HTTP API"
 
-#: indico_payment_paypal/plugin.py:25 indico_payment_paypal/plugin.py:31
+#: indico_payment_paypal/plugin.py
 msgid "Business"
 msgstr "Бізнес"
 
-#: indico_payment_paypal/plugin.py:26
+#: indico_payment_paypal/plugin.py
 msgid ""
 "The default PayPal ID or email address associated with a PayPal account. "
 "Event managers will be able to override this."
 msgstr "PayPal ID за замовчуванням або електронна пошта, асоційована з аккаунтом PayPal. Менеджери події можуть перепризначити це."
 
-#: indico_payment_paypal/plugin.py:33
+#: indico_payment_paypal/plugin.py
 msgid "The PayPal ID or email address associated with a PayPal account."
 msgstr "PayPal ID за замовчуванням або електронна пошта, асоційована з аккаунтом PayPal."
 
-#: indico_payment_paypal/util.py:23
+#: indico_payment_paypal/util.py
 msgid "Invalid email address / paypal ID"
 msgstr "Невірна електронна пошта / PayPal ID"
 
-#: indico_payment_paypal/templates/event_payment_form.html:4
+#: indico_payment_paypal/templates/event_payment_form.html
 msgid "First name"
 msgstr "Ім'я"
 
-#: indico_payment_paypal/templates/event_payment_form.html:6
+#: indico_payment_paypal/templates/event_payment_form.html
 msgid "Last name"
 msgstr "Прізвище"
 
-#: indico_payment_paypal/templates/event_payment_form.html:8
+#: indico_payment_paypal/templates/event_payment_form.html
 msgid "Total amount"
 msgstr "Повна сума"
 
-#: indico_payment_paypal/templates/event_settings_encoding_warning.html:4
+#: indico_payment_paypal/templates/event_settings_encoding_warning.html
 #, python-format
 msgid ""
 "Please make sure that you have your PayPal seller account configured to use "
@@ -76,28 +76,28 @@ msgid ""
 "%(link)shere%(endlink)s."
 msgstr "Будь ласка, переконайтеся, що ваш рахунок PayPal налаштований на використання <strong>UTF-8</strong> за замовчуванням, інакше деякі транзакції можуть бути не підтверджені Indico! Ви можете дізнатись, як це налаштувати  %(link)s тут%(endlink)s."
 
-#: indico_payment_paypal/templates/transaction_details.html:6
+#: indico_payment_paypal/templates/transaction_details.html
 msgid "Transaction ID"
 msgstr "ID транзакції"
 
-#: indico_payment_paypal/templates/transaction_details.html:8
+#: indico_payment_paypal/templates/transaction_details.html
 msgid "Invoice ID"
 msgstr "ID рахунку"
 
-#: indico_payment_paypal/templates/transaction_details.html:10
+#: indico_payment_paypal/templates/transaction_details.html
 msgid "Payer e-mail"
 msgstr "електронна пошта платника"
 
-#: indico_payment_paypal/templates/transaction_details.html:19
+#: indico_payment_paypal/templates/transaction_details.html
 msgid ""
 "The paid amount does not match the required amount. Please contact the "
 "registrant to solve the issue."
 msgstr "Сплачена сума не відповідає необхідній. Зверніться до реєстранту для вирішення проблеми."
 
-#: indico_payment_paypal/templates/transaction_details.html:22
+#: indico_payment_paypal/templates/transaction_details.html
 msgid "Paid:"
 msgstr "Оплачено:"
 
-#: indico_payment_paypal/templates/transaction_details.html:26
+#: indico_payment_paypal/templates/transaction_details.html
 msgid "Required:"
 msgstr "Необхідно:"

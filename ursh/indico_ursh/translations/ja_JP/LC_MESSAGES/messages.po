@@ -1,0 +1,135 @@
+# Translations template for indico-plugin-ursh.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-ursh project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Ken <ken.oyama.nagasaki@gmail.com>, 2022
+# Martin Meadows, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-ursh 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Martin Meadows, 2023\n"
+"Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_ursh/controllers.py
+msgid "Shortcut already exists"
+msgstr "ショートカットがすでに存在する"
+
+#: indico_ursh/controllers.py
+msgid "Malformed shortcut"
+msgstr "ショートカットが不正"
+
+#: indico_ursh/plugin.py
+msgid "API key"
+msgstr "APIキー"
+
+#: indico_ursh/plugin.py
+msgid "The API key to access the <tt>ursh</tt> service"
+msgstr "<tt>ursh</tt>サービスにアクセスするためのAPIキー"
+
+#: indico_ursh/plugin.py
+msgid "API host"
+msgstr "APIホスト"
+
+#: indico_ursh/plugin.py
+msgid ""
+"The <tt>ursh</tt> API host, providing the interface to generate short URLs"
+msgstr "短いURLを生成するインターフェイスを提供する<tt>ursh</tt>APIホスト"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create custom shortcut"
+msgstr "カスタムショートカットを作成"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL creation failed:"
+msgstr "カスタムURLの作成に失敗"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL created successfully"
+msgstr "カスタムURLを作成した"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Creating a custom shortcut for the following URL:"
+msgstr "次のURLのカスタムショートカットを作成する："
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Please enter the desired shortcut below (at least 5 chars)."
+msgstr "ご希望のショートカットを以下にご記入ください（5文字以上）"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Enter a shortcut..."
+msgstr "ショートカットを入力する"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create"
+msgstr "作成"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Short URL options"
+msgstr "短いURLのオプション"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Get short URL"
+msgstr "短いURLを取得"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create short URL"
+msgstr "短いURLを作成"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create custom short URL"
+msgstr "カスタムショートURLを作成"
+
+#: indico_ursh/templates/ursh_footer.html
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "URL Shortener"
+msgstr "URL短縮ツール"
+
+#: indico_ursh/templates/ursh_link.html
+msgid "Obtain short URL"
+msgstr "短いURLを取得"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"In this page, you can generate short links for any Indico URL. Just enter "
+"the URL below and click \"Shorten\"."
+msgstr ""
+"このページでは、IndicoのURLに対してショートリンクを生成することができます。以下のURLを入力し、「短縮する」をクリックするだけです"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Enter an Indico URL to shorten..."
+msgstr "短縮したいURL"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Shorten"
+msgstr "短縮する"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Copy to clipboard"
+msgstr "クリップボードにコピー"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"<strong>Tip:</strong> You can also generate short links by using the quick-"
+"links in various places within Indico! Just look for the <span class=\"icon-"
+"link\"></span> icon."
+msgstr ""
+"<strong>ヒント：</strong> "
+"また、インディコ内の様々な場所にあるクイックリンクを使って、ショートリンクを生成することができます！<span class=\"icon-"
+"link\"></span>アイコンを探してみてください。"

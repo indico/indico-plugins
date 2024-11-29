@@ -1,0 +1,225 @@
+# Translations template for indico-plugin-citadel.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-citadel project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Language-Team: Swedish (Sweden) (https://app.transifex.com/indico/teams/6478/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_citadel/plugin.py
+msgid "Citadel URL"
+msgstr "Citadel URL"
+
+#: indico_citadel/plugin.py
+msgid "The URL of the Citadel server"
+msgstr "Webbadressen till Citadel-servern"
+
+#: indico_citadel/plugin.py
+msgid "Citadel API token"
+msgstr "Citadel API-token"
+
+#: indico_citadel/plugin.py
+msgid "The authentication token to access Citadel"
+msgstr "Autentiseringstoken för att få åtkomst till Citadel"
+
+#: indico_citadel/plugin.py
+msgid "File extensions"
+msgstr "Filändelser"
+
+#: indico_citadel/plugin.py
+msgid "File extensions to upload for full-text search"
+msgstr "Filändelser att ladda upp för fulltextsökning"
+
+#: indico_citadel/plugin.py
+msgid "Max. file size"
+msgstr "Maximal filstorlek"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+"Maximal storlek (i MB) att ladda upp för fulltextsökning. Observera att om "
+"du ökar detta efter den initiala exporten kommer alla filer som inte "
+"tidigare har laddats upp att laddas upp för indexering vid nästa kökörning, "
+"vilket kan ta lång tid på större instanser. Du kan vilja göra en manuell "
+"uppladdning för den nya filstorleken först!"
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records)"
+msgstr "Parallella trådar (poster)"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading records."
+msgstr "Antal trådar att använda vid uppladdning av poster."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records, initial export)"
+msgstr "Parallella trådar (poster, initial export)"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr ""
+"Antal trådar som ska användas vid uppladdning av poster under den initiala "
+"exporten."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files)"
+msgstr "Parallella trådar (filer)"
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading files."
+msgstr "Antal trådar som ska användas vid uppladdning av filer."
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files, initial export)"
+msgstr "Parallella trådar (filer, initial export)"
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr "Antal trådar som ska användas vid uppladdning av filer."
+
+#: indico_citadel/plugin.py
+msgid "Disable search"
+msgstr "Inaktivera sökning"
+
+#: indico_citadel/plugin.py
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+"Detta inaktiverar plugin-programmets sökintegration. När detta alternativ "
+"används kommer det interna Indico-sökningsgränssnittet att användas. Detta "
+"kan vara användbart när du fortfarande kör en större initial export och inte"
+" vill att användare ska få ofullständiga sökresultat under den tiden."
+
+#: indico_citadel/plugin.py
+msgid "Large Category Warning Threshold"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Displays a warning to category managers when changing the ACL of big "
+"categories that would result in sending a large amount of data to the "
+"Citadel server. You can set the threshold to 0 to suppress this warning."
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "The title of an event, contribution, etc."
+msgstr "Titeln på ett evenemang, ett bidrag etc."
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's name"
+msgstr "Namnet på en talare, författare eller evenemangsordförande"
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's affiliation"
+msgstr ""
+"En talares, författares eller evenemangsordförandes "
+"organisationstillhörighet"
+
+#: indico_citadel/search.py
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr "En posttyp (såsom konferens, möte, fil, etc.)"
+
+#: indico_citadel/search.py
+msgid "Name of the venue"
+msgstr "Namn på platsen"
+
+#: indico_citadel/search.py
+msgid "Name of the room"
+msgstr "Namn på rummet"
+
+#: indico_citadel/search.py
+msgid "Address of the venue"
+msgstr "Adress till platsen"
+
+#: indico_citadel/search.py
+msgid "Name of the attached file"
+msgstr "Namn på den bifogade filen"
+
+#: indico_citadel/search.py
+msgid "A keyword associated with an event"
+msgstr "Ett nyckelord associerat med ett evenemang"
+
+#: indico_citadel/search.py
+msgid "The category of an event"
+msgstr "Kategorin för ett evenemang"
+
+#: indico_citadel/search.py
+msgid "Most relevant"
+msgstr "Mest relevant"
+
+#: indico_citadel/search.py
+msgid "Newest first"
+msgstr "Nyast först"
+
+#: indico_citadel/search.py
+msgid "Oldest first"
+msgstr "Äldst först"
+
+#: indico_citadel/search.py
+msgid "Affiliation"
+msgstr "Tillhörighet"
+
+#: indico_citadel/search.py
+msgid "Person"
+msgstr "Person"
+
+#: indico_citadel/search.py
+msgid "Type"
+msgstr "Typ"
+
+#: indico_citadel/search.py
+msgid "Location"
+msgstr "Plats"
+
+#: indico_citadel/search.py
+msgid "Date"
+msgstr "Datum"
+
+#: indico_citadel/search.py
+msgid "Category"
+msgstr "Kategori"
+
+#: indico_citadel/search.py
+msgid "Category ID"
+msgstr "Kategori id"
+
+#: indico_citadel/search.py
+msgid "Event ID"
+msgstr "Event id"
+
+#: indico_citadel/templates/event_category_warning.html
+msgid "This category contains a large number of events."
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid ""
+"Please consider using groups instead of individual users when granting "
+"access or management permissions since any change to the list below requires"
+" re-synchronizing all events with Indico's search engine."
+msgstr ""

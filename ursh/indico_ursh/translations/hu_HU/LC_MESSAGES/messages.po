@@ -1,0 +1,137 @@
+# Translations template for indico-plugin-ursh.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-ursh project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2020
+# Anna Szabó, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-ursh 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Anna Szabó, 2024\n"
+"Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_ursh/controllers.py
+msgid "Shortcut already exists"
+msgstr "A parancsikon már létezik"
+
+#: indico_ursh/controllers.py
+msgid "Malformed shortcut"
+msgstr "Hibásan formázott parancsikon"
+
+#: indico_ursh/plugin.py
+msgid "API key"
+msgstr "API kulcs"
+
+#: indico_ursh/plugin.py
+msgid "The API key to access the <tt>ursh</tt> service"
+msgstr "Az <tt>ursh</tt> szolgáltatás eléréséhez fontos API-kulcs"
+
+#: indico_ursh/plugin.py
+msgid "API host"
+msgstr "API-állomás"
+
+#: indico_ursh/plugin.py
+msgid ""
+"The <tt>ursh</tt> API host, providing the interface to generate short URLs"
+msgstr ""
+"Az <tt>ursh</tt> API-állomás, amely a felület létrehozásához rövid URL-eket"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create custom shortcut"
+msgstr "Egyéni parancsikon létrehozása"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL creation failed:"
+msgstr "Az egyéni URL létrehozása nem sikerült:"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Custom URL created successfully"
+msgstr "Az egyéni URL létrehozása sikeresen megtörtént"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Creating a custom shortcut for the following URL:"
+msgstr "Egyéni parancsikon létrehozása a következő URL-címhez:"
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Please enter the desired shortcut below (at least 5 chars)."
+msgstr "Adja meg a kívánt parancsikont az alábbiakban (legalább 5 karakter)."
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Enter a shortcut..."
+msgstr "Adja meg a parancsikont..."
+
+#: indico_ursh/templates/ursh_custom_shortener_page.html
+msgid "Create"
+msgstr "Létrehozás"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Short URL options"
+msgstr "Rövid URL-beállítások"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Get short URL"
+msgstr "Rövid URL kérése"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create short URL"
+msgstr "Rövid URL létrehozása"
+
+#: indico_ursh/templates/ursh_dropdown.html
+#: indico_ursh/templates/ursh_link.html
+msgid "Create custom short URL"
+msgstr "Egyéni rövid URL létrehozása"
+
+#: indico_ursh/templates/ursh_footer.html
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "URL Shortener"
+msgstr "URL-rövidítés"
+
+#: indico_ursh/templates/ursh_link.html
+msgid "Obtain short URL"
+msgstr "Rövid URL-cím beszerzése"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"In this page, you can generate short links for any Indico URL. Just enter "
+"the URL below and click \"Shorten\"."
+msgstr ""
+"Ezen az oldalon rövid linkeket hozhat létre bármely Indico URL-címhez. Csak "
+"adja meg az alábbi URL-t, és kattintson a \"Rövidítés\"."
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Enter an Indico URL to shorten..."
+msgstr "Adjon meg egy Indico URL-t a lerövidítéshez..."
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Shorten"
+msgstr "Lerövidíti"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid "Copy to clipboard"
+msgstr "Másolja a vágólapra"
+
+#: indico_ursh/templates/ursh_shortener_page.html
+msgid ""
+"<strong>Tip:</strong> You can also generate short links by using the quick-"
+"links in various places within Indico! Just look for the <span class=\"icon-"
+"link\"></span> icon."
+msgstr ""
+"<strong>Tipp:</strong> Ön is generálhat rövid linkeket a quick-links "
+"segítségével különböző helyeken indico! Csak keresd az <span class=\"icon-"
+"link\"></span> ikont."

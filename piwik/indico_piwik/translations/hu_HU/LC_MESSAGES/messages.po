@@ -1,0 +1,232 @@
+# Translations template for indico-plugin-piwik.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-piwik project.
+# 
+# Translators:
+# Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:40+0000\n"
+"Last-Translator: Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2019\n"
+"Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_piwik/forms.py
+msgid "Track global visits"
+msgstr "Globális látogatások nyomon követése"
+
+#: indico_piwik/forms.py
+msgid "Track events"
+msgstr "Események nyomon követése"
+
+#: indico_piwik/forms.py
+msgid "Cache results"
+msgstr "Gyorsítótár-eredmények"
+
+#: indico_piwik/forms.py
+msgid "Piwik server URL"
+msgstr "Piwik-kiszolgáló URL-címe"
+
+#: indico_piwik/forms.py
+msgid "Piwik API server URL"
+msgstr "Piwik API-kiszolgáló URL-címe"
+
+#: indico_piwik/forms.py
+msgid "Piwik API token"
+msgstr "Piwik API token"
+
+#: indico_piwik/forms.py
+msgid "Token to access the API. Do not share it!"
+msgstr "Token az API eléréséhez. Ne ossza meg!"
+
+#: indico_piwik/forms.py
+msgid "Global statistics ID"
+msgstr "Globális statisztikai azonosító"
+
+#: indico_piwik/forms.py
+msgid "Piwik site ID for global statistics"
+msgstr "A Piwik webhely-azonosítója a globális statisztikákhoz"
+
+#: indico_piwik/forms.py
+msgid "Event statistics ID"
+msgstr "Esemény statisztikai azonosítója"
+
+#: indico_piwik/forms.py
+msgid "Piwik site ID for event statistics"
+msgstr "A Piwik webhely-azonosítója az eseménystatisztikákhoz"
+
+#: indico_piwik/forms.py
+msgid "Result cache TTL (seconds)"
+msgstr "Találati gyorsítótár TTL (másodpercben)"
+
+#: indico_piwik/forms.py
+msgid "How long event reports are kept cached"
+msgstr "Meddig tartsuk az eseményjelentéseket gyorsítótárban"
+
+#: indico_piwik/forms.py
+msgid "Use Piwik server URL for all requests"
+msgstr "Az összes kéréshez használja a Piwik szerver URL-jét"
+
+#: indico_piwik/forms.py
+msgid "Event statistics can't use the same Piwik site as global statistics"
+msgstr "Az eseménystatisztikák nem használhatják ugyanazt a Piwik webhelyet, mint a globális statisztikák"
+
+#: indico_piwik/plugin.py
+msgid "Statistics"
+msgstr "Statisztikák"
+
+#: indico_piwik/templates/statistics.html
+msgid "Selection Information"
+msgstr "Kiválasztási információk"
+
+#: indico_piwik/templates/statistics.html
+#, python-format
+msgid "(%(start)s to %(end)s)"
+msgstr "(%(start)s -től %(end)s-ig)"
+
+#: indico_piwik/templates/statistics.html
+msgid "Modify Query"
+msgstr "A lekérdezés módosítása"
+
+#: indico_piwik/templates/statistics.html
+msgid "Hide"
+msgstr "Elrejt"
+
+#: indico_piwik/templates/statistics.html
+msgid "View statistics between these dates"
+msgstr "Statisztikák megtekintése ezen időpontok között"
+
+#: indico_piwik/templates/statistics.html
+msgid "to"
+msgstr "-ig"
+
+#: indico_piwik/templates/statistics.html
+msgid "Choose Event / Contribution"
+msgstr "Válassza az Esemény / Felszólalás lehetőséget"
+
+#: indico_piwik/templates/statistics.html
+msgid "Event"
+msgstr "Esemény"
+
+#: indico_piwik/templates/statistics.html
+msgid "Contribution"
+msgstr "Közreműködés"
+
+#: indico_piwik/templates/statistics.html
+msgid "Update Query"
+msgstr "Lekérdezés frissítése"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Hit Rates"
+msgstr "Látogató találati arányok"
+
+#: indico_piwik/templates/statistics.html
+msgid ""
+"Please note, statistics have only been collected since the plugin's "
+"introduction. This means that there is no data present for the earlier "
+"period of some events, this does not necessarily mean that there was no "
+"activity in the event at that time."
+msgstr "Felhívjuk figyelmét, hogy a statisztikákat csak a plugin bevezetése óta gyűjtik. Ez azt jelenti, hogy egyes események korábbi periódusára vonatkozóan nem állnak rendelkezésre adatok, ez nem feltétlenül jelenti azt, hogy abban az eseményben nem volt tevékenység."
+
+#: indico_piwik/templates/statistics.html
+msgid "Info"
+msgstr "Információ"
+
+#: indico_piwik/templates/statistics.html
+msgid "Overall Statistics"
+msgstr "Összesített statisztika"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Metrics"
+msgstr "Látogatói mutatók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitors"
+msgstr "Látogatók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Unique Visitors"
+msgstr "Egyedi Látogatók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Returning Visitors"
+msgstr "Visszatérő látogatók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Avg. Duration"
+msgstr "Átl. tartam"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Statistics"
+msgstr "Csúcs statisztikák"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Date"
+msgstr "Csúcspontja"
+
+#: indico_piwik/templates/statistics.html
+msgid "Peak Users"
+msgstr "Csúcs felhasználók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitors Geography"
+msgstr "Látogatók földrajzi helyei"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Origins"
+msgstr "Látogatói források"
+
+#: indico_piwik/templates/statistics.html
+msgid "Top Referrers"
+msgstr "Legjobb ajánlók"
+
+#: indico_piwik/templates/statistics.html
+msgid "Traffic Inbound Top 10"
+msgstr "Bejövő forgalom Top 10"
+
+#: indico_piwik/templates/statistics.html
+msgid "Referrer"
+msgstr "Utaló"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visits"
+msgstr "Látogatások"
+
+#: indico_piwik/templates/statistics.html
+msgid "Actions"
+msgstr "Műveletek"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visit Length"
+msgstr "Látogatás hossza"
+
+#: indico_piwik/templates/statistics.html
+msgid "User Systems"
+msgstr "Felhasználói rendszerek"
+
+#: indico_piwik/templates/statistics.html
+msgid "Visitor Systems"
+msgstr "Látogatói rendszerek"
+
+#: indico_piwik/templates/statistics.html
+#, python-format
+msgid "This report was generated at: %(dt)s"
+msgstr "Ezt a jelentést a következő időpontban hozták létre: %(dt)s"
+
+#: indico_piwik/templates/statistics.html
+msgid "Unable to retrieve Graph Data"
+msgstr "Nem lehet beolvasni a Graph Data-t"
+
+#: indico_piwik/templates/statistics.html
+msgid ""
+"The server did not respond in a timely manner. It may be the case that the "
+"date-range is too large."
+msgstr "A kiszolgáló nem válaszolt időben. Előfordulhat, hogy a dátumtartomány túl nagy."

@@ -1,0 +1,49 @@
+# Translations template for indico-plugin-storage-s3.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-storage-s3 project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-storage-s3 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2020-08-19 18:43+0000\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Language-Team: Swedish (Sweden) (https://app.transifex.com/indico/teams/6478/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_storage_s3/plugin.py
+msgid "Bucket info API"
+msgstr ""
+
+#: indico_storage_s3/plugin.py
+msgid "Username"
+msgstr "Användarnamn"
+
+#: indico_storage_s3/plugin.py
+msgid "The username to access the S3 bucket info endpoint"
+msgstr ""
+
+#: indico_storage_s3/plugin.py
+msgid "Password"
+msgstr "Lösenord"
+
+#: indico_storage_s3/plugin.py
+msgid "The password to access the S3 bucket info endpoint"
+msgstr ""
+
+#: indico_storage_s3/plugin.py
+msgid ""
+"Enables an API on {url} that returns information on all S3 buckets currently"
+" in use, including dynamically-named ones."
+msgstr ""

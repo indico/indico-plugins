@@ -1,0 +1,77 @@
+# Translations template for indico-plugin-cloud-captchas.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-cloud-captchas project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Ruggero Turra, 2022
+# Pierpaolo Gallo, 2023
+# paula dewaal, 2024
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-cloud-captchas 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2022-08-24 10:09+0000\n"
+"Last-Translator: paula dewaal, 2024\n"
+"Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_cloud_captchas/plugin.py
+msgid "None (use Indico's built-in CAPTCHA)"
+msgstr "Nessuno (utilizzare il CAPTCHA integrato di Indico)"
+
+#: indico_cloud_captchas/plugin.py
+msgid "Type"
+msgstr "Tipo"
+
+#: indico_cloud_captchas/plugin.py
+msgid "Select which CAPTCHA provider you want to use"
+msgstr "Selezionare il provider CAPTCHA che si vuole utilizzare"
+
+#: indico_cloud_captchas/plugin.py
+msgid "reCAPTCHA site key"
+msgstr "chiave del sito reCAPTCHA"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The site key available in the reCAPTCHA admin dashboard"
+msgstr ""
+"La chiave del sito è disponibile nella dashboard di amministrazione di "
+"reCAPTCHA"
+
+#: indico_cloud_captchas/plugin.py
+msgid "reCAPTCHA secret key"
+msgstr "reCAPTCHA secret key"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The secret key available in the reCAPTCHA admin dashboard"
+msgstr ""
+"Il secret del sito è disponibile nella dashboard di amministrazione di "
+"reCAPTCHA"
+
+#: indico_cloud_captchas/plugin.py
+msgid "hCaptcha site key"
+msgstr "hCaptcha site key"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The site key available in the hCaptcha admin dashboard"
+msgstr ""
+"La chiave del sito è disponibile nella dashboard di amministrazione di "
+"hCAPTCHA"
+
+#: indico_cloud_captchas/plugin.py
+msgid "hCAPTCHA secret key"
+msgstr "hCAPTCHA secret key"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The secret key available in the hCaptcha admin dashboard"
+msgstr ""
+"Il secret del sito è disponibile nella dashboard di amministrazione di "
+"hCAPTCHA"

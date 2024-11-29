@@ -1,0 +1,208 @@
+# Translations template for indico-plugin-citadel.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-citadel project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2021-05-26 16:26+0000\n"
+"Language-Team: English (Canada) (https://app.transifex.com/indico/teams/6478/en_CA/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: en_CA\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_citadel/plugin.py
+msgid "Citadel URL"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "The URL of the Citadel server"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Citadel API token"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "The authentication token to access Citadel"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "File extensions"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "File extensions to upload for full-text search"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Max. file size"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Maximum size (in MB) to upload for full-text search. Note that increasing "
+"this after the initial export will upload all files for indexing that have "
+"not been uploaded before during the next queue run, which may take a long "
+"time on larger instances. You may want to run a manual upload for the new "
+"file size first!"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records)"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading records."
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (records, initial export)"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading records during the initial export."
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files)"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Number of threads to use when uploading files."
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Parallel threads (files, initial export)"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Number of threads to use when uploading files during the initial export."
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Disable search"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"This disables the search integration of the plugin. When this option is "
+"used, the internal Indico search interface will be used. This may be useful "
+"when you are still running a larger initial export and do not want people to"
+" get incomplete search results during that time."
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid "Large Category Warning Threshold"
+msgstr ""
+
+#: indico_citadel/plugin.py
+msgid ""
+"Displays a warning to category managers when changing the ACL of big "
+"categories that would result in sending a large amount of data to the "
+"Citadel server. You can set the threshold to 0 to suppress this warning."
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "The title of an event, contribution, etc."
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's name"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "A speaker, author or event chair's affiliation"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "An entry type (such as conference, meeting, file, etc.)"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Name of the venue"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Name of the room"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Address of the venue"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Name of the attached file"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "A keyword associated with an event"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "The category of an event"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Most relevant"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Newest first"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Oldest first"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Affiliation"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Person"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Type"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Location"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Date"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Category"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Category ID"
+msgstr ""
+
+#: indico_citadel/search.py
+msgid "Event ID"
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid "This category contains a large number of events."
+msgstr ""
+
+#: indico_citadel/templates/event_category_warning.html
+msgid ""
+"Please consider using groups instead of individual users when granting "
+"access or management permissions since any change to the list below requires"
+" re-synchronizing all events with Indico's search engine."
+msgstr ""

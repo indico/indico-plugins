@@ -1,0 +1,35 @@
+# 
+# Translators:
+# Lanxin Ma <ma@ihep.ac.cn>, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2024\n"
+"Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Actions you can perform on your Zoom meeting"
+msgstr ""
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "You will become an alternative host of this Zoom meeting"
+msgstr "你将成为这次会议的备选主持人"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me alternative host"
+msgstr "让我成为备选主持人"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Make me an alternative host"
+msgstr "让我成为另一个主持人"
+
+#: indico_vc_zoom/client/JoinButton.tsx
+msgid "Are you sure you want to be added as an alternative host?"
+msgstr "您确实要添加为另一个主持人？"

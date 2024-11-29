@@ -1,0 +1,19 @@
+# 
+# Translators:
+# 黃柏諺 <s8321414@gmail.com>, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: 黃柏諺 <s8321414@gmail.com>, 2024\n"
+"Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: zh_CN.GB2312\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_cloud_captchas/client/CloudCaptcha.jsx
+msgid "Confirm that you are not a robot"
+msgstr "確認您不是機器人"

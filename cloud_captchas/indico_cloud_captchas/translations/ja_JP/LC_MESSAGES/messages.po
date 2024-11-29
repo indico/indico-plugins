@@ -1,0 +1,70 @@
+# Translations template for indico-plugin-cloud-captchas.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-cloud-captchas project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# 
+# Translators:
+# Ken <ken.oyama.nagasaki@gmail.com>, 2022
+# kagoya <kagoya@jindai.ac.jp>, 2023
+# Hideto D. Harashima, 2023
+# SAITO Jun, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-cloud-captchas 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2022-08-24 10:09+0000\n"
+"Last-Translator: SAITO Jun, 2023\n"
+"Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_cloud_captchas/plugin.py
+msgid "None (use Indico's built-in CAPTCHA)"
+msgstr "なし（IndicoのビルトインCAPTCHAを使う）"
+
+#: indico_cloud_captchas/plugin.py
+msgid "Type"
+msgstr "タイプ"
+
+#: indico_cloud_captchas/plugin.py
+msgid "Select which CAPTCHA provider you want to use"
+msgstr "使用したいCAPTCHAプロバイダーを選択"
+
+#: indico_cloud_captchas/plugin.py
+msgid "reCAPTCHA site key"
+msgstr "reCAPTCHAサイトキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The site key available in the reCAPTCHA admin dashboard"
+msgstr "reCAPTCHA管理者ダッシュボードで利用可能なサイトキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "reCAPTCHA secret key"
+msgstr "reCAPTCHAのシークレットキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The secret key available in the reCAPTCHA admin dashboard"
+msgstr "reCAPTCHA管理者ダッシュボードで利用可能なシークレットキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "hCaptcha site key"
+msgstr "hCaptchaサイトキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The site key available in the hCaptcha admin dashboard"
+msgstr "hCaptcha管理者ダッシュボードで利用可能なサイトキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "hCAPTCHA secret key"
+msgstr "hCAPTCHAシークレットキー"
+
+#: indico_cloud_captchas/plugin.py
+msgid "The secret key available in the hCaptcha admin dashboard"
+msgstr "hCaptcha管理者ダッシュボードで利用可能なシークレットキー"

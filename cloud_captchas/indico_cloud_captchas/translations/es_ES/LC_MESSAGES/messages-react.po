@@ -1,0 +1,19 @@
+# 
+# Translators:
+# Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2024
+# 
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2024\n"
+"Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: indico_cloud_captchas/client/CloudCaptcha.jsx
+msgid "Confirm that you are not a robot"
+msgstr "Confirma que no eres un robot"

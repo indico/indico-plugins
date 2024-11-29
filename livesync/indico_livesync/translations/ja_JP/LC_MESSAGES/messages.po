@@ -1,0 +1,185 @@
+# Translations template for indico-plugin-livesync.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-livesync project.
+# 
+# Translators:
+# Ken <ken.oyama.nagasaki@gmail.com>, 2021
+# Martin Meadows, 2023
+# Thom Rawson <thomw@niu.ac.jp>, 2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Martin Meadows, 2023\n"
+"Language-Team: Japanese (Japan) (http://app.transifex.com/indico/indico/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: indico_livesync/controllers.py
+msgid "Agent deleted"
+msgstr "エージェントが削除されました"
+
+#: indico_livesync/controllers.py
+msgid "This backend is already in use"
+msgstr "このバックエンドはすでに使用されています"
+
+#: indico_livesync/controllers.py
+msgid "Agent added"
+msgstr "エージェントが追加されました"
+
+#: indico_livesync/controllers.py
+msgid "Don't forget to run the initial export!"
+msgstr "初回エクスポートの実行をお忘れなく！"
+
+#: indico_livesync/controllers.py
+msgid "Cannot edit an agent that is not loaded"
+msgstr "ロードされていないエージェントを編集することはできません"
+
+#: indico_livesync/controllers.py
+msgid "Agent updated"
+msgstr "エージェントが更新されました"
+
+#: indico_livesync/forms.py
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Name"
+msgstr "名前"
+
+#: indico_livesync/forms.py
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "エージェントの名前。管理インターフェイスでのみ使用されます。"
+
+#: indico_livesync/plugin.py
+msgid "Queue entry TTL"
+msgstr "キューエントリーTTL"
+
+#: indico_livesync/plugin.py
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "処理したエントリーを何日間キューに保存するか。時間はキュー・エントリーの作成からカウントされるため、LiveSyncタスクがしばらく実行されていない場合、キュー・エントリーを処理した後、次の実行時に削除される可能性があります。0に設定すると、自動削除が無効になります。"
+
+#: indico_livesync/plugin.py
+msgid "Excluded categories"
+msgstr "除外されたカテゴリー"
+
+#: indico_livesync/plugin.py
+msgid "Category ID"
+msgstr "カテゴリーID"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "これらのカテゴリーまたはそのサブカテゴリーに属するオブジェクトの変更は除外されます。"
+
+#: indico_livesync/plugin.py
+msgid "Disable queue runs"
+msgstr "キューランを無効にする"
+
+#: indico_livesync/plugin.py
+msgid "Disable all scheduled queue runs."
+msgstr "スケジュールされたキューランをすべて無効にする"
+
+#: indico_livesync/plugin.py
+msgid "Skip category changes"
+msgstr "カテゴリー変更をスキップする"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr "キューを処理する際に、カテゴリの変更をスキップします。これは、大きなカテゴリーに大きな変更がある場合に、それらをすぐに処理しないようにするために、大きなインスタンスで役に立つことがあります。"
+
+#: indico_livesync/templates/edit_agent.html
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "%(backend)sエージェントを追加する"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "LiveSync Agents"
+msgstr "LiveSyncのエージェント"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "ID"
+msgstr "ID"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Backend"
+msgstr "バックエンド"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Last Run"
+msgstr "最後実行"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Queue"
+msgstr "キュー"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Status"
+msgstr "ステータス"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Actions"
+msgstr "操作"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "%(name)sがロードされていない"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Never"
+msgstr "しない"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Ready"
+msgstr "準備ができました"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "n/a"
+msgstr "該当なし"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Delete this agent?"
+msgstr "このエージェントを削除する？"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "本当にこのエージェントとそのキューエントリーをすべて削除しますか？"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Edit LiveSync agent"
+msgstr " LiveSyncエージェントを編集する"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No agents have been added yet."
+msgstr "エージェントはまだ追加されていません"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No backend plugins enabled"
+msgstr "バックエンドプラグインが有効になっていない"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Add"
+msgstr "追加する"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "一部のエージェントについては、シェルで以下のコマンドを実行し、初期エクスポートを実行する必要があります。<br> Indicoのイベントが多い場合、非常に時間がかかることがありますので、ご了承ください！"

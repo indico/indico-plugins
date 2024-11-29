@@ -1,0 +1,183 @@
+# Translations template for indico-plugin-livesync.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-livesync project.
+# 
+# Translators:
+# Thomas Wennersten, 2024
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"PO-Revision-Date: 2015-03-11 16:53+0000\n"
+"Last-Translator: Thomas Wennersten, 2024\n"
+"Language-Team: Swedish (Sweden) (http://app.transifex.com/indico/indico/language/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico_livesync/controllers.py
+msgid "Agent deleted"
+msgstr "Agent raderad"
+
+#: indico_livesync/controllers.py
+msgid "This backend is already in use"
+msgstr "Denna backend används redan"
+
+#: indico_livesync/controllers.py
+msgid "Agent added"
+msgstr "Agent tillagd"
+
+#: indico_livesync/controllers.py
+msgid "Don't forget to run the initial export!"
+msgstr "Glöm inte att köra den första exporten!"
+
+#: indico_livesync/controllers.py
+msgid "Cannot edit an agent that is not loaded"
+msgstr "Det går inte att redigera en agent som inte är laddad"
+
+#: indico_livesync/controllers.py
+msgid "Agent updated"
+msgstr "Agent uppdaterad"
+
+#: indico_livesync/forms.py
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Name"
+msgstr "Namn"
+
+#: indico_livesync/forms.py
+msgid "The name of the agent. Only used in the administration interface."
+msgstr "Namnet på agenten. Används endast i administrationsgränssnittet."
+
+#: indico_livesync/plugin.py
+msgid "Queue entry TTL"
+msgstr "TTL för köinmatning"
+
+#: indico_livesync/plugin.py
+msgid ""
+"How many days should processed entries be kept in the queue. The time counts"
+" from the creation of the queue entries, so if the LiveSync task is not "
+"running for some time, queue entries may be deleted during the next run "
+"after processing them. Setting it to 0 disables automatic deletion."
+msgstr "Hur många dagar ska bearbetade poster finnas kvar i kön. Tiden räknas från det att köposterna skapades, så om LiveSync-aktiviteten inte körs under en tid kan köposterna raderas under nästa körning efter att de har bearbetats. Om den sätts till 0 inaktiveras automatisk radering."
+
+#: indico_livesync/plugin.py
+msgid "Excluded categories"
+msgstr "Uteslutna kategorier"
+
+#: indico_livesync/plugin.py
+msgid "Category ID"
+msgstr "Kategori ID"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Changes to objects inside these categories or any of their subcategories are"
+" excluded."
+msgstr "Ändringar av objekt inom dessa kategorier eller någon av deras underkategorier är undantagna."
+
+#: indico_livesync/plugin.py
+msgid "Disable queue runs"
+msgstr "Avaktivera körning av köer"
+
+#: indico_livesync/plugin.py
+msgid "Disable all scheduled queue runs."
+msgstr "Avaktivera alla schemalagda köer."
+
+#: indico_livesync/plugin.py
+msgid "Skip category changes"
+msgstr "Hoppa över kategoriändringar"
+
+#: indico_livesync/plugin.py
+msgid ""
+"Skip category changes when processing the queue. This can be useful in large"
+" instances when there are significant changes to large categories in order "
+"to avoid processing those immediately."
+msgstr "Hoppa över kategoriförändringar när du bearbetar kön. Detta kan vara användbart i stora fall när det finns betydande ändringar i stora kategorier för att undvika att bearbeta dem omedelbart."
+
+#: indico_livesync/templates/edit_agent.html
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Add %(backend)s agent"
+msgstr "Lägg till %(backend)s agent"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "LiveSync Agents"
+msgstr "LiveSync-agenter"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "ID"
+msgstr "ID"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Backend"
+msgstr "Backend"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Last Run"
+msgstr "Senaste körningen"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Queue"
+msgstr "Kö"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Status"
+msgstr "Status"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Actions"
+msgstr "Åtgärder"
+
+#: indico_livesync/templates/plugin_details_extra.html
+#, python-format
+msgid "Not loaded: %(name)s"
+msgstr "Inte laddad: %(name)s"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Never"
+msgstr "Aldrig"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Ready"
+msgstr "Redo"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "n/a"
+msgstr "n/a"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Delete this agent?"
+msgstr "Ta bort den här agenten?"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Do you really want to delete this agent and all its queue entries?"
+msgstr "Vill du verkligen ta bort denna agent och alla dess köposter?"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Edit LiveSync agent"
+msgstr "Redigera LiveSync-agent"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No agents have been added yet."
+msgstr "Inga agenter har lagts till ännu."
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "No backend plugins enabled"
+msgstr "Inga backend-plugins aktiverade"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid "Add"
+msgstr "Lägg till"
+
+#: indico_livesync/templates/plugin_details_extra.html
+msgid ""
+"You still need to run the initial export for some agents by executing the "
+"commands below in a shell.<br> Please note that this may take a very long "
+"time if there are many events in Indico!"
+msgstr "Du måste fortfarande köra den första exporten för vissa agenter genom att utföra kommandona nedan i ett skal.<br> Observera att detta kan ta mycket lång tid om det finns många händelser i Indico!"
