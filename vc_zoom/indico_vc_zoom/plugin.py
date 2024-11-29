@@ -15,6 +15,7 @@ from wtforms.validators import URL, DataRequired, Optional, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
@@ -554,7 +555,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         @after_this_request
         def _launch_task(response):
-            refresh_meetings.delay(zoom_rooms, obj, log_entry)
+            # only launch task if we ended up committing
+            if log_entry in db.session:
+                refresh_meetings.delay(zoom_rooms, obj, log_entry)
             return response
 
     def _render_vc_room_labels(self, event, vc_room, **kwargs):
