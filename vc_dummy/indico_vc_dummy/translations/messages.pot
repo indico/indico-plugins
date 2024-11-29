@@ -1,37 +1,35 @@
-# Translations template for PROJECT.
-# Copyright (C) 2022 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# Translations template for indico-plugin-vc-dummy.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-vc-dummy project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: indico-plugin-vc-dummy 3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 12:05+0200\n"
+"POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.16.0\n"
 
-#: indico_vc_dummy/templates/info_box.html:2
-#: indico_vc_dummy/templates/manage_event_info_box.html:2
+#: indico_vc_dummy/templates/info_box.html indico_vc_dummy/templates/manage_event_info_box.html
 msgid "Plugin type"
 msgstr ""
 
-#: indico_vc_dummy/templates/info_box.html:4
-#: indico_vc_dummy/templates/manage_event_info_box.html:4
+#: indico_vc_dummy/templates/info_box.html indico_vc_dummy/templates/manage_event_info_box.html
 msgid "Favorite color"
 msgstr ""
 
-#: indico_vc_dummy/templates/manage_event_create_room.html:12
+#: indico_vc_dummy/templates/manage_event_create_room.html
 msgid "Save"
 msgstr ""
 
-#: indico_vc_dummy/templates/manage_event_create_room.html:13
+#: indico_vc_dummy/templates/manage_event_create_room.html
 msgid "Cancel"
 msgstr ""
 
