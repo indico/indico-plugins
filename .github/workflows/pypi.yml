@@ -89,14 +89,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Install Indico 🔧
         run: |
           sudo apt-get install libpq-dev
-          pip install setuptools wheel
-          pip install indico
+          uv pip install --system indico
 
       - name: Install plugins 🧩
-        run: pip install wheels/*.whl
+        run: uv pip install --system wheels/*.whl
 
       - name: List plugins 🧩
         run: indico setup list-plugins
