@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
-# Thomas Baron <thomas.baron@cern.ch>, 2023
+# Thomas Baron <thomas.baron@cern.ch>, 2024
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2023\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2024\n"
 "Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,7 +124,7 @@ msgstr ""
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "Avertissement de limite de taille de catégorie"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -132,6 +132,10 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"Affiche un avertissement aux administrateurs de catégorie lors du changement"
+" des ACLs des grosses catégories qui résulterait dans l'envoi de grosses "
+"quantités de données vers le serveur Citadel. Vous pouvez positionner ce "
+"seuil à 0 pour supprimer cet avertissement."
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
@@ -219,7 +223,7 @@ msgstr "L'identifiant de l'événement"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "Cette catégorie contient un grand nombre d'événements."
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -227,3 +231,7 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"Veuillez considérer la possibilité d'utiliser des groupes plutôt que des "
+"utilisateurs individuels pour donner des droits d'accès ou de modification "
+"car tout changement de la liste ci-dessous implique de resynchroniser tous "
+"les événements avec le moteur de recherche d'Indico."

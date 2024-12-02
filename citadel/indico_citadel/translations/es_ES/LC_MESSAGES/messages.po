@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 # 
 # Translators:
-# Jesús Martín <jesusmartin@sallep.net>, 2021
+# Jesús Martín <jesusmartin@sallep.net>, 2024
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-11-29 15:33+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2021\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2024\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -121,7 +121,7 @@ msgstr ""
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "Umbral de advertencia de categoría grande"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -129,6 +129,10 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"Muestra una advertencia a los administradores de categorías cuando se "
+"modifica la ACL de categorías grandes, lo que podría provocar el envío de "
+"una gran cantidad de datos al servidor de Citadel. Puede establecer el "
+"umbral en 0 para suprimir esta advertencia."
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
@@ -216,7 +220,7 @@ msgstr "ID del evento"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "Esta categoría contiene una gran cantidad de eventos."
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -224,3 +228,7 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"Considere utilizar grupos en lugar de usuarios individuales al otorgar "
+"acceso o permisos de administración, ya que cualquier cambio en la lista a "
+"continuación requiere volver a sincronizar todos los eventos con el motor de"
+" búsqueda de Indico."

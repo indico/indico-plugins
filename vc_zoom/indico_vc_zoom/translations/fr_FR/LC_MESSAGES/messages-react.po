@@ -16,7 +16,7 @@ msgstr ""
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Actions you can perform on your Zoom meeting"
-msgstr ""
+msgstr "Actions que vous pouvez réaliser sur votre réunion Zoom"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "You will become an alternative host of this Zoom meeting"
