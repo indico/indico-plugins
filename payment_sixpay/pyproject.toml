@@ -25,7 +25,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 payment_sixpay = 'indico_payment_sixpay.plugin:SixpayPaymentPlugin'
 
 [build-system]
-requires = ['hatchling==1.25.0']
+requires = ['hatchling==1.26.3']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]

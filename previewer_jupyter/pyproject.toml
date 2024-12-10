@@ -21,7 +21,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 previewer_jupyter = 'indico_previewer_jupyter:JupyterPreviewerPlugin'
 
 [build-system]
-requires = ['hatchling==1.25.0']
+requires = ['hatchling==1.26.3']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
