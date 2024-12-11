@@ -69,21 +69,21 @@ class VCRoomForm(VCRoomFormBase):
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
-                              description=_('Participants will join the VC room muted by default '))
+                              description=_('Participants will join the meeting muted by default '))
 
     mute_host_video = BooleanField(_('Mute video (host)'),
                                    widget=SwitchWidget(),
-                                   description=_('The host will join the VC room with video disabled'))
+                                   description=_('The host will join the meeting with video disabled'))
 
     mute_participant_video = BooleanField(_('Mute video (participants)'),
                                           widget=SwitchWidget(),
-                                          description=_('Participants will join the VC room with video disabled'))
+                                          description=_('Participants will join the meeting with video disabled'))
 
     waiting_room = BooleanField(_('Waiting room'),
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
-    description = TextAreaField(_('Description'), description=_('Optional description for this room'))
+    description = TextAreaField(_('Description'), description=_('Optional description for this meeting'))
 
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']

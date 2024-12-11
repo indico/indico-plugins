@@ -88,15 +88,15 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
-                              description=_('Participants will join the VC room muted by default '))
+                              description=_('Participants will join the meeting muted by default '))
 
     mute_host_video = BooleanField(_('Mute video (host)'),
                                    widget=SwitchWidget(),
-                                   description=_('The host will join the VC room with video disabled'))
+                                   description=_('The host will join the meeting with video disabled'))
 
     mute_participant_video = BooleanField(_('Mute video (participants)'),
                                           widget=SwitchWidget(),
-                                          description=_('Participants will join the VC room with video disabled'))
+                                          description=_('Participants will join the meeting with video disabled'))
 
     join_before_host = BooleanField(_('Join Before Host'),
                                     widget=SwitchWidget(),
@@ -108,7 +108,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                 description=_('Participants may be kept in a waiting room by the host'))
 
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=TinyMCEWidget(),
-                                          description=_('Footer to append to emails sent upon creation of a VC room'))
+                                          description=_('Footer to append to emails sent upon creation of a Zoom '
+                                                        'meeting'))
 
     send_host_url = BooleanField(_('Send host URL'),
                                  widget=SwitchWidget(),
@@ -298,14 +299,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         flag_modified(vc_room, 'data')
 
     def create_room(self, vc_room, event):
-        """Create a new Zoom room for an event, given a VC room.
+        """Create a new Zoom meeting for an event, given a VC room.
 
-        In order to create the Zoom room, the function will try to get
+        In order to create the Zoom meeting, the function will try to get
         a valid e-mail address for the user in question, which can be
         use with the Zoom API.
 
-        :param vc_room: the VC room from which to create the Zoom room
-        :param event: the event to the Zoom room will be attached
+        :param vc_room: the VC room from which to create the Zoom meeting
+        :param event: the event to the Zoom meeting will be attached
         """
         client = ZoomIndicoClient()
         host = principal_from_identifier(vc_room.data['host'])

@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.2
+
+- Stop using the (incorrect) "room" terminology for Zoom meetings, and call them "meetings" instead
+
 ### 3.3.1
 
 - Adapt to Indico 3.3.5 changes
@@ -96,7 +100,7 @@
 
 - Improve logging when a Zoom API request fails
 - Fail more gracefully if no Zoom account could be found for a user
-- Allow using the same name for multiple Zoom rooms
+- Allow using the same name for multiple Zoom meetings
 - Update the join url when changing the passcode
 - Provide an alternative method of looking up the Zoom user corresponding to an Indico user
 - Always show the full join link and passcode to event managers
@@ -107,7 +111,7 @@
 - Show detailed error when deleting a meeting fails
 - Do not allow passcodes that are too long for zoom
 - Remove the "Assistant Zoom ID" logic due to problems with Zoom's API rate limits (all meetings created were counted against the assistant's rate limit instead of the host's); this means the host can no longer be changed, but Indico instead provides an option to event managers to make themselves a co-host.
-- Fix an error when changing the linked object of a recurring Zoom room in Indico
+- Fix an error when changing the linked object of a recurring Zoom meeting in Indico
 - Include Zoom join links in the event's ical export (note: only Zoom meetings with a public passcode are displayed unless you have at least Indico v2.3.3)
 - Skip deleted Zoom meetings when cloning events
 - Mark Zoom meetings as deleted when receiving the corresponding webhook event
