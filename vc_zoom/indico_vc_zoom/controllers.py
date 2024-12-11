@@ -91,13 +91,13 @@ class RHWebhook(RH):
 
         if not vc_room:
             # This usually happens when a room wasn't created via indico
-            current_plugin.logger.debug('Action for unhandled Zoom room: %s', meeting_id)
+            current_plugin.logger.debug('Action for unhandled Zoom meeting: %s', meeting_id)
             return
 
         if event in ('meeting.updated', 'webinar.updated'):
             current_plugin.refresh_room(vc_room, None)
         elif event in ('meeting.deleted', 'webinar.deleted'):
-            current_plugin.logger.info('Zoom room deleted: %s', meeting_id)
+            current_plugin.logger.info('Zoom meeting deleted: %s', meeting_id)
             vc_room.status = VCRoomStatus.deleted
         else:
             current_plugin.logger.warning('Unhandled Zoom webhook payload: %s', event)

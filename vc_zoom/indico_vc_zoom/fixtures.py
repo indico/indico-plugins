@@ -14,7 +14,7 @@ from indico.core.plugins import plugin_engine
 
 @pytest.fixture
 def zoom_plugin(app):
-    """Return a callable which lets you create dummy Zoom room occurrences."""
+    """Return a callable which lets you create dummy Zoom meeting occurrences."""
     from indico_vc_zoom.plugin import ZoomPlugin
 
     plugin = ZoomPlugin(plugin_engine, app)

@@ -88,15 +88,15 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
-                              description=_('Participants will join the VC room muted by default '))
+                              description=_('Participants will join the meeting muted by default '))
 
     mute_host_video = BooleanField(_('Mute video (host)'),
                                    widget=SwitchWidget(),
-                                   description=_('The host will join the VC room with video disabled'))
+                                   description=_('The host will join the meeting with video disabled'))
 
     mute_participant_video = BooleanField(_('Mute video (participants)'),
                                           widget=SwitchWidget(),
-                                          description=_('Participants will join the VC room with video disabled'))
+                                          description=_('Participants will join the meeting with video disabled'))
 
     join_before_host = BooleanField(_('Join Before Host'),
                                     widget=SwitchWidget(),
@@ -108,7 +108,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                 description=_('Participants may be kept in a waiting room by the host'))
 
     creation_email_footer = TextAreaField(_('Creation email footer'), widget=TinyMCEWidget(),
-                                          description=_('Footer to append to emails sent upon creation of a VC room'))
+                                          description=_('Footer to append to emails sent upon creation of a Zoom '
+                                                        'meeting'))
 
     send_host_url = BooleanField(_('Send host URL'),
                                  widget=SwitchWidget(),
@@ -230,8 +231,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     self.refresh_room(vc_room, event)
                     if vc_room.data.get('registration_required'):
                         raise UserValueError(
-                            _('The room "{}" is using Zoom registration and thus cannot be attached to another event')
-                            .format(vc_room.name)
+                            _('The meeting "{}" is using Zoom registration and thus cannot be attached to another '
+                              'event').format(vc_room.name)
                         )
                     # this means we are updating an existing meeting with a new vc_room-event association
                     update_zoom_meeting(vc_room.data['zoom_id'], {
@@ -298,14 +299,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         flag_modified(vc_room, 'data')
 
     def create_room(self, vc_room, event):
-        """Create a new Zoom room for an event, given a VC room.
+        """Create a new Zoom meeting for an event, given a VC room.
 
-        In order to create the Zoom room, the function will try to get
+        In order to create the Zoom meeting, the function will try to get
         a valid e-mail address for the user in question, which can be
         use with the Zoom API.
 
-        :param vc_room: the VC room from which to create the Zoom room
-        :param event: the event to the Zoom room will be attached
+        :param vc_room: the VC room from which to create the Zoom meeting
+        :param event: the event to the Zoom meeting will be attached
         """
         client = ZoomIndicoClient()
         host = principal_from_identifier(vc_room.data['host'])
@@ -357,8 +358,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 meeting_obj = client.create_meeting(host_email, **kwargs)
         except HTTPError as e:
-            self.logger.exception('Error creating Zoom Room: %s', e.response.content)
-            raise VCRoomError(_('Could not create the room in Zoom. Please contact support if the error persists'))
+            self.logger.exception('Error creating Zoom meeting: %s', e.response.content)
+            raise VCRoomError(_('Could not create the meeting in Zoom. Please contact support if the error persists'))
 
         vc_room.data.update({
             'zoom_id': str(meeting_obj['id']),
@@ -445,13 +446,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
             if e.response.status_code == 404:
                 if has_request_context():
-                    flash(_("Room didn't exist in Zoom anymore"), 'warning')
+                    flash(_("Meeting didn't exist in Zoom anymore"), 'warning')
             elif e.response.status_code == 400:
                 # some sort of operational error on Zoom's side, deserves a specific error message
                 raise VCRoomError(_('Zoom Error: "{}"').format(e.response.json()['message']))
             else:
-                self.logger.error("Can't delete room")
-                raise VCRoomError(_('Problem deleting room'))
+                self.logger.error("Can't delete meeting")
+                raise VCRoomError(_('Problem deleting Zoom meeting'))
 
     def clone_room(self, old_event_vc_room, link_object):
         vc_room = old_event_vc_room.vc_room
@@ -473,13 +474,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 # mark room as deleted
                 vc_room.status = VCRoomStatus.deleted
                 flash(
-                    _('The room "{}" no longer exists in Zoom and was removed from the event').format(vc_room.name),
+                    _('The meeting "{}" no longer exists in Zoom and was removed from the event').format(vc_room.name),
                     'warning'
                 )
             return None
 
         if vc_room.data.get('registration_required'):
-            flash(_('The room "{}" is using Zoom registration and thus cannot be attached to the new event')
+            flash(_('The meeting "{}" is using Zoom registration and thus cannot be attached to the new event')
                   .format(vc_room.name), 'warning')
             return None
 

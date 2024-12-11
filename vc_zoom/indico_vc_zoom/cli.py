@@ -19,8 +19,8 @@ def cli():
 
 @cli.command()
 @click.option('--status', type=click.Choice(['deleted', 'created']))
-def rooms(status=None):
-    """Lists all Zoom rooms"""
+def meetings(status=None):
+    """Lists all Zoom meetings"""
 
     room_query = VCRoom.query.filter_by(type='zoom')
     table_data = [['ID', 'Name', 'Status', 'Zoom ID']]
