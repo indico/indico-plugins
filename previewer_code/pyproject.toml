@@ -21,7 +21,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 previewer_code = 'indico_previewer_code:CodePreviewerPlugin'
 
 [build-system]
-requires = ['hatchling==1.26.3']
+requires = ['hatchling==1.27.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]

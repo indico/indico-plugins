@@ -21,7 +21,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 owncloud = 'indico_owncloud.plugin:OwncloudPlugin'
 
 [build-system]
-requires = ['hatchling==1.26.3']
+requires = ['hatchling==1.27.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]

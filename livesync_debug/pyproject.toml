@@ -21,7 +21,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 livesync_debug = 'indico_livesync_debug.plugin:LiveSyncDebugPlugin'
 
 [build-system]
-requires = ['hatchling==1.26.3']
+requires = ['hatchling==1.27.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
