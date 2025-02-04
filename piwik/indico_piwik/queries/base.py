@@ -26,8 +26,7 @@ class PiwikQueryReportBase(PiwikQueryBase):
     """Base Piwik query to request reports"""
 
     def __init__(self):
-        from indico_piwik.plugin import PiwikPlugin
-        super().__init__(query_script=PiwikPlugin.report_script)
+        super().__init__(query_script='index.php')
 
     def call(self, date=('last7',), period='day', **query_params):
         date = ','.join(map(str, date))

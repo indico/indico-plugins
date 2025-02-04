@@ -28,8 +28,6 @@ class PiwikPlugin(IndicoPlugin):
     """
     configurable = True
     settings_form = SettingsForm
-    report_script = 'index.php'
-    track_script = 'piwik.php'
 
     default_settings = {
         'enabled': False,
