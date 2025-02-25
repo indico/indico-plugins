@@ -21,9 +21,6 @@ from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 
 
-pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
-
-
 def test_dump_event(db, dummy_user, dummy_event):
     from .schemas import EventRecordSchema
 
@@ -67,7 +64,7 @@ def test_dump_event(db, dummy_user, dummy_event):
 
 
 @pytest.mark.parametrize('scheduled', (False, True))
-def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, create_entry, scheduled):
+def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, create_timetable_entry, scheduled):
     from .schemas import ContributionRecordSchema
 
     person = EventPerson.create_from_user(dummy_user, dummy_event)
@@ -76,7 +73,7 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
 
     extra = {}
     if scheduled:
-        create_entry(dummy_contribution, utc.localize(datetime(2020, 4, 20, 4, 20)))
+        create_timetable_entry(dummy_event, dummy_contribution, utc.localize(datetime(2020, 4, 20, 4, 20)))
         extra = {
             'start_dt': dummy_contribution.start_dt.isoformat(),
             'end_dt': dummy_contribution.end_dt.isoformat(),
@@ -114,12 +111,12 @@ def test_dump_contribution(db, dummy_user, dummy_event, dummy_contribution, crea
 
 
 @pytest.mark.parametrize('scheduled', (False, True))
-def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, create_entry, scheduled):
+def test_dump_subcontribution(db, dummy_user, dummy_event, dummy_contribution, create_timetable_entry, scheduled):
     from .schemas import SubContributionRecordSchema
 
     extra = {}
     if scheduled:
-        create_entry(dummy_contribution, utc.localize(datetime(2020, 4, 20, 4, 20)))
+        create_timetable_entry(dummy_event, dummy_contribution, utc.localize(datetime(2020, 4, 20, 4, 20)))
         extra = {
             'start_dt': dummy_contribution.start_dt.isoformat(),
             'end_dt': dummy_contribution.end_dt.isoformat(),
