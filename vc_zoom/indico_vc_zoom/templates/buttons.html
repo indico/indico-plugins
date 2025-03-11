@@ -18,7 +18,7 @@
         {% elif event_vc_room.data.password_visibility == 'no_one' %}
             classes="orange {{ extra_classes }}"
             description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
-            href="{{ vc_room.data.public_url }}">
+            href="{{ vc_room.data.public_url }}"
             icon="lock"
             caption="{% trans %}Join{% endtrans %}"
         {% elif event_vc_room.data.password_visibility == 'registered' %}

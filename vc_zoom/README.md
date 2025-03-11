@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.3
+
+- Fix display issue if a Zoom meeting has its passcode visibility set to "no one"
+
 ### 3.3.2
 
 - Stop using the (incorrect) "room" terminology for Zoom meetings, and call them "meetings" instead
