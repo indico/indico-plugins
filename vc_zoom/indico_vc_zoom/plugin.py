@@ -236,15 +236,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # XXX: This feels slightly hacky. Maybe we should change the API on the core?
         association_is_new = room_assoc.vc_room is None
 
-        # in a new room, `meeting_type` comes in `data`, otherwise it's already in the VCRoom
-        is_webinar = data.get('meeting_type', vc_room.data and vc_room.data.get('meeting_type')) == 'webinar'
-
         assoc_has_changed = super().update_data_association(event, vc_room, room_assoc, data)
 
         if vc_room.data:
             try:
                 if association_is_new:
                     self.refresh_room(vc_room, event)
+                    is_webinar = vc_room.data.get('meeting_type') == 'webinar'
                     if vc_room.data.get('registration_required'):
                         raise UserValueError(
                             _('The meeting "{}" is using Zoom registration and thus cannot be attached to another '
@@ -259,19 +257,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                             if is_webinar
                             else ZoomMeetingType.recurring_meeting_no_time
                         )
-                    })
+                    }, is_webinar=is_webinar)
                 elif assoc_has_changed:
                     # the booking should now be linked to something else
                     new_schedule_args = (get_schedule_args(room_assoc.link_object)
                                          if room_assoc.link_object.start_dt
                                          else {})
-                    meeting = fetch_zoom_meeting(vc_room)
+                    meeting, is_webinar = fetch_zoom_meeting(vc_room)
                     current_schedule_args = {k: meeting[k] for k in ('start_time', 'duration') if k in meeting}
 
                     # check whether the start time / duration of the scheduled meeting differs
                     if new_schedule_args != current_schedule_args:
                         if new_schedule_args:
-                            update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args)
+                            update_zoom_meeting(vc_room.data['zoom_id'], new_schedule_args, is_webinar=is_webinar)
                         else:
                             update_zoom_meeting(vc_room.data['zoom_id'], {
                                 'start_time': None,
@@ -281,7 +279,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                                     if is_webinar
                                     else ZoomMeetingType.recurring_meeting_no_time
                                 )
-                            })
+                            }, is_webinar=is_webinar)
             except VCRoomNotFoundError as exc:
                 raise UserValueError(str(exc)) from exc
 
@@ -393,8 +391,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()
-        is_webinar = vc_room.data['meeting_type'] == 'webinar'
-        zoom_meeting = fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
+        zoom_meeting, is_webinar = fetch_zoom_meeting(vc_room, client=client)
         changes = {}
 
         if vc_room.name != zoom_meeting['topic']:
@@ -426,12 +423,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if changes:
             update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
             # always refresh meeting URL (it may have changed if password changed)
-            zoom_meeting = fetch_zoom_meeting(vc_room, client=client, is_webinar=is_webinar)
+            zoom_meeting, _is_webinar = fetch_zoom_meeting(vc_room, client=client)
             vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
 
     def refresh_room(self, vc_room, event):
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
-        zoom_meeting = fetch_zoom_meeting(vc_room, is_webinar=is_webinar)
+        zoom_meeting, is_really_webinar = fetch_zoom_meeting(vc_room)
+        if is_webinar != is_really_webinar:
+            vc_room.data['meeting_type'] = 'webinar' if is_really_webinar else 'regular'
         vc_room.name = zoom_meeting['topic']
         vc_room.data.update({
             'description': zoom_meeting.get('agenda', ''),
@@ -449,18 +448,22 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
         flag_modified(vc_room, 'data')
 
-    def delete_room(self, vc_room, event):
+    def delete_room(self, vc_room, event, *, _is_webinar=False):
         client = ZoomIndicoClient()
         zoom_id = vc_room.data['zoom_id']
-        is_webinar = vc_room.data['meeting_type'] == 'webinar'
+
         try:
-            if is_webinar:
+            if _is_webinar:
                 client.delete_webinar(zoom_id)
             else:
                 client.delete_meeting(zoom_id)
         except HTTPError as e:
+            # if it's a webinar, delete that instead
+            if not _is_webinar and e.response.status_code == 400 and e.response.json().get('code') == 3000:
+                self.delete_room(vc_room, event, _is_webinar=True)
+                return
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
-            if e.response.status_code == 404:
+            elif e.response.status_code == 404:
                 if has_request_context():
                     flash(_("Meeting didn't exist in Zoom anymore"), 'warning')
             elif e.response.status_code == 400:
@@ -472,7 +475,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def clone_room(self, old_event_vc_room, link_object):
         vc_room = old_event_vc_room.vc_room
-        is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
         has_only_one_association = len({assoc.event_id for assoc in vc_room.events}) == 1
 
         refreshed = g.setdefault('zoom_refreshed_rooms', set())
@@ -501,6 +503,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             return None
 
         if has_only_one_association:
+            is_webinar = vc_room.data.get('meeting_type', 'regular') == 'webinar'
             update_zoom_meeting(vc_room.data['zoom_id'], {
                 'start_time': None,
                 'duration': None,
@@ -509,7 +512,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     if is_webinar
                     else ZoomMeetingType.recurring_meeting_no_time
                 )
-            })
+            }, is_webinar=is_webinar)
 
         # return the new association
         return super().clone_room(old_event_vc_room, link_object)
