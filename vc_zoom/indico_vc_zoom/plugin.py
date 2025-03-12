@@ -31,6 +31,7 @@ from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
+from indico_vc_zoom.api.client import get_zoom_token
 from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
@@ -123,6 +124,21 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         invalid = set(field.data) - set(multipass.identity_providers)
         if invalid:
             raise ValidationError(_('Invalid identity providers: {}').format(escape(', '.join(invalid))))
+
+    def validate_client_secret(self, field):
+        account_id = self.account_id.data
+        client_id = self.client_id.data
+        client_secret = self.client_secret.data
+        if not account_id or not client_id or not client_secret:
+            flash(_('Zoom credentials not set; the plugin will not work correctly'), 'error')
+            return
+
+        ok, msg = get_zoom_token({'account_id': account_id, 'client_id': client_id, 'client_secret': client_secret},
+                                 for_config_check=True)
+        if ok:
+            flash(_('Successfully got a Zoom token ({})').format(msg), 'info')
+            return
+        raise ValidationError(_('Could not get Zoom token: {}').format(msg))
 
 
 class ZoomPlugin(VCPluginMixin, IndicoPlugin):

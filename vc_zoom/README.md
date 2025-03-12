@@ -14,6 +14,7 @@
 ### 3.3.3
 
 - Fix display issue if a Zoom meeting has its passcode visibility set to "no one"
+- Try to get a Zoom token when saving the credentials in the plugin settings
 
 ### 3.3.2
 
