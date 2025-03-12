@@ -248,7 +248,7 @@ class ZoomIndicoClient:
         return _handle_response(resp)
 
 
-def get_zoom_token(config, *, force=False):
+def get_zoom_token(config, *, force=False, for_config_check=False):
     from indico_vc_zoom.plugin import ZoomPlugin
 
     account_id = config['account_id']
@@ -264,6 +264,8 @@ def get_zoom_token(config, *, force=False):
     if not force and (token_data := token_cache.get(cache_key)):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
+        if for_config_check:
+            return True, 'cached'
         return token_data['access_token'], token_data['expires_at']
     try:
         resp = requests.post(
@@ -273,6 +275,8 @@ def get_zoom_token(config, *, force=False):
         )
         resp.raise_for_status()
     except HTTPError as exc:
+        if for_config_check:
+            return False, exc.response.text
         ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
         raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
     token_data = resp.json()
@@ -282,4 +286,6 @@ def get_zoom_token(config, *, force=False):
     expires_at = int(time.time() + token_data['expires_in'])
     token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
     token_cache.set(cache_key, token_data, token_data['expires_in'])
+    if for_config_check:
+        return True, 'fresh'
     return token_data['access_token'], token_data['expires_at']
