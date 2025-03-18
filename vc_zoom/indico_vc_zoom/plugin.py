@@ -376,7 +376,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             raise VCRoomError(_('Could not create the meeting in Zoom. Please contact support if the error persists'))
 
         vc_room.data.update({
-            'zoom_id': str(meeting_obj['id']),
+            'zoom_id': meeting_obj['id'],
             'start_url': meeting_obj['start_url'],
             'host': host.identifier,
             'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', '')),

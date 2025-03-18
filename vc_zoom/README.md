@@ -16,6 +16,8 @@
 - Fix display issue if a Zoom meeting has its passcode visibility set to "no one"
 - Try to get a Zoom token when saving the credentials in the plugin settings
 - Correctly handle meetings being converted to webinars (directly on Zoom) and vice versa
+- Fix Zoom webhooks not triggering updates unless the meeting has been refreshed via Indico. Please
+  run `indico zoom fix-ids` to updating existing videoconferences in the Indico database.
 
 ### 3.3.2
 
