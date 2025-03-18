@@ -108,20 +108,23 @@ def gen_random_password():
     return ''.join(random.choice(string.digits) for _ in range(8))
 
 
-def fetch_zoom_meeting(vc_room, client=None, is_webinar=False):
+def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):
     """Fetch a Zoom meeting from the Zoom API.
 
     :param vc_room: The `VCRoom` object
     :param client: a `ZoomIndicoClient` object, otherwise a fresh one will be created
-    :param is_webinar: whether the call concerns a webinar (used to call the correct endpoint)
+    :param _is_webinar: whether the call concerns a webinar (used to call the correct endpoint)
     """
     try:
         client = client or ZoomIndicoClient()
-        if is_webinar:
-            return client.get_webinar(vc_room.data['zoom_id'])
-        return client.get_meeting(vc_room.data['zoom_id'])
+        if _is_webinar:
+            return client.get_webinar(vc_room.data['zoom_id']), True
+        return client.get_meeting(vc_room.data['zoom_id']), False
     except HTTPError as e:
-        if e.response.status_code in {400, 404}:
+        if e.response.status_code == 400 and e.response.json().get('code') == 3000:
+            # this meeting is actually a webinar -> query the webinar endpoint
+            return fetch_zoom_meeting(vc_room, client, _is_webinar=True)
+        elif e.response.status_code in {400, 404}:
             # Indico will automatically mark this room as deleted
             raise VCRoomNotFoundError(_('This meeting has been deleted from Zoom'))
         else:

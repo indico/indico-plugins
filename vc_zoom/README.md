@@ -15,6 +15,7 @@
 
 - Fix display issue if a Zoom meeting has its passcode visibility set to "no one"
 - Try to get a Zoom token when saving the credentials in the plugin settings
+- Correctly handle meetings being converted to webinars (directly on Zoom) and vice versa
 
 ### 3.3.2
 
@@ -160,12 +161,30 @@ See the [zoom documentation](https://marketplace.zoom.us/docs/guides/build/serve
 
 The scopes to select when creating the app are:
 
+
+- `meeting:read:meeting:admin`
+- `meeting:write:meeting:admin`
+- `meeting:update:meeting:admin`
+- `meeting:delete:meeting:admin`
+- `user:read:user:admin`
+
+- `webinar:read:webinar:admin` (optional, only needed when using webinars)
+- `webinar:write:webinar:admin` (optional, only needed when using webinars)
+- `webinar:update:webinar:admin` (optional, only needed when using webinars)
+- `webinar:delete:webinar:admin` (optional, only needed when using webinars)
+
+In case your app still uses classic scopes (unlikely, unless you created it a long time ago):
+
 - `meeting:read:admin`
 - `meeting:write:admin`
 - `user:read:admin`
 - `webinar:read:admin` (optional, only needed when using webinars)
 - `webinar:write:admin` (optional, only needed when using webinars)
 
+Note: Even if you do not enable webinars in the plugin settings (which means users cannot create
+webinars via Indico), as long as some of your users have webinar licenses on Zoom, you MUST include
+those scopes, as users can convert meetings to webinars and vice versa via the Zoom portal, and in
+that case Indico needs to be able to manage them.
 
 ## Intellectual Property
 

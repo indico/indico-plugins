@@ -32,7 +32,10 @@ def refresh_meetings(vc_rooms, obj, log_entry=None):
         payload['duration'] = duration
     try:
         for vc_room in vc_rooms:
-            client.update_meeting(vc_room.data['zoom_id'], payload)
+            if vc_room.data['meeting_type'] == 'webinar':
+                client.update_webinar(vc_room.data['zoom_id'], payload)
+            else:
+                client.update_meeting(vc_room.data['zoom_id'], payload)
     except Exception:
         failed = True
         raise
