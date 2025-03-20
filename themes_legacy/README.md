@@ -15,6 +15,10 @@ using it when an instance is upgraded to 3.0.
 
 ## Changelog
 
+### 3.3.2
+
+- Do not show empty parentheses when a room is not set
+
 ### 3.3.1
 
 - Update translations
