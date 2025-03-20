@@ -44,7 +44,7 @@
 
             (until {{ block.timetable_entry.end_dt | format_time(timezone=timezone) }})
 
-            {% if not block.inherits_location %}
+            {% if not block.inherit_location and block.room_name %}
                 ({{ block.room_name }})
             {% endif %}
 
@@ -76,7 +76,7 @@
 
             &nbsp;
 
-            {% if not contrib.inherits_location %}
+            {% if not contrib.inherit_location and contrib.room_name %}
                 ({{ contrib.room_name }})
             {% endif %}
             <div style="float: right">
