@@ -76,7 +76,7 @@
 
             &nbsp;
 
-            {% if not contrib.inherits_location %}
+            {% if not contrib.inherit_location and contrib.room_name  %}
                 ({{ contrib.room_name }})
             {% endif %}
             <div style="float: right">
