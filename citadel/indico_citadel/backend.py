@@ -174,15 +174,15 @@ class LiveSyncCitadelUploader(Uploader):
 
         if change_type == SimpleChange.deleted:
             if citadel_id is None:
-                self.logger.warning('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
+                self.logger.info('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
                 return
             self._citadel_delete(session, citadel_id, delete_mapping=True, skip_on_502=True)
         elif change_type == SimpleChange.updated or (change_type == SimpleChange.created and citadel_id is not None):
             if citadel_id is None:
                 raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
             if change_type == SimpleChange.created:
-                self.logger.warning('Citadel ID exists for %s %s (%s); updating instead',
-                                    object_type.name, object_id, citadel_id)
+                self.logger.info('Citadel ID exists for %s %s (%s); updating instead',
+                                 object_type.name, object_id, citadel_id)
             self._citadel_update(session, citadel_id, data)
         elif change_type == SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
