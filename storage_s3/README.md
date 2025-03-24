@@ -19,6 +19,7 @@ to local storage (but it would of course be possible to write a script for this)
 
 - Adapt to Indico 3.3.6 changes
 - Add file import handler for event export/import operations that require copying many files on S3
+- Update translations
 
 ### 3.3.1
 

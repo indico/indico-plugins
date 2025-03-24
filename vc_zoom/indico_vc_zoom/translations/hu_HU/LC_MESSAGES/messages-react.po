@@ -1,12 +1,12 @@
 # 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2024
-# Anna Szabó, 2024
+# Anna Szabó, 2025
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 15:33+0100\n"
-"Last-Translator: Anna Szabó, 2024\n"
+"POT-Creation-Date: 2025-03-25 17:53+0100\n"
+"Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Actions you can perform on your Zoom meeting"
-msgstr ""
+msgstr "A Zoom-megbeszélésen végezhető műveletek"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "You will become an alternative host of this Zoom meeting"

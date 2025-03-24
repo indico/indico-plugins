@@ -5,6 +5,10 @@ gather statistics about the users accessing Indico or specific Indico events.
 
 ## Changelog
 
+### 3.3.3
+
+- Update translations
+
 ### 3.3.2
 
 - Update translations

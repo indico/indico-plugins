@@ -1,21 +1,21 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
-# Ken <ken.oyama.nagasaki@gmail.com>, 2022
 # Martin Meadows, 2023
 # Masanori Ogino <masanori.ogino@gmail.com>, 2024
+# Ken <ken.oyama.nagasaki@gmail.com>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: Masanori Ogino <masanori.ogino@gmail.com>, 2024\n"
+"Last-Translator: Ken <ken.oyama.nagasaki@gmail.com>, 2024\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +34,7 @@ msgstr "パスコードの可視化"
 
 #: indico_vc_zoom/forms.py
 msgid "Who should be able to know this meeting's passcode"
-msgstr "このミーティングのパスコードを知ることができるのは誰なのか"
+msgstr "このミーティングのパスコードを知ることができる人"
 
 #: indico_vc_zoom/forms.py
 msgid "Everyone"
@@ -98,24 +98,24 @@ msgid "Mute audio"
 msgstr "ミュート"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room muted by default "
-msgstr "入室時に参加者をミュートにする"
+msgid "Participants will join the meeting muted by default "
+msgstr "参加者はデフォルトではミュートで会議に参加"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (host)"
 msgstr "ビデオのミュート（ホスト）"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "The host will join the VC room with video disabled"
-msgstr "ホストはビデオ無効でルームに参加します"
+msgid "The host will join the meeting with video disabled"
+msgstr "ホストはビデオオフで会議に参加"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (participants)"
 msgstr "ビデオのミュート（参加者）"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room with video disabled"
-msgstr "参加者はビデオ無効でルームに参加します"
+msgid "Participants will join the meeting with video disabled"
+msgstr "参加者はビデオオフで会議に参加"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Waiting room"
@@ -131,8 +131,8 @@ msgid "Description"
 msgstr "説明"
 
 #: indico_vc_zoom/forms.py
-msgid "Optional description for this room"
-msgstr "このルームの説明（オプション）"
+msgid "Optional description for this meeting"
+msgstr "このミーティングに関しての追加説明"
 
 #: indico_vc_zoom/forms.py
 msgid "This user has no Zoom account"
@@ -164,15 +164,15 @@ msgstr "アカウントID"
 
 #: indico_vc_zoom/plugin.py
 msgid "Client ID"
-msgstr ""
+msgstr "クライアントID"
 
 #: indico_vc_zoom/plugin.py
 msgid "Client Secret"
-msgstr ""
+msgstr "クライアントシークレット"
 
 #: indico_vc_zoom/plugin.py
 msgid "Webhook Secret Token"
-msgstr ""
+msgstr "Webhoodシークレットトークン"
 
 #: indico_vc_zoom/plugin.py
 msgid ""
@@ -249,8 +249,8 @@ msgid "Creation email footer"
 msgstr "作成メールフッター"
 
 #: indico_vc_zoom/plugin.py
-msgid "Footer to append to emails sent upon creation of a VC room"
-msgstr "ビデオ会議室作成時に送信されるメールに付加するフッター"
+msgid "Footer to append to emails sent upon creation of a Zoom meeting"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid "Send host URL"
@@ -275,37 +275,49 @@ msgid "Invalid identity providers: {}"
 msgstr "無効なIDプロバイダー: {}"
 
 #: indico_vc_zoom/plugin.py
-msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"another event"
+msgid "Zoom credentials not set; the plugin will not work correctly"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Successfully got a Zoom token ({})"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Could not get Zoom token: {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"Could not create the room in Zoom. Please contact support if the error "
-"persists"
-msgstr "Zoomでルームを作成できませんでした。エラーが続く場合は、サポートにご連絡ください"
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" another event"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
-msgid "Room didn't exist in Zoom anymore"
-msgstr "そのルームは、もうZoomに存在しなかった。"
+msgid ""
+"Could not create the meeting in Zoom. Please contact support if the error "
+"persists"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Meeting didn't exist in Zoom anymore"
+msgstr "ミーティングはもうZoomにありませんでした"
 
 #: indico_vc_zoom/plugin.py
 msgid "Zoom Error: \"{}\""
 msgstr "Zoom エラー: \"{}\""
 
 #: indico_vc_zoom/plugin.py
-msgid "Problem deleting room"
-msgstr "ルームの削除に問題がある"
+msgid "Problem deleting Zoom meeting"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
-msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
-msgstr "ルーム\"{}\"はZoomに存在しないため、イベントから削除された。"
+msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"the new event"
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" the new event"
 msgstr ""
 
 #: indico_vc_zoom/util.py
@@ -321,18 +333,18 @@ msgid "Authenticators"
 msgstr "認証機関　"
 
 #: indico_vc_zoom/util.py
-msgid "This room has been deleted from Zoom"
-msgstr "このルームはZoomから削除されました"
+msgid "This meeting has been deleted from Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py
 msgid ""
-"Problem fetching room from Zoom. Please contact support if the error "
+"Problem fetching meeting from Zoom. Please contact support if the error "
 "persists."
-msgstr "Zoomからルームを取得する際に問題が発生しました。エラーが続く場合は、サポートにご連絡ください。"
+msgstr ""
 
 #: indico_vc_zoom/util.py
-msgid "Room no longer exists in Zoom"
-msgstr "Zoomにルームが存在しない"
+msgid "Meeting no longer exists in Zoom"
+msgstr "もうこのミーティングはZoomにありません"
 
 #: indico_vc_zoom/util.py
 msgid "Can't update meeting. Please contact support if the error persists."
@@ -344,7 +356,7 @@ msgstr "代替ホストとなるZoomユーザが見つかりませんでした�
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "Join the Zoom Meeting"
-msgstr ""
+msgstr "Zoomミーティングに参加"
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "Join"
@@ -368,7 +380,7 @@ msgstr "登録が必要です"
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "Please log in and register"
-msgstr "ログインしてご登録ください"
+msgstr "ログインして登録してください"
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "This Zoom Meeting can only be seen by logged in users"
@@ -405,7 +417,7 @@ msgstr[0] "代替ホスト"
 
 #: indico_vc_zoom/templates/info_box.html
 msgid "Useful links"
-msgstr "お役立ちリンク"
+msgstr "便利なリンク"
 
 #: indico_vc_zoom/templates/info_box.html
 #: indico_vc_zoom/templates/manage_event_info_box.html

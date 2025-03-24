@@ -4,7 +4,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"POT-Creation-Date: 2025-03-25 17:53+0100\n"
 "Last-Translator: Marcin Miłek, 2024\n"
 "Language-Team: Polish (Poland) (https://app.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"

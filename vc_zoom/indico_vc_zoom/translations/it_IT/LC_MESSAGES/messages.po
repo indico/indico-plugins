@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Ruggero Turra, 2020
@@ -14,9 +14,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Pierpaolo Gallo, 2024\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
@@ -101,25 +101,24 @@ msgid "Mute audio"
 msgstr "Disattivare l'audio"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room muted by default "
+msgid "Participants will join the meeting muted by default "
 msgstr ""
-"I partecipanti si connetteranno alla sala con l'audio mutato di default"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (host)"
 msgstr "Muta il video (host)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "The host will join the VC room with video disabled"
-msgstr "L'host si unirà alla sala VC con il video disabilitato"
+msgid "The host will join the meeting with video disabled"
+msgstr ""
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (participants)"
 msgstr "Disabilita il video (partecipanti)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room with video disabled"
-msgstr "I partecipanti si uniranno alla sala VC con il video disabilitato"
+msgid "Participants will join the meeting with video disabled"
+msgstr ""
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Waiting room"
@@ -135,8 +134,8 @@ msgid "Description"
 msgstr "Descrizione"
 
 #: indico_vc_zoom/forms.py
-msgid "Optional description for this room"
-msgstr "Descrizione opzionale di questa sala"
+msgid "Optional description for this meeting"
+msgstr ""
 
 #: indico_vc_zoom/forms.py
 msgid "This user has no Zoom account"
@@ -263,10 +262,8 @@ msgid "Creation email footer"
 msgstr "Creazione footer email"
 
 #: indico_vc_zoom/plugin.py
-msgid "Footer to append to emails sent upon creation of a VC room"
+msgid "Footer to append to emails sent upon creation of a Zoom meeting"
 msgstr ""
-"Footer aggiungo alle email inviate al momento della creazione di una stanza "
-"VC"
 
 #: indico_vc_zoom/plugin.py
 msgid "Send host URL"
@@ -293,39 +290,49 @@ msgid "Invalid identity providers: {}"
 msgstr "Identity providers non validi: {}"
 
 #: indico_vc_zoom/plugin.py
-msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"another event"
+msgid "Zoom credentials not set; the plugin will not work correctly"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Successfully got a Zoom token ({})"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Could not get Zoom token: {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"Could not create the room in Zoom. Please contact support if the error "
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" another event"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Could not create the meeting in Zoom. Please contact support if the error "
 "persists"
 msgstr ""
-"Impossibile creare la riunione Zoom. Contattare il supporto se l'errore "
-"persiste."
 
 #: indico_vc_zoom/plugin.py
-msgid "Room didn't exist in Zoom anymore"
-msgstr "La stanza non esiste più in Zoom"
+msgid "Meeting didn't exist in Zoom anymore"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid "Zoom Error: \"{}\""
 msgstr "Errore Zoom: \"{}\""
 
 #: indico_vc_zoom/plugin.py
-msgid "Problem deleting room"
-msgstr "Problema a cancellare la stanza"
+msgid "Problem deleting Zoom meeting"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
-msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
-msgstr "La stanza \"{}\" non esiste più in Zoome ed è stata rimossa dall'evento"
+msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"the new event"
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" the new event"
 msgstr ""
 
 #: indico_vc_zoom/util.py
@@ -341,20 +348,18 @@ msgid "Authenticators"
 msgstr "Authenticators"
 
 #: indico_vc_zoom/util.py
-msgid "This room has been deleted from Zoom"
-msgstr "Questa sala è stata cancellata da Zoom"
+msgid "This meeting has been deleted from Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py
 msgid ""
-"Problem fetching room from Zoom. Please contact support if the error "
+"Problem fetching meeting from Zoom. Please contact support if the error "
 "persists."
 msgstr ""
-"Problema a caricare la stanza Zoom. Contattare il supporto se l'errore "
-"persiste."
 
 #: indico_vc_zoom/util.py
-msgid "Room no longer exists in Zoom"
-msgstr "La stanza non esiste più in Zoom"
+msgid "Meeting no longer exists in Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py
 msgid "Can't update meeting. Please contact support if the error persists."

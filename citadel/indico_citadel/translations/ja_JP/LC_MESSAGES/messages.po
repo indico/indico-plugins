@@ -1,21 +1,21 @@
 # Translations template for indico-plugin-citadel.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-citadel project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
-# Ken <ken.oyama.nagasaki@gmail.com>, 2022
 # Thom Rawson <thomw@niu.ac.jp>, 2023
-# SAITO Jun, 2023
+# Ken <ken.oyama.nagasaki@gmail.com>, 2024
+# SAITO Jun, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Project-Id-Version: indico-plugin-citadel 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: SAITO Jun, 2023\n"
+"Last-Translator: SAITO Jun, 2024\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -108,11 +108,11 @@ msgid ""
 "when you are still running a larger initial export and do not want people to"
 " get incomplete search results during that time."
 msgstr ""
-"これはプラグインの検索統合を無効にします。このオプションを使用すると、内部のIndico検索インターフェイスが使用されます。これは、大きな初期エクスポートの実行中に不完全な検索結果を表示させたくない場合に便利でしょう。"
+"これはプラグインの検索統合を無効にします。このオプションを使用すると、Indico内の検索インターフェイスが使用されます。これは、大きな初期エクスポートの実行中に不完全な検索結果を表示させたくない場合に便利でしょう。"
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "大規模カテゴリー警告の閾値"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -120,6 +120,7 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"大規模なカテゴリーのACLを変更し、大量のデータをCitadelサーバーに送ることになる際に、カテゴリー管理者に警告を表示します。閾値を0にすると警告を無効にできます。"
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
@@ -207,7 +208,7 @@ msgstr "イベントID"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "このカテゴリーには多くのイベントがあります。"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -215,3 +216,4 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"以下のリストを変更すると全イベントについてIndico検索エンジンとの再同期が必要となるため、アクセスや管理権限の付与の際には個別ユーザーの代わりにグループの使用を検討してください。"

@@ -1,13 +1,13 @@
 # 
 # Translators:
 # Martin Meadows, 2024
-# Ken <ken.oyama.nagasaki@gmail.com>, 2024
 # SAITO Jun, 2024
+# Ken <ken.oyama.nagasaki@gmail.com>, 2024
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 15:33+0100\n"
-"Last-Translator: SAITO Jun, 2024\n"
+"POT-Creation-Date: 2025-03-25 17:53+0100\n"
+"Last-Translator: Ken <ken.oyama.nagasaki@gmail.com>, 2024\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Actions you can perform on your Zoom meeting"
-msgstr ""
+msgstr "自分のZoomミーティングで実行できるアクション"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "You will become an alternative host of this Zoom meeting"

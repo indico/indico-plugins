@@ -18,6 +18,7 @@
 - Correctly handle meetings being converted to webinars (directly on Zoom) and vice versa
 - Fix Zoom webhooks not triggering updates unless the meeting has been refreshed via Indico. Please
   run `indico zoom fix-ids` to updating existing videoconferences in the Indico database.
+- Update translations
 
 ### 3.3.2
 

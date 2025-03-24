@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-owncloud.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-owncloud project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Jesús Martín <jesusmartin@sallep.net>, 2024
@@ -9,9 +9,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-owncloud 3.3\n"
+"Project-Id-Version: indico-plugin-owncloud 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2024-11-29 15:24+0000\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2024\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
@@ -24,35 +24,40 @@ msgstr ""
 
 #: indico_owncloud/controllers.py
 msgid "Attachment added"
-msgstr ""
+msgstr "Adjunto añadido"
 
 #: indico_owncloud/forms.py
 msgid "Files"
-msgstr ""
+msgstr "Archivos"
 
 #: indico_owncloud/plugin.py
 msgid "File-picker URL"
-msgstr ""
+msgstr "URL del selector de archivos"
 
 #: indico_owncloud/plugin.py
 msgid "Service name"
-msgstr ""
+msgstr "Nombre del servicio"
 
 #: indico_owncloud/plugin.py
 msgid ""
 "A customized name for the cloud service. If empty, the default 'The cloud' "
 "will be used."
 msgstr ""
+"Un nombre personalizado para el servicio en la nube. Si está vacío, se "
+"utilizará el nombre predeterminado \"La nube\"."
 
 #: indico_owncloud/plugin.py
 msgid "Custom icon URL"
-msgstr ""
+msgstr "URL del icono personalizado"
 
 #: indico_owncloud/plugin.py
 msgid ""
 "URL for a customized icon to show in the add attachment button. If empty, "
 "the default cloud icon will be used"
 msgstr ""
+"URL para un icono personalizado que se mostrará en el botón de añadir "
+"archivos adjuntos. Si está vacío, se utilizará el icono de la nube "
+"predeterminado"
 
 #: indico_owncloud/templates/add_owncloud_files.html
 msgid "Add"
@@ -64,14 +69,14 @@ msgstr "Cancelar"
 
 #: indico_owncloud/templates/owncloud_button.html
 msgid "the cloud"
-msgstr ""
+msgstr "la nube"
 
 #: indico_owncloud/templates/owncloud_button.html
 #, python-format
 msgid "Add files from %(service_name)s"
-msgstr ""
+msgstr "Añadir archivos de %(service_name)s"
 
 #: indico_owncloud/templates/owncloud_button.html
 #, python-format
 msgid "From %(service_name)s"
-msgstr ""
+msgstr "De %(service_name)s"

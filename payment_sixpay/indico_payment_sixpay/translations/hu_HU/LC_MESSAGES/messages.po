@@ -1,20 +1,20 @@
 # Translations template for indico-plugin-payment-sixpay.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-sixpay project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2022
-# Anna Szabó, 2024
+# Anna Szabó, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-payment-sixpay 3.3.1\n"
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2021-07-29 12:01+0000\n"
-"Last-Translator: Anna Szabó, 2024\n"
+"Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -98,6 +98,8 @@ msgid ""
 "Default Saferpay account ID, such as \"1234567-12345678\". Event managers "
 "will be able to override this."
 msgstr ""
+"Alapértelmezett Saferpay számlaazonosító, például „1234567-12345678”. Az "
+"eseménykezelők ezt felülbírálhatják."
 
 #: indico_payment_sixpay/forms.py
 msgid "Order Description"
@@ -141,7 +143,7 @@ msgstr ""
 
 #: indico_payment_sixpay/forms.py
 msgid "The Saferpay account ID, such as \"1234567-12345678\"."
-msgstr ""
+msgstr "A Saferpay számla azonosítója, például „1234567-12345678”."
 
 #: indico_payment_sixpay/forms.py
 msgid ""

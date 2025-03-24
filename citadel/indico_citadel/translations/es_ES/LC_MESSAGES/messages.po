@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-citadel.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-citadel project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Jesús Martín <jesusmartin@sallep.net>, 2024
@@ -9,9 +9,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Project-Id-Version: indico-plugin-citadel 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2024\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
@@ -32,7 +32,7 @@ msgstr "La URL del servidor Citadel"
 
 #: indico_citadel/plugin.py
 msgid "Citadel API token"
-msgstr "Token de API de Citadel"
+msgstr "Token API de Citadel"
 
 #: indico_citadel/plugin.py
 msgid "The authentication token to access Citadel"
@@ -152,7 +152,7 @@ msgstr "Un tipo de entrada (como conferencia, reunión, archivo, etc.)"
 
 #: indico_citadel/search.py
 msgid "Name of the venue"
-msgstr "Nombre de la sede"
+msgstr "Nombre del lugar de celebración"
 
 #: indico_citadel/search.py
 msgid "Name of the room"
@@ -160,7 +160,7 @@ msgstr "Nombre de la sala"
 
 #: indico_citadel/search.py
 msgid "Address of the venue"
-msgstr "Dirección de la sede"
+msgstr "Dirección del lugar de celebración"
 
 #: indico_citadel/search.py
 msgid "Name of the attached file"
@@ -200,7 +200,7 @@ msgstr "Tipo"
 
 #: indico_citadel/search.py
 msgid "Location"
-msgstr "Lugar"
+msgstr "Ubicación"
 
 #: indico_citadel/search.py
 msgid "Date"

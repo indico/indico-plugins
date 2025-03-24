@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Vaclav Stepan <vaclav.stepan@gmail.com>, 2021
@@ -11,9 +11,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2024\n"
 "Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
@@ -98,24 +98,24 @@ msgid "Mute audio"
 msgstr "Ztlumit zvuk"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room muted by default "
-msgstr "Účastníkům bude při vstupu do místnosti vypnut mikrofon"
+msgid "Participants will join the meeting muted by default "
+msgstr ""
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (host)"
 msgstr "Vypnout video (hostitel)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "The host will join the VC room with video disabled"
-msgstr "Předsedajícímu při připojení do místnosti vypnout kameru"
+msgid "The host will join the meeting with video disabled"
+msgstr ""
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (participants)"
 msgstr "Vypnout video (uživatelé)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room with video disabled"
-msgstr "Účastníkům při připojení do místnosti vypnout kameru"
+msgid "Participants will join the meeting with video disabled"
+msgstr ""
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Waiting room"
@@ -131,8 +131,8 @@ msgid "Description"
 msgstr "Popis"
 
 #: indico_vc_zoom/forms.py
-msgid "Optional description for this room"
-msgstr "Volitelný popis pro tuto místnost"
+msgid "Optional description for this meeting"
+msgstr ""
 
 #: indico_vc_zoom/forms.py
 msgid "This user has no Zoom account"
@@ -258,10 +258,8 @@ msgid "Creation email footer"
 msgstr "Vytvoření zápatí e-mailu"
 
 #: indico_vc_zoom/plugin.py
-msgid "Footer to append to emails sent upon creation of a VC room"
+msgid "Footer to append to emails sent upon creation of a Zoom meeting"
 msgstr ""
-"Zápatí, které bude připojené k e-mailům odeslaným po vytvoření virtuální "
-"konferenční místnosti."
 
 #: indico_vc_zoom/plugin.py
 msgid "Send host URL"
@@ -288,41 +286,49 @@ msgid "Invalid identity providers: {}"
 msgstr "Neplatný poskytovatel identity / nepltní poskytovatelé identit: {}"
 
 #: indico_vc_zoom/plugin.py
-msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"another event"
+msgid "Zoom credentials not set; the plugin will not work correctly"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Successfully got a Zoom token ({})"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Could not get Zoom token: {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"Could not create the room in Zoom. Please contact support if the error "
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" another event"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Could not create the meeting in Zoom. Please contact support if the error "
 "persists"
 msgstr ""
-"Vytvoření virtuální místnosti v aplikaci Zoom se nezdařilo. Pokud se problém"
-" opakuje, kontaktujte podporu. "
 
 #: indico_vc_zoom/plugin.py
-msgid "Room didn't exist in Zoom anymore"
-msgstr "Virtuální místnost v aplikaci Zoom již neexistuje. "
+msgid "Meeting didn't exist in Zoom anymore"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid "Zoom Error: \"{}\""
 msgstr "Chyba aplikace Zoom: \"{}\""
 
 #: indico_vc_zoom/plugin.py
-msgid "Problem deleting room"
-msgstr "Při vymazávaní virtuální místnosti nastala chyba"
+msgid "Problem deleting Zoom meeting"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
-msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
+msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
-"Virtuální místnost \"{}\" v aplikaci Zoom již neexistuje a byla odstraněna z"
-" Vámi plánované události."
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"the new event"
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" the new event"
 msgstr ""
 
 #: indico_vc_zoom/util.py
@@ -338,20 +344,18 @@ msgid "Authenticators"
 msgstr "Autentizátory "
 
 #: indico_vc_zoom/util.py
-msgid "This room has been deleted from Zoom"
-msgstr "Tato virtuální místnost byla odstraněná z aplikace Zoom"
+msgid "This meeting has been deleted from Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py
 msgid ""
-"Problem fetching room from Zoom. Please contact support if the error "
+"Problem fetching meeting from Zoom. Please contact support if the error "
 "persists."
 msgstr ""
-"Problém s načítáním místnosti prostřednictvím aplikace Zoom. Pokud chyba "
-"přetrvává, kontaktujte podporu. "
 
 #: indico_vc_zoom/util.py
-msgid "Room no longer exists in Zoom"
-msgstr "Virtuální místnost v aplikaci Zoom již neexistuje"
+msgid "Meeting no longer exists in Zoom"
+msgstr ""
 
 #: indico_vc_zoom/util.py
 msgid "Can't update meeting. Please contact support if the error persists."

@@ -4,7 +4,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"POT-Creation-Date: 2025-03-25 17:53+0100\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2024\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
@@ -16,11 +16,11 @@ msgstr ""
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Actions you can perform on your Zoom meeting"
-msgstr ""
+msgstr "Acciones que puede realizar en su reunión de Zoom"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "You will become an alternative host of this Zoom meeting"
-msgstr "Se convertirás en un anfitrión alternativo de esta reunión de Zoom."
+msgstr "Se convertirá en un anfitrión alternativo de esta reunión de Zoom."
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Make me alternative host"
@@ -28,8 +28,8 @@ msgstr "Hágame anfitrión alternativo"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Make me an alternative host"
-msgstr "Hazme un host alternativo"
+msgstr "Hágame un anfitrión alternativo"
 
 #: indico_vc_zoom/client/JoinButton.tsx
 msgid "Are you sure you want to be added as an alternative host?"
-msgstr "¿Está seguro de que desea ser añadido como host alternativo?"
+msgstr "¿Está seguro de querer ser añadido como anfitrión alternativo?"

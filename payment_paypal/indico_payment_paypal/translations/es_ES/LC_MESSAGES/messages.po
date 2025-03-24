@@ -1,16 +1,16 @@
 # Translations template for indico-plugin-payment-paypal.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-paypal project.
 # 
 # Translators:
-# Jesús Martín <jesusmartin@sallep.net>, 2017,2021
+# Jesús Martín <jesusmartin@sallep.net>, 2017,2021,2024
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2015-03-11 16:45+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017,2021\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017,2021,2024\n"
 "Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,11 +43,11 @@ msgstr "Negocio"
 msgid ""
 "The default PayPal ID or email address associated with a PayPal account. "
 "Event managers will be able to override this."
-msgstr "El ID de PayPal o la dirección de correo electrónico predeterminados asociados con una cuenta de PayPal. Los administradores de eventos podrán anular esto."
+msgstr "El ID de PayPal o la dirección de correo predeterminados asociados con una cuenta de PayPal. Los administradores de eventos podrán anular esto."
 
 #: indico_payment_paypal/plugin.py
 msgid "The PayPal ID or email address associated with a PayPal account."
-msgstr "El ID de PayPal o la dirección de correo electrónico asociados con una cuenta de PayPal."
+msgstr "El ID de PayPal o la dirección de correo asociados con una cuenta de PayPal."
 
 #: indico_payment_paypal/util.py
 msgid "Invalid email address / paypal ID"

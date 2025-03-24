@@ -1,5 +1,5 @@
 # Translations template for indico-plugin-piwik.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-piwik project.
 # 
 # Translators:
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2015-03-11 16:40+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2020\n"
 "Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"

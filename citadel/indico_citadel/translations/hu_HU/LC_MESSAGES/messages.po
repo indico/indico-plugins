@@ -1,21 +1,21 @@
 # Translations template for indico-plugin-citadel.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-citadel project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Beáta Bréda, 2022
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2022
-# Anna Szabó, 2024
+# Anna Szabó, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Project-Id-Version: indico-plugin-citadel 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: Anna Szabó, 2024\n"
+"Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -122,7 +122,7 @@ msgstr ""
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "Nagy kategória figyelmeztetési küszöbérték"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -130,6 +130,10 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"Figyelmeztetést jelenít meg a kategória-kezelők számára, amikor olyan nagy "
+"kategóriák ACL-jét módosítják, amelyek nagy mennyiségű adatot küldenének a "
+"Citadel-kiszolgálóra. A küszöbértéket 0-ra állíthatja, hogy elrejtse ezt a "
+"figyelmeztetést."
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
@@ -217,7 +221,7 @@ msgstr "Esemény azonosító"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "Ez a kategória nagyszámú eseményt tartalmaz."
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -225,3 +229,7 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"Kérjük, fontolja meg, hogy a hozzáférési vagy kezelési jogosultságok "
+"megadásakor egyéni felhasználók helyett csoportokat használjon, mivel az "
+"alábbi lista bármilyen módosítása az összes esemény újraszinkronizálását "
+"igényli az Indico keresőmotorjával."

@@ -1,19 +1,21 @@
 # Translations template for indico-plugin-owncloud.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-owncloud project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2024
+# Ajob Kustra, 2025
+# Anna Szabó, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-owncloud 3.3\n"
+"Project-Id-Version: indico-plugin-owncloud 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2024-11-29 15:24+0000\n"
-"Last-Translator: Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2024\n"
+"Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,39 +26,43 @@ msgstr ""
 
 #: indico_owncloud/controllers.py
 msgid "Attachment added"
-msgstr ""
+msgstr "Csatolmány hozzáadva"
 
 #: indico_owncloud/forms.py
 msgid "Files"
-msgstr ""
+msgstr "Fájlok"
 
 #: indico_owncloud/plugin.py
 msgid "File-picker URL"
-msgstr ""
+msgstr "Fájl-kiválasztó URL"
 
 #: indico_owncloud/plugin.py
 msgid "Service name"
-msgstr ""
+msgstr "Szolgáltatás neve"
 
 #: indico_owncloud/plugin.py
 msgid ""
 "A customized name for the cloud service. If empty, the default 'The cloud' "
 "will be used."
 msgstr ""
+"A felhőszolgáltatás testreszabott neve. Ha üres, akkor az alapértelmezett 'A"
+" felhő' lesz használva."
 
 #: indico_owncloud/plugin.py
 msgid "Custom icon URL"
-msgstr ""
+msgstr "Egyéni ikon URL-címe"
 
 #: indico_owncloud/plugin.py
 msgid ""
 "URL for a customized icon to show in the add attachment button. If empty, "
 "the default cloud icon will be used"
 msgstr ""
+"A melléklet hozzáadása gombon megjelenítendő egyedi ikon URL-címe. Ha üres, "
+"akkor az alapértelmezett felhő ikon lesz használva."
 
 #: indico_owncloud/templates/add_owncloud_files.html
 msgid "Add"
-msgstr ""
+msgstr "Hozzáadás"
 
 #: indico_owncloud/templates/add_owncloud_files.html
 msgid "Cancel"
@@ -64,14 +70,14 @@ msgstr "Elvetés"
 
 #: indico_owncloud/templates/owncloud_button.html
 msgid "the cloud"
-msgstr ""
+msgstr "a felhő"
 
 #: indico_owncloud/templates/owncloud_button.html
 #, python-format
 msgid "Add files from %(service_name)s"
-msgstr ""
+msgstr "Fájlok hozzáadása innen: %(service_name)s"
 
 #: indico_owncloud/templates/owncloud_button.html
 #, python-format
 msgid "From %(service_name)s"
-msgstr ""
+msgstr "Innen: %(service_name)s"

@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-citadel.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-citadel project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
@@ -10,9 +10,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-citadel 3.3\n"
+"Project-Id-Version: indico-plugin-citadel 3.3.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
 "Last-Translator: Marcin Miłek, 2021\n"
 "Language-Team: Polish (Poland) (https://app.transifex.com/indico/teams/6478/pl_PL/)\n"

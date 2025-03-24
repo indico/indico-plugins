@@ -1,20 +1,20 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2022
-# Anna Szabó, 2024
+# Anna Szabó, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.1\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-29 15:33+0100\n"
+"POT-Creation-Date: 2025-03-20 17:53+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
-"Last-Translator: Anna Szabó, 2024\n"
+"Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,25 +97,25 @@ msgid "Mute audio"
 msgstr "Hang némítása"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room muted by default "
+msgid "Participants will join the meeting muted by default "
 msgstr ""
-"A résztvevők alapértelmezés szerint némítva csatlakoznak a VC szobához"
+"A résztvevők alapértelmezés szerint némán csatlakoznak a megbeszéléshez"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (host)"
 msgstr "Videó elnémítása (házigazda)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "The host will join the VC room with video disabled"
-msgstr "A házigazda letiltott videóval csatlakozik a VC-szobához"
+msgid "The host will join the meeting with video disabled"
+msgstr "A házigazda kikapcsolt kameraképpel csatlakozik a megbeszéléshez"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Mute video (participants)"
 msgstr "Videó elnémítása (résztvevők)"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
-msgid "Participants will join the VC room with video disabled"
-msgstr "A résztvevők letiltott videóval csatlakoznak a VC szobához"
+msgid "Participants will join the meeting with video disabled"
+msgstr "A résztvevők kikapcsolt kameraképpel csatlakoznak a megbeszéléshez"
 
 #: indico_vc_zoom/forms.py indico_vc_zoom/plugin.py
 msgid "Waiting room"
@@ -131,8 +131,8 @@ msgid "Description"
 msgstr "Leírás"
 
 #: indico_vc_zoom/forms.py
-msgid "Optional description for this room"
-msgstr "Opcionális leírás ehhez a szobához"
+msgid "Optional description for this meeting"
+msgstr "Választható leírás ehhez a megbeszéléshez"
 
 #: indico_vc_zoom/forms.py
 msgid "This user has no Zoom account"
@@ -164,21 +164,23 @@ msgstr "Fiók azonosító"
 
 #: indico_vc_zoom/plugin.py
 msgid "Client ID"
-msgstr ""
+msgstr "Ügyfél azonosít"
 
 #: indico_vc_zoom/plugin.py
 msgid "Client Secret"
-msgstr ""
+msgstr "Ügyfél titok"
 
 #: indico_vc_zoom/plugin.py
 msgid "Webhook Secret Token"
-msgstr ""
+msgstr "Webhook titkos token"
 
 #: indico_vc_zoom/plugin.py
 msgid ""
 "Specify the \"Secret Token\" of your Zoom Webhook if you want live updates "
 "in case of modified/deleted Zoom meetings."
 msgstr ""
+"Adja meg a Zoom Webhook „titkos token\"-jét, ha élő frissítéseket szeretne a"
+" módosított / törölt Zoom-értekezletek esetén."
 
 #: indico_vc_zoom/plugin.py
 msgid "User lookup mode"
@@ -260,8 +262,8 @@ msgid "Creation email footer"
 msgstr "Létrehozási e-mail lábléc"
 
 #: indico_vc_zoom/plugin.py
-msgid "Footer to append to emails sent upon creation of a VC room"
-msgstr "Lábléc a VC-szoba létrehozásakor küldött e-mailekhez csatoláshoz"
+msgid "Footer to append to emails sent upon creation of a Zoom meeting"
+msgstr "Lábléc a Zoom megbeszélés létrehozásakor küldött e-mailekhez"
 
 #: indico_vc_zoom/plugin.py
 msgid "Send host URL"
@@ -288,42 +290,58 @@ msgid "Invalid identity providers: {}"
 msgstr "Érvénytelen identitásszolgáltatók: {}"
 
 #: indico_vc_zoom/plugin.py
-msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"another event"
+msgid "Zoom credentials not set; the plugin will not work correctly"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Successfully got a Zoom token ({})"
+msgstr ""
+
+#: indico_vc_zoom/plugin.py
+msgid "Could not get Zoom token: {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"Could not create the room in Zoom. Please contact support if the error "
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" another event"
+msgstr ""
+"A(z) „{}” megbeszélés a Zoom regisztrációt használja, ezért nem csatolható "
+"más eseményhez"
+
+#: indico_vc_zoom/plugin.py
+msgid ""
+"Could not create the meeting in Zoom. Please contact support if the error "
 "persists"
 msgstr ""
-"Nem sikerült létrehozni a szobát a Zoom alkalmazásban. Kérjük, vegye fel a "
-"kapcsolatot az ügyfélszolgálattal, ha a hiba továbbra is fennáll"
+"Nem sikerült létrehozni a megbeszélést a Zoomban. Kérjük, forduljon az "
+"ügyfélszolgálathoz, ha a hiba továbbra is fennáll"
 
 #: indico_vc_zoom/plugin.py
-msgid "Room didn't exist in Zoom anymore"
-msgstr "A Zoomban már nem volt szoba"
+msgid "Meeting didn't exist in Zoom anymore"
+msgstr "A megbeszélés már nem létezett a Zoomban"
 
 #: indico_vc_zoom/plugin.py
 msgid "Zoom Error: \"{}\""
 msgstr "Nagyítási hiba: \"{}\""
 
 #: indico_vc_zoom/plugin.py
-msgid "Problem deleting room"
-msgstr "Probléma a szoba törlésekor"
+msgid "Problem deleting Zoom meeting"
+msgstr "Probléma a Zoom megbeszélés törlésével"
 
 #: indico_vc_zoom/plugin.py
-msgid "The room \"{}\" no longer exists in Zoom and was removed from the event"
+msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
-"A (z) \"{}\" szoba már nem létezik a Zoomban, ezért eltávolították az "
+"A(z) „{}” megbeszélés már nem létezik a Zoomban, és eltávolításra került az "
 "eseményből"
 
 #: indico_vc_zoom/plugin.py
 msgid ""
-"The room \"{}\" is using Zoom registration and thus cannot be attached to "
-"the new event"
+"The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
+" the new event"
 msgstr ""
+"A(z) „{}” megbeszélés a Zoom regisztrációt használja, ezért nem csatolható "
+"az új eseményhez."
 
 #: indico_vc_zoom/util.py
 msgid "All emails"
@@ -338,20 +356,20 @@ msgid "Authenticators"
 msgstr "Hitelesítők"
 
 #: indico_vc_zoom/util.py
-msgid "This room has been deleted from Zoom"
-msgstr "Ezt a szobát törölték a Zoomról"
+msgid "This meeting has been deleted from Zoom"
+msgstr "Ez a megbeszélés törlésre került a Zoomból"
 
 #: indico_vc_zoom/util.py
 msgid ""
-"Problem fetching room from Zoom. Please contact support if the error "
+"Problem fetching meeting from Zoom. Please contact support if the error "
 "persists."
 msgstr ""
-"Probléma a szoba lekérésében a Zoomból. Kérjük, vegye fel a kapcsolatot az "
-"ügyfélszolgálattal, ha a hiba továbbra is fennáll."
+"Probléma az megbeszélés lekérése a Zoomból. Kérjük, forduljon az "
+"ügyfélszolgálathoz, ha a hiba továbbra is fennáll."
 
 #: indico_vc_zoom/util.py
-msgid "Room no longer exists in Zoom"
-msgstr "A szoba már nem létezik a Zoomban"
+msgid "Meeting no longer exists in Zoom"
+msgstr "A találkozó már nem létezik a Zoomban"
 
 #: indico_vc_zoom/util.py
 msgid "Can't update meeting. Please contact support if the error persists."
@@ -365,7 +383,7 @@ msgstr "Nem található Zoom felhasználó alternatív gazdagéphez"
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "Join the Zoom Meeting"
-msgstr ""
+msgstr "Csatlakozás a Zoom megbeszéléshez"
 
 #: indico_vc_zoom/templates/buttons.html
 msgid "Join"

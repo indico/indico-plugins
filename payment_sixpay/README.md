@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.3.3
+
+- Update translations
+
 ### 3.3.2
 
 - Update translations

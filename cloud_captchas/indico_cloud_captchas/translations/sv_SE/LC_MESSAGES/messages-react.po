@@ -4,7 +4,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 15:33+0100\n"
+"POT-Creation-Date: 2025-03-25 17:53+0100\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Swedish (Sweden) (https://app.transifex.com/indico/teams/6478/sv_SE/)\n"
 "MIME-Version: 1.0\n"
