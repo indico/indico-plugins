@@ -147,7 +147,7 @@ class LiveSyncCitadelUploader(Uploader):
                                 f'{resp.status_code}; {resp.text}; {data}')
             raise Exception(f'Could not update record {citadel_id} on citadel: {exc}; {data}')
 
-    def _citadel_delete(self, session, citadel_id, *, delete_mapping):
+    def _citadel_delete(self, session, citadel_id, *, delete_mapping, skip_on_502=False):
         self.logger.debug('Deleting record %d from citadel', citadel_id)
         try:
             resp = session.delete(urljoin(self.search_app, f'api/record/{citadel_id}'))
@@ -159,9 +159,12 @@ class LiveSyncCitadelUploader(Uploader):
                 resp.raise_for_status()
             resp.close()
         except RequestException as exc:
-            if resp := exc.response:
+            if skip_on_502 and 'too many 502 error responses' in str(exc):
+                self.logger.warning('Skipped delete due to 502 error: %s', citadel_id)
+            elif resp := exc.response:
                 raise Exception(f'Could not delete record {citadel_id} from citadel: {resp.status_code}; {resp.text}')
-            raise Exception(f'Could not delete record {citadel_id} from citadel: {exc}')
+            else:
+                raise Exception(f'Could not delete record {citadel_id} from citadel: {exc}')
         if delete_mapping:
             CitadelIdMap.query.filter_by(citadel_id=citadel_id).delete()
             db.session.commit()
@@ -171,15 +174,15 @@ class LiveSyncCitadelUploader(Uploader):
 
         if change_type == SimpleChange.deleted:
             if citadel_id is None:
-                self.logger.warning('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
+                self.logger.info('Cannot delete %s %s: No citadel ID found', object_type.name, object_id)
                 return
-            self._citadel_delete(session, citadel_id, delete_mapping=True)
+            self._citadel_delete(session, citadel_id, delete_mapping=True, skip_on_502=True)
         elif change_type == SimpleChange.updated or (change_type == SimpleChange.created and citadel_id is not None):
             if citadel_id is None:
                 raise Exception(f'Cannot update {object_type.name} {object_id}: No citadel ID found')
             if change_type == SimpleChange.created:
-                self.logger.warning('Citadel ID exists for %s %s (%s); updating instead',
-                                    object_type.name, object_id, citadel_id)
+                self.logger.info('Citadel ID exists for %s %s (%s); updating instead',
+                                 object_type.name, object_id, citadel_id)
             self._citadel_update(session, citadel_id, data)
         elif change_type == SimpleChange.created:
             self._citadel_create(session, object_type, object_id, data)
@@ -229,8 +232,8 @@ class LiveSyncCitadelUploader(Uploader):
 
     def _get_retry_config(self):
         retry = Retry(
-            total=20,
-            backoff_factor=0.22,
+            total=10,
+            backoff_factor=0.07,
             status_forcelist=[409, 500, 502, 503, 504],
             allowed_methods=frozenset(['POST', 'PUT', 'DELETE'])
         )

@@ -8,6 +8,11 @@ to provide advanced search functionality using an Elasticsearch backend.
 ### 3.3.2
 
 - Update translations
+- Avoid excessively long retry backoff delays in case of failures
+- Do not log thousands of warnings after retrying a failed run (especially when using Sentry this
+  is problematic and a performance killer)
+- Do not fail when a record cannot be deleted from Citadel (this avoids persistent failures when
+  Citadel has some broken records)
 
 ### 3.3.1
 
