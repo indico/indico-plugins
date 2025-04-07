@@ -51,6 +51,6 @@ class RHMetrics(RH):
         resp.status = status
 
         resp.headers['X-Cached'] = 'yes' if cached else 'no'
-        resp.headers.extend(headers)
+        resp.headers.update(headers)
 
         return resp

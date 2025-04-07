@@ -27,6 +27,11 @@ If you're doing development you may want to add this under `scrape_configs`:
 
 ## Changelog
 
+### 3.3.1
+
+- Use latest prometheus-client library
+- Ensure that only one `Content-type` header (`text/plain`) is sent
+
 ### 3.3
 
 - Support (and require) Python 3.12
