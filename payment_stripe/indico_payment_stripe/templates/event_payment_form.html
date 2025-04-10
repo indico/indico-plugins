@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Payment Form</title>
-    <style>
-      #checkout-button {
-        margin: 0 auto;
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-    <h4>Clicking on the <strong>Pay now</strong> button you will get redirected to Stripe in order to complete your transaction.</h4>
-    <a id="checkout-button" href="{{ stripe_redirect_url }}" class="action-button next highlight">Pay now</a>
-  </body>
-</html>
+{% trans %}
+    Clicking on the <strong>Pay Now</strong> button will redirect you to Stripe in order to complete your payment.
+{% endtrans %}
+
+<dl class="i-data-list">
+    <dt>{% trans %}First name{% endtrans %}</dt>
+    <dd>{{ registration.first_name }}</dd>
+    <dt>{% trans %}Last name{% endtrans %}</dt>
+    <dd>{{ registration.last_name }}</dd>
+    <dt>{% trans %}Total amount{% endtrans %}</dt>
+    <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
+    <dt></dt>
+    <dd>
+        <a class="i-button" href="{{ stripe_redirect_url }}">
+            {%- trans %}Pay Now{% endtrans -%}
+        </a>
+    </dd>
+</dl>
