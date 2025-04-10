@@ -6,24 +6,19 @@
     The actual plugin definitions.
 
 """
-from indico.web.flask.util import url_for
-
+import stripe
 from wtforms.fields.simple import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
-from indico.modules.events.payment import (
-    PaymentEventSettingsFormBase,
-    PaymentPluginMixin,
-    PaymentPluginSettingsFormBase,
-)
+from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
+                                           PaymentPluginSettingsFormBase)
+from indico.web.flask.util import url_for
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 from .blueprint import blueprint
 from .utils import _, conv_to_stripe_amount
-
-import stripe
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):

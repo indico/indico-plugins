@@ -9,10 +9,10 @@
 
 
 import stripe
-from flask_pluginengine import current_plugin
 from flask import flash, redirect, request
-from werkzeug.exceptions import BadRequest
+from flask_pluginengine import current_plugin
 from markupsafe import Markup
+from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
@@ -21,6 +21,7 @@ from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
 from .utils import _, conv_from_stripe_amount
+
 
 __all__ = ['RHStripe']
 

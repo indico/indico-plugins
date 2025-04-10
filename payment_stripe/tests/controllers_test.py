@@ -5,12 +5,14 @@
 
 """
 
+from types import SimpleNamespace
+from unittest.mock import MagicMock
+
 import pytest
 from flask import request
-from mock import MagicMock
-from types import SimpleNamespace
 
 from indico.modules.events.payment.models.transactions import TransactionAction
+
 from indico_payment_stripe.controllers import RHStripe
 from indico_payment_stripe.plugin import StripePaymentPlugin
 
