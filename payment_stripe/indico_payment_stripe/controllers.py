@@ -1,12 +1,3 @@
-"""
-    indico_payment_stripe.controllers
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Controllers used by the plugin.
-
-"""
-
-
 import stripe
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
@@ -19,10 +10,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
-from .utils import _, conv_from_stripe_amount
-
-
-__all__ = ['RHStripe']
+from indico_payment_stripe import _
+from indico_payment_stripe.util import conv_from_stripe_amount
 
 
 class RHStripe(RH):

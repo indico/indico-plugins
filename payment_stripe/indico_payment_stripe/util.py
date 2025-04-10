@@ -1,17 +1,4 @@
-"""
-    indico_payment_stripe.utils
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Shared utilities.
-
-"""
-
 from decimal import Decimal
-
-from indico.util.i18n import make_bound_gettext
-
-
-gettext = _ = make_bound_gettext('payment_stripe')
 
 
 # These are currencies which do not need to use decimals to represent its

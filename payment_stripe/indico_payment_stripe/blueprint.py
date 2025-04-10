@@ -1,12 +1,3 @@
-"""
-    indico_payment_stripe.blueprint
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    The plugin blueprint.
-
-"""
-
-
 from indico.core.plugins import IndicoPluginBlueprint
 
 from indico_payment_stripe.controllers import RHStripe

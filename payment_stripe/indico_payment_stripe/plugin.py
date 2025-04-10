@@ -1,10 +1,3 @@
-"""
-    indico_payment_stripe.plugin
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    The actual plugin definitions.
-
-"""
 import stripe
 from wtforms.fields.simple import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
@@ -16,8 +9,9 @@ from indico.web.flask.util import url_for
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
-from .blueprint import blueprint
-from .utils import _, conv_to_stripe_amount
+from indico_payment_stripe import _
+from indico_payment_stripe.blueprint import blueprint
+from indico_payment_stripe.util import conv_to_stripe_amount
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
