@@ -170,6 +170,7 @@ jobs:
           - plugin: storage_s3
           - plugin: vc_zoom
           - plugin: prometheus
+          - plugin: payment_stripe
 
     steps:
       - uses: actions/checkout@v4
