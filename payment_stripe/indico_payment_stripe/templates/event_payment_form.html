@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Payment Form</title>
+    <style>
+      #checkout-button {
+        margin: 0 auto;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h4>Clicking on the <strong>Pay now</strong> button you will get redirected to Stripe in order to complete your transaction.</h4>
+    <a id="checkout-button" href="{{ stripe_redirect_url }}" class="action-button next highlight">Pay now</a>
+  </body>
+</html>
