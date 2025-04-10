@@ -59,25 +59,23 @@ class RHStripe(RH):
     def _process(self):
         payment_intent_id = self.session.payment_intent
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
-        if len(payment_intent.charges.data) != 1:
-            raise BadRequest("Charges data doesn't contain only 1 item.")
-        charge = payment_intent.charges.data[0]
 
         transaction_data = {}
-        transaction_data['charge_id'] = charge['id']
+        transaction_data['charge_id'] = payment_intent['id']
         register_transaction(
             registration=self.registration,
             amount=conv_from_stripe_amount(
-                charge['amount'],
-                charge['currency']
+                payment_intent['amount'],
+                payment_intent['currency']
             ),
-            currency=charge['currency'],
+            currency=payment_intent['currency'],
             action=TransactionAction.complete,
             provider='stripe',
             data=transaction_data
         )
 
-        receipt_url = charge['receipt_url']
+        # receipt_url = payment_intent['receipt_url']
+        receipt_url = '#'
         flash_msg = Markup(_(
             'Your payment request has been processed.'
             ' See the receipt <a href="' + receipt_url + '">here</a>.'
