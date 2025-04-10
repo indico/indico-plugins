@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     controllers tests
     ~~~~~~~~~~~~~~~~~
@@ -17,21 +16,20 @@ from indico_payment_stripe.controllers import RHStripe
 from indico_payment_stripe.plugin import StripePaymentPlugin
 
 
-@pytest.mark.parametrize('curr, indico_amount, stripe_amount', [
+@pytest.mark.parametrize(('curr', 'indico_amount', 'stripe_amount'), (
     # Currency with decimals.
     ('EUR', 10.01, 1001),
     # Currenty without decimals.
     ('JPY', 3690, 3690),
-])
+))
 @pytest.mark.parametrize(
-    'settings_value, org_sec_key, org_pub_key, event_sec_key, event_pub_key,'
-    'eff_sec_key, eff_pub_key',
-    [
+    ('settings_value', 'org_sec_key', 'org_pub_key', 'event_sec_key', 'event_pub_key', 'eff_sec_key', 'eff_pub_key'),
+    (
         # Default settings: using org keys
         (False, 'OSK', 'OPK', 'ESK', 'EPK', 'OSK', 'OPK'),
         # Custom settings: using event keys
         (True, 'OSK', 'OPK', 'ESK', 'EPK', 'ESK', 'EPK'),
-    ]
+    )
 )
 def test_handler_process(
     curr, indico_amount, stripe_amount,
@@ -79,9 +77,7 @@ def test_handler_process(
     }
 
     payment_intent_object = {
-        'charges': SimpleNamespace(**{
-            'data': [stripe_charge]
-        })
+        'charges': SimpleNamespace(data=[stripe_charge])
     }
 
     stripe.PaymentIntent.retrieve.return_value = SimpleNamespace(

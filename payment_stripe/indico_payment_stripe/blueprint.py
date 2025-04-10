@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     indico_payment_stripe.blueprint
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

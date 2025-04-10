@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     indico_payment_stripe.controllers
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +41,7 @@ class RHStripe(RH):
         uuid = request.args['registration_uuid']
         self.registration = Registration.query.filter_by(uuid=uuid).first()
         if not self.registration:
-            raise BadRequest("Registration UUID not provided in callback")
+            raise BadRequest('Registration UUID not provided in callback')
 
         use_event_api_keys = self._get_event_settings('use_event_api_keys')
         stripe.api_key = (
@@ -55,7 +54,7 @@ class RHStripe(RH):
             request.args['session_id']
         )
         if not self.session:
-            raise BadRequest("Invalid stripe session")
+            raise BadRequest('Invalid stripe session')
 
     def _process(self):
         payment_intent_id = self.session.payment_intent

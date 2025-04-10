@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     indico_payment_stripe.utils
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -20,7 +19,7 @@ gettext = _ = make_bound_gettext('payment_stripe')
 # The values are taken from https://stripe.com/docs/currencies#zero-decimal
 # as recommended by
 # https://groups.google.com/a/lists.stripe.com/forum/#!topic/api-discuss/IsiAW3uEfHQ
-ZERO_DECIMAL_CURRS = set([
+ZERO_DECIMAL_CURRS = {
     'BIF',
     'CLP',
     'DJF',
@@ -37,7 +36,7 @@ ZERO_DECIMAL_CURRS = set([
     'XAF',
     'XOF',
     'XPF',
-])
+}
 
 
 def conv_to_stripe_amount(
