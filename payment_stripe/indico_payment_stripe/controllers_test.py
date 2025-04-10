@@ -4,7 +4,6 @@
 
 """
 
-from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
@@ -76,12 +75,7 @@ def test_handler_process(
         'receipt_url': 'https://foo.com'
     }
 
-    payment_intent_object = {
-        'charges': SimpleNamespace(data=[stripe_charge])
-    }
-
-    stripe.PaymentIntent.retrieve.return_value = SimpleNamespace(
-        **payment_intent_object)
+    stripe.PaymentIntent.retrieve.return_value = stripe_charge
 
     rh = RHStripe()
     rh.event = MagicMock(id=1)
@@ -100,7 +94,7 @@ def test_handler_process(
         'payment_intent': payment_intent_id
     }
 
-    rh.session = SimpleNamespace(**payment_session)
+    rh.session = MagicMock(**payment_session)
 
     # Stripe-specific attributes.
     rh.stripe_token = 'xxx'
