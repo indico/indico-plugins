@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
@@ -10,10 +11,12 @@ from indico_payment_stripe.plugin import StripePaymentPlugin
 
 
 @pytest.mark.parametrize(('curr', 'indico_amount', 'stripe_amount'), (
-    # Currency with decimals.
-    ('EUR', 10.01, 1001),
-    # Currenty without decimals.
-    ('JPY', 3690, 3690),
+    # Currency with decimals
+    ('EUR', Decimal('10.01'), 1001),
+    # Currenty without decimals
+    ('JPY', Decimal(3690), 3690),
+    # Currency with more than 2 decimals
+    ('JOD', Decimal('12.345'), 12345),
 ))
 @pytest.mark.parametrize(
     ('settings_value', 'org_sec_key', 'org_pub_key', 'event_sec_key', 'event_pub_key', 'eff_sec_key', 'eff_pub_key'),

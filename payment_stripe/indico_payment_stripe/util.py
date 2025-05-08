@@ -1,5 +1,10 @@
 from decimal import Decimal
 
+import iso4217
+from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
+
+from indico_payment_stripe import _
+
 
 # These are currencies which do not need to use decimals to represent its
 # smallest values.
@@ -26,51 +31,66 @@ ZERO_DECIMAL_CURRS = {
 }
 
 
-def conv_to_stripe_amount(
-    indico_amount,
-    curr,
-    zero_decimal_currs=ZERO_DECIMAL_CURRS
-):
-    """Converts the given Indico-stored amount to the one requested by Stripe.
+def conv_to_stripe_amount(indico_amount: Decimal, iso_currency: str) -> int:
+    """Convert from the Indico amount format to that of Stripe.
 
-    :param float indico_amount: The amount meant to be stored by Indico.
-    :param str curr: The ISO code of the currency being used.
-    :param zero_decimal_currs: Currencies whose amount do not need any
-        conversion.
-    :returns: The amount meant to be used by Stripe.
-    :rtype: int.
+    :param indico_amount: The amount coming from Indico.
+    :param str iso_currency: The ISO code of the currency being used.
+    :return: The amount meant to be used by Stripe.
 
     In most cases, Stripe wants to see the payment amount in the given
-    currency's smallest unit. Most of the time this means multiplying by 100.
-    Sometimes, the currency's smallest unit do not need such a conversion.
-
+    currency's smallest unit, unless it's a currency which does not have
+    a smaller unit ("zero-decimal currencies").
     """
-    return (
-        int(indico_amount) if curr.upper() in zero_decimal_currs
-        else int(indico_amount * 100)
-    )
+    iso_currency = iso_currency.upper()
+    if iso_currency in ZERO_DECIMAL_CURRS:
+        return int(indico_amount)
+    return _to_small_currency(indico_amount, iso_currency)
 
 
-def conv_from_stripe_amount(
-    stripe_amount,
-    curr,
-    zero_decimal_currs=ZERO_DECIMAL_CURRS
-):
-    """Converts the given amount used for Stripe to the one used by Indico.
+def conv_from_stripe_amount(stripe_amount: int, iso_currency: str) -> Decimal:
+    """Convert the given amount used for Stripe to the one used by Indico.
 
-    :param float indico_amount: The amount used for Stripe.
-    :param str curr: The ISO code of the currency being used.
-    :param zero_decimal_currs: Currencies whose amount do not need any
-        conversion.
-    :returns: The amount meant to be used by Indico.
-    :rtype: float.
+    :param stripe_amount: The amount used for Stripe.
+    :param iso_currency: The ISO code of the currency being used.
+    :return: The amount meant to be used by Indico.
 
-    This function is the inverse of the :meth:`conv_to_strip_amount`.
-
-
+    This function is the inverse of the :meth:`conv_to_stripe_amount`.
     """
-    return (
-        float(stripe_amount)
-        if curr.upper() in zero_decimal_currs else
-        float(Decimal(str(stripe_amount)) / 100)
-    )
+    iso_currency = iso_currency.upper()
+    if iso_currency in ZERO_DECIMAL_CURRS:
+        return Decimal(stripe_amount)
+    return _to_large_currency(stripe_amount, iso_currency)
+
+
+def _validate_currency(iso_currency):
+    """Check whether the currency can be properly handled by this plugin.
+
+    :param iso_currency: an ISO4217 currency code, e.g. ``"EUR"``
+    :raises: :py:exc:`~.HTTPNotImplemented` if the currency is not valid
+    """
+    try:
+        iso4217.Currency(iso_currency)
+    except ValueError:
+        raise HTTPNotImplemented(
+            _("Unknown currency '{}' for Stripe. Please contact the organizers.").format(iso_currency)
+        )
+
+
+def _to_small_currency(large_currency_amount, iso_currency) -> int:
+    """Convert an amount from large currency to small currency.
+
+    :param large_currency_amount: the amount in large currency, e.g. ``2.3``
+    :param iso_currency: the ISO currency code, e.g. ``"EUR"``
+    :return: the amount in small currency, e.g. ``230``
+    """
+    _validate_currency(iso_currency)
+    exponent = iso4217.Currency(iso_currency).exponent
+    return int(large_currency_amount * (10**exponent))
+
+
+def _to_large_currency(small_currency_amount, iso_currency) -> Decimal:
+    """Inverse of :py:func:`_to_small_currency`."""
+    _validate_currency(iso_currency)
+    exponent = iso4217.Currency(iso_currency).exponent
+    return Decimal(small_currency_amount) / (10**exponent)
