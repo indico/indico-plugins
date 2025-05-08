@@ -5,6 +5,7 @@ from markupsafe import Markup
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.payment.models.transactions import TransactionAction
+from indico.modules.events.payment.notifications import notify_amount_inconsistency
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
@@ -50,15 +51,18 @@ class RHStripe(RH):
         payment_intent_id = self.session.payment_intent
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id, api_key=self.stripe_api_key)
 
-        transaction_data = {}
-        transaction_data['charge_id'] = payment_intent['id']
+        currency = payment_intent['currency'].upper()
+        amount = conv_from_stripe_amount(payment_intent['amount'], currency)
+        if amount != self.registration.price or currency != self.registration.currency:
+            current_plugin.logger.warning("Payment doesn't match event's fee: %s %s != %s %s",
+                                          amount, currency, self.registration.price, self.registration.currency)
+            notify_amount_inconsistency(self.registration, amount, currency)
+
+        transaction_data = {k: v for k, v in payment_intent.items() if k != 'client_secret'}
         register_transaction(
             registration=self.registration,
-            amount=conv_from_stripe_amount(
-                payment_intent['amount'],
-                payment_intent['currency']
-            ),
-            currency=payment_intent['currency'],
+            amount=amount,
+            currency=currency,
             action=TransactionAction.complete,
             provider='stripe',
             data=transaction_data
