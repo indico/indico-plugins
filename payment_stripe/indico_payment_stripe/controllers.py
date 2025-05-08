@@ -33,21 +33,22 @@ class RHStripe(RH):
             raise BadRequest('Registration UUID not provided in callback')
 
         use_event_api_keys = self._get_event_settings('use_event_api_keys')
-        stripe.api_key = (
+        self.stripe_api_key = (
             self._get_event_settings('sec_key')
             if use_event_api_keys else
             current_plugin.settings.get('sec_key')
         )
 
         self.session = stripe.checkout.Session.retrieve(
-            request.args['session_id']
+            request.args['session_id'],
+            api_key=self.stripe_api_key
         )
         if not self.session:
             raise BadRequest('Invalid stripe session')
 
     def _process(self):
         payment_intent_id = self.session.payment_intent
-        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id, api_key=self.stripe_api_key)
 
         transaction_data = {}
         transaction_data['charge_id'] = payment_intent['id']

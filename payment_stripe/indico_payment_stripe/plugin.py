@@ -137,10 +137,9 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return blueprint
 
     def adjust_payment_form_data(self, data):
-
         registration = data['registration']
 
-        stripe.api_key = (
+        api_key = (
             data['event_settings']['sec_key']
             if data['event_settings']['use_event_api_keys'] else
             data['settings']['sec_key']
@@ -187,5 +186,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
             + '?session_id={CHECKOUT_SESSION_ID}'
             + '&registration_uuid=' + registration.uuid,
             cancel_url=failure_url,
+            api_key=api_key,
         )
         data['stripe_redirect_url'] = session.url
