@@ -171,6 +171,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         session = stripe.checkout.Session.create(
             mode='payment',
             payment_method_types=['card'],
+            customer_email=registration.email,
             line_items=[{
                 'quantity': 1,
                 'price_data': {
