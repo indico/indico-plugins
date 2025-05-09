@@ -2,7 +2,6 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
-from flask import request
 
 from indico.modules.events.payment.models.transactions import TransactionAction
 
@@ -61,63 +60,45 @@ def test_handler_process(
     stripe = mocker.patch('indico_payment_stripe.controllers.stripe')
     stripe_payment_intent = stripe.PaymentIntent.retrieve
 
-    stripe_charge = {
+    stripe_response = {
         'id': 1,
         'status': 'succeeded',
         'amount': stripe_amount,
         'currency': curr,
-        'outcome': {
-            'type': 'authorized'
-        },
-        'receipt_url': 'https://foo.com'
+        'client_secret': 'xxx',
     }
 
-    stripe.PaymentIntent.retrieve.return_value = stripe_charge
+    stripe.PaymentIntent.retrieve.return_value = stripe_response
 
     rh = RHStripeSuccess()
+    rh.stripe_api_key = 'xxx'
     rh.event = MagicMock(id=1)
     rh.registration = MagicMock(registration_form_id=3)
     rh.registration.registration_form.event = dummy_event
     rh.registration.price = indico_amount
     rh.registration.currency = curr
     rh.registration.locator.registrant = {
-        'confId': rh.event.id,
         'reg_form_id': rh.registration.registration_form_id,
-        'event_id': dummy_event.id
+        'event_id': dummy_event.id,
+        'token': '00000000-0000-0000-0000-000000000000'
     }
 
-    payment_intent_id = 'pi_1DsqyX2eZvKYlo2CxTM01D6z'
-    payment_session = {
-        'payment_intent': payment_intent_id
-    }
-
-    rh.session = MagicMock(**payment_session)
-
-    # Stripe-specific attributes.
-    rh.stripe_token = 'xxx'
-    rh.stripe_token_type = 'card'
-    rh.stripe_email = 'foo@foo.com'
-
-    request.args = {
-        'registrantId': '1',
-        'token': 'c6ea3f2b-062f-4371-8927-21e543be3ead',
-    }
-    request.form = {
-        'charge_id': 1
-    }
-
+    payment_intent_id = 'pi_test'
+    rh.session = MagicMock(payment_intent=payment_intent_id)
     with StripePaymentPlugin.instance.plugin_context():
         rh._process()
 
     stripe_payment_intent.assert_called_once_with(
-        payment_intent_id
+        payment_intent_id,
+        api_key=rh.stripe_api_key,
     )
 
+    del stripe_response['client_secret']  # this one must NOT be in the recorded data
     rt.assert_called_once_with(
         registration=rh.registration,
         amount=indico_amount,
         currency=curr,
         action=TransactionAction.complete,
         provider='stripe',
-        data=request.form,
+        data=stripe_response,
     )
