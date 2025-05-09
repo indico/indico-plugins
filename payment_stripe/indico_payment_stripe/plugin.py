@@ -1,21 +1,17 @@
-import stripe
 from wtforms.fields.simple import BooleanField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
                                            PaymentPluginSettingsFormBase)
-from indico.web.flask.util import url_for
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_payment_stripe import _
 from indico_payment_stripe.blueprint import blueprint
-from indico_payment_stripe.util import conv_to_stripe_amount
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-
     pub_key = StringField(
         _('Publishable key'),
         [DataRequired()],
@@ -45,7 +41,6 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
-
     use_event_api_keys = BooleanField(
         _('Use event API keys'),
         [Optional()],
@@ -135,59 +130,3 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         return blueprint
-
-    def adjust_payment_form_data(self, data):
-        registration = data['registration']
-
-        api_key = (
-            data['event_settings']['sec_key']
-            if data['event_settings']['use_event_api_keys'] else
-            data['settings']['sec_key']
-        )
-
-        data['pub_key'] = (
-            data['event_settings']['pub_key']
-            if data['event_settings']['use_event_api_keys'] else
-            data['settings']['pub_key']
-        )
-
-        price = conv_to_stripe_amount(
-            registration.price,
-            registration.currency,
-        )
-
-        name = registration.event.title
-        description = registration.registration_form.title
-
-        # pass the registration uuid explicitly all the time, since the redirect after a successful
-        # payment is crucial for marking it as paid on Indico, and we do not want to deal with the
-        # (albeit unlikely) case that someone's session expired in the meantime.
-        # we need the "double placeholder" because the curly braces get url-encoded by `url_for`,
-        # but we need to keep them intact as the stripe library replaces them
-        success_url = url_for_plugin(
-            'payment_stripe.success', registration.locator.uuid, session_id='__sid__', _external=True
-        ).replace('__sid__', '{CHECKOUT_SESSION_ID}')
-        # for the cancel url we just use the normal url (uuid only when needed) since nothing special
-        # happens in that case
-        cancel_url = url_for('payment.event_payment', registration.locator.registrant, _external=True)
-
-        session = stripe.checkout.Session.create(
-            mode='payment',
-            payment_method_types=['card'],
-            customer_email=registration.email,
-            line_items=[{
-                'quantity': 1,
-                'price_data': {
-                    'currency': registration.currency,
-                    'unit_amount': price,
-                    'product_data': {
-                        'name': name,
-                        'description': description,
-                    }
-                },
-            }],
-            success_url=success_url,
-            cancel_url=cancel_url,
-            api_key=api_key,
-        )
-        data['stripe_redirect_url'] = session.url

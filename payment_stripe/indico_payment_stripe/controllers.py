@@ -2,20 +2,80 @@ import stripe
 from flask import flash, redirect, request
 from flask_pluginengine import current_plugin
 from markupsafe import Markup
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.plugins import url_for_plugin
 from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
-from indico.modules.events.payment.util import register_transaction
+from indico.modules.events.payment.util import get_active_payment_plugins, register_transaction
 from indico.web.flask.util import url_for
 
 from indico_payment_stripe import _
-from indico_payment_stripe.util import conv_from_stripe_amount
+from indico_payment_stripe.util import conv_from_stripe_amount, conv_to_stripe_amount
 
 
-class RHStripe(RHPaymentBase):
-    """Processes the responses sent by Stripe."""
+class RHInitStripePayment(RHPaymentBase):
+    """Initialize a Stripe payment and redirect to Stripe."""
+
+    def _process_args(self):
+        RHPaymentBase._process_args(self)
+        if 'stripe' not in get_active_payment_plugins(self.event):
+            raise NotFound
+        if not current_plugin.instance.supports_currency(self.registration.currency):
+            raise BadRequest
+
+    def _process(self):
+        event_settings = current_plugin.event_settings.get_all(self.event)
+        settings = current_plugin.settings.get_all()
+        api_key = event_settings['sec_key'] if event_settings['use_event_api_keys'] else settings['sec_key']
+
+        # data['pub_key'] = (
+        #     event_settings['pub_key']
+        #     if event_settings['use_event_api_keys'] else
+        #     settings['pub_key']
+        # )
+
+        price = conv_to_stripe_amount(self.registration.price, self.registration.currency)
+        name = self.registration.event.title
+        description = self.registration.registration_form.title
+
+        # pass the registration uuid explicitly all the time, since the redirect after a successful
+        # payment is crucial for marking it as paid on Indico, and we do not want to deal with the
+        # (albeit unlikely) case that someone's session expired in the meantime.
+        # we need the "double placeholder" because the curly braces get url-encoded by `url_for`,
+        # but we need to keep them intact as the stripe library replaces them
+        success_url = url_for_plugin(
+            'payment_stripe.success', self.registration.locator.uuid, session_id='__sid__', _external=True
+        ).replace('__sid__', '{CHECKOUT_SESSION_ID}')
+        # for the cancel url we just use the normal url (uuid only when needed) since nothing special
+        # happens in that case
+        cancel_url = url_for('payment.event_payment', self.registration.locator.registrant, _external=True)
+
+        session = stripe.checkout.Session.create(
+            mode='payment',
+            payment_method_types=['card'],
+            customer_email=self.registration.email,
+            line_items=[{
+                'quantity': 1,
+                'price_data': {
+                    'currency': self.registration.currency,
+                    'unit_amount': price,
+                    'product_data': {
+                        'name': name,
+                        'description': description,
+                    }
+                },
+            }],
+            success_url=success_url,
+            cancel_url=cancel_url,
+            api_key=api_key,
+        )
+        return redirect(session.url)
+
+
+class RHStripeSuccess(RHPaymentBase):
+    """Process the success response sent by Stripe."""
 
     def _get_event_settings(self, settings_name):
         event_settings = current_plugin.event_settings

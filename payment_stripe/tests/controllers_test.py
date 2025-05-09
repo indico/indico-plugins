@@ -6,7 +6,7 @@ from flask import request
 
 from indico.modules.events.payment.models.transactions import TransactionAction
 
-from indico_payment_stripe.controllers import RHStripe
+from indico_payment_stripe.controllers import RHStripeSuccess
 from indico_payment_stripe.plugin import StripePaymentPlugin
 
 
@@ -74,7 +74,7 @@ def test_handler_process(
 
     stripe.PaymentIntent.retrieve.return_value = stripe_charge
 
-    rh = RHStripe()
+    rh = RHStripeSuccess()
     rh.event = MagicMock(id=1)
     rh.registration = MagicMock(registration_form_id=3)
     rh.registration.registration_form.event = dummy_event

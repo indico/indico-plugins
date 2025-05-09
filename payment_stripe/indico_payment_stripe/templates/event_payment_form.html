@@ -11,7 +11,7 @@
     <dd>{{ format_currency(amount, currency, locale=session.lang) }}</dd>
     <dt></dt>
     <dd>
-        <a class="i-button" href="{{ stripe_redirect_url }}">
+        <a class="i-button" href="{{ url_for_plugin('payment_stripe.init', registration.locator.registrant) }}">
             {%- trans %}Pay Now{% endtrans -%}
         </a>
     </dd>
