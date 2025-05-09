@@ -8,18 +8,9 @@ from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_payment_stripe import _
-from indico_payment_stripe.blueprint import blueprint
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    pub_key = StringField(
-        _('Publishable key'),
-        [DataRequired()],
-        description=_(
-            'Publishable API key for the stripe.com account. Event managers can'
-            ' override this.'
-        )
-    )
     sec_key = StringField(
         _('Secret key'),
         [DataRequired()],
@@ -49,15 +40,6 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
             'Override the organization Stripe API keys.'
         ),
         widget=SwitchWidget(),
-    )
-    pub_key = StringField(
-        _('Publishable key'),
-        [
-            HiddenUnless('use_event_api_keys'),
-            UsedIf(lambda form, _: form.use_event_api_keys.data),
-            DataRequired(),
-        ],
-        description=_('Publishable API key for the stripe.com account')
     )
     sec_key = StringField(
         _('Secret key'),
@@ -103,7 +85,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     event_settings_form = EventSettingsForm
     default_settings = {
         'method_name': 'Stripe',
-        'pub_key': '',
         'sec_key': '',
         'org_name': '',
         'description': '',
@@ -114,7 +95,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         'method_name': None,
         # NOTE: apparently setting a value to `None` here means using the
         #       plugin default and showing it in the event settings form?
-        'pub_key': '',
         'sec_key': '',
         'org_name': None,
         'description': None,
@@ -129,4 +109,5 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         return url_for_plugin(self.name + '.static', filename='images/logo.png')
 
     def get_blueprints(self):
+        from indico_payment_stripe.blueprint import blueprint
         return blueprint

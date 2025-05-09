@@ -1,7 +1,5 @@
 import stripe
 from flask import flash, redirect, request
-from flask_pluginengine import current_plugin
-from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.plugins import url_for_plugin
@@ -12,6 +10,7 @@ from indico.modules.events.payment.util import get_active_payment_plugins, regis
 from indico.web.flask.util import url_for
 
 from indico_payment_stripe import _
+from indico_payment_stripe.plugin import StripePaymentPlugin
 from indico_payment_stripe.util import conv_from_stripe_amount, conv_to_stripe_amount
 
 
@@ -22,19 +21,13 @@ class RHInitStripePayment(RHPaymentBase):
         RHPaymentBase._process_args(self)
         if 'stripe' not in get_active_payment_plugins(self.event):
             raise NotFound
-        if not current_plugin.instance.supports_currency(self.registration.currency):
+        if not StripePaymentPlugin.instance.supports_currency(self.registration.currency):
             raise BadRequest
 
     def _process(self):
-        event_settings = current_plugin.event_settings.get_all(self.event)
-        settings = current_plugin.settings.get_all()
+        event_settings = StripePaymentPlugin.event_settings.get_all(self.event)
+        settings = StripePaymentPlugin.settings.get_all()
         api_key = event_settings['sec_key'] if event_settings['use_event_api_keys'] else settings['sec_key']
-
-        # data['pub_key'] = (
-        #     event_settings['pub_key']
-        #     if event_settings['use_event_api_keys'] else
-        #     settings['pub_key']
-        # )
 
         price = conv_to_stripe_amount(self.registration.price, self.registration.currency)
         name = self.registration.event.title
@@ -78,7 +71,7 @@ class RHStripeSuccess(RHPaymentBase):
     """Process the success response sent by Stripe."""
 
     def _get_event_settings(self, settings_name):
-        event_settings = current_plugin.event_settings
+        event_settings = StripePaymentPlugin.event_settings
         return event_settings.get(
             self.registration.registration_form.event,
             settings_name
@@ -90,7 +83,7 @@ class RHStripeSuccess(RHPaymentBase):
         self.stripe_api_key = (
             self._get_event_settings('sec_key')
             if use_event_api_keys else
-            current_plugin.settings.get('sec_key')
+            StripePaymentPlugin.settings.get('sec_key')
         )
 
         self.session = stripe.checkout.Session.retrieve(
@@ -107,8 +100,8 @@ class RHStripeSuccess(RHPaymentBase):
         currency = payment_intent['currency'].upper()
         amount = conv_from_stripe_amount(payment_intent['amount'], currency)
         if amount != self.registration.price or currency != self.registration.currency:
-            current_plugin.logger.warning("Payment doesn't match event's fee: %s %s != %s %s",
-                                          amount, currency, self.registration.price, self.registration.currency)
+            StripePaymentPlugin.logger.warning("Payment doesn't match event's fee: %s %s != %s %s",
+                                               amount, currency, self.registration.price, self.registration.currency)
             notify_amount_inconsistency(self.registration, amount, currency)
 
         transaction_data = {k: v for k, v in payment_intent.items() if k != 'client_secret'}
