@@ -159,14 +159,17 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         name = registration.event.title
         description = registration.registration_form.title
 
-        success_base_url = url_for_plugin('payment_stripe.handler',
-                                          registration.event,
-                                          registration.registration_form,
-                                          _external=True)
-
-        failure_url = url_for('payment.event_payment',
-                              registration.registration_form,
-                              _external=True)
+        # pass the registration uuid explicitly all the time, since the redirect after a successful
+        # payment is crucial for marking it as paid on Indico, and we do not want to deal with the
+        # (albeit unlikely) case that someone's session expired in the meantime.
+        # we need the "double placeholder" because the curly braces get url-encoded by `url_for`,
+        # but we need to keep them intact as the stripe library replaces them
+        success_url = url_for_plugin(
+            'payment_stripe.success', registration.locator.uuid, session_id='__sid__', _external=True
+        ).replace('__sid__', '{CHECKOUT_SESSION_ID}')
+        # for the cancel url we just use the normal url (uuid only when needed) since nothing special
+        # happens in that case
+        cancel_url = url_for('payment.event_payment', registration.locator.registrant, _external=True)
 
         session = stripe.checkout.Session.create(
             mode='payment',
@@ -183,10 +186,8 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
                     }
                 },
             }],
-            success_url=success_base_url
-            + '?session_id={CHECKOUT_SESSION_ID}'
-            + '&registration_uuid=' + registration.uuid,
-            cancel_url=failure_url,
+            success_url=success_url,
+            cancel_url=cancel_url,
             api_key=api_key,
         )
         data['stripe_redirect_url'] = session.url

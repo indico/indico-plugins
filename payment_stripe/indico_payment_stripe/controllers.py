@@ -4,21 +4,18 @@ from flask_pluginengine import current_plugin
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest
 
+from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
 from indico.modules.events.payment.util import register_transaction
-from indico.modules.events.registration.models.registrations import Registration
 from indico.web.flask.util import url_for
-from indico.web.rh import RH
 
 from indico_payment_stripe import _
 from indico_payment_stripe.util import conv_from_stripe_amount
 
 
-class RHStripe(RH):
+class RHStripe(RHPaymentBase):
     """Processes the responses sent by Stripe."""
-
-    CSRF_ENABLED = False
 
     def _get_event_settings(self, settings_name):
         event_settings = current_plugin.event_settings
@@ -28,11 +25,7 @@ class RHStripe(RH):
         )
 
     def _process_args(self):
-        uuid = request.args['registration_uuid']
-        self.registration = Registration.query.filter_by(uuid=uuid).first()
-        if not self.registration:
-            raise BadRequest('Registration UUID not provided in callback')
-
+        RHPaymentBase._process_args(self)
         use_event_api_keys = self._get_event_settings('use_event_api_keys')
         self.stripe_api_key = (
             self._get_event_settings('sec_key')
