@@ -121,15 +121,5 @@ class RHStripeSuccess(RHPaymentBase):
             data=transaction_data
         )
 
-        # receipt_url = payment_intent['receipt_url']
-        receipt_url = '#'
-        flash_msg = Markup(_(
-            'Your payment request has been processed.'
-            ' See the receipt <a href="' + receipt_url + '">here</a>.'
-        ))
-        flash(flash_msg, 'success')
-        reg_url = url_for(
-            'event_registration.display_regform',
-            self.registration.locator.registrant
-        )
-        return redirect(reg_url)
+        flash(_('Your payment was successful.'), 'success')
+        return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
