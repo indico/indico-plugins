@@ -19,16 +19,6 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
             ' override this.'
         )
     )
-    org_name = StringField(
-        _('Organization name'),
-        [Optional()],
-        description=_('Name of the organization')
-    )
-    description = StringField(
-        _('Description'),
-        [Optional()],
-        description=_('A description of the product or service being purchased')
-    )
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
@@ -50,29 +40,6 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
         ],
         description=_('Secret API key for the stripe.com account')
     )
-    org_name = StringField(
-        _('Organizer name'),
-        [Optional()],
-        default='Organization',
-        description=_('Name of the event organizer')
-    )
-    description = StringField(
-        _('Description'),
-        [Optional()],
-        default='Payment for conference',
-        description=_('A description of the product or service being purchased')
-    )
-    require_postal_code = BooleanField(
-        _('Require postal code input'),
-        [Optional()],
-        default=False,
-        description=_(
-            'Require registrants to input their postal code when filling the'
-            ' payment form. Enabling this will decrease the chance of the'
-            ' payment being marked as fraudulent.'
-        ),
-        widget=SwitchWidget(),
-    )
 
 
 class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
@@ -86,8 +53,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     default_settings = {
         'method_name': 'Stripe',
         'sec_key': '',
-        'org_name': '',
-        'description': '',
     }
     default_event_settings = {
         'enabled': False,
@@ -96,9 +61,6 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
         # NOTE: apparently setting a value to `None` here means using the
         #       plugin default and showing it in the event settings form?
         'sec_key': '',
-        'org_name': None,
-        'description': None,
-        'require_postal_code': False,
     }
 
     def init(self):
