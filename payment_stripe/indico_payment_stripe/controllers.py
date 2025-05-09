@@ -1,3 +1,10 @@
+# This file is part of the Indico plugins.
+# Copyright (C) 2019 - 2025 <original contributors tbd>, CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
 import stripe
 from flask import flash, redirect, request
 from werkzeug.exceptions import BadRequest, NotFound
