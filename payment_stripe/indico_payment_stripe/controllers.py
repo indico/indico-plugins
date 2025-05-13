@@ -6,7 +6,8 @@
 # see the LICENSE file for more details.
 
 import stripe
-from flask import flash, redirect, request
+from flask import flash, redirect
+from marshmallow import fields
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.plugins import url_for_plugin
@@ -14,6 +15,7 @@ from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.notifications import notify_amount_inconsistency
 from indico.modules.events.payment.util import get_active_payment_plugins, register_transaction
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 
 from indico_payment_stripe import _
@@ -46,16 +48,21 @@ class RHInitStripePayment(RHPaymentBase):
         # we need the "double placeholder" because the curly braces get url-encoded by `url_for`,
         # but we need to keep them intact as the stripe library replaces them
         success_url = url_for_plugin(
-            'payment_stripe.success', self.registration.locator.uuid, session_id='__sid__', _external=True
+            'payment_stripe.success', self.registration.locator.uuid, stripe_session_id='__sid__', _external=True
         ).replace('__sid__', '{CHECKOUT_SESSION_ID}')
-        # for the cancel url we just use the normal url (uuid only when needed) since nothing special
-        # happens in that case
-        cancel_url = url_for('payment.event_payment', self.registration.locator.registrant, _external=True)
+        cancel_url = url_for_plugin('payment_stripe.cancel', self.registration.locator.registrant, _external=True)
 
-        session = stripe.checkout.Session.create(
+        stripe_session = stripe.checkout.Session.create(
             mode='payment',
             payment_method_types=['card'],
             customer_email=self.registration.email,
+            metadata={
+                # XXX: metadata values are always strings
+                'indico_registration_id': str(self.registration.id),
+                'indico_registration_last_txn': (
+                    str(self.registration.transaction.id if self.registration.transaction else -1)
+                ),
+            },
             line_items=[{
                 'quantity': 1,
                 'price_data': {
@@ -71,7 +78,18 @@ class RHInitStripePayment(RHPaymentBase):
             cancel_url=cancel_url,
             api_key=api_key,
         )
-        return redirect(session.url)
+        return redirect(stripe_session.url)
+
+
+class RHStripeCancel(RHPaymentBase):
+    """Process a cancellation sent by Stripe.
+
+    This happens when the user uses the "back" button on the Stripe payment page.
+    """
+
+    def _process(self):
+        flash(_('You cancelled the payment.'), 'info')
+        return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
 
 
 class RHStripeSuccess(RHPaymentBase):
@@ -84,7 +102,8 @@ class RHStripeSuccess(RHPaymentBase):
             settings_name
         )
 
-    def _process_args(self):
+    @use_kwargs({'stripe_session_id': fields.String(required=True)}, location='query')
+    def _process_args(self, stripe_session_id):
         RHPaymentBase._process_args(self)
         use_event_api_keys = self._get_event_settings('use_event_api_keys')
         self.stripe_api_key = (
@@ -92,16 +111,20 @@ class RHStripeSuccess(RHPaymentBase):
             if use_event_api_keys else
             StripePaymentPlugin.settings.get('sec_key')
         )
-
-        self.session = stripe.checkout.Session.retrieve(
-            request.args['session_id'],
-            api_key=self.stripe_api_key
-        )
-        if not self.session:
+        self.stripe_session = stripe.checkout.Session.retrieve(stripe_session_id, api_key=self.stripe_api_key)
+        if not self.stripe_session:
             raise BadRequest('Invalid stripe session')
 
     def _process(self):
-        payment_intent_id = self.session.payment_intent
+        expected_txn_id = str(self.registration.transaction.id if self.registration.transaction else -1)
+
+        # stripe session belongs to a different registration
+        if self.stripe_session.metadata['indico_registration_id'] != str(self.registration.id):
+            raise BadRequest('Invalid stripe session metadata')
+        # registration had a transaction registered since initiating the payment process
+        elif self.stripe_session.metadata['indico_registration_last_txn'] != expected_txn_id:
+            raise BadRequest('Invalid registration transaction state')
+        payment_intent_id = self.stripe_session.payment_intent
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id, api_key=self.stripe_api_key)
 
         currency = payment_intent['currency'].upper()
@@ -111,7 +134,10 @@ class RHStripeSuccess(RHPaymentBase):
                                                amount, currency, self.registration.price, self.registration.currency)
             notify_amount_inconsistency(self.registration, amount, currency)
 
-        transaction_data = {k: v for k, v in payment_intent.items() if k != 'client_secret'}
+        transaction_data = {
+            'checkout_session': dict(self.stripe_session),
+            'payment_intent': {k: v for k, v in payment_intent.items() if k != 'client_secret'},
+        }
         register_transaction(
             registration=self.registration,
             amount=amount,

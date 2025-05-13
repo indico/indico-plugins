@@ -1,7 +1,7 @@
 {% extends 'events/payment/transaction_details.html' %}
 {% block details %}
-    <dt>{% trans %}Transaction ID{% endtrans %}</dt>
-    <dd>{{ transaction.data.id }}</dd>
+    <dt>{% trans %}Payment ID{% endtrans %}</dt>
+    <dd>{{ transaction.data.payment_intent.id }}</dd>
     <dt>{% trans %}Status{% endtrans %}</dt>
-    <dd>{{ transaction.data.status }}</dd>
+    <dd>{{ transaction.data.payment_intent.status }}</dd>
 {% endblock %}

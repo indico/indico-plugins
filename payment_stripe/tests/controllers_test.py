@@ -6,7 +6,6 @@
 # see the LICENSE file for more details.
 
 from decimal import Decimal
-from unittest.mock import MagicMock
 
 import pytest
 from flask import request
@@ -34,6 +33,12 @@ def test_conv_amounts(curr, indico_amount, stripe_amount):
     assert conv_from_stripe_amount(stripe_amount, curr) == indico_amount
 
 
+class StripeDict(dict):
+    # stripe objects are dict-like but support dotted attribute access
+    def __getattr__(self, key):
+        return self[key]
+
+
 @pytest.mark.parametrize('use_event_keys', (True, False))
 @pytest.mark.usefixtures('request_context')
 def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_event_keys):
@@ -45,24 +50,30 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
     dummy_reg.currency = 'EUR'
     dummy_reg.base_price = Decimal('13.37')
 
-    rt = mocker.patch('indico_payment_stripe.controllers.register_transaction')
+    register_txn = mocker.patch('indico_payment_stripe.controllers.register_transaction')
     stripe = mocker.patch('indico_payment_stripe.controllers.stripe')
     stripe_session = stripe.checkout.Session.retrieve
     stripe_payment_intent = stripe.PaymentIntent.retrieve
 
-    stripe_response = {
+    payment_intent_id = 'pi_test'
+    stripe_session_response = StripeDict({
+        'payment_intent': payment_intent_id,
+        'metadata': {'indico_registration_id': str(dummy_reg.id), 'indico_registration_last_txn': '-1'},
+    })
+    stripe_payment_intent_response = StripeDict({
         'id': 1,
         'status': 'succeeded',
         'amount': conv_to_stripe_amount(dummy_reg.price, dummy_reg.currency),
         'currency': dummy_reg.currency.lower(),
         'client_secret': 'secret',
-    }
+    })
 
-    stripe.PaymentIntent.retrieve.return_value = stripe_response
+    stripe_session.return_value = stripe_session_response
+    stripe_payment_intent.return_value = stripe_payment_intent_response
     session_id = 'cs_test_foobar'
 
     request.view_args = {'event_id': dummy_event.id, 'reg_form_id': dummy_regform.id}
-    request.args = {'token': dummy_reg.uuid, 'session_id': session_id}
+    request.args = {'token': dummy_reg.uuid, 'stripe_session_id': session_id}
 
     rh = RHStripeSuccess()
     with StripePaymentPlugin.instance.plugin_context():
@@ -74,8 +85,6 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
         api_key=expected_api_key,
     )
 
-    payment_intent_id = 'pi_test'
-    rh.session = MagicMock(payment_intent=payment_intent_id)
     with StripePaymentPlugin.instance.plugin_context():
         rh._process()
 
@@ -84,12 +93,12 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
         api_key=expected_api_key,
     )
 
-    del stripe_response['client_secret']  # this one must NOT be in the recorded data
-    rt.assert_called_once_with(
+    del stripe_payment_intent_response['client_secret']  # this one must NOT be in the recorded data
+    register_txn.assert_called_once_with(
         registration=rh.registration,
         amount=dummy_reg.price,
         currency=dummy_reg.currency,
         action=TransactionAction.complete,
         provider='stripe',
-        data=stripe_response,
+        data={'checkout_session': stripe_session_response, 'payment_intent': stripe_payment_intent_response},
     )

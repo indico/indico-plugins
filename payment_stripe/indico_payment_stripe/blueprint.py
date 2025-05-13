@@ -7,7 +7,7 @@
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_payment_stripe.controllers import RHInitStripePayment, RHStripeSuccess
+from indico_payment_stripe.controllers import RHInitStripePayment, RHStripeCancel, RHStripeSuccess
 
 
 blueprint = IndicoPluginBlueprint(
@@ -18,3 +18,4 @@ blueprint = IndicoPluginBlueprint(
 
 blueprint.add_url_rule('/init', 'init', RHInitStripePayment)
 blueprint.add_url_rule('/success', 'success', RHStripeSuccess)
+blueprint.add_url_rule('/cancel', 'cancel', RHStripeCancel)
