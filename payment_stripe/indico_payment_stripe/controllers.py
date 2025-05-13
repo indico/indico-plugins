@@ -10,6 +10,7 @@ from flask import flash, redirect
 from marshmallow import fields
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.errors import IndicoError
 from indico.core.plugins import url_for_plugin
 from indico.modules.events.payment.controllers import RHPaymentBase
 from indico.modules.events.payment.models.transactions import TransactionAction
@@ -20,7 +21,7 @@ from indico.web.flask.util import url_for
 
 from indico_payment_stripe import _
 from indico_payment_stripe.plugin import StripePaymentPlugin
-from indico_payment_stripe.util import conv_from_stripe_amount, conv_to_stripe_amount
+from indico_payment_stripe.util import conv_from_stripe_amount, conv_to_stripe_amount, get_stripe_api_key
 
 
 class RHInitStripePayment(RHPaymentBase):
@@ -34,10 +35,8 @@ class RHInitStripePayment(RHPaymentBase):
             raise BadRequest
 
     def _process(self):
-        event_settings = StripePaymentPlugin.event_settings.get_all(self.event)
-        settings = StripePaymentPlugin.settings.get_all()
-        api_key = event_settings['sec_key'] if event_settings['use_event_api_keys'] else settings['sec_key']
-
+        if not (api_key := get_stripe_api_key(self.event)):
+            raise IndicoError('Stripe is not correctly configured in this event. Please contact the organizers.')
         price = conv_to_stripe_amount(self.registration.price, self.registration.currency)
         name = self.registration.event.title
         description = self.registration.registration_form.title
@@ -95,22 +94,10 @@ class RHStripeCancel(RHPaymentBase):
 class RHStripeSuccess(RHPaymentBase):
     """Process the success response sent by Stripe."""
 
-    def _get_event_settings(self, settings_name):
-        event_settings = StripePaymentPlugin.event_settings
-        return event_settings.get(
-            self.registration.registration_form.event,
-            settings_name
-        )
-
     @use_kwargs({'stripe_session_id': fields.String(required=True)}, location='query')
     def _process_args(self, stripe_session_id):
         RHPaymentBase._process_args(self)
-        use_event_api_keys = self._get_event_settings('use_event_api_keys')
-        self.stripe_api_key = (
-            self._get_event_settings('sec_key')
-            if use_event_api_keys else
-            StripePaymentPlugin.settings.get('sec_key')
-        )
+        self.stripe_api_key = get_stripe_api_key(self.event)
         self.stripe_session = stripe.checkout.Session.retrieve(stripe_session_id, api_key=self.stripe_api_key)
         if not self.stripe_session:
             raise BadRequest('Invalid stripe session')

@@ -42,9 +42,9 @@ class StripeDict(dict):
 @pytest.mark.parametrize('use_event_keys', (True, False))
 @pytest.mark.usefixtures('request_context')
 def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_event_keys):
-    StripePaymentPlugin.settings.set('sec_key', 'secret-global')
-    StripePaymentPlugin.event_settings.set(dummy_event, 'use_event_api_keys', use_event_keys)
-    StripePaymentPlugin.event_settings.set(dummy_event, 'sec_key', 'secret-event')
+    StripePaymentPlugin.settings.set('stripe_api_key_global', 'secret-global')
+    StripePaymentPlugin.event_settings.set(dummy_event, 'use_custom_key', use_event_keys)
+    StripePaymentPlugin.event_settings.set(dummy_event, 'stripe_api_key', 'secret-event')
     expected_api_key = ('secret-event' if use_event_keys else 'secret-global')
 
     dummy_reg.currency = 'EUR'

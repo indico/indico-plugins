@@ -8,7 +8,9 @@
 from decimal import Decimal
 
 import iso4217
+import stripe
 from werkzeug.exceptions import NotImplemented as HTTPNotImplemented
+from wtforms import ValidationError
 
 from indico_payment_stripe import _
 
@@ -101,3 +103,18 @@ def _to_large_currency(small_currency_amount, iso_currency) -> Decimal:
     _validate_currency(iso_currency)
     exponent = iso4217.Currency(iso_currency).exponent
     return Decimal(small_currency_amount) / (10**exponent)
+
+
+def validate_stripe_key(form, field):
+    try:
+        stripe.checkout.Session.list(limit=1, api_key=field.data)
+    except stripe.AuthenticationError as exc:
+        raise ValidationError(f'Stripe API key validation failed: {exc}')
+
+
+def get_stripe_api_key(event) -> str:
+    from indico_payment_stripe.plugin import StripePaymentPlugin
+    if StripePaymentPlugin.event_settings.get(event, 'use_custom_key'):
+        return StripePaymentPlugin.event_settings.get(event, 'stripe_api_key')
+    else:
+        return StripePaymentPlugin.settings.get('stripe_api_key_global')

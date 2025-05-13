@@ -5,48 +5,61 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from wtforms.fields.simple import BooleanField, StringField
+from wtforms.fields.simple import BooleanField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.plugins import IndicoPlugin, url_for_plugin
+from indico.modules.categories.forms import IndicoPasswordField
 from indico.modules.events.payment import (PaymentEventSettingsFormBase, PaymentPluginMixin,
                                            PaymentPluginSettingsFormBase)
-from indico.web.forms.validators import HiddenUnless, UsedIf
+from indico.web.forms.base import generated_data
+from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_payment_stripe import _
+from indico_payment_stripe.util import validate_stripe_key
 
 
 class PluginSettingsForm(PaymentPluginSettingsFormBase):
-    sec_key = StringField(
-        _('Secret key'),
-        [DataRequired()],
+    stripe_api_key_global = IndicoPasswordField(
+        _('Stripe secret API key'),
+        [Optional(), validate_stripe_key],
         description=_(
-            'Secret API key for the stripe.com account. Event managers can'
-            ' override this.'
-        )
+            'Secret API key for the Stripe account. Event managers can override this, but will never see the one '
+            'configured here. If left empty, event managers are required to provide their own key. Clearing this field '
+            'once events are using Stripe will break payments in these events unless a custom key is set there.'
+        ),
+        toggle=True
     )
 
 
-class EventSettingsForm(PaymentEventSettingsFormBase):
-    use_event_api_keys = BooleanField(
-        _('Use event API keys'),
+class EventSettingsFormWithGlobalKey(PaymentEventSettingsFormBase):
+    use_custom_key = BooleanField(
+        _('Custom Stripe API key'),
         [Optional()],
         default=False,
-        description=_(
-            'Override the organization Stripe API keys.'
-        ),
+        description=_('Override the globally configured Stripe API key.'),
         widget=SwitchWidget(),
     )
-    sec_key = StringField(
-        _('Secret key'),
-        [
-            HiddenUnless('use_event_api_keys'),
-            UsedIf(lambda form, _: form.use_event_api_keys.data),
-            DataRequired(),
-        ],
-        description=_('Secret API key for the stripe.com account')
+    stripe_api_key = IndicoPasswordField(
+        _('Stripe secret API key'),
+        [HiddenUnless('use_custom_key'), DataRequired(), validate_stripe_key],
+        description=_('Secret API key for the Stripe account'),
+        toggle=True
     )
+
+
+class EventSettingsFormNoGlobalKey(PaymentEventSettingsFormBase):
+    stripe_api_key = IndicoPasswordField(
+        _('Stripe secret API key'),
+        [DataRequired(), validate_stripe_key],
+        description=_('Secret API key for the Stripe account'),
+        toggle=True
+    )
+
+    @generated_data
+    def use_custom_key(self):
+        return True
 
 
 class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
@@ -56,22 +69,24 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
     """
     configurable = True
     settings_form = PluginSettingsForm
-    event_settings_form = EventSettingsForm
     default_settings = {
         'method_name': 'Stripe',
-        'sec_key': '',
+        'stripe_api_key_global': '',
     }
     default_event_settings = {
         'enabled': False,
-        'use_event_api_keys': False,
         'method_name': None,
-        # NOTE: apparently setting a value to `None` here means using the
-        #       plugin default and showing it in the event settings form?
-        'sec_key': '',
+        'use_custom_key': False,
+        'stripe_api_key': None,
     }
 
-    def init(self):
-        super().init()
+    def event_settings_form(self, *args, **kwargs):
+        form_cls = (
+            EventSettingsFormWithGlobalKey
+            if self.settings.get('stripe_api_key_global')
+            else EventSettingsFormNoGlobalKey
+        )
+        return form_cls(*args, **kwargs)
 
     @property
     def logo_url(self):
