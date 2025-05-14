@@ -20,14 +20,17 @@ from indico_payment_stripe.util import conv_from_stripe_amount, conv_to_stripe_a
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',)
 
 
-@pytest.mark.parametrize(('curr', 'indico_amount', 'stripe_amount'), (
-    # Currency with decimals
-    ('EUR', Decimal('10.01'), 1001),
-    # Currenty without decimals
-    ('JPY', Decimal(3690), 3690),
-    # Currency with more than 2 decimals
-    ('JOD', Decimal('12.345'), 12345),
-))
+@pytest.mark.parametrize(
+    ('curr', 'indico_amount', 'stripe_amount'),
+    (
+        # Currency with decimals
+        ('EUR', Decimal('10.01'), 1001),
+        # Currenty without decimals
+        ('JPY', Decimal(3690), 3690),
+        # Currency with more than 2 decimals
+        ('JOD', Decimal('12.345'), 12345),
+    ),
+)
 def test_conv_amounts(curr, indico_amount, stripe_amount):
     assert conv_to_stripe_amount(indico_amount, curr) == stripe_amount
     assert conv_from_stripe_amount(stripe_amount, curr) == indico_amount
@@ -45,7 +48,7 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
     StripePaymentPlugin.settings.set('stripe_api_key_global', 'secret-global')
     StripePaymentPlugin.event_settings.set(dummy_event, 'use_custom_key', use_event_keys)
     StripePaymentPlugin.event_settings.set(dummy_event, 'stripe_api_key', 'secret-event')
-    expected_api_key = ('secret-event' if use_event_keys else 'secret-global')
+    expected_api_key = 'secret-event' if use_event_keys else 'secret-global'
 
     dummy_reg.currency = 'EUR'
     dummy_reg.base_price = Decimal('13.37')
@@ -56,17 +59,21 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
     stripe_payment_intent = stripe.PaymentIntent.retrieve
 
     payment_intent_id = 'pi_test'
-    stripe_session_response = StripeDict({
-        'payment_intent': payment_intent_id,
-        'metadata': {'indico_registration_id': str(dummy_reg.id), 'indico_registration_last_txn': '-1'},
-    })
-    stripe_payment_intent_response = StripeDict({
-        'id': 1,
-        'status': 'succeeded',
-        'amount': conv_to_stripe_amount(dummy_reg.price, dummy_reg.currency),
-        'currency': dummy_reg.currency.lower(),
-        'client_secret': 'secret',
-    })
+    stripe_session_response = StripeDict(
+        {
+            'payment_intent': payment_intent_id,
+            'metadata': {'indico_registration_id': str(dummy_reg.id), 'indico_registration_last_txn': '-1'},
+        }
+    )
+    stripe_payment_intent_response = StripeDict(
+        {
+            'id': 1,
+            'status': 'succeeded',
+            'amount': conv_to_stripe_amount(dummy_reg.price, dummy_reg.currency),
+            'currency': dummy_reg.currency.lower(),
+            'client_secret': 'secret',
+        }
+    )
 
     stripe_session.return_value = stripe_session_response
     stripe_payment_intent.return_value = stripe_payment_intent_response

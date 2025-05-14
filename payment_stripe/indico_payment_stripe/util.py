@@ -114,6 +114,7 @@ def validate_stripe_key(form, field):
 
 def get_stripe_api_key(event) -> str:
     from indico_payment_stripe.plugin import StripePaymentPlugin
+
     if StripePaymentPlugin.event_settings.get(event, 'use_custom_key'):
         return StripePaymentPlugin.event_settings.get(event, 'stripe_api_key')
     else:

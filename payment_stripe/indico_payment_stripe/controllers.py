@@ -62,17 +62,19 @@ class RHInitStripePayment(RHPaymentBase):
                     str(self.registration.transaction.id if self.registration.transaction else -1)
                 ),
             },
-            line_items=[{
-                'quantity': 1,
-                'price_data': {
-                    'currency': self.registration.currency,
-                    'unit_amount': price,
-                    'product_data': {
-                        'name': name,
-                        'description': description,
-                    }
-                },
-            }],
+            line_items=[
+                {
+                    'quantity': 1,
+                    'price_data': {
+                        'currency': self.registration.currency,
+                        'unit_amount': price,
+                        'product_data': {
+                            'name': name,
+                            'description': description,
+                        },
+                    },
+                }
+            ],
             success_url=success_url,
             cancel_url=cancel_url,
             api_key=api_key,
@@ -117,8 +119,13 @@ class RHStripeSuccess(RHPaymentBase):
         currency = payment_intent['currency'].upper()
         amount = conv_from_stripe_amount(payment_intent['amount'], currency)
         if amount != self.registration.price or currency != self.registration.currency:
-            StripePaymentPlugin.logger.warning("Payment doesn't match event's fee: %s %s != %s %s",
-                                               amount, currency, self.registration.price, self.registration.currency)
+            StripePaymentPlugin.logger.warning(
+                "Payment doesn't match event's fee: %s %s != %s %s",
+                amount,
+                currency,
+                self.registration.price,
+                self.registration.currency,
+            )
             notify_amount_inconsistency(self.registration, amount, currency)
 
         transaction_data = {
@@ -131,7 +138,7 @@ class RHStripeSuccess(RHPaymentBase):
             currency=currency,
             action=TransactionAction.complete,
             provider='stripe',
-            data=transaction_data
+            data=transaction_data,
         )
 
         flash(_('Your payment was successful.'), 'success')

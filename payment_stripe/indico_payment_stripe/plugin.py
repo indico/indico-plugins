@@ -29,7 +29,7 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
             'configured here. If left empty, event managers are required to provide their own key. Clearing this field '
             'once events are using Stripe will break payments in these events unless a custom key is set there.'
         ),
-        toggle=True
+        toggle=True,
     )
 
 
@@ -45,7 +45,7 @@ class EventSettingsFormWithGlobalKey(PaymentEventSettingsFormBase):
         _('Stripe secret API key'),
         [HiddenUnless('use_custom_key'), DataRequired(), validate_stripe_key],
         description=_('Secret API key for the Stripe account'),
-        toggle=True
+        toggle=True,
     )
 
 
@@ -54,7 +54,7 @@ class EventSettingsFormNoGlobalKey(PaymentEventSettingsFormBase):
         _('Stripe secret API key'),
         [DataRequired(), validate_stripe_key],
         description=_('Secret API key for the Stripe account'),
-        toggle=True
+        toggle=True,
     )
 
     @generated_data
@@ -67,6 +67,7 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     Provides a payment method using the Stripe API.
     """
+
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {
@@ -94,4 +95,5 @@ class StripePaymentPlugin(PaymentPluginMixin, IndicoPlugin):
 
     def get_blueprints(self):
         from indico_payment_stripe.blueprint import blueprint
+
         return blueprint
