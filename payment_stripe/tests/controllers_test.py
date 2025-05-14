@@ -57,8 +57,10 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
     stripe = mocker.patch('indico_payment_stripe.controllers.stripe')
     stripe_session = stripe.checkout.Session.retrieve
     stripe_payment_intent = stripe.PaymentIntent.retrieve
+    stripe_payment_method = stripe.PaymentMethod.retrieve
 
     payment_intent_id = 'pi_test'
+    payment_method_id = 'pm_test'
     stripe_session_response = StripeDict(
         {
             'payment_intent': payment_intent_id,
@@ -67,16 +69,23 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
     )
     stripe_payment_intent_response = StripeDict(
         {
-            'id': 1,
+            'id': payment_intent_id,
             'status': 'succeeded',
             'amount': conv_to_stripe_amount(dummy_reg.price, dummy_reg.currency),
             'currency': dummy_reg.currency.lower(),
             'client_secret': 'secret',
+            'payment_method': payment_method_id,
+        }
+    )
+    stripe_payment_method_response = StripeDict(
+        {
+            'id': 'pm_test',
         }
     )
 
     stripe_session.return_value = stripe_session_response
     stripe_payment_intent.return_value = stripe_payment_intent_response
+    stripe_payment_method.return_value = stripe_payment_method_response
     session_id = 'cs_test_foobar'
 
     request.view_args = {'event_id': dummy_event.id, 'reg_form_id': dummy_regform.id}
@@ -100,6 +109,11 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
         api_key=expected_api_key,
     )
 
+    stripe_payment_method.assert_called_once_with(
+        payment_method_id,
+        api_key=expected_api_key,
+    )
+
     del stripe_payment_intent_response['client_secret']  # this one must NOT be in the recorded data
     register_txn.assert_called_once_with(
         registration=rh.registration,
@@ -107,5 +121,9 @@ def test_handler_process(mocker, dummy_event, dummy_regform, dummy_reg, use_even
         currency=dummy_reg.currency,
         action=TransactionAction.complete,
         provider='stripe',
-        data={'checkout_session': stripe_session_response, 'payment_intent': stripe_payment_intent_response},
+        data={
+            'checkout_session': stripe_session_response,
+            'payment_intent': stripe_payment_intent_response,
+            'payment_method': stripe_payment_method_response,
+        },
     )

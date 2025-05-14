@@ -53,7 +53,6 @@ class RHInitStripePayment(RHPaymentBase):
 
         stripe_session = stripe.checkout.Session.create(
             mode='payment',
-            payment_method_types=['card'],
             customer_email=self.registration.email,
             metadata={
                 # XXX: metadata values are always strings
@@ -115,6 +114,7 @@ class RHStripeSuccess(RHPaymentBase):
             raise BadRequest('Invalid registration transaction state')
         payment_intent_id = self.stripe_session.payment_intent
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id, api_key=self.stripe_api_key)
+        payment_method = stripe.PaymentMethod.retrieve(payment_intent.payment_method, api_key=self.stripe_api_key)
 
         currency = payment_intent['currency'].upper()
         amount = conv_from_stripe_amount(payment_intent['amount'], currency)
@@ -131,6 +131,7 @@ class RHStripeSuccess(RHPaymentBase):
         transaction_data = {
             'checkout_session': dict(self.stripe_session),
             'payment_intent': {k: v for k, v in payment_intent.items() if k != 'client_secret'},
+            'payment_method': dict(payment_method),
         }
         register_transaction(
             registration=self.registration,
