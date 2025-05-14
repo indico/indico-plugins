@@ -16,7 +16,9 @@ See the [Stripe testing documentation][stripe-testing] for a testing guide.
 
 ## Credits
 
-Originally developed by .....
+Originally developed and updated by Wibowo Arindrarto, Dmytro Karpenko, Bernard Kolobara,
+Claudio Wunder and other contributors.
+
 Adapted to Indico 3.3 by the CERN Indico Team.
 
 Use of the Stripe logo included in this plugin is covered by [Stripe's usage agreement][stripe-terms].

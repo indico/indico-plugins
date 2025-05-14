@@ -6,7 +6,10 @@ version = '3.3'
 license = 'MIT'
 authors = [
     { name = 'Indico Team', email = 'indico-team@cern.ch' },
-    # TODO credit previous authors that made significant contributions
+    { name = 'Wibowo Arindrarto', email = 'bow@bow.web.id' },
+    { name = 'Dmytro Karpenko', email = 'dmytrok@usit.uio.no' },
+    { name = 'Bernard Kolobara', email = 'me@kolobara.com' },
+    { name = 'Claudio Wunder', email = 'cwunder@hubspot.com' },
 ]
 classifiers = [
     'Environment :: Plugins',
