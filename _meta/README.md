@@ -8,6 +8,11 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.4
+
+- Add `indico-plugin-payment-stripe`
+- Update `indico-plugin-prometheus`
+
 ### 3.3.3
 
 - Require Indico v3.3.6
