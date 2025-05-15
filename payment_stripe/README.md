@@ -5,7 +5,6 @@ This plugin provides a payment option for Indico's payment module using [Stripe]
 When used, the user will be sent to Stripe to make the payment, and afterwards
 they are automatically sent back to Indico.
 
-This plugin uses the Stripe API version `2022-11-15`.
 See the [Stripe testing documentation][stripe-testing] for a testing guide.
 
 ## Changelog
@@ -13,6 +12,8 @@ See the [Stripe testing documentation][stripe-testing] for a testing guide.
 ### 3.3
 
 - Initial release for Indico 3.3
+- **Important:** This release is a breaking change; you need to configure your Stripe API key again.
+- Stripe API version: `2025-04-30.basil`
 
 ## Credits
 
