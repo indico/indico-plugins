@@ -51,15 +51,26 @@ class RHInitStripePayment(RHPaymentBase):
         ).replace('__sid__', '{CHECKOUT_SESSION_ID}')
         cancel_url = url_for_plugin('payment_stripe.cancel', self.registration.locator.registrant, _external=True)
 
+        metadata = {
+            # XXX: metadata values are always strings
+            'indico_event_id': str(self.registration.event.id),
+            'indico_registration_id': str(self.registration.id),
+            'indico_registration_form_id': str(self.registration.registration_form.id),
+            'indico_registration_last_txn': (
+                str(self.registration.transaction.id if self.registration.transaction else -1)
+            ),
+        }
+
         stripe_session = stripe.checkout.Session.create(
             mode='payment',
             customer_email=self.registration.email,
-            metadata={
-                # XXX: metadata values are always strings
-                'indico_registration_id': str(self.registration.id),
-                'indico_registration_last_txn': (
-                    str(self.registration.transaction.id if self.registration.transaction else -1)
+            metadata=metadata,
+            payment_intent_data={
+                'description': (
+                    f'Indico: {self.registration.event.id}#{self.registration.friendly_id} '
+                    f'({self.registration.full_name})'
                 ),
+                'metadata': metadata,
             },
             line_items=[
                 {
