@@ -37,6 +37,7 @@ on:
           - payment_manual
           - payment_paypal
           - payment_sixpay
+          - payment_stripe
           - piwik
           - previewer_code
           - previewer_jupyter
