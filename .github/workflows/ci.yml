@@ -167,10 +167,10 @@ jobs:
           - plugin: citadel
           - plugin: livesync
           - plugin: payment_paypal
+          - plugin: payment_stripe
+          - plugin: prometheus
           - plugin: storage_s3
           - plugin: vc_zoom
-          - plugin: prometheus
-          - plugin: payment_stripe
 
     steps:
       - uses: actions/checkout@v4
