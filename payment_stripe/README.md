@@ -7,6 +7,15 @@ they are automatically sent back to Indico.
 
 See the [Stripe testing documentation][stripe-testing] for a testing guide.
 
+## Configuration
+
+If you want to use the same Stripe API key for the whole Indico instance, you can set it globally in
+the plugin settings. Event managers will be able to use it, but they will not be able to see the
+API key.
+
+Alternatively, event managers can set their own Stripe API key when enabling the plugin in their
+event. This can also be done when a global API key is set in order to override that key.
+
 ## Changelog
 
 ### 3.3
