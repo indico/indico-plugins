@@ -1,0 +1,25 @@
+{% extends 'events/payment/transaction_details.html' %}
+{% block details %}
+    {% if transaction.data.payment_intent %}
+        <dt>{% trans %}Payment ID{% endtrans %}</dt>
+        <dd><code>{{ transaction.data.payment_intent.id }}</code></dd>
+        <dt>{% trans %}Status{% endtrans %}</dt>
+        <dd>{{ transaction.data.payment_intent.status }}</dd>
+    {% endif %}
+    {% if transaction.data.payment_method %}
+        <dt>{% trans %}Live Mode{% endtrans %}</dt>
+        <dd>
+            {% if transaction.data.payment_method.livemode %}
+                {% trans %}Production{% endtrans %}
+            {% else %}
+                <strong>{% trans %}Sandbox{% endtrans %}</strong>
+            {% endif %}
+        </dd>
+        <dt>{% trans %}Payment Method{% endtrans %}</dt>
+        <dd>{{ transaction.data.payment_method.type.title() }}</dd>
+        {% if transaction.data.payment_method.type == 'card' %}
+            <dt>{% trans %}Credit Card{% endtrans %}</dt>
+            <dd>{{ transaction.data.payment_method.card.display_brand.title() }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock %}

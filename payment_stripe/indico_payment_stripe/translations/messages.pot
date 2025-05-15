@@ -1,0 +1,102 @@
+# Translations template for indico-plugin-payment-stripe.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the indico-plugin-payment-stripe project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico-plugin-payment-stripe 3.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-15 12:31+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: indico_payment_stripe/controllers.py
+msgid "You cancelled the payment."
+msgstr ""
+
+#: indico_payment_stripe/controllers.py
+msgid "Your payment was successful."
+msgstr ""
+
+#: indico_payment_stripe/plugin.py
+msgid "Stripe secret API key"
+msgstr ""
+
+#: indico_payment_stripe/plugin.py
+msgid ""
+"Secret API key for the Stripe account. Event managers can override this, but will never see the one configured here. "
+"If left empty, event managers are required to provide their own key. Clearing this field once events are using Stripe"
+" will break payments in these events unless a custom key is set there."
+msgstr ""
+
+#: indico_payment_stripe/plugin.py
+msgid "Custom Stripe API key"
+msgstr ""
+
+#: indico_payment_stripe/plugin.py
+msgid "Override the globally configured Stripe API key."
+msgstr ""
+
+#: indico_payment_stripe/plugin.py
+msgid "Secret API key for the Stripe account"
+msgstr ""
+
+#: indico_payment_stripe/util.py
+msgid "Unknown currency '{}' for Stripe. Please contact the organizers."
+msgstr ""
+
+#: indico_payment_stripe/templates/event_payment_form.html
+msgid "Clicking on the <strong>Pay Now</strong> button will redirect you to Stripe in order to complete your payment."
+msgstr ""
+
+#: indico_payment_stripe/templates/event_payment_form.html
+msgid "First name"
+msgstr ""
+
+#: indico_payment_stripe/templates/event_payment_form.html
+msgid "Last name"
+msgstr ""
+
+#: indico_payment_stripe/templates/event_payment_form.html
+msgid "Total amount"
+msgstr ""
+
+#: indico_payment_stripe/templates/event_payment_form.html
+msgid "Pay Now"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Payment ID"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Status"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Live Mode"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Production"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Sandbox"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Payment Method"
+msgstr ""
+
+#: indico_payment_stripe/templates/transaction_details.html
+msgid "Credit Card"
+msgstr ""
+
