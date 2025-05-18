@@ -2,7 +2,7 @@
 name = 'indico-plugins'
 description = 'A meta-package containing the official Indico plugins'
 readme = 'README.md'
-version = '3.3.3'
+version = '3.3.4'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [
@@ -21,10 +21,11 @@ dependencies = [
     'indico-plugin-payment-manual>=3.3.2,<3.4.dev0',
     'indico-plugin-payment-paypal>=3.3.2,<3.4.dev0',
     'indico-plugin-payment-sixpay>=3.3.3,<3.4.dev0',
+    'indico-plugin-payment-stripe>=3.3,<3.4.dev0',
     'indico-plugin-piwik>=3.3.3,<3.4.dev0',
     'indico-plugin-previewer-code>=3.3,<3.4.dev0',
     'indico-plugin-previewer-jupyter>=3.3.1,<3.4.dev0',
-    'indico-plugin-prometheus>=3.3,<3.4.dev0',
+    'indico-plugin-prometheus>=3.3.1,<3.4.dev0',
     'indico-plugin-storage-s3>=3.3.2,<3.4.dev0',
     'indico-plugin-ursh>=3.3.2,<3.4.dev0',
     'indico-plugin-vc-zoom>=3.3.3,<3.4.dev0',
