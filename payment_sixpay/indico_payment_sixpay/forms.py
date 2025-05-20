@@ -120,21 +120,10 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
     order_description = StringField(
         label=_('Order Description'),
         validators=[DataRequired(), FormatField(max_length=80)],
-        description=_(
-            'The default description of each order in a human readable way. '
-            'It is presented to the registrant during the transaction with Saferpay. '
-            'Event managers will be able to override this. '
-            'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
         validators=[DataRequired(), FormatField(max_length=80, id_safe=True)],
-        description=_(
-            'The default identifier of each order for further processing. '
-            'Event managers will be able to override this. '
-            'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
@@ -145,6 +134,20 @@ class PluginSettingsForm(PaymentPluginSettingsFormBase):
             'Event managers will be able to override this.'
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.order_description.description = _(
+            'The default description of each order in a human readable way. '
+            'It is presented to the registrant during the transaction with Saferpay. '
+            'Event managers will be able to override this. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
+        self.order_description.description = _(
+            'The default identifier of each order for further processing. '
+            'Event managers will be able to override this. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
 
 
 class EventSettingsForm(PaymentEventSettingsFormBase):
@@ -161,19 +164,10 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
     order_description = StringField(
         label=_('Order Description'),
         validators=[DataRequired(), FormatField(max_length=80)],
-        description=_(
-            'The description of each order in a human readable way. '
-            'It is presented to the registrant during the transaction with Saferpay. '
-            'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
     )
     order_identifier = StringField(
         label=_('Order Identifier'),
         validators=[DataRequired(), FormatField(max_length=80, id_safe=True)],
-        description=_(
-            'The default identifier of each order for further processing. '
-            'Supported placeholders: {}'
-        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
     )
     notification_mail = StringField(
         label=_('Notification Email'),
@@ -183,3 +177,14 @@ class EventSettingsForm(PaymentEventSettingsFormBase):
             "This is independent of Indico's own payment notifications."
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.order_description.description = _(
+            'The description of each order in a human readable way. '
+            'It is presented to the registrant during the transaction with Saferpay. '
+            'Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.default_field_map))
+        self.order_identifier.description = _(
+            'The default identifier of each order for further processing. Supported placeholders: {}'
+        ).format(', '.join(f'{{{p}}}' for p in FormatField.id_safe_field_map))
