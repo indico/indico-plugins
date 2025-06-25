@@ -13,7 +13,7 @@ from indico.web.flask.templating import get_template_module
 def notify_host_start_url(vc_room):
     from indico_vc_zoom.plugin import ZoomPlugin
 
-    user = principal_from_identifier(vc_room.data['host'])
+    user = principal_from_identifier(vc_room.data['host'], require_user_token=False)
     to_list = {user.email}
 
     template_module = get_template_module(

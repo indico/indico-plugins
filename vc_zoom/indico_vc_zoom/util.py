@@ -203,12 +203,13 @@ def process_alternative_hosts(emails):
             users = [identity.user for identity in Identity.query.filter(criteria)]
     else:
         raise TypeError('invalid mode')
-    return [u.identifier for u in users if u is not None]
+    return [u.persistent_identifier for u in users if u is not None]
 
 
 def get_alt_host_emails(identifiers):
     """Convert a list of identities into a list of enterprise e-mails."""
-    emails = [find_enterprise_email(principal_from_identifier(ident)) for ident in identifiers]
+    emails = [find_enterprise_email(principal_from_identifier(ident, require_user_token=False))
+              for ident in identifiers]
     if None in emails:
         raise VCRoomError(_('Could not find Zoom user for alternative host'))
     return emails

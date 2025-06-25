@@ -27,7 +27,7 @@ from indico.web.rh import RH
 
 class RHRoomAlternativeHost(RHVCSystemEventBase):
     def _process(self):
-        new_identifier = session.user.identifier
+        new_identifier = session.user.persistent_identifier
         if new_identifier == self.vc_room.data['host'] or new_identifier in self.vc_room.data['alternative_hosts']:
             raise UserValueError(_('You were already an (alternative) host of this meeting'))
 

@@ -88,7 +88,7 @@ class VCRoomForm(VCRoomFormBase):
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
         if defaults.host_user is None and defaults.host is not None:
-            host = principal_from_identifier(defaults.host)
+            host = principal_from_identifier(defaults.host, require_user_token=False)
             defaults.host_choice = 'myself' if host == session.user else 'someone_else'
             defaults.host_user = None if host == session.user else host
 
@@ -124,6 +124,6 @@ class VCRoomForm(VCRoomFormBase):
         if self.host_choice is None:
             return None
         elif self.host_choice.data == 'myself':
-            return session.user.identifier
+            return session.user.persistent_identifier
         else:
-            return self.host_user.data.identifier if self.host_user.data else None
+            return self.host_user.data.persistent_identifier if self.host_user.data else None

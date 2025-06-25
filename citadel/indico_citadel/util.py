@@ -197,9 +197,9 @@ def _get_alternative_group_names():
 def _include_capitalized_groups(groups):
     alternatives = _get_alternative_group_names()
     for group in groups:
-        yield group.identifier
+        yield group.persistent_identifier
         for alt_name in alternatives.get((group.provider, group.name.lower()), ()):
-            yield GroupProxy(alt_name, group.provider).identifier
+            yield GroupProxy(alt_name, group.provider).persistent_identifier
 
 
 @memoize_redis(3600)
@@ -208,8 +208,8 @@ def get_user_access(user, admin_override_enabled=False):
         return []
     if admin_override_enabled and user.is_admin:
         return ['IndicoAdmin']
-    access = [user.identifier] + [u.identifier for u in user.get_merged_from_users_recursive()]
-    access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
+    access = [user.persistent_identifier] + [u.persistent_identifier for u in user.get_merged_from_users_recursive()]
+    access += [GroupProxy(x.id, _group=x).persistent_identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:
         multipass_groups = [GroupProxy(x.name, x.provider.name, x)
                             for x in user.iter_all_multipass_groups()]
