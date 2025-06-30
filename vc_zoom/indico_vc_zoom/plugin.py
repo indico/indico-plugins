@@ -224,7 +224,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return form
 
     def get_extra_delete_msg(self, vc_room, event_vc_room):
-        host = principal_from_identifier(vc_room.data['host'])
+        host = principal_from_identifier(vc_room.data['host'], require_user_token=False)
         if host == session.user or len(vc_room.events) <= 1:
             return ''
         return render_plugin_template('vc_zoom:extra_delete_msg.html', host=host.full_name)
@@ -323,7 +323,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         :param event: the event to the Zoom meeting will be attached
         """
         client = ZoomIndicoClient()
-        host = principal_from_identifier(vc_room.data['host'])
+        host = principal_from_identifier(vc_room.data['host'], require_user_token=False)
         host_email = find_enterprise_email(host)
 
         # get the object that this booking is linked to
@@ -378,7 +378,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         vc_room.data.update({
             'zoom_id': meeting_obj['id'],
             'start_url': meeting_obj['start_url'],
-            'host': host.identifier,
+            'host': host.persistent_identifier,
             'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', '')),
             'registration_required': meeting_obj['settings'].get('approval_type') != 2,
         })
@@ -541,26 +541,27 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def can_manage_vc_room(self, user, room):
         return (
-            user == principal_from_identifier(room.data['host']) or
+            user == principal_from_identifier(room.data['host'], require_user_token=False) or
             super().can_manage_vc_room(user, room)
         )
 
     def _merge_users(self, target, source, **kwargs):
         super()._merge_users(target, source, **kwargs)
         for room in VCRoom.query.filter(
-            VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.identifier})
+            VCRoom.type == self.service_name, VCRoom.data.contains({'host': source.persistent_identifier})
         ):
-            room.data['host'] = target.identifier
+            room.data['host'] = target.persistent_identifier
             flag_modified(room, 'data')
         for room in VCRoom.query.filter(
-            VCRoom.type == self.service_name, VCRoom.data.contains({'alternative_hosts': [source.identifier]})
+            VCRoom.type == self.service_name,
+            VCRoom.data.contains({'alternative_hosts': [source.persistent_identifier]}),
         ):
-            room.data['alternative_hosts'].remove(source.identifier)
-            room.data['alternative_hosts'].append(target.identifier)
+            room.data['alternative_hosts'].remove(source.persistent_identifier)
+            room.data['alternative_hosts'].append(target.persistent_identifier)
             flag_modified(room, 'data')
 
     def get_notification_cc_list(self, action, vc_room, event):
-        return {principal_from_identifier(vc_room.data['host']).email}
+        return {principal_from_identifier(vc_room.data['host'], require_user_token=False).email}
 
     def _check_meetings(self, sender, obj, **kwargs):
         zoom_rooms = [ass.vc_room for ass in getattr(obj, 'vc_room_associations', []) if ass.vc_room.type == 'zoom']

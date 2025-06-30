@@ -50,8 +50,8 @@
             caption="{% trans %}Please log in{% endtrans %}"
         {% endif %}
 
-        {% if session.user.identifier != vc_room.data['host']
-           and session.user.identifier not in vc_room.data.get('alternative_hosts', [])
+        {% if session.user.persistent_identifier != vc_room.data['host']
+           and session.user.persistent_identifier not in vc_room.data.get('alternative_hosts', [])
            and event.can_manage(session.user) %}
              alt-host-url="{{ url_for_plugin('vc_zoom.make_me_alt_host', event_vc_room) }}"
         {% endif %}

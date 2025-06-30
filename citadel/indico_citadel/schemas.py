@@ -32,7 +32,7 @@ PRINCIPAL_TYPES = {
 
 
 def _get_identifiers(access_list):
-    return sorted(p.identifier for p in access_list if p.principal_type in PRINCIPAL_TYPES)
+    return sorted(p.persistent_identifier for p in access_list if p.principal_type in PRINCIPAL_TYPES)
 
 
 def _get_category_chain(event, categories):
