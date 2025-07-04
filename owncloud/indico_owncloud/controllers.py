@@ -39,8 +39,8 @@ class AddAttachmentOwncloudMixin:
                 local_filename = secure_client_filename(filename)
                 attachment = Attachment(folder=folder, user=session.user, title=local_filename,
                                         type=AttachmentType.file, protection_mode=form.data['protection_mode'])
-                if attachment.is_self_protected:
-                    attachment.acl = form.data['acl']
+                if attachment.is_self_protected and form.acl:
+                    attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(local_filename)[0] or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=local_filename, content_type=content_type)
 
