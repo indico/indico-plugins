@@ -2,7 +2,7 @@
 name = 'indico-plugin-prometheus'
 description = 'Prometheus metrics in Indico servers'
 readme = 'README.md'
-version = '3.3.1'
+version = '3.3.2'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [
@@ -12,7 +12,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
 ]
 requires-python = '>=3.12.2, <3.13'
-dependencies = ['indico>=3.3', 'prometheus-client==0.21.1']
+dependencies = ['indico>=3.3', 'prometheus-client==0.22.1']
 
 [project.urls]
 GitHub = 'https://github.com/indico/indico-plugins'

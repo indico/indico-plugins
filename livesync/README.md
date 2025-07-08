@@ -5,6 +5,10 @@ external services, typically to provide advanced search functionality.
 
 ## Changelog
 
+### 3.3.3
+
+- Do not register Celery task unless the plugin is enabled
+
 ### 3.3.2
 
 - Update translations
