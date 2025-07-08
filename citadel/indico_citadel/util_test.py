@@ -29,6 +29,20 @@ def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
     assert format_query(query, placeholders) == expected
 
+@pytest.mark.parametrize(('query', 'expected'), (
+    ('person:"John Doe" affiliation:"CERN"', 'person:"John Doe" affiliation:"CERN"'),
+    ('person:"John Doe" affiliation:CERN', 'person:"John Doe" affiliation:CERN'),
+    ('person:John Doe affiliation:"CERN"', 'person:John Doe affiliation:"CERN"'),
+    ('person:John Doe affiliation:CERN', 'person:John Doe affiliation:CERN'),
+    ('affiliation:"CERN" person:"John Doe"', 'affiliation:"CERN" person:"John Doe"'),
+    ('affiliation:"CERN" person:John Doe', 'affiliation:"CERN" person:John Doe'),
+    ('affiliation:CERN person:"John Doe"', 'affiliation:CERN person:"John Doe"'),
+    ('affiliation:CERN person:John Doe', 'affiliation:CERN person:John Doe'),
+))
+def test_query_placeholders_with_quotes(query, expected):
+    placeholders = {'person': 'person', 'affiliation': 'affiliation'}
+    assert format_query(query, placeholders) == expected
+
 
 @pytest.mark.parametrize(('val', 'expected'), (
     ({'a': 0, 'b': None, 'c': {'c1': None, 'c2': 0, 'c3': {'c3a': None}}},
