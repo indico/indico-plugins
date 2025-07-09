@@ -23,7 +23,7 @@ from indico_citadel.util import _flatten, format_aggregations, format_query, rem
     ('title:"meeting" "jane doe"', 'title:"meeting" "jane doe"'),
     ('"section meeting" OR "group meeting"', '"section meeting" OR "group meeting"'),
     ('title:meeting AND "indico"', 'title:meeting AND "indico"'),
-    ('title:valid stringtitle:valid foo:bar', 'title:valid stringtitle\\:valid foo\\:bar')
+    ('title:valid stringtitle:valid foo:bar', 'title:valid stringtitle\\:valid foo\\:bar'),
 ))
 def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
