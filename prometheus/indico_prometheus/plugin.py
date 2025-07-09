@@ -7,6 +7,7 @@
 
 from datetime import timedelta
 
+from flask_pluginengine import uses
 from wtforms.fields import BooleanField
 from wtforms.validators import DataRequired, Optional
 
@@ -53,6 +54,9 @@ class PluginSettingsForm(IndicoForm):
     )
 
 
+# XXX it would be nicer if plugins could register metrics with this plugin, instead of having to make this
+# plugin know about other plugins...
+@uses('livesync')
 class PrometheusPlugin(IndicoPlugin):
     """Prometheus
 
