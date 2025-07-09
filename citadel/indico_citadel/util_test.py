@@ -29,6 +29,7 @@ def test_query_placeholders(query, expected):
     placeholders = {'title': 'title', 'person': 'person', 'file': 'file'}
     assert format_query(query, placeholders) == expected
 
+
 @pytest.mark.parametrize(('query', 'expected'), (
     ('person:"John Doe" affiliation:"CERN"', 'person:"John Doe" affiliation:"CERN"'),
     ('person:"John Doe" affiliation:CERN', 'person:"John Doe" affiliation:CERN'),
