@@ -18,6 +18,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 from indico_prometheus import _
 from indico_prometheus.blueprint import blueprint
+from indico_prometheus.metrics import define_metrics
 
 
 class PluginSettingsForm(IndicoForm):
@@ -72,6 +73,10 @@ class PrometheusPlugin(IndicoPlugin):
         'heavy_cache_ttl': TimedeltaConverter,
         'active_user_age': TimedeltaConverter
     }
+
+    def init(self):
+        super().init()
+        define_metrics()
 
     def get_blueprints(self):
         return blueprint

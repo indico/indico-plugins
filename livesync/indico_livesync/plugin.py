@@ -60,6 +60,7 @@ class LiveSyncPlugin(IndicoPlugin):
         self.backend_classes = {}
         connect_signals(self)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+        self.connect(signals.core.import_tasks, self._import_tasks)
         self.template_hook('plugin-details', self._extend_plugin_details)
 
     def get_blueprints(self):
@@ -67,6 +68,9 @@ class LiveSyncPlugin(IndicoPlugin):
 
     def _extend_indico_cli(self, sender, **kwargs):
         return cli
+
+    def _import_tasks(self, sender, **kwargs):
+        import indico_livesync.task  # noqa: F401
 
     def register_backend_class(self, name, backend_class):
         if name in self.backend_classes:

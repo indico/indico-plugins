@@ -27,6 +27,12 @@ If you're doing development you may want to add this under `scrape_configs`:
 
 ## Changelog
 
+### 3.3.2
+
+- Fix errors if livesync plugin is installed but not enabled and do not expose livesync-related
+  metrics at all in that case
+- Use latest prometheus-client library
+
 ### 3.3.1
 
 - Use latest prometheus-client library
