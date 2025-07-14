@@ -292,14 +292,16 @@ msgstr "Érvénytelen identitásszolgáltatók: {}"
 #: indico_vc_zoom/plugin.py
 msgid "Zoom credentials not set; the plugin will not work correctly"
 msgstr ""
+"A zoom hitelesítő adatok nincsenek beállítva; a plugin nem fog megfelelően "
+"működni."
 
 #: indico_vc_zoom/plugin.py
 msgid "Successfully got a Zoom token ({})"
-msgstr ""
+msgstr "Sikeresen megszerezte a Zoom tokent ({})"
 
 #: indico_vc_zoom/plugin.py
 msgid "Could not get Zoom token: {}"
-msgstr ""
+msgstr "Nem sikerült megszerezni a Zoom tokent: {}"
 
 #: indico_vc_zoom/plugin.py
 msgid ""
