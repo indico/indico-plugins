@@ -8,6 +8,15 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.5
+
+- Update `indico-plugin-citadel`
+- Update `indico-plugin-livesync`
+- Update `indico-plugin-owncloud`
+- Update `indico-plugin-payment-sixpay`
+- Update `indico-plugin-prometheus`
+- Update `indico-plugin-vc-zoom`
+
 ### 3.3.4
 
 - Add `indico-plugin-payment-stripe`
