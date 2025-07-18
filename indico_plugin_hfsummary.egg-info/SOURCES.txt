@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+indico_hfsummary/__init__.py
+indico_hfsummary/plugin.py
+indico_plugin_hfsummary.egg-info/PKG-INFO
+indico_plugin_hfsummary.egg-info/SOURCES.txt
+indico_plugin_hfsummary.egg-info/dependency_links.txt
+indico_plugin_hfsummary.egg-info/entry_points.txt
+indico_plugin_hfsummary.egg-info/top_level.txt

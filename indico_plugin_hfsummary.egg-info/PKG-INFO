@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: indico-plugin-hfsummary
+Version: 0.1
+Summary: A plugin to summarize meeting minutes using Hugging Face
+Requires-Python: >=3.9
