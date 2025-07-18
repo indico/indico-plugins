@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indico-plugin-hfsummary"
+version = "0.1"
+description = "A plugin to summarize meeting minutes using Hugging Face"
+
+requires-python = ">=3.9"
+
+[project.entry-points."indico.plugins"]
+indico_hfsummary = "indico_hfsummary.plugin:IndicoHFSummaryPlugin"
