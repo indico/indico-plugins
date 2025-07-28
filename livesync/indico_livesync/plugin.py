@@ -47,6 +47,7 @@ class LiveSyncPlugin(IndicoPlugin):
     Provides the basic LiveSync functionality.
     Only useful if a livesync agent plugin is installed, too.
     """
+
     configurable = True
     settings_form = SettingsForm
     default_settings = {'excluded_categories': [],

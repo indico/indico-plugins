@@ -41,7 +41,7 @@ select = [
 ]
 ignore = [
     # plugin-specific excludes:
-    'D', # too noisy for now
+    'D400', # too noisy for now
     # anything below should match the indico core ruff.toml
     'E226',    # allow omitting whitespace around arithmetic operators
     'E731',    # allow assigning lambdas (it's useful for single-line functions defined inside other functions)

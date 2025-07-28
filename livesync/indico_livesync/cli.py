@@ -229,7 +229,6 @@ def enqueue(type, change, ids):
     that way it cascades to all child objects when used on anything except
     categories.
     """
-
     model = {
         EntryType.category: db.m.Category,
         EntryType.event: db.m.Event,

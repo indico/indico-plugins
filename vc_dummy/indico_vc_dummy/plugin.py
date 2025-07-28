@@ -31,6 +31,7 @@ class DummyPlugin(VCPluginMixin, IndicoPlugin):
 
     Dummy videoconferencing plugin
     """
+
     configurable = True
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm

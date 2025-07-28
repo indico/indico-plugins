@@ -22,7 +22,6 @@ from nbconvert.preprocessors.base import Preprocessor
 
 
 class CppHighlighter(Preprocessor):
-
     """Detects and tags code cells that use the C++ language."""
 
     magics = ['%%cpp', '%%dcl']

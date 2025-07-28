@@ -14,4 +14,5 @@ class LiveSyncDebugPlugin(LiveSyncPluginBase):
 
     Provides the debug backend for LiveSync which just prints/logs changes
     """
+
     backend_classes = {'debug': LiveSyncDebugBackend}

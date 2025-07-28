@@ -26,7 +26,6 @@ def cli():
 @click.option('--status', type=click.Choice(['deleted', 'created']))
 def meetings(status=None):
     """Lists all Zoom meetings"""
-
     room_query = VCRoom.query.filter_by(type='zoom')
     table_data = [['ID', 'Name', 'Status', 'Zoom ID']]
 
@@ -47,7 +46,6 @@ def fix_ids():
 
     This ensures Zoom webhooks correctly work for those meetings.
     """
-
     res = VCRoom.query.filter(VCRoom.type == 'zoom', db.func.jsonb_typeof(VCRoom.data['zoom_id']) == 'string').all()
     for vcr in verbose_iterator(res, len(res), get_id=attrgetter('id'), get_title=lambda x: x.data['zoom_id'],
                                 print_total_time=True):

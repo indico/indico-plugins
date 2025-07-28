@@ -34,7 +34,6 @@ class NotebookPreviewer(Previewer):
 
 
 class JupyterPreviewerPlugin(IndicoPlugin):
-
     """Jupyter Notebook renderer"""
 
     configurable = False

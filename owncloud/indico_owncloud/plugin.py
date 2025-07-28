@@ -39,6 +39,7 @@ class OwncloudPlugin(IndicoPlugin):
     Provides an integration with OwnCloud storage servers, enabling managers
     to attach files to categories/events from their cloud storage.
     """
+
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {

@@ -144,7 +144,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     """Zoom
 
-    Zoom Plugin for Indico."""
+    Zoom Plugin for Indico.
+    """
 
     configurable = True
     settings_form = PluginSettingsForm
@@ -191,7 +192,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Override the default room form creation mechanism."""
-
         if existing_vc_room and request.method != 'POST':
             try:
                 self.refresh_room(existing_vc_room, event)

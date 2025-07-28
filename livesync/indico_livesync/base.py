@@ -73,9 +73,6 @@ class LiveSyncBackendBase:
             return 'no description available'
 
     def __init__(self, agent):
-        """
-        :param agent: a `LiveSyncAgent` instance
-        """
         self.agent = agent
 
     def is_configured(self):
