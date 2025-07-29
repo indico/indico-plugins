@@ -13,7 +13,7 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
 
     
     def get_blueprints(self):
-        return None
+        return blueprint
    
 
     # summarization logic 
