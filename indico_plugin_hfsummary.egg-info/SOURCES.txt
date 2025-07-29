@@ -1,7 +1,9 @@
 README.md
 pyproject.toml
 indico_hfsummary/__init__.py
+indico_hfsummary/blueprint.py
 indico_hfsummary/plugin.py
+indico_hfsummary/utils.py
 indico_plugin_hfsummary.egg-info/PKG-INFO
 indico_plugin_hfsummary.egg-info/SOURCES.txt
 indico_plugin_hfsummary.egg-info/dependency_links.txt
