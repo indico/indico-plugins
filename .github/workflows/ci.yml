@@ -2,7 +2,7 @@ name: CI
 
 env:
   TZ: Europe/Zurich
-  PYTHON_VERSION: '3.12.7'
+  PYTHON_VERSION: '3.12.11'
   NODE_VERSION: '22.x'
 
 on:
@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Pick Indico core repo
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,25 +45,13 @@ jobs:
 
       - name: Create virtualenv
         run: |
-          python3.12 -m venv .venv
+          uv venv --python ${{ env.PYTHON_VERSION }} --seed .venv
           source .venv/bin/activate
-          pip install -U pip setuptools wheel
 
       - name: Activate virtualenv for later steps
         run: |
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache pip
-        id: cache-pip
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip|${{ runner.os }}|3.12|${{ hashFiles('**/pyproject.toml') }}
 
       - uses: actions/cache@v4
         id: cache-npm
@@ -76,8 +67,8 @@ jobs:
 
       - name: Install Indico
         run: |
-          pip install Babel
-          pip install "indico[dev] @ git+https://github.com/${INDICO_REPO}.git@${INDICO_BRANCH}"
+          uv pip install babel
+          uv pip install "indico[dev] @ git+https://github.com/${INDICO_REPO}.git@${INDICO_BRANCH}"
 
       - name: Install node dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -180,6 +171,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -202,12 +196,12 @@ jobs:
       - name: Install extra dependencies
         if: matrix.plugin == 'citadel' || matrix.plugin == 'prometheus'
         run: |
-          pip install -e "${GITHUB_WORKSPACE}/livesync/"
+          uv pip install -e "${GITHUB_WORKSPACE}/livesync/"
 
       - name: Install plugin
         run: |
           cd "${GITHUB_WORKSPACE}/${{ matrix.plugin }}"
-          pip install -e .
+          uv pip install -e .
 
       - name: Install redis
         run: sudo apt-get install redis-server
