@@ -3,10 +3,6 @@ from indico.core.plugins import IndicoPluginBlueprint
 from indico_hfsummary.utils import clean_html_text, chunk_text, cern_qwen, build_prompt, convert_text_to_html_sections
 import time
 
-blueprint = IndicoPluginBlueprint('hfsummary', __name__, url_prefix='/plugin/hfsummary')
-
-@blueprint.route('/summarize', methods=['POST'])
-
 def summarize():
     start_time = time.time()
     data = request.get_json()
