@@ -1,8 +1,12 @@
 from flask import request, jsonify
 from indico_hfsummary.utils import clean_html_text, chunk_text, cern_qwen, build_prompt, convert_text_to_html_sections
 import time
-
+import os 
 from indico.web.rh import RH
+from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.notes.util import get_scheduled_notes
+
+
 
 
 class Summarizer(RH):
@@ -55,4 +59,76 @@ class Summarizer(RH):
 
         '''
         
-            
+
+
+class SummarizeEvent(RHEventBase):
+
+    CSRF_ENABLED = False
+
+    def _process_args(self):
+        print(request.view_args)
+        RHEventBase._process_args(self)
+
+    def _process(self):
+        event = self.event
+
+        notes = get_scheduled_notes(self.event)
+
+        event_note_html = event.note.html if event.note else (event.description or "")
+        contrib_notes_html = "\n\n".join(note.html for note in notes if hasattr(note, 'html'))
+
+        raw_notes = event_note_html + "\n\n" + contrib_notes_html
+        print(f"raw_notes{raw_notes}")
+
+        if not raw_notes.strip():
+            return jsonify({"error": "No meeting notes found for this event or its contributions."}), 400
+
+
+        
+        
+
+        start_time = time.time()
+
+        cleaned_text = clean_html_text(raw_notes)
+        print(cleaned_text)
+        chunks = chunk_text(cleaned_text)
+        summaries = []
+        token = os.getenv('CERN_SUMMARY_API_TOKEN')
+        
+        for chunk in chunks:
+            prompt = build_prompt(chunk)
+            response = cern_qwen(prompt, token)
+            if response:
+                summary = response['choices'][0]['message']['content']
+                summaries.append(summary)
+            else:
+                summaries.append("[Error during summarization]")
+
+        combined_summary = "\n".join(summaries)
+        html_output = convert_text_to_html_sections(combined_summary)
+        print(f"[SummarizeEvent] Summarizing event {event.id}: {event.title}")
+        print(f"Summary:{html_output}")
+
+        processing_time = round(time.time() - start_time, 2)
+
+        return f"""
+        <html>
+        <head><title>Meeting Minutes Summary</title></head>
+        <body>
+        <h2>Meeting Minutes Summary</h2>
+        {''.join(html_output)}
+        <p><i>Processing Time: {processing_time} seconds</i></p>
+        </body>
+        </html>
+        """
+
+
+        '''
+
+        return jsonify({
+                    "summary_html": html_output,
+                    "processing_time": processing_time
+                })
+
+        '''
+    
