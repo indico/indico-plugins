@@ -5,7 +5,9 @@ from flask_pluginengine.plugin import render_plugin_template
 class IndicoHFSummaryPlugin(IndicoPlugin):
     '''
     AI-assisted minutes summarization tool
+    
     '''
+    
     def init(self):
         super().init()
         self.template_hook('event-manage-button', self.summary_button)
