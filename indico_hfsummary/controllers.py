@@ -7,8 +7,7 @@ from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
 
-
-
+# send a text to summarize
 class Summarizer(RH):
     CSRF_ENABLED = False # disable the protection for external api posts(postman)
 
@@ -27,6 +26,7 @@ class Summarizer(RH):
 
         for chunk in chunks:
             prompt = build_prompt(chunk)
+
             response = cern_qwen(prompt, token)
             if response:
                 summary = response['choices'][0]['message']['content']
@@ -59,8 +59,11 @@ class Summarizer(RH):
 
         '''
         
+#---------------------------------------------------------------------------------------------------------------
 
 
+
+# summarize the event
 class SummarizeEvent(RHEventBase):
 
     CSRF_ENABLED = False
@@ -74,30 +77,33 @@ class SummarizeEvent(RHEventBase):
 
         notes = get_scheduled_notes(self.event)
 
-        event_note_html = event.note.html if event.note else (event.description or "")
         contrib_notes_html = "\n\n".join(note.html for note in notes if hasattr(note, 'html'))
 
-        raw_notes = event_note_html + "\n\n" + contrib_notes_html
-        print(f"raw_notes{raw_notes}")
+        raw_notes = contrib_notes_html
+        
 
         if not raw_notes.strip():
             return jsonify({"error": "No meeting notes found for this event or its contributions."}), 400
 
 
-        
-        
-
         start_time = time.time()
 
         cleaned_text = clean_html_text(raw_notes)
-        print(cleaned_text)
+        
         chunks = chunk_text(cleaned_text)
         summaries = []
         token = os.getenv('CERN_SUMMARY_API_TOKEN')
         
+        
+
+
         for chunk in chunks:
             prompt = build_prompt(chunk)
+            print(f"[DEBUG] Prompt sent to model:\n{prompt}")
+
+   
             response = cern_qwen(prompt, token)
+            print(f"[DEBUG] Model response:\n{response}")
             if response:
                 summary = response['choices'][0]['message']['content']
                 summaries.append(summary)

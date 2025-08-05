@@ -32,27 +32,19 @@ def chunk_text(text: str, max_tokens=1500):
     
     return chunks
 
-
 def build_prompt(text: str) -> str:
-    return f"""You are a precise assistant that summarizes meeting minutes accurately and clearly. Stick to the facts. Do not add opinions, assumptions, or inferred content.
+    return f"""Imagine you're a stand-up comedian summarizing a meeting. Be funny, witty, but keep the core ideas intact.
+Every bullet should sound like you're roasting the meeting — without being cruel. Stay fact-based.
+End with a mic drop line.
 
-Instructions: 
-- Use concise bullet points, grouped into clearly named sections. 
-- Avoid assumptions or repetition. 
-- Ensure the summary is easy to scan and logically structured. 
-- Do not explain your reasoning, process, or how you grouped the content. Only output the final summary.
-- DO NOT create "Miscellaneous", "Misc", "Other", or "General" sections. 
-- Omit the miscellaneous meeting minutes and exclude them in the summary.
-- Combine the relevant meeting minutes under the same section.
-
-- Limit to maximum 2 bullet points for each section.
-- Format each section like this:
+Format each section like this:
 **Section Title**
 • First bullet point
 • Second bullet points
 
 Now, summarize the following meeting minutes: {text} 
 """
+
 
 # convert text to html in the end
 def convert_text_to_html_sections(summary_text: str) -> str:
