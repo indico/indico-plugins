@@ -4,7 +4,7 @@ from lxml import etree, html as lxml_html
 from lxml.html.clean import Cleaner
 
 
-# cleaning html text from tags 
+# clean html tags from text in the first place
 def clean_html_text(raw_html):
     try:
         # parse HTML and extract text content
@@ -19,9 +19,9 @@ def clean_html_text(raw_html):
         return cleaned_str
     except Exception as e:
         return f"[error cleaning HTML: {e}]"
+    
 
-
-# chunking function
+# chunking
 def chunk_text(text: str, max_tokens=1500):
     words = text.split()
     chunks = []
@@ -32,19 +32,35 @@ def chunk_text(text: str, max_tokens=1500):
     
     return chunks
 
-def build_prompt(text: str) -> str:
-    return f"""Imagine you're a stand-up comedian summarizing a meeting. Be funny, witty, but keep the core ideas intact.
-Every bullet should sound like you're roasting the meeting — without being cruel. Stay fact-based.
-End with a mic drop line.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# prompt 
+def build_prompt(text: str) -> str:
+    return f"""A passive-aggressive AI who's forced to summarize boring corporate meetings.
+
+Tone: Sarcastic, dry, visibly annoyed. Add sighs and eyerolls if necessary.
 Format each section like this:
 **Section Title**
 • First bullet point
-• Second bullet points
+• Second bullet point
 
-Now, summarize the following meeting minutes: {text} 
+Now summarize this mess: {text} 
 """
-
 
 # convert text to html in the end
 def convert_text_to_html_sections(summary_text: str) -> str:
@@ -80,7 +96,7 @@ def convert_text_to_html_sections(summary_text: str) -> str:
 
 
 
-# calling the hf-qwen25-32b model
+# call model hf-qwen25-32b
 def cern_qwen(message_text: str, token: str):
     url = "https://ml.cern.ch/openai/v1/chat/completions"
     headers = {
@@ -106,5 +122,3 @@ def cern_qwen(message_text: str, token: str):
     except Exception as e:
         print("Request failed:", e)
         return None
-
-
