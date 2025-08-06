@@ -1,29 +1,32 @@
 <script src="{{ url_for_plugin('indico_hfsummary.static', filename='js/summarize.js') }}"></script>
 
 
-<button id="summary-button"
-        data-event-id="{{ event.id }}"
-        style="margin-top:1px; padding:2px 8px; border-radius:6px; font-size:14px; border:1px solid #ccc; background:#f7f7f7; color:#333;">
-  Summarize Event
-</button>
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
 
 
-<div style="margin-top: 10px;">
-  <label for="prompt-select"><strong>Choose a prompt:</strong></label>
-  <select id="prompt-select">
-    <option value="grumpy">Grumpy</option>
-    <option value="angry">Angry</option>
-    <option value="funny">Funny</option>
-    <option value="custom">Custom Prompt</option>
-  </select>
+  <button id="summary-button"
+          data-event-id="{{ event.id }}"
+          style="padding: 4px 10px; border-radius: 6px; font-size: 14px; border: 1px solid #ccc; background: #f7f7f7; color: #333;">
+    Summarize Event
+  </button>
+
+  <div>
+    <label for="prompt-select"><strong>Choose a prompt:</strong></label><br>
+    <select id="prompt-select">
+      <option value="default">Default</option>
+      <option value="tldr">TL;DR</option>
+      <option value="dev">Development</option>
+      <option value="grumpy">Grumpy</option>
+      <option value="old-angry-engineer">Old engineer</option>
+      <option value="funny">LOL</option>
+      <option value="custom">Custom Prompt</option>
+    </select>
+  </div>
+
+  <div id="custom-prompt-container" style="display:none;">
+    <textarea id="custom-prompt" rows="3" cols="50" placeholder="Enter your custom prompt here..."></textarea>
+  </div>
+
 </div>
 
-
-<div id="custom-prompt-container" style="display:none; margin-top: 5px;">
-  <textarea id="custom-prompt" rows="3" cols="50" placeholder="Enter your custom prompt here... 
-Make sure to add this format information :  
-  **Section Title**
-  • First bullet point
-  • Second bullet point"></textarea>
-</div>
 

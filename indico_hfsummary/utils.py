@@ -2,7 +2,8 @@ import re
 import requests
 from lxml import etree, html as lxml_html
 from lxml.html.clean import Cleaner
-
+import markdown
+import html2text
 
 # clean html tags from text in the first place
 def clean_html_text(raw_html):
@@ -19,7 +20,16 @@ def clean_html_text(raw_html):
         return cleaned_str
     except Exception as e:
         return f"[error cleaning HTML: {e}]"
-    
+
+# html to markdown to feed llm
+def html_to_markdown(html_string):
+    h = html2text.HTML2Text()
+    h.ignore_links = True
+    h.ignore_images = True
+    h.body_width = 0  
+    return h.handle(html_string)
+
+
 
 # chunking
 def chunk_text(text: str, max_tokens=1500):
@@ -33,33 +43,27 @@ def chunk_text(text: str, max_tokens=1500):
     return chunks
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # prompt 
 def build_prompt(text: str) -> str:
-    return f"""A passive-aggressive AI who's forced to summarize boring corporate meetings.
+    return f"""You are a precise assistant that summarizes meeting minutes accurately and clearly. Stick to the facts. Do not add opinions, assumptions, or inferred content.
 
-Tone: Sarcastic, dry, visibly annoyed. Add sighs and eyerolls if necessary.
-Format each section like this:
-**Section Title**
-• First bullet point
-• Second bullet point
+    Instructions: 
 
-Now summarize this mess: {text} 
+    Use concise bullet points, grouped into clearly named sections.
+    Avoid assumptions or repetition.
+    Ensure the summary is easy to scan and logically structured.
+    Do not explain your reasoning, process, or how you grouped the content. Only output the final summary.
+    DO NOT create "Miscellaneous", "Misc", "Other", or "General" sections.
+    Omit the miscellaneous meeting minutes and exclude them in the summary.
+    Combine the relevant meeting minutes under the same section.
+    Limit to maximum 2 bullet points for each section.
+
+    Format each section like this:
+    Section Title
+    • First bullet point
+    • Second bullet points
+
+Now, summarize the following meeting minutes: {text}
 """
 
 # convert text to html in the end
@@ -73,7 +77,7 @@ def convert_text_to_html_sections(summary_text: str) -> str:
         if not line:
             continue
             
-        # checking for **Section Title** - but what if it sections start with other symbols - rip
+        # checking for **Section Title** - but what if sections start with other symbols - rip
         if line.startswith("**") and line.endswith("**"):
             # save previous section if exists
             if current_section and current_bullets:
@@ -93,6 +97,10 @@ def convert_text_to_html_sections(summary_text: str) -> str:
         html_sections.append(f"<b>{current_section}</b><ul>{''.join(current_bullets)}</ul>")
     
     return "\n".join(html_sections)
+
+
+
+
 
 
 
@@ -122,3 +130,9 @@ def cern_qwen(message_text: str, token: str):
     except Exception as e:
         print("Request failed:", e)
         return None
+
+# convert markdown to html text when returning the summary
+def markdown_to_html(summary_text: str) -> str:
+    html = markdown.markdown(summary_text)
+    return html
+    

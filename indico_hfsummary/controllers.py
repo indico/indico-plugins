@@ -1,11 +1,10 @@
 from flask import request, jsonify
-from indico_hfsummary.utils import clean_html_text, chunk_text, cern_qwen, build_prompt, convert_text_to_html_sections
+from indico_hfsummary.utils import clean_html_text, chunk_text, cern_qwen, build_prompt, convert_text_to_html_sections, markdown_to_html, html_to_markdown
 import time
 import os 
 from indico.web.rh import RH
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
-
 
 # send a text to summarize
 class Summarizer(RH):
@@ -84,18 +83,20 @@ class SummarizeEvent(RHEventBase):
             return jsonify({"error": "No meeting notes found for this event or its contributions."}), 400
 
         start_time = time.time()
-        cleaned_text = clean_html_text(raw_notes)
+        #cleaned_text = clean_html_text(raw_notes)
+        cleaned_text= html_to_markdown(raw_notes)
         chunks = chunk_text(cleaned_text)
         summaries = []
         token = os.getenv('CERN_SUMMARY_API_TOKEN')
 
         for chunk in chunks:
-            # Use passed prompt template
+            # use passed prompt template
             full_prompt = f"{prompt_template.strip()}\n\n{chunk}"
             
             print(f"[DEBUG] Prompt sent to model:\n{full_prompt}")
 
             response = cern_qwen(full_prompt, token)
+            print(f"[DEBUG] response from  model:\n{response}")
             
             if response:
                 summary = response['choices'][0]['message']['content']
@@ -104,11 +105,12 @@ class SummarizeEvent(RHEventBase):
                 summaries.append("[Error during summarization]")
 
         combined_summary = "\n".join(summaries)
+        print("---------Summary ---------")
         print(combined_summary)
-        html_output = convert_text_to_html_sections(combined_summary)
+        html_output = markdown_to_html(combined_summary)
         print(f"[SummarizeEvent] Summarizing event {event.id}: {event.title}")
         
-        #print(f"Summary:\n{html_output}")
+        print(f"Summary html output:\n{html_output}")
         
         processing_time = round(time.time() - start_time, 2)
 
