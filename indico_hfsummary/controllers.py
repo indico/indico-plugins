@@ -93,10 +93,10 @@ class SummarizeEvent(RHEventBase):
             # use passed prompt template
             full_prompt = f"{prompt_template.strip()}\n\n{chunk}"
             
-            print(f"[DEBUG] Prompt sent to model:\n{full_prompt}")
+            print(f"*********** Prompt sent to model:\n{full_prompt}")
 
             response = cern_qwen(full_prompt, token)
-            print(f"[DEBUG] response from  model:\n{response}")
+            print(f"*********** Response from  model:\n{response}")
             
             if response:
                 summary = response['choices'][0]['message']['content']
