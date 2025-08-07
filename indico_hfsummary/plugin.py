@@ -18,4 +18,4 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
     
     def summary_button(self, event):
         print("work damn you")
-        return render_plugin_template('indico_hfsummary/summarize_button.html', event = event)
+        return render_plugin_template('summarize_button.html', event = event)
