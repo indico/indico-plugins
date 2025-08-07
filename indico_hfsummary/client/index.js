@@ -1,0 +1,1 @@
+import './ind_summarize_button';
