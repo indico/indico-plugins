@@ -1,13 +1,13 @@
 {
   "build": {
-    "clientPath": "/home/zeynep/dev/indico/src/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client",
-    "distPath": "/home/zeynep/dev/indico/src/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/static/dist",
+    "clientPath": "/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client",
+    "distPath": "/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/static/dist",
     "distURL": "/static/plugins/hfsummary/dist/",
     "indicoSourcePath": "/home/zeynep/dev/indico/src",
-    "rootPath": "/home/zeynep/dev/indico/src/indico/plugins/indico-plugin-hf-summary/indico_hfsummary",
-    "staticPath": "/home/zeynep/dev/indico/src/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/static",
+    "rootPath": "/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary",
+    "staticPath": "/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/static",
     "staticURL": "/static/plugins/hfsummary/",
-    "urlMapPath": "/home/zeynep/dev/indico/src/indico/plugins/indico-plugin-hf-summary/url_map.json"
+    "urlMapPath": "/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/url_map.json"
   },
   "indico": {
     "build": {

@@ -2,7 +2,7 @@ from indico.core.plugins import IndicoPluginBlueprint
 from indico_hfsummary.controllers import Summarizer
 from indico_hfsummary.controllers import SummarizeEvent
 
-blueprint = IndicoPluginBlueprint('indico_hfsummary', __name__, url_prefix='/plugin/hfsummary')
+blueprint = IndicoPluginBlueprint('hfsummary', __name__, url_prefix='/plugin/hfsummary')
 
 blueprint.add_url_rule('/summarize', 'summarize', Summarizer, methods=('POST','GET'))
 

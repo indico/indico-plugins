@@ -6,7 +6,7 @@ description = "A plugin to summarize meeting minutes using Hugging Face"
 requires-python = ">=3.9"
 
 [project.entry-points."indico.plugins"]
-indico_hfsummary = "indico_hfsummary.plugin:IndicoHFSummaryPlugin"
+hfsummary = "indico_hfsummary.plugin:IndicoHFSummaryPlugin"
 
 [build-system]
 requires = ["hatchling"]
@@ -15,5 +15,3 @@ build-backend = 'hatchling.build'
 [tool.hatch.build]
 packages = ["indico_hfsummary"]
 
-[tool.hatch.build.include]
-"indico_hfsummary/templates/**" = "indico_hfsummary/templates"
