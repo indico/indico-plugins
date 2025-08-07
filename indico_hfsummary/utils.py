@@ -23,7 +23,7 @@ def clean_html_text(raw_html):
 
 # html to markdown to feed llm
 def html_to_markdown(html_string):
-    h = html2text.HTML2Text()
+    h = html2text.HTML2Text() 
     h.ignore_links = True
     h.ignore_images = True
     h.body_width = 0  
@@ -133,6 +133,7 @@ def cern_qwen(message_text: str, token: str):
 
 # convert markdown to html text when returning the summary
 def markdown_to_html(summary_text: str) -> str:
+    summary_text = re.sub(r"(?m)^•\s*", "- ", summary_text)
     html = markdown.markdown(summary_text)
     return html
     

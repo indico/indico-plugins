@@ -1,7 +1,7 @@
 from indico.core.plugins import IndicoPlugin
 from indico_hfsummary.blueprint import blueprint
 from flask_pluginengine.plugin import render_plugin_template
-
+from indico.modules.events.views import WPSimpleEventDisplay
 class IndicoHFSummaryPlugin(IndicoPlugin):
     '''
     AI-assisted minutes summarization tool
@@ -10,7 +10,8 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
     
     def init(self):
         super().init()
-        self.template_hook('event-manage-button', self.summary_button)
+        self.template_hook('event-manage-dropdown-after-notes-compile', self.summary_button)
+        self.inject_bundle('main.js', WPSimpleEventDisplay)
 
     def get_blueprints(self):
         return blueprint
