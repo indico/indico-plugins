@@ -22,4 +22,6 @@ node_modules/
 *.lock
 url_map.json
 .venv/
-__pycache__/
+.vscode/
+**/__pycache__/
+static/

@@ -133,7 +133,7 @@ def cern_qwen(message_text: str, token: str):
 
 # convert markdown to html text when returning the summary
 def markdown_to_html(summary_text: str) -> str:
-    summary_text = re.sub(r"(?m)^•\s*", "- ", summary_text)
+    #summary_text = re.sub(r"(?m)^•\s*", "- ", summary_text)
     html = markdown.markdown(summary_text)
     return html
     
