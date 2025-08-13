@@ -1,6 +1,8 @@
 import React, {useMemo, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Dropdown, TextArea, Button, Form, Message, Loader} from 'semantic-ui-react';
+import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
+import styles from '/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client/summarize_button.module.scss';
+import {Translate} from 'indico/react/i18n';
 
 const PROMPT_OPTIONS = [
   { key: 'default', text: 'Default', value: 'default' }, 
@@ -167,74 +169,112 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
       open={open} 
       onClose={() => setOpen(false)} 
       onOpen={() => setOpen(true)} 
-      trigger={<li><a href="#">Summarize</a></li>} // trigger the modal
+      trigger={<li><a>Summarize</a></li>} // trigger the modal
     >
       <Modal.Header>Summarize Meeting</Modal.Header>
+
       <Modal.Content>
-        <Form loading={loading}> {/* form to select prompt type and enter custom prompt text + added loading thing :) */}
-          <Form.Field> {/* Dropdown to select prompt type */}
-            <label>Select Prompt</label>
-            <Dropdown
+        <Grid celled="internally">
+          <GridRow columns={2}>
+            <GridColumn>
+              <Header
+                as="h3"
+                content={Translate.string('Select Prompt')}
+                subheader={Translate.string('You can choose from the predefined ones, edit or write your own custom prompt')}
+              />
+
+              <Form.Field> {/* Dropdown to select prompt type */}
+              
+              <Dropdown
               id="prompt-select" 
               selection // selection dropdown
               options={PROMPT_OPTIONS} 
               value={selectedPromptKey} 
               onChange={(_, { value }) => setSelectedPromptKey(value)} 
-            />
-          </Form.Field>
-
-          {selectedPromptKey === 'custom' && ( // if custom prompt is selected, show the text area for custom input
-            <Form.Field id="custom-prompt-container"> {/* container for custom prompt input */}
-              <label>Custom prompt</label> 
-              <TextArea // text area for custom prompt input
-                id="custom-prompt" 
-                placeholder="Type your custom instructions…"
-                value={customPromptText} 
-                onChange={(_, { value }) => setCustomPromptText(value)}
               />
-            </Form.Field>
-          )}
+              </Form.Field>
 
-          <Form.Field> {/* text area to show the prompt text that will be sent to the model */}
-            <label>Preview of prompt sent to the model (editable)</label>
-            <TextArea 
-              value={editedPromptText || promptText}  // use edited prompt text if available, otherwise use generated prompt
-              onChange={(_, { value }) => setEditedPromptText(value)}
-              placeholder={promptText}
-              style={{ minHeight: 140 }} 
-            /> 
-          </Form.Field>
+              <Card raised fluid>
+                  <CardContent>
+                    <Form loading={loading}> {/* form to select prompt type and enter custom prompt text + added loading thing :) */}
+                      
 
-          <Button
-            id="summary-button" 
-            primary // primary button style
-            type="button" 
-            onClick={runSummarize} // onClick handler to run the summarization
-            data-event-id={eventId} // passing the event ID as data attribute
-            disabled={loading} // disable button while loading
-          >
-            {loading ? 'Summarizing…' : 'Generate summary'}
-          </Button>
-        </Form>
+                      {selectedPromptKey === 'custom' && ( // if custom prompt is selected, show the text area for custom input
+                        <Form.Field id="custom-prompt-container"> {/* container for custom prompt input */}
+                          <label>Custom prompt</label> 
+                          <TextArea // text area for custom prompt input
+                            id="custom-prompt" 
+                            placeholder="Type your custom instructions…"
+                            value={customPromptText} 
+                            onChange={(_, { value }) => setCustomPromptText(value)}
+                          />
+                        </Form.Field>
+                      )}
 
-        {loading && ( 
-          <div style={{ marginTop: 16 }}> 
-            <Loader active inline='centered' />
-          </div>
-        )}
+                      <Form.Field> {/* text area to show the prompt text that will be sent to the model */}
+                        <label>Preview of prompt sent to the model (editable)</label>
+                        <TextArea 
+                          value={editedPromptText || promptText}  // use edited prompt text if available, otherwise use generated prompt
+                          onChange={(_, { value }) => setEditedPromptText(value)}
+                          placeholder={promptText}
+                          style={{ minHeight: 140 }} 
+                        /> 
+                      </Form.Field>
 
-        {error && ( 
-          <Message negative style={{ marginTop: 16 }}>
-            <Message.Header>Couldn\'t get a summary</Message.Header>
-            <p>{error}</p>
-          </Message>
-        )}
+                      <Button
+                        id="summary-button" 
+                        primary // primary button style
+                        type="button" 
+                        onClick={runSummarize} // onClick handler to run the summarization
+                        data-event-id={eventId} // passing the event ID as data attribute
+                        disabled={loading} // disable button while loading
+                      >
+                        {loading ? 'Summarizing…' : 'Generate summary'}
+                      </Button>
+                      </Form>
+                  </CardContent>
+              </Card>
+            </GridColumn>
+            <GridColumn styleName="column-divider">
+              <Header
+                as="h3"
+                content={Translate.string('Preview')}
+                subheader={Translate.string(
+                  'Summary'
+                )}
+              />
+              
+                <Card raised fluid>
+                  <CardContent>
+                    {loading && ( 
+                    <div style={{ marginTop: 16 }}> 
+                      <Loader active inline='centered' />
+                    </div>
+                  )}
+
+                  {error && ( 
+                    <Message negative style={{ marginTop: 16 }}>
+                      <Message.Header>Couldn\'t get a summary</Message.Header>
+                      <p>{error}</p>
+                    </Message>
+                  )}
 
 
-        {summaryHtml && ( // if there is a summary HTML, display it
-          <div id="summary-output" style={{ marginTop: 16 }}
-               dangerouslySetInnerHTML={{ __html: summaryHtml }} />
-        )}
+                  {summaryHtml && ( // if there is a summary HTML, display it
+                    <div id="summary-output" 
+                    className={styles.previewCard}
+                    style={{ marginTop: 16 }}
+                    dangerouslySetInnerHTML={{ __html: summaryHtml }}
+                    />
+                  )}
+                  </CardContent>
+                </Card>
+              
+              
+            </GridColumn>
+          </GridRow>
+        </Grid>
+
       </Modal.Content>
     </Modal>
   );
