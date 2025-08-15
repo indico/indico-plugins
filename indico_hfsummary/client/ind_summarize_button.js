@@ -1,6 +1,6 @@
 import React, {useMemo, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
+import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Segment, Dimmer, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
 //import styles from '/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client/summarize_button.module.scss';
 import './ind_summarize_button.module.scss'
 import {Translate} from 'indico/react/i18n';
@@ -197,7 +197,7 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
 
               <Card raised fluid>
                   <CardContent>
-                    <Form loading={loading}> {/* form to select prompt type and enter custom prompt text + added loading thing :) */}
+                    <Form > {/* form to select prompt type and enter custom prompt text */}
                       
 
                       {selectedPromptKey === 'custom' && ( // if custom prompt is selected, show the text area for custom input
@@ -232,7 +232,7 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
                       >
                         {loading ? 'Summarizing…' : 'Generate summary'}
                       </Button>
-                      </Form>
+                    </Form>
                   </CardContent>
               </Card>
             </GridColumn>
@@ -246,26 +246,26 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
               />
               
                 <Card raised fluid styleName="preview-card-wrapper">
-                  <CardContent>
-                    {loading && ( 
-                      <div> 
-                        <Loader active inline='centered' />
-                      </div>
+                  <CardContent >
+                    <Segment basic style={{ position: 'relative', minHeight: '250px' }}>
+                    {loading && (
+                      <Dimmer active inverted>
+                        <Loader>Loading summary...</Loader>
+                      </Dimmer>
                     )}
-
                     {error && ( 
                       <Message negative>
                         <Message.Header>Couldn\'t get a summary</Message.Header>
                         <p>{error}</p>
                       </Message>
                     )}
-
-                    {summaryHtml && ( // if there is a summary HTML, display it
+                    {summaryHtml && ( // if there is a summary HTML, display it                    
                       <div id="summary-output" 
                       styleName="preview-card"
                       dangerouslySetInnerHTML={{ __html: summaryHtml }}
                       />
                     )}
+                    </Segment>
                   </CardContent>
                 </Card>
               
