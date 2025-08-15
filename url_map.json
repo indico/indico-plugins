@@ -50021,46 +50021,6 @@
         }
       ]
     },
-    "plugin_hfsummary.summarize": {
-      "endpoint": "plugin_hfsummary.summarize",
-      "rules": [
-        {
-          "args": [],
-          "converters": {},
-          "defaults": {},
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "plugin",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "hfsummary",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "summarize",
-              "isDynamic": false
-            }
-          ]
-        }
-      ]
-    },
     "plugin_hfsummary.summarize_event": {
       "endpoint": "plugin_hfsummary.summarize_event",
       "rules": [

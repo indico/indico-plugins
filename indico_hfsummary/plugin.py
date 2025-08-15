@@ -11,7 +11,8 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
     def init(self):
         super().init()
         self.template_hook('event-manage-dropdown-after-notes-compile', self.summary_button)
-        self.inject_bundle('main.js', WPSimpleEventDisplay)
+        self.inject_bundle('main.js', WPSimpleEventDisplay) 
+        self.inject_bundle('main.css', WPSimpleEventDisplay)
 
     def get_blueprints(self):
         return blueprint
@@ -19,3 +20,4 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
     def summary_button(self, event):
         print("work damn you")
         return render_plugin_template('summarize_button.html', event = event)
+    
