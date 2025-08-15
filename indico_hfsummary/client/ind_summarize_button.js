@@ -1,7 +1,6 @@
 import React, {useMemo, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Segment, Dimmer, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
-//import styles from '/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client/summarize_button.module.scss';
 import './ind_summarize_button.module.scss'
 import {Translate} from 'indico/react/i18n';
 
@@ -14,6 +13,11 @@ const PROMPT_OPTIONS = [
   { key: 'funny', text: 'LOL', value: 'funny' },
   { key: 'custom', text: 'Custom…', value: 'custom' }, 
 ];
+
+
+const LOCAL_STORAGE_KEY = 'savedPrompts';
+const SUMMARY_STORAGE_KEY = 'hfSummaryHtml';
+
 
 function buildPrompt(selectedKey, customPromptText) { // build the prompt text based on the selected key and custom input
   
@@ -104,6 +108,11 @@ Instructions:
       - First bullet point
       - Second bullet point`)}
 
+
+Format each section like this: 
+      ## Section Title
+      - First bullet point
+      - Second bullet point      
 Now, summarize the following meeting minutes:`;
  
     default: // fallback case incase of an unknown key
@@ -123,7 +132,7 @@ Now, summarize the following meeting minutes:`;
 
 }
 
-function SummarizeButton({ eventId }) {  // react component to handle the summarization button and modal
+function SummarizeButton({ eventId }) {  // main react component to handle the summarization button and modal
   const [open, setOpen] = useState(false); 
   const [selectedPromptKey, setSelectedPromptKey] = useState('default'); 
   const [customPromptText, setCustomPromptText] = useState(''); 
@@ -131,13 +140,76 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
   const [error, setError] = useState(null); 
   const [summaryHtml, setSummaryHtml] = useState(''); 
   const [editedPromptText, setEditedPromptText] = useState(''); // state for manually edited prompt
+  const [savedPrompts, setSavedPrompts] = useState([]);
+  const [manageModalOpen, setManageModalOpen] = useState(false);
 
-  const promptText = useMemo( () => buildPrompt(selectedPromptKey, customPromptText),[selectedPromptKey, customPromptText]);
+ // Combine predefined and saved prompts for dropdown
+  const allPromptOptions = [
+    ...PROMPT_OPTIONS,
+    ...savedPrompts.map((prompt, idx) => ({
+      key: `saved-${idx}`,
+      text: prompt.slice(0, 30) + (prompt.length > 30 ? '...' : ''),
+      value: `saved-${idx}`,
+      promptText: prompt,
+    })),
+  ];
+
+
+  const promptText = useMemo(() => {
+  if (selectedPromptKey.startsWith('saved-')) {
+    const saved = allPromptOptions.find(opt => opt.value === selectedPromptKey);
+    return saved?.promptText || '';
+  }
+  return buildPrompt(selectedPromptKey, customPromptText);
+}, [selectedPromptKey, customPromptText, allPromptOptions]);
 
   // clear edited prompt when usr changes dropdown selection
   useEffect(() => {
     setEditedPromptText('');
   }, [selectedPromptKey, customPromptText]); 
+
+  useEffect(() => {
+      const prompts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+      setSavedPrompts(prompts);
+  }, []);
+
+  function saveCustomPrompt() {
+    if (customPromptText.trim()) {
+        const prompts = [...savedPrompts, customPromptText.trim()];
+        setSavedPrompts(prompts);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(prompts));
+    }
+  }
+
+  function deleteSavedPrompt(idx) {
+    const prompts = savedPrompts.filter((_, i) => i !== idx);
+    setSavedPrompts(prompts);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(prompts));
+  }
+
+
+  // When a saved prompt is selected, set its text
+  function handlePromptChange(_, { value }) {
+    setSelectedPromptKey(value);
+    const saved = allPromptOptions.find(opt => opt.value === value && opt.promptText);
+    if (saved) {
+      setCustomPromptText(saved.promptText); // Show saved prompt in preview
+    } else if (value === 'custom') {
+      setCustomPromptText('');
+    } else {
+      setCustomPromptText(''); // Reset for predefined prompts
+    }
+  }
+
+
+  useEffect(() => {
+      const savedSummary = localStorage.getItem(SUMMARY_STORAGE_KEY);
+      if (savedSummary) {
+        setSummaryHtml(savedSummary);
+      }
+  }, []);
+
+
 
   async function runSummarize() { // function to run the summarization process
     if (!eventId) { 
@@ -149,23 +221,28 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
     setSummaryHtml(''); // clear previous summary 
     try {
       const finalPromptText = editedPromptText || promptText;
-      const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text --- CHANGE - INDICO AXOIS
-      const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server
+      const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text 
+      const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server ---- ADD INDICO AXIOS THING
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`); 
       const data = await resp.json(); // parse the JSON response
+
+
       if (data.summary_html) { // if there is summary_html in the response
         setSummaryHtml(data.summary_html); // set the summary HTML
+        localStorage.setItem(SUMMARY_STORAGE_KEY, data.summary_html); // add to local storage
       } else {
         setError('No summary returned.');
       }
     } catch (e) {
-      setError(`Error during summarization: ${e.message}`);
+      //setError(`Error during summarization: ${e.message}`);
+      setError(`Error during summarization: ${handleAxiosError(e)}`);
     } finally {
       setLoading(false);
     }
   };
 
   return ( 
+     <>
     <Modal 
       open={open} 
       onClose={() => setOpen(false)} 
@@ -187,13 +264,21 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
               <Form.Field> {/* Dropdown to select prompt type */}
               
               <Dropdown
-              id="prompt-select" 
-              selection // selection dropdown
-              options={PROMPT_OPTIONS} 
-              value={selectedPromptKey} 
-              onChange={(_, { value }) => setSelectedPromptKey(value)} 
+                id="prompt-select" 
+                selection
+                options={allPromptOptions}
+                value={selectedPromptKey}
+                onChange={handlePromptChange}
               />
-              </Form.Field>
+            </Form.Field>
+              <Button
+                size="tiny"
+                type="button"
+                onClick={() => setManageModalOpen(true)}
+                style={{ marginTop: '0.5em' }}
+              >
+              Manage Saved Prompts
+            </Button>
 
               <Card raised fluid>
                   <CardContent>
@@ -209,6 +294,9 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
                             value={customPromptText} 
                             onChange={(_, { value }) => setCustomPromptText(value)}
                           />
+                          <Button type="button" onClick={saveCustomPrompt}>
+                            Save Custom Prompt
+                          </Button>
                         </Form.Field>
                       )}
 
@@ -265,17 +353,59 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
                       dangerouslySetInnerHTML={{ __html: summaryHtml }}
                       />
                     )}
+
+                    {summaryHtml && (
+                      <Button
+                        size="tiny"
+                        type="button"
+                        onClick={() => {
+                          setSummaryHtml('');
+                          localStorage.removeItem(SUMMARY_STORAGE_KEY);
+                        }}
+                        style={{ marginTop: '1em' }}
+                      >
+                        Clear Saved Summary
+                      </Button>
+                  )}
+
                     </Segment>
                   </CardContent>
                 </Card>
-              
-              
             </GridColumn>
           </GridRow>
         </Grid>
 
       </Modal.Content>
     </Modal>
+
+    <Modal
+      open={manageModalOpen}
+      onClose={() => setManageModalOpen(false)}
+      size="small"
+    >
+      <Modal.Header>Manage Saved Prompts</Modal.Header>
+      <Modal.Content>
+        {savedPrompts.length === 0 ? (
+          <p>No saved prompts yet.</p>
+        ) : (
+          savedPrompts.map((prompt, idx) => (
+            <Segment key={idx} style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ flex: 1, marginRight: '1em', overflowWrap: 'anywhere' }}>{prompt}</span>
+              <Button size="mini" negative onClick={() => deleteSavedPrompt(idx)}>
+                Delete
+              </Button>
+            </Segment>
+          ))
+        )}
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setManageModalOpen(false)}>Close</Button>
+      </Modal.Actions>
+    </Modal>
+
+
+</>
+
   );
 }
 
