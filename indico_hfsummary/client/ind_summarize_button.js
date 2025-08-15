@@ -1,7 +1,8 @@
 import React, {useMemo, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
-import styles from '/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client/summarize_button.module.scss';
+//import styles from '/home/zeynep/dev/indico/plugins/indico-plugin-hf-summary/indico_hfsummary/client/summarize_button.module.scss';
+import './ind_summarize_button.module.scss'
 import {Translate} from 'indico/react/i18n';
 
 const PROMPT_OPTIONS = [
@@ -148,7 +149,7 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
     setSummaryHtml(''); // clear previous summary 
     try {
       const finalPromptText = editedPromptText || promptText;
-      const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text
+      const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text --- CHANGE - INDICO AXOIS
       const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`); 
       const data = await resp.json(); // parse the JSON response
@@ -244,29 +245,27 @@ function SummarizeButton({ eventId }) {  // react component to handle the summar
                 )}
               />
               
-                <Card raised fluid>
+                <Card raised fluid styleName="preview-card-wrapper">
                   <CardContent>
                     {loading && ( 
-                    <div style={{ marginTop: 16 }}> 
-                      <Loader active inline='centered' />
-                    </div>
-                  )}
+                      <div> 
+                        <Loader active inline='centered' />
+                      </div>
+                    )}
 
-                  {error && ( 
-                    <Message negative style={{ marginTop: 16 }}>
-                      <Message.Header>Couldn\'t get a summary</Message.Header>
-                      <p>{error}</p>
-                    </Message>
-                  )}
+                    {error && ( 
+                      <Message negative>
+                        <Message.Header>Couldn\'t get a summary</Message.Header>
+                        <p>{error}</p>
+                      </Message>
+                    )}
 
-
-                  {summaryHtml && ( // if there is a summary HTML, display it
-                    <div id="summary-output" 
-                    className={styles.previewCard}
-                    style={{ marginTop: 16 }}
-                    dangerouslySetInnerHTML={{ __html: summaryHtml }}
-                    />
-                  )}
+                    {summaryHtml && ( // if there is a summary HTML, display it
+                      <div id="summary-output" 
+                      styleName="preview-card"
+                      dangerouslySetInnerHTML={{ __html: summaryHtml }}
+                      />
+                    )}
                   </CardContent>
                 </Card>
               

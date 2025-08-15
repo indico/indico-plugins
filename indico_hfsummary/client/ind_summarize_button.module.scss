@@ -1,0 +1,23 @@
+// took the column-divider from ConflictModal.module.scss file
+
+
+@use 'base/palette' as *;
+
+.column-divider {
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column;
+  border-left: 1px solid $raincloud-gray;
+}
+
+.preview-card-wrapper {
+  flex-grow: 1;
+
+  .preview-card {
+    overflow: auto;
+    flex-grow: 1;
+    ul li {
+      margin-left: 2em;
+    }
+  }
+}
