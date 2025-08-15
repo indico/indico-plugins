@@ -1,9 +1,9 @@
 {
-  "main.css": "/static/plugins/hfsummary/dist/css/main.af94bd54.css",
-  "main.js": "/static/plugins/hfsummary/dist/js/main.4495de62.bundle.js",
+  "main.css": "/static/plugins/hfsummary/dist/css/main.9356d326.css",
+  "main.js": "/static/plugins/hfsummary/dist/js/main.a17d77ed.bundle.js",
   "js/monaco.css.worker.js": "/static/plugins/hfsummary/dist/js/monaco.css.worker.js",
   "js/monaco.html.worker.js": "/static/plugins/hfsummary/dist/js/monaco.html.worker.js",
   "js/monaco.editor.worker.js": "/static/plugins/hfsummary/dist/js/monaco.editor.worker.js",
-  "main.af94bd54.css.map": "/static/plugins/hfsummary/dist/css/main.af94bd54.css.map",
-  "main.4495de62.bundle.js.map": "/static/plugins/hfsummary/dist/js/main.4495de62.bundle.js.map"
+  "main.9356d326.css.map": "/static/plugins/hfsummary/dist/css/main.9356d326.css.map",
+  "main.a17d77ed.bundle.js.map": "/static/plugins/hfsummary/dist/js/main.a17d77ed.bundle.js.map"
 }
