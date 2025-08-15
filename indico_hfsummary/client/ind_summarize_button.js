@@ -270,7 +270,7 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                 value={selectedPromptKey}
                 onChange={handlePromptChange}
               />
-            </Form.Field>
+              </Form.Field>
               <Button
                 size="tiny"
                 type="button"
@@ -278,9 +278,9 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                 style={{ marginTop: '0.5em' }}
               >
               Manage Saved Prompts
-            </Button>
+             </Button>
 
-              <Card raised fluid>
+               <Card raised fluid>
                   <CardContent>
                     <Form > {/* form to select prompt type and enter custom prompt text */}
                       
@@ -322,7 +322,7 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                       </Button>
                     </Form>
                   </CardContent>
-              </Card>
+               </Card>
             </GridColumn>
             <GridColumn styleName="column-divider">
               <Header
@@ -336,37 +336,37 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                 <Card raised fluid styleName="preview-card-wrapper">
                   <CardContent >
                     <Segment basic style={{ position: 'relative', minHeight: '250px' }}>
-                    {loading && (
-                      <Dimmer active inverted>
-                        <Loader>Loading summary...</Loader>
-                      </Dimmer>
-                    )}
-                    {error && ( 
-                      <Message negative>
-                        <Message.Header>Couldn\'t get a summary</Message.Header>
-                        <p>{error}</p>
-                      </Message>
-                    )}
-                    {summaryHtml && ( // if there is a summary HTML, display it                    
-                      <div id="summary-output" 
-                      styleName="preview-card"
-                      dangerouslySetInnerHTML={{ __html: summaryHtml }}
-                      />
-                    )}
+                        {loading && (
+                          <Dimmer active inverted>
+                            <Loader>Loading summary...</Loader>
+                          </Dimmer>
+                        )}
+                        {error && ( 
+                          <Message negative>
+                            <Message.Header>Couldn\'t get a summary</Message.Header>
+                            <p>{error}</p>
+                          </Message>
+                        )}
+                        {summaryHtml && ( // if there is a summary HTML, display it                    
+                          <div id="summary-output" 
+                          styleName="preview-card"
+                          dangerouslySetInnerHTML={{ __html: summaryHtml }}
+                          />
+                        )}
 
-                    {summaryHtml && (
-                      <Button
-                        size="tiny"
-                        type="button"
-                        onClick={() => {
-                          setSummaryHtml('');
-                          localStorage.removeItem(SUMMARY_STORAGE_KEY);
-                        }}
-                        style={{ marginTop: '1em' }}
-                      >
-                        Clear Saved Summary
-                      </Button>
-                  )}
+                        {summaryHtml && (
+                          <Button
+                            size="tiny"
+                            type="button"
+                            onClick={() => {
+                              setSummaryHtml('');
+                              localStorage.removeItem(SUMMARY_STORAGE_KEY);
+                            }}
+                            style={{ marginTop: '1em' }}
+                          >
+                            Clear Saved Summary
+                          </Button>
+                      )}
 
                     </Segment>
                   </CardContent>
