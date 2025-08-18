@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Segment, Dimmer, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
 import './ind_summarize_button.module.scss'
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 const PROMPT_OPTIONS = [
   { key: 'default', text: 'Default', value: 'default' }, 
@@ -210,6 +211,29 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
   }, []);
 
 
+  // saving summary to event note when the save button is triggered
+  async function saveSummaryToEventNote() {
+  if (!summaryHtml) {
+    setError('Summary is empty. Cannot save.');
+    return;
+  }
+  const noteResp = await indicoAxios.get(`/event/${eventId}/api/note`);
+  console.log('noteResp.data:', noteResp.data);
+
+  const currentRevision = noteResp.data.id;
+
+  const existingHtml = noteResp.data.html || '';
+
+  const updatedHtml = existingHtml + '<hr><h2>Summary</h2>' + summaryHtml;
+
+  try {
+    await indicoAxios.post(`/event/${eventId}/api/note`, 
+    { source: updatedHtml, render_mode:'html',revision_id: currentRevision});
+    } 
+  catch (e) {
+    setError('Failed to save summary to event note.');
+  }
+}
 
   async function runSummarize() { // function to run the summarization process
     if (!eventId) { 
@@ -221,16 +245,24 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
     setSummaryHtml(''); // clear previous summary 
     try {
       const finalPromptText = editedPromptText || promptText; 
-      const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text 
-      const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server ---- ADD INDICO AXIOS THING
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`); 
-      const data = await resp.json(); // parse the JSON response
+      //const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text 
+      //const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server ---- ADD INDICO AXIOS THING
+      //if (!resp.ok) throw new Error(`HTTP ${resp.status}`); 
+      //const data = await resp.json(); // parse the JSON response
 
+      const resp = await indicoAxios.get(`/plugin/hfsummary/summarize-event/${eventId}`, {
+      params: {
+        prompt: finalPromptText
+      }
+    });
+      const data = resp.data;
 
-      if (data.summary_html) { // if there is summary_html in the response
+        if (data.summary_html) { // if there is summary_html in the response
         setSummaryHtml(data.summary_html); // set the summary HTML
         localStorage.setItem(SUMMARY_STORAGE_KEY, data.summary_html); // add to local storage
-      } else {
+
+      }
+      else {
         setError('No summary returned.');
       }
     } catch (e) {
@@ -358,19 +390,29 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                         )}
 
                         {summaryHtml && (
-                          <Button
+                          <div style = {{ display:'flex', gap: '0.5em', marginTop: '1em'}}>
+                            <Button   // save the summary to event note button 
+                              size="tiny"
+                              primary
+                              onClick={saveSummaryToEventNote}
+                              style={{ marginTop: '1em' }}
+                            >
+                              Save Summary
+                            </Button>
+
+                            <Button
                             size="tiny"
                             type="button"
-                            onClick={() => { // clear the summary and local storage
+                            onClick={() => { // clear the summary from local storage
                               setSummaryHtml('');
                               localStorage.removeItem(SUMMARY_STORAGE_KEY);
                             }}
                             style={{ marginTop: '1em' }}
                           >
-                            Clear Saved Summary
-                          </Button>
+                             Clear Saved Summary
+                           </Button>
+                          </div>
                       )}
-
                     </Segment>
                   </CardContent>
                 </Card>
