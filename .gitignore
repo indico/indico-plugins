@@ -24,4 +24,7 @@ url_map.json
 .venv/
 .vscode/
 **/__pycache__/
-static/
+**/static/dist
+webpack-build-config.json
+url_map.json
+indico_plugin_hfsummary.egg-info

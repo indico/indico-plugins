@@ -15,7 +15,6 @@ const PROMPT_OPTIONS = [
   { key: 'custom', text: 'Custom…', value: 'custom' }, 
 ];
 
-
 const LOCAL_STORAGE_KEY = 'savedPrompts';
 const SUMMARY_STORAGE_KEY = 'hfSummaryHtml';
 
@@ -116,7 +115,7 @@ Format each section like this:
       - Second bullet point      
 Now, summarize the following meeting minutes:`;
  
-    default: // fallback case incase of an unknown key
+    default: 
       return `You are a precise assistant that summarizes meeting minutes accurately and clearly. Stick to the facts. Do not add opinions, assumptions, or inferred content.
 
 Instructions:
@@ -140,9 +139,10 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null); 
   const [summaryHtml, setSummaryHtml] = useState(''); 
-  const [editedPromptText, setEditedPromptText] = useState(''); // state for manually edited prompt
+  const [editedPromptText, setEditedPromptText] = useState(''); 
   const [savedPrompts, setSavedPrompts] = useState([]);
   const [manageModalOpen, setManageModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
  // Combine predefined and saved prompts for dropdown
   const allPromptOptions = [
@@ -211,27 +211,32 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
   }, []);
 
 
-  // saving summary to event note when the save button is triggered
+  // saving summary to event note when the save button is clicked
   async function saveSummaryToEventNote() {
   if (!summaryHtml) {
     setError('Summary is empty. Cannot save.');
     return;
   }
+  setSaving(true);
+  
   const noteResp = await indicoAxios.get(`/event/${eventId}/api/note`);
   console.log('noteResp.data:', noteResp.data);
 
   const currentRevision = noteResp.data.id;
-
   const existingHtml = noteResp.data.html || '';
-
   const updatedHtml = existingHtml + '<hr><h2>Summary</h2>' + summaryHtml;
-
+  
+  setSaving(false);
+ 
+  
   try {
     await indicoAxios.post(`/event/${eventId}/api/note`, 
     { source: updatedHtml, render_mode:'html',revision_id: currentRevision});
     } 
   catch (e) {
-    setError('Failed to save summary to event note.');
+    setError(`Error during saving summary: ${handleAxiosError(e)}`);
+  } finally {
+    setSaving(false);
   }
 }
 
@@ -240,15 +245,11 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
       setError('Missing eventId.');
       return;
     }
-    setLoading(true); // set loading state to true
+    setLoading(true); 
     setError(null); 
     setSummaryHtml(''); // clear previous summary 
     try {
       const finalPromptText = editedPromptText || promptText; 
-      //const url = `/plugin/hfsummary/summarize-event/${eventId}?prompt=${encodeURIComponent(finalPromptText)}`; // url with the prompt text 
-      //const resp = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } }); // fetch the summary from the server ---- ADD INDICO AXIOS THING
-      //if (!resp.ok) throw new Error(`HTTP ${resp.status}`); 
-      //const data = await resp.json(); // parse the JSON response
 
       const resp = await indicoAxios.get(`/plugin/hfsummary/summarize-event/${eventId}`, {
       params: {
@@ -266,7 +267,6 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
         setError('No summary returned.');
       }
     } catch (e) {
-      //setError(`Error during summarization: ${e.message}`);
       setError(`Error during summarization: ${handleAxiosError(e)}`);
     } finally {
       setLoading(false);
@@ -296,7 +296,6 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
               <Form.Field> {/* Dropdown to select prompt type */}
               
               <Dropdown
-                id="prompt-select" 
                 selection
                 options={allPromptOptions}
                 value={selectedPromptKey}
@@ -347,11 +346,10 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
 
                       <Button
                         id="summary-button" 
-                        primary // primary button style
+                        primary 
                         type="button" 
-                        onClick={runSummarize} // onClick handler to run the summarization
-                        data-event-id={eventId} // passing the event ID as data attribute
-                        disabled={loading} // disable button while loading
+                        onClick={runSummarize}                       
+                        disabled={loading} 
                       >
                         {loading ? 'Summarizing…' : 'Generate summary'}
                       </Button>
@@ -396,11 +394,12 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                               primary
                               onClick={saveSummaryToEventNote}
                               style={{ marginTop: '1em' }}
+                              disabled={saving} 
                             >
-                              Save summary
+                              {saving ? 'Saving…' : 'Save summary'}
                             </Button>
 
-                            <Button
+                            <Button // clear summary button
                             size="tiny"
                             type="button"
                             onClick={() => { // clear the summary from local storage
