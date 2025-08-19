@@ -1,2 +1,0 @@
-[indico.plugins]
-indico_hfsummary = indico_hfsummary.plugin:IndicoHFSummaryPlugin
