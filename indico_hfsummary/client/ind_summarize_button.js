@@ -43,7 +43,7 @@ function buildPrompt(selectedKey, customPromptText) { // build the prompt text b
 Now, summarize the following meeting minutes:`;
 
     case 'tldr':
-      return `Summarize this meeting in TL;DR style (short, essentials only). 
+      return `Summarize this meeting in TL;DR style (Too long, didn't read format). Be short, take essentials only. 
       Format each section like this: 
       ## Section Title
       - First bullet point
@@ -397,7 +397,7 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                               onClick={saveSummaryToEventNote}
                               style={{ marginTop: '1em' }}
                             >
-                              Save Summary
+                              Save summary
                             </Button>
 
                             <Button
@@ -409,7 +409,7 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
                             }}
                             style={{ marginTop: '1em' }}
                           >
-                             Clear Saved Summary
+                             Clear summary
                            </Button>
                           </div>
                       )}
