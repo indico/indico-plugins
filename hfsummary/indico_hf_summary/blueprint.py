@@ -1,5 +1,5 @@
 from indico.core.plugins import IndicoPluginBlueprint
-from indico_hfsummary.controllers import SummarizeEvent
+from hfsummary.controllers import SummarizeEvent
 
 blueprint = IndicoPluginBlueprint('hfsummary', __name__, url_prefix='/plugin/hfsummary')
 

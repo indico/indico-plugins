@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from indico_hfsummary.utils import chunk_text, cern_qwen, markdown_to_html, html_to_markdown
+from hfsummary.utils import chunk_text, cern_qwen, markdown_to_html, html_to_markdown
 import time
 import os 
 from indico.modules.events.controllers.base import RHEventBase
