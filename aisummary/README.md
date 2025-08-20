@@ -1,3 +1,3 @@
-# indico-plugin-hf-summary
+# indico-plugin-AIsummary
 
 The aim of this project is to create a feature that automatically generates summaries of meeting minutes stored in Indico. This feature will extract key information from the minutes and present it in a concise, easy-to-read format. To achieve this, a new plugin is created for Indico that utilizes an open-source Large Language Model (LLM) to summarize the minutes. The plugin will enable users to select the minutes they wish to summarize, using pre-written prompts to generate the summaries. summary-rebase
