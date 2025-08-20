@@ -1,7 +1,7 @@
 [project]
 name = "indico-plugin-hfsummary"
 version = "0.1"
-description = "A plugin to summarize meeting minutes using a large language model (LLM)"
+description = "A plugin to summarize meeting minutes using a large language model(LLM)"
 
 requires-python = ">=3.9"
 
