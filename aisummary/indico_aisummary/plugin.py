@@ -1,7 +1,16 @@
-from indico.core.plugins import IndicoPlugin
-from indico_aisummary.blueprint import blueprint
+# This file is part of the Indico plugins.
+# Copyright (C) 2002 - 2025 CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
 from flask_pluginengine.plugin import render_plugin_template
+
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.views import WPSimpleEventDisplay
+
+from indico_aisummary.blueprint import blueprint
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):
