@@ -22,9 +22,4 @@ node_modules/
 *.lock
 url_map.json
 .venv/
-.vscode/
-**/__pycache__/
-**/static/dist
-webpack-build-config.json
-url_map.json
-indico_plugin_hfsummary.egg-info
+__pycache__/

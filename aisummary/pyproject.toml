@@ -1,16 +1,16 @@
 [project]
-name = "indico-plugin-hfsummary"
+name = "indico-plugin-AIsummary"
 version = "0.1"
 description = "A plugin to summarize meeting minutes using a large language model(LLM)"
 
 requires-python = ">=3.9"
 
 [project.entry-points."indico.plugins"]
-hfsummary = "indico_hfsummary.plugin:IndicoHFSummaryPlugin"
+aisummary = "indico_aisummary.plugin:IndicoAISummaryPlugin"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
-packages = ["indico_hfsummary"]
+packages = ["indico_aisummary"]

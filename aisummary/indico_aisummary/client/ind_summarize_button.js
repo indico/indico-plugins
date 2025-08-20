@@ -251,7 +251,7 @@ function SummarizeButton({ eventId }) {  // main react component to handle the s
     try {
       const finalPromptText = editedPromptText || promptText; 
 
-      const resp = await indicoAxios.get(`/plugin/hfsummary/summarize-event/${eventId}`, {
+      const resp = await indicoAxios.get(`/plugin/aisummary/summarize-event/${eventId}`, {
       params: {
         prompt: finalPromptText
       }
