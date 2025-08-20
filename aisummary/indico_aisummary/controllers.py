@@ -1,9 +1,19 @@
-from flask import request, jsonify
-from indico_aisummary.utils import chunk_text, cern_qwen, markdown_to_html, html_to_markdown
-import time
+# This file is part of the Indico plugins.
+# Copyright (C) 2002 - 2025 CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
 import os
+import time
+
+from flask import jsonify, request
+
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
+
+from indico_aisummary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
 
 
 # summarize the event

@@ -1,3 +1,10 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
 import React, {useMemo, useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Dropdown, TextArea, Button, Form, Message, Loader, Segment, Dimmer, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
