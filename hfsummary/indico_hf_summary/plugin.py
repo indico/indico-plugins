@@ -21,4 +21,5 @@ class IndicoHFSummaryPlugin(IndicoPlugin):
     def summary_button(self, event):
         return render_plugin_template('summarize_button.html', event = event)
     
+
     
