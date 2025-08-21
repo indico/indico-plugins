@@ -7,9 +7,9 @@
 
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_aisummary.controllers import SummarizeEvent
+from indico_ai_summary.controllers import SummarizeEvent
 
 
-blueprint = IndicoPluginBlueprint('aisummary', __name__, url_prefix='/plugin/aisummary')
+blueprint = IndicoPluginBlueprint('ai_summary', __name__, url_prefix='/plugin/ai-summary')
 
 blueprint.add_url_rule('/summarize-event/<int:event_id>', 'summarize_event', SummarizeEvent, methods=('GET',))

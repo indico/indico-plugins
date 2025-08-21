@@ -10,7 +10,7 @@ from flask_pluginengine.plugin import render_plugin_template
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.views import WPSimpleEventDisplay
 
-from indico_aisummary.blueprint import blueprint
+from indico_ai_summary.blueprint import blueprint
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):

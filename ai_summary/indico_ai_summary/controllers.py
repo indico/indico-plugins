@@ -13,7 +13,7 @@ from flask import jsonify, request
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
-from indico_aisummary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
+from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
 
 
 # summarize the event
