@@ -6,15 +6,33 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine.plugin import render_plugin_template
+from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.views import WPSimpleEventDisplay
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoPasswordField
 
 from indico_ai_summary.blueprint import blueprint
 
 
+class IndicoAISummarySettingsForm(IndicoForm):
+    cern_summary_api_token = IndicoPasswordField(
+    _('CERN Summary API Token'),
+    [DataRequired()],
+    description=_('Enter your CERN Summary API token. This will be used to authenticate requests to the summarization service.')  # noqa: E501
+)
+
+
 class IndicoAISummaryPlugin(IndicoPlugin):
     """AI-assisted minutes summarization tool"""
+
+    configurable = True
+    settings_form = IndicoAISummarySettingsForm
+    default_settings = {
+        'cern_summary_api_token': '',
+    }
 
     def init(self):
         super().init()
