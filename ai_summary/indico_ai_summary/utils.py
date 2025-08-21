@@ -5,30 +5,24 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import itertools
+
 import html2text
 import markdown
 import requests
+from flask_pluginengine import current_plugin
 
 
-# html to markdown to feed LLM
-def html_to_markdown(html_string):
+def html_to_markdown(html: str) -> str:
     h = html2text.HTML2Text()
     h.ignore_links = True
     h.ignore_images = True
     h.body_width = 0
-    return h.handle(html_string)
+    return h.handle(html)
 
 
-# chunking
-def chunk_text(text: str, max_tokens=1500):
-    words = text.split()
-    chunks = []
-
-    for i in range(0, len(words), max_tokens):
-        chunk = ' '.join(words[i:i + max_tokens])
-        chunks.append(chunk)
-
-    return chunks
+def chunk_text(text: str, max_tokens: int = 1500) -> list[str]:
+    return (' '.join(batch) for batch in itertools.batched(text.split(), max_tokens))
 
 
 # call model hf-qwen25-32b
@@ -52,13 +46,16 @@ def cern_qwen(message_text: str, token: str):
         if response.ok:
             return response.json()
         else:
-            print('Error:', response.status_code, response.text)
+            current_plugin.logger.error(
+                'Error in cern_qwen: status_code=%s, response=%s',
+                response.status_code,
+                response.text
+            )
             return None
     except Exception as e:
-        print('Request failed:', e)
+        current_plugin.logger.error('Exception in cern_qwen: %s', e)
         return None
 
 
-# convert markdown to html text when returning the summary
 def markdown_to_html(summary_text: str) -> str:
     return markdown.markdown(summary_text)

@@ -6,8 +6,9 @@
 # see the LICENSE file for more details.
 
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 
 data = tomllib.loads(Path('_meta/pyproject.toml').read_text())
