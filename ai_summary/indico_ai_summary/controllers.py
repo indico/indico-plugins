@@ -24,15 +24,15 @@ class SummarizeEvent(RHManageEventBase):
         print(request.view_args)
         RHManageEventBase._process_args(self)
 
-    @use_kwargs({'prompt': fields.Str(missing='')})
+    @use_kwargs({'prompt': fields.Str(missing='')}, location='query')
     def _process(self, prompt):
         event = self.event
         prompt_template = prompt.strip()
-
         notes = get_scheduled_notes(event)
         meeting_notes = '\n\n'.join(note.html for note in notes if hasattr(note, 'html'))
 
         if not meeting_notes.strip():
+            current_plugin.logger.error("No meeting notes found from this event's contributions.")
             return jsonify({'error': "No meeting notes found from this event's contributions."}), 400
 
         cleaned_text = html_to_markdown(meeting_notes)
@@ -47,20 +47,20 @@ class SummarizeEvent(RHManageEventBase):
             current_plugin.logger.error('Exception in cern summary api token: %s', e)
 
         for chunk in chunks:
-            full_prompt = f'{prompt_template.strip()}\n\n{chunk}'
+            full_prompt = f'{prompt_template}\n\n{chunk}'
             try:
                 response = cern_qwen(full_prompt, token)
                 if response:
                     summary = response['choices'][0]['message']['content']
                     summaries.append(summary)
                 else:
-                    summaries.append('[Error during summarization]')
+                    summaries.append('[Error during summarization, it might be because of the token or the model itself. Check the token again.]')  # noqa: E501
             except Exception as e:
+                current_plugin.logger.error(f'Exception during summarization: {e}')
                 summaries.append(f'[Exception during summarization: {e}]')
 
         combined_summary = '\n'.join(summaries)
         html_output = markdown_to_html(combined_summary)
-        print(f'Summary html output:\n{html_output}')
 
         return jsonify({
             'summary_html': html_output
