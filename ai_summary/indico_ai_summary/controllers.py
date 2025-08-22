@@ -5,26 +5,25 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import os
-import time
 
 from flask import jsonify, request
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
-from indico.modules.events.notes.controllers import RHManageNoteBase
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
+from flask_pluginengine import current_plugin
 
 from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
 
 
-class SummarizeEvent(RHManageNoteBase):
+class SummarizeEvent(RHManageEventBase):
 
     CSRF_ENABLED = False
 
     def _process_args(self):
         print(request.view_args)
-        RHManageNoteBase._process_args(self)
+        RHManageEventBase._process_args(self)
 
     @use_kwargs({'prompt': fields.Str(missing='')})
     def _process(self, prompt):
@@ -37,13 +36,16 @@ class SummarizeEvent(RHManageNoteBase):
         if not meeting_notes.strip():
             return jsonify({'error': "No meeting notes found from this event's contributions."}), 400
 
-        start_time = time.time()
         cleaned_text = html_to_markdown(meeting_notes)
         chunks = chunk_text(cleaned_text)
         summaries = []
-        token = self.plugin.settings.get('cern_summary_api_token')
-        if not token:
-            return jsonify({'error': 'CERN Summary API token is not set in plugin settings.'}), 400
+        try:
+            token = current_plugin.settings.get('cern_summary_api_token')
+            if not token:
+                current_plugin.logger.error('CERN Summary API token is not set in plugin settings.')
+                return jsonify({'error': 'CERN Summary API token is not set in plugin settings.'}), 400
+        except Exception as e:
+            current_plugin.logger.error('Exception in cern summary api token: %s', e)
 
         for chunk in chunks:
             full_prompt = f'{prompt_template.strip()}\n\n{chunk}'
@@ -61,9 +63,6 @@ class SummarizeEvent(RHManageNoteBase):
         html_output = markdown_to_html(combined_summary)
         print(f'Summary html output:\n{html_output}')
 
-        processing_time = round(time.time() - start_time, 2)
-
         return jsonify({
-            'summary_html': html_output,
-            'processing_time': processing_time
+            'summary_html': html_output
         })
