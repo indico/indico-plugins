@@ -20,13 +20,14 @@ from indico_ai_summary.blueprint import blueprint
 class IndicoAISummarySettingsForm(IndicoForm):
     cern_summary_api_token = IndicoPasswordField(
     _('CERN Summary API Token'),
-    [DataRequired()],
-    description=_('Enter your CERN Summary API token. This will be used to authenticate requests to the summarization service.')  # noqa: E501
+    [DataRequired()]
 )
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):
-    """AI-assisted minutes summarization tool"""
+    """AI-assisted minutes summarization tool
+    Enter your CERN Summary API token. This will be used to authenticate requests to the summarization service.
+    """
 
     configurable = True
     settings_form = IndicoAISummarySettingsForm
