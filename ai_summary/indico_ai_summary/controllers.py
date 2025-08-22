@@ -5,14 +5,13 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-
 from flask import jsonify, request
+from flask_pluginengine import current_plugin
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
-from flask_pluginengine import current_plugin
 
 from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
 
