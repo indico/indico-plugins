@@ -23,7 +23,6 @@ import '../styles/ind_summarize_button.module.scss';
 
 function SummarizeButton({eventId}) {
   // React State Definitions
-  const [open, setOpen] = useState(false); // modal visibility
   const [selectedPromptKey, setSelectedPromptKey] = useState('default'); // selected prompt type
   const [customPromptText, setCustomPromptText] = useState(''); // custom prompt content
   const [editedPromptText, setEditedPromptText] = useState(''); // manual edits to generated prompt
@@ -41,7 +40,6 @@ function SummarizeButton({eventId}) {
 
   // trigger summary generation by calling the backend API
   const runSummarize = async () => {
-    try {
       setLoading(true);
       setError(null);
       setSummaryHtml('');
@@ -53,8 +51,15 @@ function SummarizeButton({eventId}) {
         ? savedPrompts[parseInt(selectedPromptKey.replace('saved-', ''), 10)]
         : buildPrompt(selectedPromptKey, customPromptText));
       
-      // call backend to fetch summary
-      const data = await fetchSummary(eventId, prompt);
+      let data;
+      try {
+        // call backend to fetch summary
+        data = await fetchSummary(eventId, prompt);
+      } catch (e) {
+        setError(`Error during summarization: ${e.message}`);
+        setLoading(false);
+        return;
+      }
       // if response contains the summary - display and cache it
       if (data.summary_html) {
         setSummaryHtml(data.summary_html);
@@ -62,12 +67,8 @@ function SummarizeButton({eventId}) {
       } else {
         setError('No summary returned.');
       }
-    } catch (e) {
-      setError(`Error during summarization: ${e.message}`);
-    } finally {
       setLoading(false);
-    }
-  };
+    };
 
   // save generated summary into Indico event notes
   const handleSaveSummary = async () => {
@@ -92,9 +93,6 @@ function SummarizeButton({eventId}) {
   return (
     <>
       <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
         trigger={<li><a>Summarize</a></li>}
       >
         <Modal.Header>Summarize Meeting</Modal.Header>
