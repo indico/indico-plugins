@@ -56,7 +56,7 @@ function SummarizeButton({eventId}) {
         // call backend to fetch summary
         data = await fetchSummary(eventId, prompt);
       } catch (e) {
-        setError(`Error during summarization: ${e.message}`);
+        setError(`Error during summarization: ${handleAxiosError(e)}`);
         setLoading(false);
         return;
       }
@@ -84,7 +84,7 @@ function SummarizeButton({eventId}) {
       // save combined notes(or previous summary) + summary back to Indico
       await saveSummaryToEvent(eventId, updatedHtml, noteData.id);
     } catch (e) {
-      setError(`Error saving summary: ${e.message}`);
+      setError(`Error during saving summary: ${handleAxiosError(e)}`);
     } finally {
       setSaving(false);
     }
@@ -137,7 +137,7 @@ function SummarizeButton({eventId}) {
               {/* right column : summary preview */}
               <GridColumn styleName="column-divider">
                 <Header as="h3" content="Preview" subheader="Summary" />
-                <Card raised fluid>
+                <Card raised fluid styleName="preview-card-wrapper">
                   <CardContent>
                     <SummaryPreview
                       loading={loading}

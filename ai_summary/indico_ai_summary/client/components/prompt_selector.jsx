@@ -60,7 +60,7 @@ export default function PromptSelector({
         size="tiny"
         type="button"
         onClick={openManageModal}
-        style={{marginTop: '0.5em'}}
+        style={{marginTop: '0.1em'}}
       >
         Manage Saved Prompts
       </Button>
@@ -77,6 +77,7 @@ export default function PromptSelector({
           {/* save custom prompt to localStorage */}
           <Button
             type="button"
+            size="tiny"
             onClick={() => {
               if (customPromptText.trim()) {
                 const newPrompts = [...savedPrompts, customPromptText.trim()];
