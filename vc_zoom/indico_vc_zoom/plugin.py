@@ -587,14 +587,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return render_plugin_template('room_labels.html', vc_room=vc_room)
 
     def _event_metadata_postprocess(self, sender, event, data, user=None, skip_access_check=False, **kwargs):
-        urls = []
-        if 'description' in kwargs.get('html_fields', ()):
-            linebreak = '<br>\n'
-            format_link = lambda name, url: f'<a href="{url}">{escape(name)}: {url}</a>'
-        else:
-            linebreak = '\n'
-            format_link = lambda name, url: f'{name}: {url}'
-
+        html = 'description' in kwargs.get('html_fields', ())
+        items = []
         for assoc in event.vc_room_associations:
             if not assoc.show or assoc.vc_room.type != 'zoom':
                 continue
@@ -606,11 +600,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
                 event.can_manage(user)
             ):
-                urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['url']))
+                items.append((assoc.vc_room.name, assoc.vc_room.data['url']))
             elif visibility == 'no_one':
                 # XXX: Not sure if showing this is useful, but on the event page we show the join link
                 # with no passcode as well, so let's keep the logic identical here.
-                urls.append(format_link(assoc.vc_room.name, assoc.vc_room.data['public_url']))
+                items.append((assoc.vc_room.name, assoc.vc_room.data['public_url']))
 
-        if urls:
-            return {'description': (data['description'] + (linebreak * 2) + linebreak.join(urls)).strip()}
+        if not items:
+            return
+
+        if html:
+            desc = render_plugin_template('vc_zoom:event_metadata_desc.html', items=items)
+            return {'description': data['description'] + f'\n{desc}'}
+
+        if len(items) == 1:
+            urls = [url for name, url in items]
+            desc = f'Zoom: {urls[0]}'
+        else:
+            urls = [f'- {name}: {url}' for name, url in items]
+            desc = 'Zoom:\n' + '\n'.join(urls)
+
+        return {'description': (data['description'] + '\n\n' + desc).strip()}

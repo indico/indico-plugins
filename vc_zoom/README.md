@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.5
+
+- Improve formatting of Zoom links inserted in iCal event descriptions
+
 ### 3.3.4
 
 - Adapt to Indico 3.3.7 changes
