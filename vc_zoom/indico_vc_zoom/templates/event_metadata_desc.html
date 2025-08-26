@@ -1,0 +1,10 @@
+{% if items|length == 1 %}
+    <p>Zoom: <a href="{{ items[0][1] }}">{{ items[0][1] }}</a></p>
+{% else %}
+    <p><strong>Zoom:</strong></p>
+    <ul>
+        {% for name, url in items -%}
+            <li>{{ name }}: <a href="{{ url }}">{{ url }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
