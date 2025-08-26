@@ -23,7 +23,7 @@ export default function ManagePromptsModal({
         ) : (
           // display saved prompts in individual segments
           savedPrompts.map((prompt, idx) => (
-            <Segment key={idx} style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Segment key={idx} style={{display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
               {/* show the saved prompt text */}
               <span style={{flex: 1, marginRight: '1em', overflowWrap: 'anywhere'}}>
                 {prompt}
