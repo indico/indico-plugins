@@ -7,6 +7,7 @@
 
 import React from 'react';
 import {Button, Loader, Dimmer, Segment, Message} from 'semantic-ui-react';
+import '../styles/ind_summarize_button.module.scss';
 
 export default function SummaryPreview({
   loading,
@@ -34,6 +35,7 @@ export default function SummaryPreview({
       {summaryHtml && (
         <div
           id="summary-output"
+          styleName="preview-card"
           dangerouslySetInnerHTML={{__html: summaryHtml}}
         />
       )}

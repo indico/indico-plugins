@@ -16,7 +16,8 @@
 
 .preview-card-wrapper {
   flex-grow: 1;
-
+  margin-top: 0 !important;
+  
   .preview-card {
     overflow: auto;
     flex-grow: 1;
