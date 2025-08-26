@@ -107,34 +107,27 @@ function SummarizeButton({eventId}) {
                   subheader={Translate.string('Choose a predefined prompt, edit, or create a custom one')}
                 />
 
-                {/* Prompt selection outside the card */}
-                <PromptSelector
+                {/* dropdown + manage daved prompts button (outside card) */}
+                <PromptSelector.Controls
                   selectedPromptKey={selectedPromptKey}
                   setSelectedPromptKey={setSelectedPromptKey}
-                  customPromptText={customPromptText}
-                  setCustomPromptText={setCustomPromptText}
-                  editedPromptText={editedPromptText}
-                  setEditedPromptText={setEditedPromptText}
                   savedPrompts={savedPrompts}
-                  setSavedPrompts={setSavedPrompts}
+                  setCustomPromptText={setCustomPromptText}
                   openManageModal={() => setManageModalOpen(true)}
-                  promptOnly={true} 
                 />
-                
-                {/* card contains only custom prompt + preview + generate */}
+
+                {/* card with custom editor + preview of prompt + generate button */}
                 <Card raised fluid style={{marginTop: '1em'}}>
                   <CardContent>
                     <Form>
-                      <PromptSelector
+                      <PromptSelector.Editor
                         selectedPromptKey={selectedPromptKey}
-                        setSelectedPromptKey={setSelectedPromptKey}
                         customPromptText={customPromptText}
                         setCustomPromptText={setCustomPromptText}
                         editedPromptText={editedPromptText}
                         setEditedPromptText={setEditedPromptText}
                         savedPrompts={savedPrompts}
                         setSavedPrompts={setSavedPrompts}
-                        openManageModal={() => setManageModalOpen(true)}
                       />
                       <Button
                         id="summary-button"

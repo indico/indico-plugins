@@ -9,19 +9,20 @@ import React from 'react';
 import {Dropdown, TextArea, Button, Form} from 'semantic-ui-react';
 import {PROMPT_OPTIONS, buildPrompt} from '../utils/prompts';
 
-export default function PromptSelector({
+const PromptSelector = {};
+PromptSelector.Controls = PromptControls;
+PromptSelector.Editor = PromptEditor;
+
+export default PromptSelector;
+
+// dropdown + manage daved prompts button (outside card)
+function PromptControls({
   selectedPromptKey,
   setSelectedPromptKey,
-  customPromptText,
-  setCustomPromptText,
-  editedPromptText,
-  setEditedPromptText,
   savedPrompts,
-  setSavedPrompts,
+  setCustomPromptText,
   openManageModal,
-  promptOnly = false,
-}) {
-  
+}) {  
   // combine predefined + saved prompts into one list for the dropdown
   const allPromptOptions = [
     ...PROMPT_OPTIONS,
@@ -32,7 +33,7 @@ export default function PromptSelector({
       promptText: prompt,
     })),
   ];
-
+  
   // when user changes prompt - update selected prompt and custom text if needed
   const handlePromptChange = (_, {value}) => {
     setSelectedPromptKey(value);
@@ -40,33 +41,41 @@ export default function PromptSelector({
     setCustomPromptText(saved?.promptText || '');
   };
 
-  // the full prompt text for previewing
-  const promptText = selectedPromptKey.startsWith('saved-')
-    ? allPromptOptions.find(opt => opt.value === selectedPromptKey)?.promptText || ''
-    : buildPrompt(selectedPromptKey, customPromptText);
+  return (
+    <Form>
+      <Form.Field>
+        <Dropdown
+          selection
+          options={allPromptOptions}
+          value={selectedPromptKey}
+          onChange={handlePromptChange}
+        />
+      </Form.Field>
+      <Button
+        size="tiny"
+        type="button"
+        onClick={openManageModal}
+        style={{marginTop: '0.3em'}}
+      >
+        Manage Saved Prompts
+      </Button>
+    </Form>
+  );
+}
 
-   if (promptOnly) {
-    return (
-      <Form>
-        <Form.Field>
-          <Dropdown
-            selection
-            options={allPromptOptions}
-            value={selectedPromptKey}
-            onChange={handlePromptChange}
-          />
-        </Form.Field>
-        <Button
-          size="tiny"
-          type="button"
-          onClick={openManageModal}
-          style={{marginTop: '0.3em'}}
-        >
-          Manage Saved Prompts
-        </Button>
-      </Form>
-    );
-  }
+// card with custom editor + preview of prompt + generate button
+function PromptEditor({
+  selectedPromptKey,
+  customPromptText,
+  setCustomPromptText,
+  editedPromptText,
+  setEditedPromptText,
+  savedPrompts,
+  setSavedPrompts,
+}) {
+  const promptText = selectedPromptKey.startsWith('saved-')
+    ? savedPrompts[parseInt(selectedPromptKey.replace('saved-', ''), 10)] || ''
+    : buildPrompt(selectedPromptKey, customPromptText);
 
   return (
     <>
