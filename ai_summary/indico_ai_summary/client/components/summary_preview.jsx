@@ -31,10 +31,17 @@ export default function SummaryPreview({
         </Message>
       )}
 
+      {/* show placeholder when no summary yet */}
+      {!loading && !error && !summaryHtml && (
+        <div styleName="placeholder-no-summary"
+        >
+          No summary yet
+        </div>
+      )}
+
       {/* render summary HTML */}
       {summaryHtml && (
-        <div
-          id="summary-output"
+        <div          
           styleName="preview-card"
           dangerouslySetInnerHTML={{__html: summaryHtml}}
         />

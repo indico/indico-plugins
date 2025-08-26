@@ -55,7 +55,7 @@ function PromptControls({
         size="tiny"
         type="button"
         onClick={openManageModal}
-        style={{marginTop: '0.3em'}}
+        style={{marginTop: '0.1em'}}
       >
         Manage Saved Prompts
       </Button>

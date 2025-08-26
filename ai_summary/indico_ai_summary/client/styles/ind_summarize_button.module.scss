@@ -29,3 +29,13 @@
   }
   }
 }
+
+.placeholder-no-summary{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: rgba(0,0,0,0.5);
+  margin-top: 8em;
+  font-style: italic;
+}

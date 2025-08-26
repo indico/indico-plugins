@@ -130,7 +130,6 @@ function SummarizeButton({eventId}) {
                         setSavedPrompts={setSavedPrompts}
                       />
                       <Button
-                        id="summary-button"
                         primary
                         type="button"
                         onClick={runSummarize}
