@@ -94,6 +94,7 @@ function SummarizeButton({eventId}) {
     <>
       <Modal
         trigger={<li><a>Summarize</a></li>}
+        style={{minWidth: '65vw'}}
       >
         <Modal.Header>Summarize Meeting</Modal.Header>
         <Modal.Content>
