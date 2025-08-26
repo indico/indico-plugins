@@ -19,7 +19,9 @@ export default function PromptSelector({
   savedPrompts,
   setSavedPrompts,
   openManageModal,
+  promptOnly = false,
 }) {
+  
   // combine predefined + saved prompts into one list for the dropdown
   const allPromptOptions = [
     ...PROMPT_OPTIONS,
@@ -43,29 +45,32 @@ export default function PromptSelector({
     ? allPromptOptions.find(opt => opt.value === selectedPromptKey)?.promptText || ''
     : buildPrompt(selectedPromptKey, customPromptText);
 
+   if (promptOnly) {
+    return (
+      <Form>
+        <Form.Field>
+          <Dropdown
+            selection
+            options={allPromptOptions}
+            value={selectedPromptKey}
+            onChange={handlePromptChange}
+          />
+        </Form.Field>
+        <Button
+          size="tiny"
+          type="button"
+          onClick={openManageModal}
+          style={{marginTop: '0.3em'}}
+        >
+          Manage Saved Prompts
+        </Button>
+      </Form>
+    );
+  }
+
   return (
     <>
-      {/* Dropdown menu to choose prompt */}
-      <Form.Field>
-        <Dropdown
-          selection
-          options={allPromptOptions}
-          value={selectedPromptKey}
-          onChange={handlePromptChange}
-        />
-      </Form.Field>
-
-      {/* manage saved prompts modal trigger */}
-      <Button
-        size="tiny"
-        type="button"
-        onClick={openManageModal}
-        style={{marginTop: '0.1em'}}
-      >
-        Manage Saved Prompts
-      </Button>
-
-      {/* if custom prompt is selected - enable text input */}
+      {/* custom prompt input */}
       {selectedPromptKey === 'custom' && (
         <Form.Field>
           <label>Custom prompt</label>
@@ -92,7 +97,7 @@ export default function PromptSelector({
         </Form.Field>
       )}
 
-      {/* editable preview of final prompt */}
+      {/* editable preview */}
       <Form.Field>
         <label>Preview of prompt sent to the model (editable)</label>
         <TextArea

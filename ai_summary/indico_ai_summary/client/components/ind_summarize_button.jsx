@@ -106,7 +106,23 @@ function SummarizeButton({eventId}) {
                   content={Translate.string('Select Prompt')}
                   subheader={Translate.string('Choose a predefined prompt, edit, or create a custom one')}
                 />
-                <Card raised fluid>
+
+                {/* Prompt selection outside the card */}
+                <PromptSelector
+                  selectedPromptKey={selectedPromptKey}
+                  setSelectedPromptKey={setSelectedPromptKey}
+                  customPromptText={customPromptText}
+                  setCustomPromptText={setCustomPromptText}
+                  editedPromptText={editedPromptText}
+                  setEditedPromptText={setEditedPromptText}
+                  savedPrompts={savedPrompts}
+                  setSavedPrompts={setSavedPrompts}
+                  openManageModal={() => setManageModalOpen(true)}
+                  promptOnly={true} 
+                />
+                
+                {/* card contains only custom prompt + preview + generate */}
+                <Card raised fluid style={{marginTop: '1em'}}>
                   <CardContent>
                     <Form>
                       <PromptSelector
