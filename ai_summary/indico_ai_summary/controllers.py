@@ -21,7 +21,6 @@ class SummarizeEvent(RHManageEventBase):
     CSRF_ENABLED = False
 
     def _process_args(self):
-        print(request.view_args)
         RHManageEventBase._process_args(self)
 
     @use_kwargs({'prompt': fields.Str(missing='')}, location='query')
