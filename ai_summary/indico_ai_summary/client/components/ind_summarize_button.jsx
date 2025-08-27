@@ -27,7 +27,7 @@ function SummarizeButton({eventId}) {
   const [selectedPromptKey, setSelectedPromptKey] = useState('default'); // selected prompt type
   const [customPromptText, setCustomPromptText] = useState(''); // custom prompt content
   const [editedPromptText, setEditedPromptText] = useState(''); // manual edits to generated prompt
-  const [savedPrompts, setSavedPrompts] = useState(getSavedPrompts); // saved custom prompts
+  const [savedPrompts, setSavedPrompts] = useState(getSavedPrompts()); // saved custom prompts
   const [summaryHtml, setSummaryHtml] = useState(); // generated summary HTML
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
