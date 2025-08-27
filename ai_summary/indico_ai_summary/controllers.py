@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import jsonify, request
+from flask import jsonify
 from flask_pluginengine import current_plugin
 from webargs import fields
 from webargs.flaskparser import use_kwargs
