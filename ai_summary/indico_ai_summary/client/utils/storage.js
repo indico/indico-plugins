@@ -31,16 +31,6 @@ export function deletePrompt(index) {
   return prompts;
 }
 
-// retrieve cached summary
-export function getSummary() {
-  return localStorage.getItem(SUMMARY_KEY) || '';
-}
-
-// save summary to localStorage
-export function saveSummary(summary) {
-  localStorage.setItem(SUMMARY_KEY, summary);
-}
-
 // clear cached summary
 export function clearSummary() {
   localStorage.removeItem(SUMMARY_KEY);

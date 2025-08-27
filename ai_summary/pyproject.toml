@@ -2,15 +2,36 @@
 name = "indico-plugin-ai-summary"
 version = "0.1"
 description = "A plugin to summarize meeting minutes using a large language model(LLM)"
+license = 'MIT'
+authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
+classifiers = [
+    'Environment :: Plugins',
+    'Environment :: Web Environment',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.12',
+]
+requires-python = '>=3.12.2, <3.13'
+dependencies = ['indico>=3.3']
 
-requires-python = ">=3.9"
+[project.urls]
+GitHub = 'https://github.com/indico/indico-plugins'
 
 [project.entry-points."indico.plugins"]
 ai_summary = "indico_ai_summary.plugin:IndicoAISummaryPlugin"
 
 [build-system]
-requires = ["hatchling"]
+requires = ['hatchling==1.27.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
-packages = ["indico_ai_summary"]
+packages = ['indico_cloud_captchas']
+exclude = [
+    '*.no-header',
+    '.keep',
+    # exclude original client sources (they are all included in source maps anyway)
+    'indico_*/client/',
+    # no need for tests outside development
+    'test_snapshots/',
+    'tests/',
+    '*_test.py',
+]

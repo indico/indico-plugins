@@ -13,10 +13,11 @@ import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {getSavedPrompts, deletePrompt, getSummary, saveSummary, clearSummary} from '../utils/storage';
+import {handleAxiosError} from 'indico/utils/axios'; 
+import {deletePrompt, clearSummary, getSavedPrompts} from '../utils/storage';
 import {fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
 import {buildPrompt} from '../utils/prompts';
-import PromptSelector from './prompt_selector';
+import {PromptControls, PromptEditor} from './prompt_selector';
 import SummaryPreview from './summary_preview';
 import ManagePromptsModal from './manage_prompts_modal';
 import '../styles/ind_summarize_button.module.scss';
@@ -26,17 +27,12 @@ function SummarizeButton({eventId}) {
   const [selectedPromptKey, setSelectedPromptKey] = useState('default'); // selected prompt type
   const [customPromptText, setCustomPromptText] = useState(''); // custom prompt content
   const [editedPromptText, setEditedPromptText] = useState(''); // manual edits to generated prompt
-  const [savedPrompts, setSavedPrompts] = useState([]); // saved custom prompts
-  const [summaryHtml, setSummaryHtml] = useState(''); // generated summary HTML
+  const [savedPrompts, setSavedPrompts] = useState(getSavedPrompts); // saved custom prompts
+  const [summaryHtml, setSummaryHtml] = useState(); // generated summary HTML
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false); // saving summary indicator
   const [manageModalOpen, setManageModalOpen] = useState(false); // saved prompts modal
-
-  useEffect(() => { // load saved prompts and last generated summary from localStorage
-    setSavedPrompts(getSavedPrompts());
-    setSummaryHtml(getSummary());
-  }, []);
 
   // trigger summary generation by calling the backend API
   const runSummarize = async () => {
@@ -60,10 +56,9 @@ function SummarizeButton({eventId}) {
         setLoading(false);
         return;
       }
-      // if response contains the summary - display and cache it
+      // if response contains the summary display it
       if (data.summary_html) {
         setSummaryHtml(data.summary_html);
-        saveSummary(data.summary_html);
       } else {
         setError('No summary returned.');
       }
@@ -72,10 +67,6 @@ function SummarizeButton({eventId}) {
 
   // save generated summary into Indico event notes
   const handleSaveSummary = async () => {
-    if (!summaryHtml) {
-      setError('Summary is empty. Cannot save.');
-      return;
-    }
     try {
       setSaving(true);
       // fetch existing event notes
@@ -93,6 +84,7 @@ function SummarizeButton({eventId}) {
   return (
     <>
       <Modal
+        closeIcon
         trigger={<li><a>Summarize</a></li>}
         style={{minWidth: '65vw'}}
       >
@@ -109,7 +101,7 @@ function SummarizeButton({eventId}) {
                 />
 
                 {/* dropdown + manage daved prompts button (outside card) */}
-                <PromptSelector.Controls
+                <PromptControls
                   selectedPromptKey={selectedPromptKey}
                   setSelectedPromptKey={setSelectedPromptKey}
                   savedPrompts={savedPrompts}
@@ -121,7 +113,7 @@ function SummarizeButton({eventId}) {
                 <Card raised fluid style={{marginTop: '1em'}}>
                   <CardContent>
                     <Form>
-                      <PromptSelector.Editor
+                      <PromptEditor
                         selectedPromptKey={selectedPromptKey}
                         customPromptText={customPromptText}
                         setCustomPromptText={setCustomPromptText}

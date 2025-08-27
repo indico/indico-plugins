@@ -9,14 +9,8 @@ import React from 'react';
 import {Dropdown, TextArea, Button, Form} from 'semantic-ui-react';
 import {PROMPT_OPTIONS, buildPrompt} from '../utils/prompts';
 
-const PromptSelector = {};
-PromptSelector.Controls = PromptControls;
-PromptSelector.Editor = PromptEditor;
-
-export default PromptSelector;
-
-// dropdown + manage daved prompts button (outside card)
-function PromptControls({
+// dropdown + manage saved prompts button (outside card)
+export function PromptControls({
   selectedPromptKey,
   setSelectedPromptKey,
   savedPrompts,
@@ -24,7 +18,7 @@ function PromptControls({
   openManageModal,
 }) {  
   // combine predefined + saved prompts into one list for the dropdown
-  const allPromptOptions = [
+  const allPromptOptionsRaw = [
     ...PROMPT_OPTIONS,
     ...savedPrompts.map((prompt, idx) => ({
       key: `saved-${idx}`,
@@ -33,13 +27,19 @@ function PromptControls({
       promptText: prompt,
     })),
   ];
+
+  const allPromptOptions = allPromptOptionsRaw.map(({key, text, value}) => ({key, text, value}));
   
   // when user changes prompt - update selected prompt and custom text if needed
   const handlePromptChange = (_, {value}) => {
-    setSelectedPromptKey(value);
-    const saved = allPromptOptions.find(opt => opt.value === value && opt.promptText);
+  setSelectedPromptKey(value);
+  if (value.startsWith('saved-')) {
+    const saved = allPromptOptionsRaw.find(opt => opt.value === value && opt.promptText);
     setCustomPromptText(saved?.promptText || '');
-  };
+  } else {
+    setCustomPromptText('');
+  }
+};
 
   return (
     <Form>
@@ -64,7 +64,7 @@ function PromptControls({
 }
 
 // card with custom editor + preview of prompt + generate button
-function PromptEditor({
+export function PromptEditor({
   selectedPromptKey,
   customPromptText,
   setCustomPromptText,
