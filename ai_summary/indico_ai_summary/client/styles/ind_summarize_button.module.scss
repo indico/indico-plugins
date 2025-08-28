@@ -1,0 +1,41 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.column-divider {
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column;
+  border-left: 1px solid $raincloud-gray;
+}
+
+.preview-card-wrapper {
+  flex-grow: 1;
+  margin-top: 0 !important;
+  
+  .preview-card {
+    overflow: auto;
+    flex-grow: 1;
+    ul li {
+      margin-left: 1.5em;
+    }
+    h1, h2, h3 {
+    font-size: 1.5em;
+  }
+  }
+}
+
+.placeholder-no-summary{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: rgba(0,0,0,0.5);
+  margin-top: 8em;
+  font-style: italic;
+}
