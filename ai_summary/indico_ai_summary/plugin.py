@@ -37,7 +37,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
 
     def init(self):
         super().init()
-        self.template_hook('event-manage-dropdown-after-notes-compile', self.summary_button)
+        self.template_hook('event-manage-dropdown-notes-summarize', self.summary_button)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.css', WPSimpleEventDisplay)
 
