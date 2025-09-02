@@ -24,7 +24,7 @@ requires = ['hatchling==1.27.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
-packages = ['indico_cloud_captchas']
+packages = ['indico_ai_summary']
 exclude = [
     '*.no-header',
     '.keep',
