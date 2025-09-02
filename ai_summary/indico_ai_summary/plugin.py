@@ -17,11 +17,8 @@ from indico.web.forms.fields import IndicoPasswordField
 from indico_ai_summary.blueprint import blueprint
 
 
-class IndicoAISummarySettingsForm(IndicoForm):
-    cern_summary_api_token = IndicoPasswordField(
-    _('CERN Summary API Token'),
-    [DataRequired()]
-)
+class PluginSettingsForm(IndicoForm):
+    cern_summary_api_token = IndicoPasswordField(_('CERN Summary API Token'), [DataRequired()])
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):
@@ -30,7 +27,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
     """
 
     configurable = True
-    settings_form = IndicoAISummarySettingsForm
+    settings_form = PluginSettingsForm
     default_settings = {
         'cern_summary_api_token': '',
     }
