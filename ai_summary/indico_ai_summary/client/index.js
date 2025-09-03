@@ -7,3 +7,4 @@
 
 import './components/ind_summarize_button';
 import './components/PromptManagerField';
+import './CategoryManagePrompts';

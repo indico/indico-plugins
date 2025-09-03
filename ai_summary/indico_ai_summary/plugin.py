@@ -6,12 +6,11 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine.plugin import render_plugin_template
-from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
 from wtforms.validators import DataRequired
 
+from indico.core import signals
 from indico.core.plugins import IndicoPlugin
 from indico.core.plugins.views import WPPlugins
-from indico.core import signals
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -21,6 +20,8 @@ from indico.web.forms.widgets import JinjaWidget
 from indico.web.menu import SideMenuItem
 
 from indico_ai_summary.blueprint import blueprint
+from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
+from indico_ai_summary.views import WPCategoryManagePrompts
 
 
 class PromptManagerField(JSONField):
@@ -50,8 +51,10 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         self.template_hook('event-manage-dropdown-notes-summarize', self._render_summarize_button)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPPlugins)
+        self.inject_bundle('main.js', WPCategoryManagePrompts)
         self.inject_bundle('main.css', WPSimpleEventDisplay)
         self.inject_bundle('main.css', WPPlugins)
+        self.inject_bundle('main.css', WPCategoryManagePrompts)
         self.connect(signals.menu.items, self._extend_category_menu, sender='category-management-sidemenu')
 
     def get_blueprints(self):
