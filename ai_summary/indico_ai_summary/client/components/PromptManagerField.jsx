@@ -1,6 +1,13 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
 import React, {useCallback, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Dropdown, Label, Form, TextArea, Button, Input} from 'semantic-ui-react';
+import {Form, TextArea, Button, Input} from 'semantic-ui-react';
 
 export default function PromptManagerField({value, onChange}) {
   const addPrompt = () => {

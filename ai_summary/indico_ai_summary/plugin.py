@@ -9,13 +9,12 @@ from flask_pluginengine.plugin import render_plugin_template
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
+from indico.core.plugins.views import WPPlugins
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPasswordField
-from indico.web.forms.fields import JSONField
+from indico.web.forms.fields import IndicoPasswordField, JSONField
 from indico.web.forms.widgets import JinjaWidget
-from indico.core.plugins.views import WPPlugins
 
 from indico_ai_summary.blueprint import blueprint
 
