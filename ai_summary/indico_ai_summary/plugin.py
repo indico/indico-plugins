@@ -6,15 +6,19 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine.plugin import render_plugin_template
+from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
 from wtforms.validators import DataRequired
 
 from indico.core.plugins import IndicoPlugin
 from indico.core.plugins.views import WPPlugins
+from indico.core import signals
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, JSONField
 from indico.web.forms.widgets import JinjaWidget
+from indico.web.menu import SideMenuItem
 
 from indico_ai_summary.blueprint import blueprint
 
@@ -43,15 +47,21 @@ class IndicoAISummaryPlugin(IndicoPlugin):
 
     def init(self):
         super().init()
-        self.template_hook('event-manage-dropdown-notes-summarize', self.summary_button)
+        self.template_hook('event-manage-dropdown-notes-summarize', self._render_summarize_button)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPPlugins)
         self.inject_bundle('main.css', WPSimpleEventDisplay)
         self.inject_bundle('main.css', WPPlugins)
+        self.connect(signals.menu.items, self._extend_category_menu, sender='category-management-sidemenu')
 
     def get_blueprints(self):
         return blueprint
 
-    def summary_button(self, event):
+    def _render_summarize_button(self, event):
         return render_plugin_template('summarize_button.html', category=event.category,
                                       event=event, stored_prompts=self.settings.get('prompts'))
+
+    def _extend_category_menu(self, sender, category, **kwargs):
+        return SideMenuItem(CATEGORY_SIDEMENU_ITEM, _('Prompts'),
+                            url_for('plugin_ai_summary.manage_category_prompts', category),
+                            icon='puzzle', weight=0)
