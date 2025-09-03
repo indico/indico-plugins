@@ -9,61 +9,52 @@
 // This file defines the Summarize button, manages modal states,
 // handles prompt selection, generates summaries, and integrates
 // with Indico's API to fetch and save meeting notes.
-import React, {useState, useEffect} from 'react';
+
+// import getStoredPrompts from 'indico-url:plugin_ai_summary.stored_prompts';
+
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Card, CardContent} from 'semantic-ui-react';
+import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {handleAxiosError} from 'indico/utils/axios'; 
-import {deletePrompt, clearSummary, getSavedPrompts} from '../utils/storage';
+import {handleAxiosError} from 'indico/utils/axios';
 import {fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
-import {buildPrompt} from '../utils/prompts';
 import {PromptControls, PromptEditor} from './prompt_selector';
 import SummaryPreview from './summary_preview';
-import ManagePromptsModal from './manage_prompts_modal';
 import '../styles/ind_summarize_button.module.scss';
 
-function SummarizeButton({eventId}) {
+function SummarizeButton({categoryId, eventId, storedPrompts}) {
   // React State Definitions
-  const [selectedPromptKey, setSelectedPromptKey] = useState('default'); // selected prompt type
-  const [customPromptText, setCustomPromptText] = useState(''); // custom prompt content
-  const [editedPromptText, setEditedPromptText] = useState(''); // manual edits to generated prompt
-  const [savedPrompts, setSavedPrompts] = useState(getSavedPrompts()); // saved custom prompts
-  const [summaryHtml, setSummaryHtml] = useState(); // generated summary HTML
+  const [selectedPromptIndex, setSelectedPromptIndex] = useState(0); // prompt selected for deletion
+  const [prompts, setPrompts] = useState(storedPrompts); // all stored prompts
+  const selectedPrompt = prompts[selectedPromptIndex];
+  const [summaryHtml, setSummaryHtml] = useState(''); // generated summary HTML
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false); // saving summary indicator
-  const [manageModalOpen, setManageModalOpen] = useState(false); // saved prompts modal
 
   // trigger summary generation by calling the backend API
   const runSummarize = async () => {
-      setLoading(true);
-      setError(null);
-      setSummaryHtml('');
+    setLoading(true);
+    setError(null);
+    setSummaryHtml('');
 
-      // build prompt: either edited, saved, or from template
-      const prompt =
-      editedPromptText ||
-      (selectedPromptKey.startsWith('saved-')
-        ? savedPrompts[parseInt(selectedPromptKey.replace('saved-', ''), 10)]
-        : buildPrompt(selectedPromptKey, customPromptText));
-      
-      let data;
-      try {
-        // call backend to fetch summary
-        data = await fetchSummary(eventId, prompt);
-      } catch (e) {
-        setError(`Error during summarization: ${handleAxiosError(e)}`);
-        setLoading(false);
-        return;
-      }
-      // if response contains the summary display it
-      if (data.summary_html) {
-        setSummaryHtml(data.summary_html);
-      } else {
-        setError('No summary returned.');
-      }
+    let data;
+    try {
+      // call backend to fetch summary
+      data = await fetchSummary(eventId, selectedPrompt.text);
+    } catch (e) {
+      setError(`Error during summarization: ${handleAxiosError(e)}`);
       setLoading(false);
-    };
+      return;
+    }
+    // if response contains the summary display it
+    if (data.summary_html) {
+      setSummaryHtml(data.summary_html);
+    } else {
+      setError('No summary returned.');
+    }
+    setLoading(false);
+  };
 
   // save generated summary into Indico event notes
   const handleSaveSummary = async () => {
@@ -85,7 +76,11 @@ function SummarizeButton({eventId}) {
     <>
       <Modal
         closeIcon
-        trigger={<li><a>Summarize</a></li>}
+        trigger={
+          <li>
+            <a>Summarize</a>
+          </li>
+        }
         style={{minWidth: '65vw'}}
       >
         <Modal.Header>Summarize Meeting</Modal.Header>
@@ -94,78 +89,47 @@ function SummarizeButton({eventId}) {
             <GridRow columns={2}>
               {/* left column : prompt selection */}
               <GridColumn>
-                <Header
-                  as="h3"
-                  content={Translate.string('Select Prompt')}
-                  subheader={Translate.string('Choose a predefined prompt, edit, or create a custom one')}
-                />
-
-                {/* dropdown + manage daved prompts button (outside card) */}
-                <PromptControls
-                  selectedPromptKey={selectedPromptKey}
-                  setSelectedPromptKey={setSelectedPromptKey}
-                  savedPrompts={savedPrompts}
-                  setCustomPromptText={setCustomPromptText}
-                  openManageModal={() => setManageModalOpen(true)}
-                />
-
-                {/* card with custom editor + preview of prompt + generate button */}
-                <Card raised fluid style={{marginTop: '1em'}}>
-                  <CardContent>
-                    <Form>
-                      <PromptEditor
-                        selectedPromptKey={selectedPromptKey}
-                        customPromptText={customPromptText}
-                        setCustomPromptText={setCustomPromptText}
-                        editedPromptText={editedPromptText}
-                        setEditedPromptText={setEditedPromptText}
-                        savedPrompts={savedPrompts}
-                        setSavedPrompts={setSavedPrompts}
-                      />
-                      <Button
-                        primary
-                        type="button"
-                        onClick={runSummarize}
-                        disabled={loading}
-                      >
-                        {loading ? 'Summarizing…' : 'Generate summary'}
-                      </Button>
-                    </Form>
-                  </CardContent>
-                </Card>
+                <Form>
+                  <Header as="h3" content={Translate.string('Select a prompt')} />
+                  <PromptControls
+                    selectedPromptIndex={selectedPromptIndex}
+                    setSelectedPromptIndex={setSelectedPromptIndex}
+                    storedPrompts={storedPrompts}
+                  />
+                  <PromptEditor
+                    selectedPromptIndex={selectedPromptIndex}
+                    selectedPrompt={selectedPrompt}
+                    setPrompts={setPrompts}
+                  />
+                  <Button
+                    primary
+                    type="button"
+                    icon
+                    labelPosition="right"
+                    onClick={runSummarize}
+                    disabled={loading}
+                  >
+                    {loading ? 'Summarizing…' : 'Generate meeting summary'}
+                    <Icon name="magic" />
+                  </Button>
+                </Form>
               </GridColumn>
 
               {/* right column : summary preview */}
               <GridColumn styleName="column-divider">
                 <Header as="h3" content="Preview" subheader="Summary" />
-                <Card raised fluid styleName="preview-card-wrapper">
-                  <CardContent>
-                    <SummaryPreview
-                      loading={loading}
-                      error={error}
-                      summaryHtml={summaryHtml}
-                      saving={saving}
-                      onSave={handleSaveSummary}
-                      onClear={() => { setSummaryHtml(''); clearSummary(); }}
-                    />
-                  </CardContent>
-                </Card>
+                <SummaryPreview
+                  loading={loading}
+                  error={error}
+                  summaryHtml={summaryHtml}
+                  saving={saving}
+                  onSave={handleSaveSummary}
+                />
               </GridColumn>
             </GridRow>
           </Grid>
         </Modal.Content>
       </Modal>
-
-      {/* modal to manage saved prompts */}
-      <ManagePromptsModal
-        open={manageModalOpen}
-        onClose={() => setManageModalOpen(false)}
-        savedPrompts={savedPrompts}
-        deletePrompt={(idx) => {
-          const updated = deletePrompt(idx);
-          setSavedPrompts(updated);
-        }}
-      />
     </>
   );
 }
@@ -175,8 +139,16 @@ customElements.define(
   'ind-summarize-button',
   class extends HTMLElement {
     connectedCallback() {
-      const eventId = this.getAttribute('event-id');
-      ReactDOM.render(<SummarizeButton eventId={eventId} />, this);
+      const eventId = parseInt(this.getAttribute('event-id'), 10);
+      const categoryId = parseInt(this.getAttribute('category-id'), 10);
+      const storedPrompts = [
+        ...JSON.parse(this.getAttribute('stored-prompts')),
+        {name: 'Custom...', text: ''},
+      ];
+      ReactDOM.render(
+        <SummarizeButton categoryId={categoryId} eventId={eventId} storedPrompts={storedPrompts} />,
+        this
+      );
     }
     disconnectedCallback() {
       ReactDOM.unmountComponentAtNode(this);

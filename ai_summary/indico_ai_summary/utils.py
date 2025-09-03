@@ -31,15 +31,13 @@ def cern_qwen(message_text: str, token: str):
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json',
-        'Host': 'hf-qwen25-32b.genai.ml.cern.ch'
+        'Host': 'hf-qwen25-32b.genai.ml.cern.ch',
     }
     data = {
         'model': 'hf-qwen25-32b',
-        'messages': [
-            {'role': 'user', 'content': message_text}
-        ],
+        'messages': [{'role': 'user', 'content': message_text}],
         'max_tokens': 1024,
-        'stream': False
+        'stream': False,
     }
     try:
         response = requests.post(url, json=data, headers=headers)
@@ -47,9 +45,7 @@ def cern_qwen(message_text: str, token: str):
             return response.json()
         else:
             current_plugin.logger.error(
-                'Error in cern_qwen: status_code=%s, response=%s',
-                response.status_code,
-                response.text
+                'Error in cern_qwen: status_code=%s, response=%s', response.status_code, response.text
             )
             return None
     except Exception as e:

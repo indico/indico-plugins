@@ -6,3 +6,4 @@
 // see the LICENSE file for more details.
 
 import './components/ind_summarize_button';
+import './components/PromptManagerField';
