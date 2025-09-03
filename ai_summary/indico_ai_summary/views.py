@@ -5,8 +5,8 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from indico.modules.categories.views import WPCategoryManagement
 from indico.core.plugins import WPJinjaMixinPlugin
+from indico.modules.categories.views import WPCategoryManagement
 
 
 class WPCategoryManagePrompts(WPJinjaMixinPlugin, WPCategoryManagement):

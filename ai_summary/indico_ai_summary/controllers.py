@@ -7,15 +7,15 @@
 
 from flask import jsonify
 from flask_pluginengine import current_plugin
-from indico_ai_summary.views import WPCategoryManagePrompts
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
-from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
 from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
+from indico_ai_summary.views import WPCategoryManagePrompts
 
 
 CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
