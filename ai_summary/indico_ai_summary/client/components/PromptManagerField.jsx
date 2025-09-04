@@ -5,11 +5,25 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+import _ from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form, TextArea, Button, Input, Card, Icon} from 'semantic-ui-react';
 
-export default function PromptManagerField({value, onChange}) {
+import {FinalField} from 'indico/react/forms';
+
+export function FinalPromptManagerField({submitBtn}) {
+  return (
+    <FinalField
+      name="prompts"
+      component={PromptManagerField}
+      submitBtn={submitBtn}
+      isEqual={_.isEqual}
+    />
+  );
+}
+
+export default function PromptManagerField({value, onChange, submitBtn}) {
   const addPrompt = () => {
     onChange([...value, {name: '', text: ''}]);
   };
@@ -27,7 +41,7 @@ export default function PromptManagerField({value, onChange}) {
   };
 
   return (
-    <Form>
+    <>
       {value.map((prompt, idx) => (
         <PromptField
           key={idx}
@@ -43,8 +57,9 @@ export default function PromptManagerField({value, onChange}) {
           Add Prompt
           <Icon name="plus" />
         </Button>
+        {submitBtn}
       </div>
-    </Form>
+    </>
   );
 }
 
@@ -81,7 +96,7 @@ function PromptField({name, text, onChangeName, onChangeText, onRemove}) {
 
 export function WTFPromptManagerField({fieldId}) {
   const field = useMemo(() => document.getElementById(`${fieldId}-data`), [fieldId]);
-  const [prompts, setPrompts] = useState(JSON.parse(field.value) || [{name: 'Title', text: ''}]);
+  const [prompts, setPrompts] = useState(JSON.parse(field.value));
 
   const onChange = useCallback(
     v => {
@@ -92,7 +107,11 @@ export function WTFPromptManagerField({fieldId}) {
     [field]
   );
 
-  return <PromptManagerField value={prompts} onChange={onChange} />;
+  return (
+    <Form>
+      <PromptManagerField value={prompts} onChange={onChange} />
+    </Form>
+  );
 }
 
 window.setupPromptManagerFieldWidget = function setupPromptManagerFieldWidget({fieldId}) {
