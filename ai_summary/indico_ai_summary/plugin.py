@@ -21,6 +21,8 @@ from indico.web.menu import SideMenuItem
 
 from indico_ai_summary.blueprint import blueprint
 from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
+from indico_ai_summary.models.prompt import Prompt
+from indico_ai_summary.schemas import PromptSchema
 from indico_ai_summary.views import WPCategoryManagePrompts
 
 
@@ -61,8 +63,11 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         return blueprint
 
     def _render_summarize_button(self, event):
+        global_prompts = self.settings.get('prompts')
+        category_prompts = Prompt.query.with_parent(event.category).all()
+        all_prompts = global_prompts + PromptSchema(many=True).dump(category_prompts)
         return render_plugin_template('summarize_button.html', category=event.category,
-                                      event=event, stored_prompts=self.settings.get('prompts'))
+                                      event=event, stored_prompts=all_prompts)
 
     def _extend_category_menu(self, sender, category, **kwargs):
         return SideMenuItem(CATEGORY_SIDEMENU_ITEM, _('Prompts'),

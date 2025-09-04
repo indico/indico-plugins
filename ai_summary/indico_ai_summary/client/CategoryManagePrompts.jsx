@@ -5,12 +5,45 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Form as FinalForm} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
 
-export default function CategoryManagePrompts() {
-  return <Form>TODO: Manage Prompts</Form>;
+import {indicoAxios} from 'indico/utils/axios';
+import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+
+import {FinalPromptManagerField} from './components/PromptManagerField';
+
+export default function CategoryManagePrompts({categoryId, prompts: predefinedPrompts}) {
+  const onSubmit = async ({prompts}, form) => {
+    // TODO: url import
+    const url = `/plugin/ai-summary/manage-category-prompts/${categoryId}`;
+    try {
+      await indicoAxios.post(url, {prompts});
+      form.initialize({prompts});
+    } catch (error) {
+      handleSubmitError(error);
+    }
+  };
+
+  const submitBtn = <FinalSubmitButton label="Save Changes" />;
+
+  return (
+    <FinalForm
+      onSubmit={onSubmit}
+      initialValues={{prompts: predefinedPrompts}}
+      initialValuesEqual={_.isEqual}
+      subscription={{}}
+    >
+      {fprops => (
+        <Form onSubmit={fprops.handleSubmit}>
+          <FinalPromptManagerField submitBtn={submitBtn} />
+        </Form>
+      )}
+    </FinalForm>
+  );
 }
 
 window.setupCategoryManagePrompts = function setupCategoryManagePrompts() {

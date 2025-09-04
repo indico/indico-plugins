@@ -10,10 +10,13 @@ from flask_pluginengine import current_plugin
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 
+from indico.core.db import db
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
+from indico_ai_summary.models.prompt import Prompt
+from indico_ai_summary.schemas import PromptSchema
 from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
 from indico_ai_summary.views import WPCategoryManagePrompts
 
@@ -27,9 +30,19 @@ class RHManageCategoryPrompts(RHManageCategoryBase):
         RHManageCategoryBase._process_args(self)
 
     def _process_GET(self):
+        prompts = Prompt.query.with_parent(self.category).all()
+        serialized_prompts = PromptSchema(many=True).dump(prompts)
         return WPCategoryManagePrompts.render_template('manage_category_prompts.html', category=self.category,
                                                        active_menu_item=CATEGORY_SIDEMENU_ITEM,
-                                                       stored_prompts=current_plugin.settings.get('prompts'))
+                                                       stored_prompts=serialized_prompts)
+
+    @use_kwargs({'prompts': fields.List(fields.Nested(PromptSchema), required=True)}, location='json')
+    def _process_POST(self, prompts):
+        Prompt.query.with_parent(self.category).delete()
+        for prompt_data in prompts:
+            prompt = Prompt(category_id=self.category.id, name=prompt_data['name'], text=prompt_data['text'])
+            db.session.add(prompt)
+        return '', 204
 
 
 class SummarizeEvent(RHManageEventBase):
