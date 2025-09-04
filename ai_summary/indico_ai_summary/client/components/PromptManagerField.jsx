@@ -7,11 +7,11 @@
 
 import React, {useCallback, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Form, TextArea, Button, Input} from 'semantic-ui-react';
+import {Form, TextArea, Button, Input, Card, Icon} from 'semantic-ui-react';
 
 export default function PromptManagerField({value, onChange}) {
   const addPrompt = () => {
-    onChange([...value, {name: 'Name', text: ''}]);
+    onChange([...value, {name: '', text: ''}]);
   };
 
   const removePrompt = idx => {
@@ -29,20 +29,53 @@ export default function PromptManagerField({value, onChange}) {
   return (
     <Form>
       {value.map((prompt, idx) => (
-        <Form.Field key={idx}>
-          <Button type="button" onClick={() => removePrompt(idx)} style={{float: 'right'}}>
-            Remove
-          </Button>
-          <label>Prompt name</label>
-          <Input value={prompt.name} onChange={(_, {value: v}) => updateName(idx, v)} />
-          <label>Prompt text</label>
-          <TextArea value={prompt.text} onChange={(_, {value: v}) => updatePrompt(idx, v)} />
-        </Form.Field>
+        <PromptField
+          key={idx}
+          name={prompt.name}
+          text={prompt.text}
+          onRemove={() => removePrompt(idx)}
+          onChangeText={text => updatePrompt(idx, text)}
+          onChangeName={name => updateName(idx, name)}
+        />
       ))}
-      <Button type="button" onClick={addPrompt}>
-        Add Prompt
-      </Button>
+      <div style={{display: 'flex', justifyContent: 'end'}}>
+        <Button icon type="button" labelPosition="right" onClick={addPrompt}>
+          Add Prompt
+          <Icon name="plus" />
+        </Button>
+      </div>
     </Form>
+  );
+}
+
+function PromptField({name, text, onChangeName, onChangeText, onRemove}) {
+  return (
+    <Card fluid>
+      <Card.Content>
+        <div style={{display: 'flex', justifyContent: 'end', marginBottom: '-1em'}}>
+          <Button icon type="button" compact onClick={onRemove}>
+            <Icon name="trash alternate outline" />
+          </Button>
+        </div>
+        <Form.Field>
+          <label>Prompt Name</label>
+          <Input
+            value={name}
+            placeholder="e.g. Summarizer..."
+            onChange={(_, {value: v}) => onChangeName(v)}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Prompt Text</label>
+          <TextArea
+            value={text}
+            placeholder="Enter your LLM prompt here..."
+            onChange={(_, {value: v}) => onChangeText(v)}
+            rows={10}
+          />
+        </Form.Field>
+      </Card.Content>
+    </Card>
   );
 }
 

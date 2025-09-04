@@ -31,7 +31,7 @@ class PromptManagerField(JSONField):
 
 class PluginSettingsForm(IndicoForm):
     cern_summary_api_token = IndicoPasswordField(_('CERN Summary API Token'), [DataRequired()])
-    prompts = PromptManagerField(_('Prompts'))
+    prompts = PromptManagerField(_('Predefined Prompts'))
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):
