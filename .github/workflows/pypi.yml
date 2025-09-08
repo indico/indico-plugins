@@ -54,7 +54,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -85,7 +85,7 @@ jobs:
           path: wheels
 
       - name: Set up Python 🐍
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -153,14 +153,14 @@ jobs:
           path: dist
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: dist/
           skip-existing: true
           attestations: false
       - name: Publish to PyPI 🚀
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           packages-dir: dist/
           skip-existing: true
