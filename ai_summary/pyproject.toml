@@ -11,7 +11,12 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
 ]
 requires-python = '>=3.12.2, <3.13'
-dependencies = ['indico>=3.3']
+dependencies = [
+    'indico>=3.3',
+    'llm>=0.27.1',
+    'llm-gpt4all>=0.4',
+    'llm-mistral>=0.15',
+]
 
 [project.urls]
 GitHub = 'https://github.com/indico/indico-plugins'

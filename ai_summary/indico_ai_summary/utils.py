@@ -6,52 +6,48 @@
 # see the LICENSE file for more details.
 
 import itertools
-
 import html2text
 import markdown
-import requests
-from flask_pluginengine import current_plugin
+from enum import Enum
 
 
-def html_to_markdown(html: str) -> str:
-    h = html2text.HTML2Text()
-    h.ignore_links = True
-    h.ignore_images = True
-    h.body_width = 0
-    return h.handle(html)
+class MarkupMode(Enum):
+    """Supported markup conversion modes.
+
+    Members
+    - ``HTML_TO_MARKDOWN``: convert HTML to Markdown
+    - ``MARKDOWN_TO_HTML``: convert Markdown to HTML
+    """
+
+    HTML_TO_MARKDOWN = 1
+    MARKDOWN_TO_HTML = 2
+
+
+def convert_markup(markup: str, mode: MarkupMode) -> str:
+    """Convert markup between HTML and Markdown formats.
+
+    :param markup: The input markup string to be converted.
+    :param mode: The conversion mode. Use members of :class:`MarkupMode`,
+        for example ``MarkupMode.HTML_TO_MARKDOWN`` or
+        ``MarkupMode.MARKDOWN_TO_HTML``.
+    :return: The converted markup string.
+    """
+    if mode == MarkupMode.HTML_TO_MARKDOWN:
+        h = html2text.HTML2Text()
+        h.ignore_links = True
+        h.ignore_images = True
+        h.body_width = 0
+        return h.handle(markup)
+    if mode == MarkupMode.MARKDOWN_TO_HTML:
+        return markdown.markdown(markup)
+    raise ValueError(f'Unknown markup mode: {mode}')
 
 
 def chunk_text(text: str, max_tokens: int = 1500) -> list[str]:
-    return (' '.join(batch) for batch in itertools.batched(text.split(), max_tokens))
+    """Chunk text into smaller parts based on a maximum token count.
 
-
-# call model hf-qwen25-32b
-def cern_qwen(message_text: str, token: str):
-    url = 'https://ml.cern.ch/openai/v1/chat/completions'
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json',
-        'Host': 'hf-qwen25-32b.genai.ml.cern.ch',
-    }
-    data = {
-        'model': 'hf-qwen25-32b',
-        'messages': [{'role': 'user', 'content': message_text}],
-        'max_tokens': 1024,
-        'stream': False,
-    }
-    try:
-        response = requests.post(url, json=data, headers=headers)
-        if response.ok:
-            return response.json()
-        else:
-            current_plugin.logger.error(
-                'Error in cern_qwen: status_code=%s, response=%s', response.status_code, response.text
-            )
-            return None
-    except Exception as e:
-        current_plugin.logger.error('Exception in cern_qwen: %s', e)
-        return None
-
-
-def markdown_to_html(summary_text: str) -> str:
-    return markdown.markdown(summary_text)
+    :param text: The input text to be chunked.
+    :param max_tokens: The maximum number of tokens per chunk.
+    :return: A list of text chunks.
+    """
+    return [' '.join(batch) for batch in itertools.batched(text.split(), max_tokens)]

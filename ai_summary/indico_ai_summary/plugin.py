@@ -6,7 +6,7 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine.plugin import render_plugin_template
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin
@@ -18,6 +18,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, JSONField
 from indico.web.forms.widgets import JinjaWidget
 from indico.web.menu import SideMenuItem
+from wtforms.fields import StringField, URLField, IntegerField
 
 from indico_ai_summary.blueprint import blueprint
 from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
@@ -32,19 +33,43 @@ class PromptManagerField(JSONField):
 
 
 class PluginSettingsForm(IndicoForm):
-    cern_summary_api_token = IndicoPasswordField(_('CERN Summary API Token'), [DataRequired()])
+    llm_provider_name = StringField(_('LLM Provider Name'),
+                                    [DataRequired()],
+                                    description=_('The name of your LLM provider (e.g. OpenAI, Mistral etc.).'))
+    llm_model_name = StringField(_('Model Name'), [DataRequired()], description=_('The name of the model '
+                                 '(e.g. gpt-4o, mistral-7b-instruct-v0.1, hf-qwen25-32b etc.).'))
+    llm_provider_url = URLField(_('Provider Endpoint URL'),
+                                [DataRequired()],
+                                description=_("The URL of the LLM provider's API endpoint. The endpoint must "
+                                              "adhere to the OpenAI API specification."))
+    llm_auth_token = IndicoPasswordField(_('Auth Token'),
+                                         [DataRequired()],
+                                         description=_('The authentication token for accessing the LLM provider.'))
+    llm_host_name = StringField(_('Host Name'),
+                                 description=_('An optional host header to be added to the request (if '
+                                               'required by your provider).'))
+    llm_max_tokens = IntegerField(_('Max Tokens'),
+                                  [NumberRange(min=1)],
+                                  default=1024,
+                                  description=_('The maximum number of tokens to generate in the response. Defaults '
+                                                'to a maximum of 1024 tokens.'))
     prompts = PromptManagerField(_('Predefined Prompts'))
 
 
 class IndicoAISummaryPlugin(IndicoPlugin):
     """AI-assisted minutes summarization tool
-    Enter your CERN Summary API token. This will be used to authenticate requests to the summarization service.
+    Configure your LLM provider as well as predefined prompts to assist in summarizing event minutes.
     """
 
     configurable = True
     settings_form = PluginSettingsForm
     default_settings = {
-        'cern_summary_api_token': '',
+        'llm_model_name': None,
+        'llm_provider_name': None,
+        'llm_provider_url': None,
+        'llm_auth_token': None,
+        'llm_host_name': None,
+        'llm_max_tokens': 1024,
         'prompts': [],
     }
 

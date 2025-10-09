@@ -11,14 +11,16 @@ from webargs import fields
 from webargs.flaskparser import use_kwargs
 
 from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
 from indico_ai_summary.models.prompt import Prompt
 from indico_ai_summary.schemas import PromptSchema
-from indico_ai_summary.utils import cern_qwen, chunk_text, html_to_markdown, markdown_to_html
+from indico_ai_summary.utils import chunk_text, convert_markup, MarkupMode
 from indico_ai_summary.views import WPCategoryManagePrompts
+from indico_ai_summary.llm_interface import LLMInterface
 
 
 CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
@@ -63,33 +65,33 @@ class SummarizeEvent(RHManageEventBase):
             current_plugin.logger.error("No meeting notes found from this event's contributions.")
             return jsonify({'error': "No meeting notes found from this event's contributions."}), 400
 
-        cleaned_text = html_to_markdown(meeting_notes)
+        cleaned_text = convert_markup(meeting_notes, MarkupMode.HTML_TO_MARKDOWN)
         chunks = chunk_text(cleaned_text)
         summaries = []
-        try:
-            token = current_plugin.settings.get('cern_summary_api_token')
-            if not token:
-                current_plugin.logger.error('CERN Summary API token is not set in plugin settings.')
-                return jsonify({'error': 'CERN Summary API token is not set in plugin settings.'}), 400
-        except Exception as e:
-            current_plugin.logger.error('Exception in cern summary api token: %s', e)
+
+        if not current_plugin.settings.get('llm_auth_token'):
+            current_plugin.logger.error('LLM Auth Token is not set in plugin settings.')
+            return jsonify({'error': 'LLM Auth Token is not set in plugin settings.'}), 400
 
         for chunk in chunks:
             full_prompt = f'{prompt_template}\n\n{chunk}'
-            try:
-                response = cern_qwen(full_prompt, token)
-                if response:
-                    summary = response['choices'][0]['message']['content']
-                    summaries.append(summary)
-                else:
-                    summaries.append('[Error during summarization, it might be because of the token or the model itself. Check the token again.]')  # noqa: E501
-            except Exception as e:
-                current_plugin.logger.error(f'Exception during summarization: {e}')
-                summaries.append(f'[Exception during summarization: {e}]')
+            llm_model = LLMInterface(
+                model_name=current_plugin.settings.get('llm_model_name'),
+                host=current_plugin.settings.get('llm_host_name'),
+                url=current_plugin.settings.get('llm_provider_url'),
+                auth_token=current_plugin.settings.get('llm_auth_token'),
+                max_tokens=current_plugin.settings.get('llm_max_tokens')
+            )
+            response = llm_model.execute(full_prompt)
+            if not response:
+                current_plugin.logger.error('Empty response during summarization. Check the token or model.')
+                raise IndicoError('An error occurred during summarization.')
+
+            summaries.append(response)
 
         combined_summary = '\n'.join(summaries)
-        html_output = markdown_to_html(combined_summary)
+        html_output = convert_markup(combined_summary, MarkupMode.MARKDOWN_TO_HTML)
 
-        return jsonify({
+        return {
             'summary_html': html_output
-        })
+        }
