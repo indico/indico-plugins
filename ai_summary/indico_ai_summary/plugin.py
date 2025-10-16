@@ -16,9 +16,9 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, JSONField
-from indico.web.forms.widgets import JinjaWidget
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 from indico.web.menu import SideMenuItem
-from wtforms.fields import StringField, URLField, IntegerField
+from wtforms.fields import StringField, URLField, IntegerField, BooleanField
 
 from indico_ai_summary.blueprint import blueprint
 from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
@@ -37,13 +37,14 @@ class PluginSettingsForm(IndicoForm):
                                     [DataRequired()],
                                     description=_('The name of your LLM provider (e.g. OpenAI, Mistral etc.).'))
     llm_model_name = StringField(_('Model Name'), [DataRequired()], description=_('The name of the model '
-                                 '(e.g. gpt-4o, mistral-7b-instruct-v0.1, hf-qwen25-32b etc.).'))
+                                 '(e.g. gpt-4o, mistral-large-latest, hf-qwen25-32b etc.).'))
     llm_provider_url = URLField(_('Provider Endpoint URL'),
                                 [DataRequired()],
                                 description=_("The URL of the LLM provider's API endpoint. The endpoint must "
                                               "adhere to the OpenAI API specification."))
     llm_auth_token = IndicoPasswordField(_('Auth Token'),
                                          [DataRequired()],
+                                         toggle=True,
                                          description=_('The authentication token for accessing the LLM provider.'))
     llm_host_name = StringField(_('Host Name'),
                                  description=_('An optional host header to be added to the request (if '
@@ -53,6 +54,12 @@ class PluginSettingsForm(IndicoForm):
                                   default=1024,
                                   description=_('The maximum number of tokens to generate in the response. Defaults '
                                                 'to a maximum of 1024 tokens.'))
+    llm_stream_response = BooleanField(_('Stream Response'),
+                                        widget=SwitchWidget(),
+                                        default=False,
+                                        description=_('Stream back the live token-by-token response from the LLM.'))
+    display_info = BooleanField(_('Display LLM Info'), widget=SwitchWidget(), default=True,
+                                 description=_('Display the model name and LLM provider name in the summarizer modal.'))
     prompts = PromptManagerField(_('Predefined Prompts'))
 
 
@@ -70,6 +77,8 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         'llm_auth_token': None,
         'llm_host_name': None,
         'llm_max_tokens': 1024,
+        'llm_stream_response': False,
+        'display_info': True,
         'prompts': [],
     }
 
@@ -91,8 +100,22 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         global_prompts = self.settings.get('prompts')
         category_prompts = Prompt.query.with_parent(event.category).all()
         all_prompts = global_prompts + PromptSchema(many=True).dump(category_prompts)
-        return render_plugin_template('summarize_button.html', category=event.category,
-                                      event=event, stored_prompts=all_prompts)
+        stream_response = self.settings.get('llm_stream_response')
+        show_info = self.settings.get('display_info')
+
+        if show_info:
+            llm_info = {
+                'provider_name': self.settings.get('llm_provider_name'),
+                'model_name': self.settings.get('llm_model_name')
+            }
+
+        return render_plugin_template('summarize_button.html',
+                                      category=event.category,
+                                      event=event,
+                                      stored_prompts=all_prompts,
+                                      stream_response=stream_response,
+                                      llm_info=(llm_info if show_info else None)
+                                      )
 
     def _extend_category_menu(self, sender, category, **kwargs):
         return SideMenuItem(CATEGORY_SIDEMENU_ITEM, _('Prompts'),

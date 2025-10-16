@@ -12,49 +12,102 @@
 
 // import getStoredPrompts from 'indico-url:plugin_ai_summary.stored_prompts';
 
-import React, {useState} from 'react';
+import staticURL from 'indico-url:plugin_ai_summary.static';
+
+import React, {useState, useEffect, useContext} from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon} from 'semantic-ui-react';
+import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError} from 'indico/utils/axios';
-import {fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
-import {PromptControls, PromptEditor} from './prompt_selector';
-import SummaryPreview from './summary_preview';
+import {streamSummary, fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
+import {PromptControls, PromptEditor} from './PromptSelector';
+import SummaryPreview from './SummaryPreview';
 import '../styles/ind_summarize_button.module.scss';
 
-function SummarizeButton({categoryId, eventId, storedPrompts}) {
-  // React State Definitions
-  const [selectedPromptIndex, setSelectedPromptIndex] = useState(0); // prompt selected for deletion
-  const [prompts, setPrompts] = useState(storedPrompts); // all stored prompts
+function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, llmInfo}) {
+  const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
+  const [prompts, setPrompts] = useState(storedPrompts);
   const selectedPrompt = prompts[selectedPromptIndex];
-  const [summaryHtml, setSummaryHtml] = useState(''); // generated summary HTML
+  const [summaryHtml, setSummaryHtml] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [saving, setSaving] = useState(false); // saving summary indicator
+  const [saving, setSaving] = useState(false);
+  const [streamStopped, setStreamStopped] = useState(false);
+  const [streamCtl, setStreamCtl] = useState(null);
 
-  // trigger summary generation by calling the backend API
-  const runSummarize = async () => {
+  // trigger summary generation from the backend
+  const runSummarize = () => {
+    // Close any existing stream first
+    if (streamCtl) {
+      try {
+        streamCtl.close();
+      } catch {}
+      setStreamCtl(null);
+    }
+
     setLoading(true);
     setError(null);
     setSummaryHtml('');
 
-    let data;
-    try {
-      // call backend to fetch summary
-      data = await fetchSummary(eventId, selectedPrompt.text);
-    } catch (e) {
-      setError(`Error during summarization: ${handleAxiosError(e)}`);
-      setLoading(false);
+    if (streamResponse) {
+      setStreamStopped(false);
+      // Streaming via SSE
+      const ctl = streamSummary(eventId, selectedPrompt.text, {
+        onChunk: html => {
+          // Replace each time with server snapshot
+          setSummaryHtml(html);
+        },
+        onDone: () => {
+          setLoading(false);
+          setStreamCtl(null);
+        },
+        onError: msg => {
+          setError(typeof msg === 'string' ? msg : 'Error during summarization');
+          setLoading(false);
+          setStreamCtl(null);
+        },
+      });
+      setStreamCtl(ctl);
       return;
     }
-    // if response contains the summary display it
-    if (data.summary_html) {
-      setSummaryHtml(data.summary_html);
-    } else {
-      setError('No summary returned.');
+
+    // Non-streaming single request
+    (async () => {
+      try {
+        const data = await fetchSummary(eventId, selectedPrompt.text);
+        if (data?.summary_html) {
+          setSummaryHtml(data.summary_html);
+        } else {
+          setError('No summary returned.');
+        }
+      } catch (e) {
+        setError(`Error during summarization: ${handleAxiosError(e)}`);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  };
+
+  // stop/cancel an in-progress stream
+  const stopStreaming = () => {
+    if (streamCtl) {
+      try {
+        streamCtl.close();
+      } catch {}
+      setStreamCtl(null);
     }
+    setStreamStopped(true);
     setLoading(false);
   };
+
+  // Ensure stream is closed when component unmounts
+  useEffect(() => () => {
+    if (streamCtl) {
+      try {
+        streamCtl.close();
+      } catch {}
+    }
+  }, [streamCtl]);
 
   // save generated summary into Indico event notes
   const handleSaveSummary = async () => {
@@ -72,59 +125,139 @@ function SummarizeButton({categoryId, eventId, storedPrompts}) {
     }
   };
 
+  const renderSummarizeButton = (loading, streamResponse, error) => {
+    if (error) {
+      return (
+        <Button
+          primary
+          attached="bottom"
+          onClick={runSummarize}
+          disabled={loading}
+        >
+          <Icon name="undo" />
+          <Translate>Try Again</Translate>
+        </Button>
+      );
+    }
+
+    if (!loading) {
+      return (
+        <Button
+          primary
+          attached="bottom"
+          onClick={runSummarize}
+          disabled={loading}
+        >
+          <Icon name="play circle" />
+          <Translate>Generate Summary</Translate>
+        </Button>
+      );
+    }
+
+    if (loading && streamResponse) {
+      return (
+        <Button
+          negative
+          attached="bottom"
+          onClick={stopStreaming}
+        >
+          <Icon name="stop" />
+          <Translate>Stop Generating</Translate>
+        </Button>
+      );
+    }
+
+    if (loading && !streamResponse) {
+      return (
+        <Button
+          primary
+          attached="bottom"
+          disabled
+        >
+          <Translate>Generating Summary...</Translate>
+        </Button>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <Modal
         closeIcon
+        onClose={() => {
+          // Ensure any active stream is closed when modal is closed
+          if (streamCtl) {
+            try {
+              streamCtl.close();
+            } catch {}
+            setStreamCtl(null);
+          }
+          setLoading(false);
+        }}
+        closeOnEscape={false}
+        closeOnDimmerClick={false}
         trigger={
-          <li>
-            <a>Summarize</a>
-          </li>
+          <div styleName="summarize-button-menu">
+            <img src={staticURL({filename:'images/sparkle.svg'})} />
+            <Translate as="a">Summarize</Translate>
+          </div>
         }
         style={{minWidth: '65vw'}}
       >
-        <Modal.Header>Summarize Meeting</Modal.Header>
+        <Modal.Header>
+          <Translate>Summarize Meeting</Translate>
+        </Modal.Header>
         <Modal.Content>
           <Grid celled="internally">
             <GridRow columns={2}>
-              {/* left column : prompt selection */}
-              <GridColumn>
+              <GridColumn width={5}>
                 <Form>
                   <Header as="h3" content={Translate.string('Select a prompt')} />
                   <PromptControls
                     selectedPromptIndex={selectedPromptIndex}
                     setSelectedPromptIndex={setSelectedPromptIndex}
                     storedPrompts={storedPrompts}
+                    disabled={loading}
                   />
                   <PromptEditor
                     selectedPromptIndex={selectedPromptIndex}
                     selectedPrompt={selectedPrompt}
                     setPrompts={setPrompts}
-                  />
-                  <Button
-                    primary
-                    type="button"
-                    icon
-                    labelPosition="right"
-                    onClick={runSummarize}
                     disabled={loading}
-                  >
-                    {loading ? 'Summarizing…' : 'Generate meeting summary'}
-                    <Icon name="magic" />
-                  </Button>
+                  />
+                  {renderSummarizeButton(loading, streamResponse, error)}
                 </Form>
               </GridColumn>
-
-              {/* right column : summary preview */}
-              <GridColumn styleName="column-divider">
-                <Header as="h3" content="Preview" subheader="Summary" />
-                <SummaryPreview
-                  loading={loading}
-                  error={error}
-                  summaryHtml={summaryHtml}
-                  saving={saving}
-                  onSave={handleSaveSummary}
-                />
+              <GridColumn width={11} styleName="column-divider">
+                  <Header as="h3">
+                    <Translate>Preview</Translate>
+                    <span styleName="completion-status">
+                      {loading && !error && (
+                        <Loader active inline size="small" styleName="modal-spinner" />
+                      )}
+                      {streamStopped && summaryHtml && (
+                        <Popup
+                          trigger={<Icon name="stop circle outline" color="grey" />}
+                          content={Translate.string('Response interrupted')}
+                          position="top center"
+                        />
+                      )}
+                      {!loading && !error && !streamStopped && summaryHtml && (
+                        <Icon name="check circle outline" color="green" />
+                      )}
+                    </span>
+                  </Header>
+                  <SummaryPreview
+                    loading={loading}
+                    error={error}
+                    summaryHtml={summaryHtml}
+                    saving={saving}
+                    onSave={handleSaveSummary}
+                    streamResponse={streamResponse}
+                    onRetry={runSummarize}
+                    llmInfo={llmInfo}
+                  />
               </GridColumn>
             </GridRow>
           </Grid>
@@ -134,19 +267,26 @@ function SummarizeButton({categoryId, eventId, storedPrompts}) {
   );
 }
 
-// custom HTML element <ind-summarize-button>
 customElements.define(
   'ind-summarize-button',
   class extends HTMLElement {
     connectedCallback() {
       const eventId = parseInt(this.getAttribute('event-id'), 10);
       const categoryId = parseInt(this.getAttribute('category-id'), 10);
+      const streamResponse = JSON.parse(this.getAttribute('stream-response'));
+      const llmInfo = JSON.parse(this.getAttribute('llm-info'));
       const storedPrompts = [
         ...JSON.parse(this.getAttribute('stored-prompts')),
         {name: 'Custom...', text: ''},
       ];
       ReactDOM.render(
-        <SummarizeButton categoryId={categoryId} eventId={eventId} storedPrompts={storedPrompts} />,
+        <SummarizeButton
+          categoryId={categoryId}
+          eventId={eventId}
+          storedPrompts={storedPrompts}
+          streamResponse={streamResponse}
+          llmInfo={llmInfo}
+        />,
         this
       );
     }

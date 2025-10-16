@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import jsonify
+from flask import jsonify, Response, stream_with_context
 from flask_pluginengine import current_plugin
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -18,7 +18,7 @@ from indico.modules.events.notes.util import get_scheduled_notes
 
 from indico_ai_summary.models.prompt import Prompt
 from indico_ai_summary.schemas import PromptSchema
-from indico_ai_summary.utils import chunk_text, convert_markup, MarkupMode
+from indico_ai_summary.utils import chunk_text, convert_markup, MarkupMode, generate_chunk_stream
 from indico_ai_summary.views import WPCategoryManagePrompts
 from indico_ai_summary.llm_interface import LLMInterface
 
@@ -73,15 +73,26 @@ class SummarizeEvent(RHManageEventBase):
             current_plugin.logger.error('LLM Auth Token is not set in plugin settings.')
             return jsonify({'error': 'LLM Auth Token is not set in plugin settings.'}), 400
 
-        for chunk in chunks:
-            full_prompt = f'{prompt_template}\n\n{chunk}'
-            llm_model = LLMInterface(
+        llm_model = LLMInterface(
                 model_name=current_plugin.settings.get('llm_model_name'),
                 host=current_plugin.settings.get('llm_host_name'),
                 url=current_plugin.settings.get('llm_provider_url'),
                 auth_token=current_plugin.settings.get('llm_auth_token'),
                 max_tokens=current_plugin.settings.get('llm_max_tokens')
             )
+
+        if current_plugin.settings.get('llm_stream_response'):
+            return Response(
+                stream_with_context(generate_chunk_stream(chunks, prompt_template, llm_model)),
+                content_type='text/event-stream',
+                headers={
+                    'Cache-Control': 'no-cache',
+                    'X-Accel-Buffering': 'no'
+                }
+            )
+
+        for chunk in chunks:
+            full_prompt = f'{prompt_template}\n\n{chunk}'
             response = llm_model.execute(full_prompt)
             if not response:
                 current_plugin.logger.error('Empty response during summarization. Check the token or model.')

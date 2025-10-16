@@ -8,7 +8,11 @@
 import itertools
 import html2text
 import markdown
+import json
 from enum import Enum
+from collections.abc import Generator
+
+from indico_ai_summary.llm_interface import LLMInterface
 
 
 class MarkupMode(Enum):
@@ -34,7 +38,7 @@ def convert_markup(markup: str, mode: MarkupMode) -> str:
     """
     if mode == MarkupMode.HTML_TO_MARKDOWN:
         h = html2text.HTML2Text()
-        h.ignore_links = True
+        h.ignore_links = False
         h.ignore_images = True
         h.body_width = 0
         return h.handle(markup)
@@ -51,3 +55,24 @@ def chunk_text(text: str, max_tokens: int = 1500) -> list[str]:
     :return: A list of text chunks.
     """
     return [' '.join(batch) for batch in itertools.batched(text.split(), max_tokens)]
+
+
+def generate_chunk_stream(chunks: list[str], prompt: str, llm_model: LLMInterface) -> Generator[str, None, None]:
+    """Generate a stream of chunks from the LLM model."""
+    # Maintain a cumulative markdown buffer across all text chunks so snapshots grow
+    md_total = ''
+    for chunk in chunks:
+        full_prompt = f'{prompt}\n\n{chunk}'
+        response_stream = llm_model.execute(full_prompt, stream=True)
+        if not response_stream:
+            yield f"data: {json.dumps({'error': 'An error occurred during summarization.'})}\n\n"
+            return
+        try:
+            for delta in response_stream:
+                md_total += delta
+                html_snapshot = convert_markup(md_total, MarkupMode.MARKDOWN_TO_HTML)
+                yield f"data: {json.dumps({'summary_html': html_snapshot})}\n\n"
+        except Exception:
+            yield f"data: {json.dumps({'error': 'Streaming error from LLM provider'})}\n\n"
+            return
+    yield 'data: [DONE]\n\n'

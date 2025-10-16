@@ -1,5 +1,8 @@
 <ind-summarize-button
     category-id="{{ category.id }}"
     event-id="{{ event.id }}"
-    stored-prompts="{{ stored_prompts | tojson | forceescape }}">
+    stored-prompts="{{ stored_prompts | tojson | forceescape }}"
+    stream-response="{{ stream_response | tojson }}"
+    llm-info="{{ llm_info | tojson | forceescape }}"
+>
 </ind-summarize-button>

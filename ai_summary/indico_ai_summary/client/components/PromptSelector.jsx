@@ -6,10 +6,11 @@
 // see the LICENSE file for more details.
 
 import React from 'react';
+import {Translate} from 'indico/react/i18n';
 import {Dropdown, TextArea, Form} from 'semantic-ui-react';
 
 // dropdown + manage saved prompts button (outside card)
-export function PromptControls({selectedPromptIndex, setSelectedPromptIndex, storedPrompts}) {
+export function PromptControls({selectedPromptIndex, setSelectedPromptIndex, storedPrompts, disabled}) {
   const options = storedPrompts.map((prompt, idx) => ({
     key: `${idx}`,
     text: prompt.name,
@@ -22,12 +23,12 @@ export function PromptControls({selectedPromptIndex, setSelectedPromptIndex, sto
 
   return (
     <Form.Field>
-      <Dropdown selection options={options} value={selectedPromptIndex} onChange={onChange} />
+      <Dropdown selection options={options} value={selectedPromptIndex} onChange={onChange} disabled={disabled} />
     </Form.Field>
   );
 }
 
-export function PromptEditor({selectedPromptIndex, selectedPrompt, setPrompts}) {
+export function PromptEditor({selectedPromptIndex, selectedPrompt, setPrompts, disabled}) {
   const onChange = (_, {value}) => {
     setPrompts(oldPrompts =>
       oldPrompts.map((p, i) => (i === selectedPromptIndex ? {name: p.name, text: value} : p))
@@ -35,9 +36,9 @@ export function PromptEditor({selectedPromptIndex, selectedPrompt, setPrompts}) 
   };
 
   return (
-    <Form.Field>
-      <label>Selected prompt (editable)</label>
-      <TextArea value={selectedPrompt.text} onChange={onChange} rows={10} />
+    <Form.Field style={{marginBottom: 0}}>
+      <Translate as="label">Selected prompt (editable)</Translate>
+      <TextArea value={selectedPrompt.text} onChange={onChange} rows={5} disabled={disabled} />
     </Form.Field>
   );
 }
