@@ -54,7 +54,7 @@ class SummarizeEvent(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
 
-    @use_kwargs({'prompt': fields.Str(missing='')}, location='query')
+    @use_kwargs({'prompt': fields.Str(load_default='')}, location='json')
     def _process(self, prompt):
         event = self.event
         prompt_template = prompt.strip()

@@ -9,8 +9,11 @@ import _ from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form, TextArea, Button, Input, Card, Icon} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from 'indico/react/forms';
+
+import './PromptManagerField.module.scss';
 
 export function FinalPromptManagerField({submitBtn}) {
   return (
@@ -52,9 +55,9 @@ export default function PromptManagerField({value, onChange, submitBtn}) {
           onChangeName={name => updateName(idx, name)}
         />
       ))}
-      <div style={{display: 'flex', justifyContent: 'end'}}>
+      <div styleName="add-prompt-buttons">
         <Button icon type="button" labelPosition="right" onClick={addPrompt}>
-          Add Prompt
+            <Translate>Add Prompt</Translate>
           <Icon name="plus" />
         </Button>
         {submitBtn}
@@ -67,24 +70,24 @@ function PromptField({name, text, onChangeName, onChangeText, onRemove}) {
   return (
     <Card fluid>
       <Card.Content>
-        <div style={{display: 'flex', justifyContent: 'end', marginBottom: '-1em'}}>
+        <div styleName="delete-prompt-button">
           <Button icon type="button" compact onClick={onRemove}>
             <Icon name="trash alternate outline" />
           </Button>
         </div>
         <Form.Field>
-          <label>Prompt Name</label>
+          <Translate as="label">Prompt Name</Translate>
           <Input
             value={name}
-            placeholder="e.g. Summarizer..."
+            placeholder={Translate.string('e.g. Summarizer...')}
             onChange={(_, {value: v}) => onChangeName(v)}
           />
         </Form.Field>
         <Form.Field>
-          <label>Prompt Text</label>
+          <Translate as="label">Prompt Text</Translate>
           <TextArea
             value={text}
-            placeholder="Enter your LLM prompt here..."
+            placeholder={Translate.string('Enter your prompt here...')}
             onChange={(_, {value: v}) => onChangeText(v)}
             rows={10}
           />

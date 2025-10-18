@@ -14,7 +14,7 @@
 
 import staticURL from 'indico-url:plugin_ai_summary.static';
 
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -22,7 +22,7 @@ import {handleAxiosError} from 'indico/utils/axios';
 import {streamSummary, fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
 import {PromptControls, PromptEditor} from './PromptSelector';
 import SummaryPreview from './SummaryPreview';
-import '../styles/ind_summarize_button.module.scss';
+import './ind_summarize_button.module.scss';
 
 function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, llmInfo}) {
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
@@ -40,7 +40,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
     // Close any existing stream first
     if (streamCtl) {
       try {
-        streamCtl.close();
+        streamCtl.abort();
       } catch {}
       setStreamCtl(null);
     }
@@ -51,7 +51,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
 
     if (streamResponse) {
       setStreamStopped(false);
-      // Streaming via SSE
+      // Streaming via indicoAxios
       const ctl = streamSummary(eventId, selectedPrompt.text, {
         onChunk: html => {
           // Replace each time with server snapshot
@@ -92,7 +92,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
   const stopStreaming = () => {
     if (streamCtl) {
       try {
-        streamCtl.close();
+        streamCtl.abort();
       } catch {}
       setStreamCtl(null);
     }
@@ -104,7 +104,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
   useEffect(() => () => {
     if (streamCtl) {
       try {
-        streamCtl.close();
+        streamCtl.abort();
       } catch {}
     }
   }, [streamCtl]);
@@ -189,7 +189,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
           // Ensure any active stream is closed when modal is closed
           if (streamCtl) {
             try {
-              streamCtl.close();
+              streamCtl.abort();
             } catch {}
             setStreamCtl(null);
           }
@@ -244,7 +244,11 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
                         />
                       )}
                       {!loading && !error && !streamStopped && summaryHtml && (
-                        <Icon name="check circle outline" color="green" />
+                        <Popup
+                          trigger={<Icon name="check circle outline" color="green" />}
+                          content={Translate.string('Response complete')}
+                          position="top center"
+                        />
                       )}
                     </span>
                   </Header>

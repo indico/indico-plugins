@@ -11,7 +11,9 @@ import React, {useRef, useEffect} from 'react';
 import {Button, Segment, Header, HeaderSubheader, Icon, Dimmer, Image, Card} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import '../styles/ind_summarize_button.module.scss';
+import './SummaryPreview.module.scss';
+import './ActionButtons.module.scss';
+
 import ActionButtons from './ActionButtons';
 
 export default function SummaryPreview({loading, error, summaryHtml, saving, onSave, streamResponse, onRetry, llmInfo}) {
@@ -26,8 +28,8 @@ export default function SummaryPreview({loading, error, summaryHtml, saving, onS
     }
   }, [streamResponse, summaryHtml, error]);
 
-  const scrollBarStyle = loading && !error ? "preview-card-wrapper scrollbar-hidden" : "preview-card-wrapper";
-  const displayedHtml = summaryHtml ? (error ? summaryHtml.substring(0, 1000) : summaryHtml) : null;
+  const scrollBarStyle = loading || error ? 'preview-card-wrapper scrollbar-hidden' : 'preview-card-wrapper';
+  const displayedHtml = summaryHtml ? (error ? summaryHtml.substring(0, 800) : summaryHtml) : null;
 
   if (!loading && !error && !summaryHtml) {
     return (

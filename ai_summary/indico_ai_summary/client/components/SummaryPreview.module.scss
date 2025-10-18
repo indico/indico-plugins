@@ -5,15 +5,6 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-@use 'base/palette' as *;
-
-.column-divider {
-  box-shadow: none !important;
-  display: flex !important;
-  flex-direction: column;
-  border-left: 1px solid $raincloud-gray;
-}
-
 .preview-card-wrapper {
   flex-grow: 1;
   margin-top: 0 !important;
@@ -27,30 +18,10 @@
       ul li {
         margin-left: 1.5em;
       }
+
       h1, h2, h3 {
         font-size: 1.5em;
       }
-  }
-}
-
-.completion-status {
-
-  margin-left: 5px !important;
-
-  .modal-spinner {
-    // SUI modal loader workaround (https://github.com/Semantic-Org/Semantic-UI-React/issues/3133)
-
-    &::before {
-      width: 18px !important;
-      height: 18px !important;
-      border-color: rgba(0,0,0,.1) !important;
-    }
-
-    &::after {
-      width: 18px !important;
-      height: 18px !important;
-      border-color: #767676 transparent transparent !important;
-    }
   }
 }
 
@@ -85,7 +56,7 @@
   display: none;
 }
 
-// Hide scrollbar but allow scrolling
+// Hide scrollbar when streaming back the generated summary
 .scrollbar-hidden {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -129,45 +100,5 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-  }
-}
-
-.placeholder-no-summary{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: rgba(0,0,0,0.5);
-  margin-top: 8em;
-  font-style: italic;
-}
-
-.summarize-button-menu {
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 0;
-
-  img {
-    margin-right: 5px;
-  }
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-
-  .llm-info {
-    color: $dark-gray;
-  }
-}
-
-.action-buttons-container {
-  display: flex;
-  align-items: baseline;
-  gap: 0;
-
-  .save-button {
-    margin-left: 10px !important;
   }
 }

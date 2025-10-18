@@ -9,7 +9,7 @@ import React, {useState, useEffect} from 'react';
 import {Button, ButtonGroup, Icon, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import '../styles/ind_summarize_button.module.scss';
+import './ActionButtons.module.scss';
 
 export default function ActionButtons({loading, error, summaryHtml, saving, onSave, onRetry}) {
 

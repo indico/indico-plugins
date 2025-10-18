@@ -5,6 +5,8 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
+import manageCategoryPrompts from 'indico-url:plugin_ai_summary.manage_category_prompts';
+
 import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -18,10 +20,8 @@ import {FinalPromptManagerField} from './components/PromptManagerField';
 
 export default function CategoryManagePrompts({categoryId, prompts: predefinedPrompts}) {
   const onSubmit = async ({prompts}, form) => {
-    // TODO: url import
-    const url = `/plugin/ai-summary/manage-category-prompts/${categoryId}`;
     try {
-      await indicoAxios.post(url, {prompts});
+      await indicoAxios.post(manageCategoryPrompts({category_id: categoryId}), {prompts});
       form.initialize({prompts});
     } catch (error) {
       handleSubmitError(error);

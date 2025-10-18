@@ -1,0 +1,45 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.column-divider {
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column;
+  border-left: 1px solid $raincloud-gray;
+}
+
+.completion-status {
+  margin-left: 5px !important;
+
+  .modal-spinner {
+    // SUI modal loader workaround (https://github.com/Semantic-Org/Semantic-UI-React/issues/3133)
+
+    &::before {
+      width: 18px !important;
+      height: 18px !important;
+      border-color: rgba(0,0,0,.1) !important;
+    }
+
+    &::after {
+      width: 18px !important;
+      height: 18px !important;
+      border-color: #767676 transparent transparent !important;
+    }
+  }
+}
+
+.summarize-button-menu {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 0;
+
+  img {
+    margin-right: 5px;
+  }
+}
