@@ -14,6 +14,8 @@ import '../styles/ind_summarize_button.module.scss';
 export default function ActionButtons({loading, error, summaryHtml, saving, onSave, onRetry}) {
 
     const [isCopied, setIsCopied] = useState(false);
+    const [showSavedIcon, setShowSavedIcon] = useState(false);
+    const [prevSaving, setPrevSaving] = useState(false);
 
     useEffect(() => {
         if (isCopied) {
@@ -22,19 +24,19 @@ export default function ActionButtons({loading, error, summaryHtml, saving, onSa
         }
     }, [isCopied]);
 
+    useEffect(() => {
+        if (prevSaving && !saving) {
+            setShowSavedIcon(true);
+            const timer = setTimeout(() => setShowSavedIcon(false), 2000);
+            return () => clearTimeout(timer);
+        }
+        setPrevSaving(saving);
+    }, [saving, prevSaving]);
+
     if (!loading) {
         return (
+            <div styleName="action-buttons-container">
               <ButtonGroup basic>
-                {summaryHtml && !error && (
-                  <Popup trigger={
-                    <Button icon onClick={onSave} disabled={saving}>
-                      {saving ? <Icon name="spinner" loading /> : <Icon name="save" />}
-                    </Button>
-                  }
-                    content={saving ? Translate.string('Saving summary...') : Translate.string('Save the generated summary to the meeting minutes')}
-                    position="top center"
-                  />
-                )}
                 {summaryHtml && !error && (
                   <Popup trigger={
                     <Button
@@ -63,6 +65,30 @@ export default function ActionButtons({loading, error, summaryHtml, saving, onSa
                   position="top center"
                 />
               </ButtonGroup>
+
+              {summaryHtml && !error && (
+                <Popup trigger={
+                  <Button primary={!showSavedIcon} basic={showSavedIcon} icon onClick={onSave} disabled={saving} styleName="save-button">
+                    {saving ? (
+                      <Icon name="spinner" loading />
+                    ) : showSavedIcon ? (
+                      <Icon name="check" color="green" />
+                    ) : (
+                      <Icon name="save" />
+                    )}
+                  </Button>
+                }
+                  content={
+                    saving
+                      ? Translate.string('Saving summary...')
+                      : showSavedIcon
+                        ? Translate.string('Saved!')
+                        : Translate.string('Save the generated summary to the meeting minutes')
+                  }
+                  position="top center"
+                />
+              )}
+            </div>
           );
       }
 

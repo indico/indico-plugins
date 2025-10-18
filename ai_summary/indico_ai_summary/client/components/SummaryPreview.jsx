@@ -27,7 +27,7 @@ export default function SummaryPreview({loading, error, summaryHtml, saving, onS
   }, [streamResponse, summaryHtml, error]);
 
   const scrollBarStyle = loading && !error ? "preview-card-wrapper scrollbar-hidden" : "preview-card-wrapper";
-  const displayedHtml = summaryHtml ? (error ? summaryHtml.substring(0, 1200) : summaryHtml) : null;
+  const displayedHtml = summaryHtml ? (error ? summaryHtml.substring(0, 1000) : summaryHtml) : null;
 
   if (!loading && !error && !summaryHtml) {
     return (

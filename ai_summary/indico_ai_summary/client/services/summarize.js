@@ -74,7 +74,7 @@ export function streamSummary(eventId, prompt, {onChunk, onDone, onError} = {}) 
     }
     // Otherwise, we were in the middle of streaming and lost connection
     if (onError) {
-      onError('Connection lost while streaming summary.');
+      onError('Connection lost whilst streaming summary.');
     }
   };
 

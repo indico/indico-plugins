@@ -6,7 +6,9 @@
 # see the LICENSE file for more details.
 
 from flask_pluginengine.plugin import render_plugin_template
+from wtforms.fields import BooleanField, FloatField, IntegerField, StringField, TextAreaField, URLField
 from wtforms.validators import DataRequired, NumberRange
+from wtforms.widgets import NumberInput
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin
@@ -18,7 +20,6 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPasswordField, JSONField
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 from indico.web.menu import SideMenuItem
-from wtforms.fields import StringField, URLField, IntegerField, BooleanField
 
 from indico_ai_summary.blueprint import blueprint
 from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
@@ -54,6 +55,16 @@ class PluginSettingsForm(IndicoForm):
                                   default=1024,
                                   description=_('The maximum number of tokens to generate in the response. Defaults '
                                                 'to a maximum of 1024 tokens.'))
+    llm_temperature = FloatField(_('Temperature'),
+                                   [NumberRange(min=0, max=1)],
+                                   widget=NumberInput(step='0.1'),
+                                   default=0.5,
+                                   description=_('The sampling temperature to use, between 0 and 1. Higher values '
+                                                 'like 0.8 will make the response more random, while lower values like '
+                                                 '0.2 will make it more focused and deterministic.'))
+    llm_system_prompt = TextAreaField(_('System Prompt'),
+                                    description=_('An optional system prompt to guide the behavior of the LLM. '
+                                                  'This prompt will be prepended to all user prompts.'))
     llm_stream_response = BooleanField(_('Stream Response'),
                                         widget=SwitchWidget(),
                                         default=False,
@@ -77,6 +88,8 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         'llm_auth_token': None,
         'llm_host_name': None,
         'llm_max_tokens': 1024,
+        'llm_temperature': 0.5,
+        'llm_system_prompt': '',
         'llm_stream_response': False,
         'display_info': True,
         'prompts': [],
@@ -114,8 +127,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
                                       event=event,
                                       stored_prompts=all_prompts,
                                       stream_response=stream_response,
-                                      llm_info=(llm_info if show_info else None)
-                                      )
+                                      llm_info=(llm_info if show_info else None))
 
     def _extend_category_menu(self, sender, category, **kwargs):
         return SideMenuItem(CATEGORY_SIDEMENU_ITEM, _('Prompts'),

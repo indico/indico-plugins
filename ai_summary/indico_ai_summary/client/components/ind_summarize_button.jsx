@@ -119,7 +119,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
       // save combined notes(or previous summary) + summary back to Indico
       await saveSummaryToEvent(eventId, updatedHtml, noteData.id);
     } catch (e) {
-      setError(`Error during saving summary: ${handleAxiosError(e)}`);
+      setError(`Error during saving summary: ${handleAxiosError(e)}.`);
     } finally {
       setSaving(false);
     }

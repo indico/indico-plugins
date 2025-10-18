@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from flask import jsonify, Response, stream_with_context
+from flask import Response, jsonify, stream_with_context
 from flask_pluginengine import current_plugin
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -16,11 +16,11 @@ from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
 
+from indico_ai_summary.llm_interface import LLMInterface
 from indico_ai_summary.models.prompt import Prompt
 from indico_ai_summary.schemas import PromptSchema
-from indico_ai_summary.utils import chunk_text, convert_markup, MarkupMode, generate_chunk_stream
+from indico_ai_summary.utils import MarkupMode, chunk_text, convert_markup, generate_chunk_stream
 from indico_ai_summary.views import WPCategoryManagePrompts
-from indico_ai_summary.llm_interface import LLMInterface
 
 
 CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
@@ -78,7 +78,9 @@ class SummarizeEvent(RHManageEventBase):
                 host=current_plugin.settings.get('llm_host_name'),
                 url=current_plugin.settings.get('llm_provider_url'),
                 auth_token=current_plugin.settings.get('llm_auth_token'),
-                max_tokens=current_plugin.settings.get('llm_max_tokens')
+                max_tokens=current_plugin.settings.get('llm_max_tokens'),
+                temperature=current_plugin.settings.get('llm_temperature'),
+                system_prompt=current_plugin.settings.get('llm_system_prompt')
             )
 
         if current_plugin.settings.get('llm_stream_response'):
@@ -87,7 +89,7 @@ class SummarizeEvent(RHManageEventBase):
                 content_type='text/event-stream',
                 headers={
                     'Cache-Control': 'no-cache',
-                    'X-Accel-Buffering': 'no'
+                    'X-Accel-Buffering': 'no'  # Disable buffering for nginx
                 }
             )
 

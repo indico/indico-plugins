@@ -1,7 +1,7 @@
 [project]
 name = "indico-plugin-ai-summary"
 version = "0.1"
-description = "A plugin to summarize meeting minutes using a large language model(LLM)"
+description = "Summarize Indico meeting minutes using a Large Language Model"
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [

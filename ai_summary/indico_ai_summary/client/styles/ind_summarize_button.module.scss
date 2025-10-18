@@ -161,3 +161,13 @@
     color: $dark-gray;
   }
 }
+
+.action-buttons-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+
+  .save-button {
+    margin-left: 10px !important;
+  }
+}
