@@ -53,10 +53,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         (_('Access'), ['managers', 'acl'])
     ]
 
-    account_id = StringField(_('Account ID'), [])
-    client_id = StringField(_('Client ID'), [])
-    client_secret = IndicoPasswordField(_('Client Secret'), [], toggle=True)
-
+    account_id = StringField(_('Account ID'))
+    client_id = StringField(_('Client ID'))
+    client_secret = IndicoPasswordField(_('Client Secret'), toggle=True)
     webhook_token = IndicoPasswordField(_('Webhook Secret Token'), toggle=True,
                                         description=_('Specify the "Secret Token" of your Zoom Webhook if you want '
                                                       'live updates in case of modified/deleted Zoom meetings.'))
