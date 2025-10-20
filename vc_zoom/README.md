@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.6
+
+- Use the (regional) API URL Zoom returns when getting a token instead of the global `api.zoom.us`
+
 ### 3.3.5
 
 - Improve formatting of Zoom links inserted in iCal event descriptions

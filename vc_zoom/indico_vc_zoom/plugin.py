@@ -133,10 +133,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
             flash(_('Zoom credentials not set; the plugin will not work correctly'), 'error')
             return
 
-        ok, msg = get_zoom_token({'account_id': account_id, 'client_id': client_id, 'client_secret': client_secret},
-                                 for_config_check=True)
+        ok, url, msg = get_zoom_token({'account_id': account_id, 'client_id': client_id,
+                                       'client_secret': client_secret},
+                                      for_config_check=True)
         if ok:
-            flash(_('Successfully got a Zoom token ({})').format(msg), 'info')
+            flash(_('Successfully got a Zoom token ({}); using API URL {}').format(msg, url), 'info')
             return
         raise ValidationError(_('Could not get Zoom token: {}').format(msg))
 

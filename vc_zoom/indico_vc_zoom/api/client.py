@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 import time
+from urllib.parse import urljoin
 
 import requests
 from pytz import utc
@@ -48,24 +49,24 @@ class ZoomSession(Session):
     def __init__(self, zoom_plugin_config):
         super().__init__()
         self.__zoom_plugin_config = zoom_plugin_config
-        self.__set_zoom_headers(self.__get_token())
+        self.__configure_zoom_api()
 
-    def __get_token(self, *, force=False):
-        return get_zoom_token(self.__zoom_plugin_config, force=force)[0]
-
-    def __set_zoom_headers(self, token):
+    def __configure_zoom_api(self, *, force=False):
+        token, api_url = get_zoom_token(self.__zoom_plugin_config, force=force)[:2]
+        self.__zoom_api_url = api_url
         self.headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
 
-    def request(self, *args, **kwargs):
+    def request(self, method, url, *args, **kwargs):
         from indico_vc_zoom.plugin import ZoomPlugin
-        resp = super().request(*args, **kwargs)
+        url = urljoin(self.__zoom_api_url, url)
+        resp = super().request(method, url, *args, **kwargs)
         if resp.status_code == 401:
-            ZoomPlugin.logger.warn('Request failed with invalid token; getting a new one')
-            self.__set_zoom_headers(self.__get_token(force=True))
-            resp = super().request(*args, **kwargs)
+            ZoomPlugin.logger.warning('Request failed with invalid token; getting a new one')
+            self.__configure_zoom_api(force=True)
+            resp = super().request(method, url, *args, **kwargs)
         return resp
 
 
@@ -163,7 +164,7 @@ class UserComponent(BaseComponent):
 class ZoomClient:
     """Zoom REST API Python Client."""
 
-    BASE_URI = 'https://api.zoom.us/v2'
+    BASE_URI = '/v2'
 
     _components = {
         'user': UserComponent,
@@ -265,8 +266,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
         if for_config_check:
-            return True, 'cached'
-        return token_data['access_token'], token_data['expires_at']
+            return True, token_data['api_url'], 'cached'
+        return token_data['access_token'], token_data['api_url'], token_data['expires_at']
     try:
         resp = requests.post(
             'https://zoom.us/oauth/token',
@@ -276,16 +277,16 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         resp.raise_for_status()
     except HTTPError as exc:
         if for_config_check:
-            return False, exc.response.text
+            return False, None, exc.response.text
         ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
         raise Exception('Could not get zoom token; please contact an admin if this problem persists.')
     token_data = resp.json()
     assert 'access_token' in token_data
-    ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s)', token_data['expires_in'],
-                            token_data['scope'])
+    ZoomPlugin.logger.debug('Got new token from Zoom (expires_in=%s, scope=%s, url=%s)', token_data['expires_in'],
+                            token_data['scope'], token_data['api_url'])
     expires_at = int(time.time() + token_data['expires_in'])
     token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
     token_cache.set(cache_key, token_data, token_data['expires_in'])
     if for_config_check:
-        return True, 'fresh'
-    return token_data['access_token'], token_data['expires_at']
+        return True, token_data['api_url'], 'fresh'
+    return token_data['access_token'], token_data['api_url'], token_data['expires_at']
