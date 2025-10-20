@@ -60,7 +60,7 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -101,7 +101,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -175,7 +175,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
