@@ -11,5 +11,5 @@ from indico.core.marshmallow import mm
 
 
 class PromptSchema(mm.Schema):
-    name = fields.Str(required=True)
-    text = fields.Str(required=True)
+    name = fields.String(required=True)
+    text = fields.String(required=True)

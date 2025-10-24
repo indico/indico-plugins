@@ -15,11 +15,12 @@ from indico.core.errors import IndicoError
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.notes.util import get_scheduled_notes
+from indico.util.string import sanitize_html
 
 from indico_ai_summary.llm_interface import LLMInterface
 from indico_ai_summary.models.prompt import Prompt
 from indico_ai_summary.schemas import PromptSchema
-from indico_ai_summary.utils import MarkupMode, chunk_text, convert_markup, generate_chunk_stream
+from indico_ai_summary.utils import chunk_text, generate_chunk_stream, html_to_markdown, markdown_to_html
 from indico_ai_summary.views import WPCategoryManagePrompts
 
 
@@ -27,7 +28,6 @@ CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
 
 
 class RHManageCategoryPrompts(RHManageCategoryBase):
-
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
 
@@ -47,25 +47,18 @@ class RHManageCategoryPrompts(RHManageCategoryBase):
         return '', 204
 
 
-class SummarizeEvent(RHManageEventBase):
-
-    CSRF_ENABLED = False
-
-    def _process_args(self):
-        RHManageEventBase._process_args(self)
-
-    @use_kwargs({'prompt': fields.Str(load_default='')}, location='json')
+class RHSummarizeEvent(RHManageEventBase):
+    @use_kwargs({'prompt': fields.Str(required=True)})
     def _process(self, prompt):
-        event = self.event
-        prompt_template = prompt.strip()
-        notes = get_scheduled_notes(event)
+        prompt_template = prompt
+        notes = get_scheduled_notes(self.event)
         meeting_notes = '\n\n'.join(note.html for note in notes if hasattr(note, 'html'))
 
         if not meeting_notes.strip():
             current_plugin.logger.error("No meeting notes found from this event's contributions.")
             return jsonify({'error': "No meeting notes found from this event's contributions."}), 400
 
-        cleaned_text = convert_markup(meeting_notes, MarkupMode.HTML_TO_MARKDOWN)
+        cleaned_text = html_to_markdown(meeting_notes)
         chunks = chunk_text(cleaned_text)
         summaries = []
 
@@ -74,14 +67,14 @@ class SummarizeEvent(RHManageEventBase):
             return jsonify({'error': 'LLM Auth Token is not set in plugin settings.'}), 400
 
         llm_model = LLMInterface(
-                model_name=current_plugin.settings.get('llm_model_name'),
-                host=current_plugin.settings.get('llm_host_name'),
-                url=current_plugin.settings.get('llm_provider_url'),
-                auth_token=current_plugin.settings.get('llm_auth_token'),
-                max_tokens=current_plugin.settings.get('llm_max_tokens'),
-                temperature=current_plugin.settings.get('llm_temperature'),
-                system_prompt=current_plugin.settings.get('llm_system_prompt')
-            )
+            model_name=current_plugin.settings.get('llm_model_name'),
+            host=current_plugin.settings.get('llm_host_header'),
+            url=current_plugin.settings.get('llm_provider_url'),
+            auth_token=current_plugin.settings.get('llm_auth_token'),
+            max_tokens=current_plugin.settings.get('llm_max_tokens'),
+            temperature=current_plugin.settings.get('llm_temperature'),
+            system_prompt=current_plugin.settings.get('llm_system_prompt'),
+        )
 
         if current_plugin.settings.get('llm_stream_response'):
             return Response(
@@ -103,8 +96,8 @@ class SummarizeEvent(RHManageEventBase):
             summaries.append(response)
 
         combined_summary = '\n'.join(summaries)
-        html_output = convert_markup(combined_summary, MarkupMode.MARKDOWN_TO_HTML)
+        html_output = markdown_to_html(combined_summary)
 
         return {
-            'summary_html': html_output
+            'summary_html': sanitize_html(html_output)
         }

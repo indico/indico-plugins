@@ -24,7 +24,7 @@ import {PromptControls, PromptEditor} from './PromptSelector';
 import SummaryPreview from './SummaryPreview';
 import './ind_summarize_button.module.scss';
 
-function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, llmInfo}) {
+function SummarizeButton({eventId, storedPrompts, streamResponse, llmInfo}) {
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
   const [prompts, setPrompts] = useState(storedPrompts);
   const selectedPrompt = prompts[selectedPromptIndex];
@@ -51,7 +51,7 @@ function SummarizeButton({categoryId, eventId, storedPrompts, streamResponse, ll
 
     if (streamResponse) {
       setStreamStopped(false);
-      // Streaming via indicoAxios
+      // Streaming via fetch
       const ctl = streamSummary(eventId, selectedPrompt.text, {
         onChunk: html => {
           // Replace each time with server snapshot

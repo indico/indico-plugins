@@ -2,7 +2,7 @@
     category-id="{{ category.id }}"
     event-id="{{ event.id }}"
     stored-prompts="{{ stored_prompts | tojson | forceescape }}"
-    stream-response="{{ stream_response | tojson }}"
+    stream-response="{{ stream_response | tojson | forceescape }}"
     llm-info="{{ llm_info | tojson | forceescape }}"
 >
 </ind-summarize-button>

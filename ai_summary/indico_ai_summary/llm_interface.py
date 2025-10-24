@@ -31,7 +31,7 @@ class LLMInterface(llm.Model):
 
     can_stream = False
 
-    def __init__(self, model_name: str, host: str, url: str, auth_token: str, max_tokens: int = 1024,
+    def __init__(self, *, model_name: str, host: str, url: str, auth_token: str, max_tokens: int = 1024,
                  temperature: float = 0.5, system_prompt: str = '') -> None:
         super().__init__()
         self.model_name = model_name
@@ -86,7 +86,7 @@ class LLMInterface(llm.Model):
                     line = raw_line.strip()
                     # OpenAI-compatible providers prefix with 'data: '
                     if line.startswith('data:'):
-                        line = line[len('data:'):].strip()
+                        line = line.removeprefix('data:').strip()
                     if line == '[DONE]':
                         break
                     # Some providers may send keep-alives like ': ping' -> ignore non-JSON
@@ -110,12 +110,12 @@ class LLMInterface(llm.Model):
         """Extract content delta and completion status from a provider chunk."""
         choices = obj.get('choices') or []
         if choices:
-            ch0 = choices[0]
-            delta = ch0.get('delta') or {}
+            choice = choices[0]
+            delta = choice.get('delta') or {}
             content = delta.get('content')
             if content:
                 return content, False
-            if ch0.get('finish_reason'):
+            if choice.get('finish_reason'):
                 return None, True
         # Fallback: some providers may send raw 'content'
         content = obj.get('content')

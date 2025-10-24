@@ -8,44 +8,36 @@
 import itertools
 import json
 from collections.abc import Generator
-from enum import Enum
 
-import html2text
-import markdown
+from html2text import HTML2Text
+
+from indico.modules.categories.models.categories import Category
+from indico.util.string import render_markdown, sanitize_html
 
 from indico_ai_summary.llm_interface import LLMInterface
+from indico_ai_summary.models.prompt import Prompt
 
 
-class MarkupMode(Enum):
-    """Supported markup conversion modes.
+def html_to_markdown(html_string: str) -> str:
+    """Convert a HTML string to Markdown.
 
-    Members
-    - ``HTML_TO_MARKDOWN``: convert HTML to Markdown
-    - ``MARKDOWN_TO_HTML``: convert Markdown to HTML
+    :param html_string: The input HTML string.
+    :return: The converted Markdown string.
     """
+    h = HTML2Text()
+    h.ignore_links = False
+    h.ignore_images = True
+    h.body_width = 0
+    return h.handle(html_string)
 
-    HTML_TO_MARKDOWN = 1
-    MARKDOWN_TO_HTML = 2
 
+def markdown_to_html(markdown_string: str) -> str:
+    """Convert a Markdown string to HTML using :func:`render_markdown` from the core.
 
-def convert_markup(markup: str, mode: MarkupMode) -> str:
-    """Convert markup between HTML and Markdown formats.
-
-    :param markup: The input markup string to be converted.
-    :param mode: The conversion mode. Use members of :class:`MarkupMode`,
-        for example ``MarkupMode.HTML_TO_MARKDOWN`` or
-        ``MarkupMode.MARKDOWN_TO_HTML``.
-    :return: The converted markup string.
+    :param markdown_string: The input Markdown string.
+    :return: The converted HTML string.
     """
-    if mode == MarkupMode.HTML_TO_MARKDOWN:
-        h = html2text.HTML2Text()
-        h.ignore_links = False
-        h.ignore_images = True
-        h.body_width = 0
-        return h.handle(markup)
-    if mode == MarkupMode.MARKDOWN_TO_HTML:
-        return markdown.markdown(markup)
-    raise ValueError(f'Unknown markup mode: {mode}')
+    return render_markdown(markdown_string)
 
 
 def chunk_text(text: str, max_tokens: int = 1500) -> list[str]:
@@ -71,9 +63,15 @@ def generate_chunk_stream(chunks: list[str], prompt: str, llm_model: LLMInterfac
         try:
             for delta in response_stream:
                 md_total += delta
-                html_snapshot = convert_markup(md_total, MarkupMode.MARKDOWN_TO_HTML)
+                html_snapshot = sanitize_html(markdown_to_html(md_total))
                 yield f"data: {json.dumps({'summary_html': html_snapshot})}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': f'Streaming error: {e}'})}\n\n"
             return
     yield 'data: [DONE]\n\n'
+
+
+def get_all_prompts(category: Category) -> set[Prompt]:
+    """Get all prompts defined for the given event/category."""
+    current_category = category or Category.get_root()
+    return set(Prompt.query.filter(Prompt.category_id.in_(categ['id'] for categ in current_category.chain)).all())

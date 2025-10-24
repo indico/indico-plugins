@@ -130,6 +130,7 @@ export function streamSummary(eventId, prompt, {onChunk, onDone, onError} = {}) 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': document.getElementById('csrf-token').getAttribute('content'),
         },
         body: JSON.stringify({prompt: prompt || ''}),
         signal: abortController.signal,

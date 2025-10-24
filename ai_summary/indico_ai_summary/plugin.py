@@ -23,8 +23,8 @@ from indico.web.menu import SideMenuItem
 
 from indico_ai_summary.blueprint import blueprint
 from indico_ai_summary.controllers import CATEGORY_SIDEMENU_ITEM
-from indico_ai_summary.models.prompt import Prompt
 from indico_ai_summary.schemas import PromptSchema
+from indico_ai_summary.utils import get_all_prompts
 from indico_ai_summary.views import WPCategoryManagePrompts
 
 
@@ -47,18 +47,16 @@ class PluginSettingsForm(IndicoForm):
                                          [DataRequired()],
                                          toggle=True,
                                          description=_('The authentication token for accessing the LLM provider.'))
-    llm_host_name = StringField(_('Host Name'),
+    llm_host_header = StringField(_('Host Name'),
                                  description=_('An optional host header to be added to the request (if '
                                                'required by your provider).'))
     llm_max_tokens = IntegerField(_('Max Tokens'),
                                   [NumberRange(min=1)],
-                                  default=1024,
                                   description=_('The maximum number of tokens to generate in the response. Defaults '
                                                 'to a maximum of 1024 tokens.'))
     llm_temperature = FloatField(_('Temperature'),
                                    [NumberRange(min=0, max=1)],
                                    widget=NumberInput(step='0.1'),
-                                   default=0.5,
                                    description=_('The sampling temperature to use, between 0 and 1. Higher values '
                                                  'like 0.8 will make the response more random, while lower values like '
                                                  '0.2 will make it more focused and deterministic.'))
@@ -76,7 +74,8 @@ class PluginSettingsForm(IndicoForm):
 
 class IndicoAISummaryPlugin(IndicoPlugin):
     """AI-assisted minutes summarization tool
-    Configure your LLM provider as well as predefined prompts to assist in summarizing event minutes.
+
+    Configure your LLM provider as well as predefined prompts to assist in summarizing meeting minutes.
     """
 
     configurable = True
@@ -86,7 +85,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
         'llm_provider_name': None,
         'llm_provider_url': None,
         'llm_auth_token': None,
-        'llm_host_name': None,
+        'llm_host_header': None,
         'llm_max_tokens': 1024,
         'llm_temperature': 0.5,
         'llm_system_prompt': '',
@@ -111,11 +110,12 @@ class IndicoAISummaryPlugin(IndicoPlugin):
 
     def _render_summarize_button(self, event):
         global_prompts = self.settings.get('prompts')
-        category_prompts = Prompt.query.with_parent(event.category).all()
+        category_prompts = get_all_prompts(event.category)
         all_prompts = global_prompts + PromptSchema(many=True).dump(category_prompts)
         stream_response = self.settings.get('llm_stream_response')
         show_info = self.settings.get('display_info')
 
+        llm_info = None
         if show_info:
             llm_info = {
                 'provider_name': self.settings.get('llm_provider_name'),
@@ -127,7 +127,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
                                       event=event,
                                       stored_prompts=all_prompts,
                                       stream_response=stream_response,
-                                      llm_info=(llm_info if show_info else None))
+                                      llm_info=llm_info)
 
     def _extend_category_menu(self, sender, category, **kwargs):
         return SideMenuItem(CATEGORY_SIDEMENU_ITEM, _('Prompts'),
