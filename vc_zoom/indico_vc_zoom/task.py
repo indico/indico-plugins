@@ -54,7 +54,7 @@ def refresh_token(threshold=600):
         # not using oauth -> nothing to do
         return
 
-    expires_at = get_zoom_token(config)[1]
+    expires_at = get_zoom_token(config)[2]
     expires_in = int(expires_at - time.time())
     if expires_in > threshold:
         ZoomPlugin.logger.debug('Token expires in %ds, not renewing yet', expires_in)
