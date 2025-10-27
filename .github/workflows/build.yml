@@ -66,14 +66,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           merge-multiple: true
           pattern: plugin-wheel-*
           path: dist
       - name: List artifacts 📃
         run: ls -al dist/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: Upload build artifacts 📦
         with:
           name: plugin-wheels
