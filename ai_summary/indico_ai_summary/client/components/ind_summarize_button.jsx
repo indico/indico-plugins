@@ -10,28 +10,29 @@
 // handles prompt selection, generates summaries, and integrates
 // with Indico's API to fetch and save meeting notes.
 
-// import getStoredPrompts from 'indico-url:plugin_ai_summary.stored_prompts';
-
 import staticURL from 'indico-url:plugin_ai_summary.static';
+import getStoredPrompts from 'indico-url:plugin_ai_summary.llm_prompts';
 
 import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 import {handleAxiosError} from 'indico/utils/axios';
-import {streamSummary, fetchSummary, fetchEventNote, saveSummaryToEvent} from '../services/summarize';
+import {streamSummary, fetchSummary, fetchEventNote, saveSummaryToEvent} from '../utils/summarize';
 import {PromptControls, PromptEditor} from './PromptSelector';
 import SummaryPreview from './SummaryPreview';
 import './ind_summarize_button.module.scss';
 
-function SummarizeButton({eventId, storedPrompts, streamResponse, llmInfo}) {
+function SummarizeButton({eventId, streamResponse, llmInfo}) {
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
-  const [prompts, setPrompts] = useState(storedPrompts);
+  const [prompts, setPrompts] = useState([selectedPromptIndex]);
   const selectedPrompt = prompts[selectedPromptIndex];
   const [summaryHtml, setSummaryHtml] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [streamStopped, setStreamStopped] = useState(false);
   const [streamCtl, setStreamCtl] = useState(null);
 
@@ -113,15 +114,31 @@ function SummarizeButton({eventId, storedPrompts, streamResponse, llmInfo}) {
   const handleSaveSummary = async () => {
     try {
       setSaving(true);
+      const summaryMarker = `<hr>
+        <h2>
+          <img src="${staticURL({filename: 'images/sparkle.svg'})}" width="18px" height="18px" />
+          <span style="color: #0099C9">Summary</span>
+        </h2>`;
       // fetch existing event notes
       const noteData = await fetchEventNote(eventId);
-      const updatedHtml = `${noteData.html || ''}<hr><h2>Summary</h2>${summaryHtml}`;
+      const updatedHtml = `${summaryMarker}${summaryHtml}${noteData.html || ''}`;
+
       // save combined notes(or previous summary) + summary back to Indico
       await saveSummaryToEvent(eventId, updatedHtml, noteData.id);
+      setIsSaved(true);
     } catch (e) {
       setError(`Error during saving summary: ${handleAxiosError(e)}.`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const getPrompts = async () => {
+    try {
+      const prompts =  await indicoAxios.get(getStoredPrompts({event_id: eventId}));
+      setPrompts(prompts.data);
+    } catch (e) {
+      handleAxiosError(e);
     }
   };
 
@@ -194,6 +211,12 @@ function SummarizeButton({eventId, storedPrompts, streamResponse, llmInfo}) {
             setStreamCtl(null);
           }
           setLoading(false);
+          if (isSaved) {
+            location.reload();
+          }
+        }}
+        onOpen={() => {
+          getPrompts();
         }}
         closeOnEscape={false}
         closeOnDimmerClick={false}
@@ -217,7 +240,7 @@ function SummarizeButton({eventId, storedPrompts, streamResponse, llmInfo}) {
                   <PromptControls
                     selectedPromptIndex={selectedPromptIndex}
                     setSelectedPromptIndex={setSelectedPromptIndex}
-                    storedPrompts={storedPrompts}
+                    storedPrompts={prompts}
                     disabled={loading}
                   />
                   <PromptEditor
@@ -279,15 +302,10 @@ customElements.define(
       const categoryId = parseInt(this.getAttribute('category-id'), 10);
       const streamResponse = JSON.parse(this.getAttribute('stream-response'));
       const llmInfo = JSON.parse(this.getAttribute('llm-info'));
-      const storedPrompts = [
-        ...JSON.parse(this.getAttribute('stored-prompts')),
-        {name: 'Custom...', text: ''},
-      ];
       ReactDOM.render(
         <SummarizeButton
           categoryId={categoryId}
           eventId={eventId}
-          storedPrompts={storedPrompts}
           streamResponse={streamResponse}
           llmInfo={llmInfo}
         />,

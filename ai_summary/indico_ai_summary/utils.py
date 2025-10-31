@@ -15,7 +15,7 @@ from indico.modules.categories.models.categories import Category
 from indico.util.string import render_markdown, sanitize_html
 
 from indico_ai_summary.llm_interface import LLMInterface
-from indico_ai_summary.models.prompt import Prompt
+from indico_ai_summary.models.llm_prompt import LLMPrompt
 
 
 def html_to_markdown(html_string: str) -> str:
@@ -71,7 +71,7 @@ def generate_chunk_stream(chunks: list[str], prompt: str, llm_model: LLMInterfac
     yield 'data: [DONE]\n\n'
 
 
-def get_all_prompts(category: Category) -> set[Prompt]:
+def get_all_prompts(category: Category) -> set[LLMPrompt]:
     """Get all prompts defined for the given event/category."""
     current_category = category or Category.get_root()
-    return set(Prompt.query.filter(Prompt.category_id.in_(categ['id'] for categ in current_category.chain)).all())
+    return set(LLMPrompt.query.filter(LLMPrompt.category_id.in_(categ['id'] for categ in current_category.chain)).all())

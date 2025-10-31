@@ -125,7 +125,7 @@ export function streamSummary(eventId, prompt, {onChunk, onDone, onError} = {}) 
   const processStream = async () => {
     try {
       // Normally, we would use IndicoAxios here with `responseType: 'stream'`, but this causes
-      // the output to be not as smooth.
+      // the output to be not as smooth, due to Axios using XHR under the hood.
       const response = await fetch(summarizeEventURL({event_id: eventId}), {
         method: 'POST',
         headers: {

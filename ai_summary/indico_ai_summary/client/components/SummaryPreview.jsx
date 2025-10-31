@@ -61,7 +61,7 @@ export default function SummaryPreview({loading, error, summaryHtml, saving, onS
                 <Header as="h2" icon>
                   <Icon name="times circle outline" color="red" />
                   <Header.Content color="white">
-                    <Translate>Couldn't get a summary</Translate>
+                    <Translate>Something went wrong</Translate>
                     <HeaderSubheader>{error}</HeaderSubheader>
                   </Header.Content>
                 </Header>

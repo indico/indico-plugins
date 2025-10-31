@@ -18,13 +18,21 @@ from indico.modules.events.notes.util import get_scheduled_notes
 from indico.util.string import sanitize_html
 
 from indico_ai_summary.llm_interface import LLMInterface
-from indico_ai_summary.models.prompt import Prompt
+from indico_ai_summary.models.llm_prompt import LLMPrompt
 from indico_ai_summary.schemas import PromptSchema
-from indico_ai_summary.utils import chunk_text, generate_chunk_stream, html_to_markdown, markdown_to_html
+from indico_ai_summary.utils import (chunk_text, generate_chunk_stream, get_all_prompts, html_to_markdown,
+                                     markdown_to_html)
 from indico_ai_summary.views import WPCategoryManagePrompts
 
 
 CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
+
+
+class RHLLMPrompts(RHManageEventBase):
+    def _process(self):
+        global_prompts = current_plugin.settings.get('prompts')
+        category_prompts = get_all_prompts(self.event.category)
+        return global_prompts + PromptSchema(many=True).dump(category_prompts)
 
 
 class RHManageCategoryPrompts(RHManageCategoryBase):
@@ -32,7 +40,7 @@ class RHManageCategoryPrompts(RHManageCategoryBase):
         RHManageCategoryBase._process_args(self)
 
     def _process_GET(self):
-        prompts = Prompt.query.with_parent(self.category).all()
+        prompts = LLMPrompt.query.with_parent(self.category).all()
         serialized_prompts = PromptSchema(many=True).dump(prompts)
         return WPCategoryManagePrompts.render_template('manage_category_prompts.html', category=self.category,
                                                        active_menu_item=CATEGORY_SIDEMENU_ITEM,
@@ -40,9 +48,9 @@ class RHManageCategoryPrompts(RHManageCategoryBase):
 
     @use_kwargs({'prompts': fields.List(fields.Nested(PromptSchema), required=True)}, location='json')
     def _process_POST(self, prompts):
-        Prompt.query.with_parent(self.category).delete()
+        LLMPrompt.query.with_parent(self.category).delete()
         for prompt_data in prompts:
-            prompt = Prompt(category_id=self.category.id, name=prompt_data['name'], text=prompt_data['text'])
+            prompt = LLMPrompt(category_id=self.category.id, name=prompt_data['name'], text=prompt_data['text'])
             db.session.add(prompt)
         return '', 204
 

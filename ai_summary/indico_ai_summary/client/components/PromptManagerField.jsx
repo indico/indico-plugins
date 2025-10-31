@@ -111,9 +111,11 @@ export function WTFPromptManagerField({fieldId}) {
   );
 
   return (
-    <Form>
-      <PromptManagerField value={prompts} onChange={onChange} />
-    </Form>
+    <div className="ui form">
+      <Form>
+        <PromptManagerField value={prompts} onChange={onChange} />
+      </Form>
+    </div>
   );
 }
 

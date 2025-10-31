@@ -9,7 +9,7 @@ from indico.core.db.sqlalchemy import db
 from indico.util.string import format_repr
 
 
-class Prompt(db.Model):
+class LLMPrompt(db.Model):
     """Predefined LLM prompts"""
 
     __tablename__ = 'predefined_prompts'
@@ -33,7 +33,7 @@ class Prompt(db.Model):
     )
     #: Text of the prompt
     text = db.Column(
-        db.String,
+        db.Text,
         nullable=False
     )
 
@@ -42,7 +42,7 @@ class Prompt(db.Model):
         'Category',
         lazy=True,
         backref=db.backref(
-            'predefined_prompts',
+            'llm_summary_prompts',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )

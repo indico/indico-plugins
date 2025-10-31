@@ -22,7 +22,7 @@ def upgrade():
     op.create_table('predefined_prompts',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('category_id', sa.Integer(), nullable=False, index=True),
-                    sa.Column('name', sa.Text(), nullable=False),
+                    sa.Column('name', sa.String(), nullable=False),
                     sa.Column('text', sa.Text(), nullable=False),
                     sa.ForeignKeyConstraint(['category_id'], ['categories.categories.id']),
                     sa.PrimaryKeyConstraint('id'),
