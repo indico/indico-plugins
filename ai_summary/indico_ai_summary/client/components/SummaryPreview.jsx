@@ -16,7 +16,7 @@ import './ActionButtons.module.scss';
 
 import ActionButtons from './ActionButtons';
 
-export default function SummaryPreview({loading, error, summaryHtml, saving, onSave, streamResponse, onRetry, llmInfo}) {
+export default function SummaryPreview({loading, error, summaryHtml, summaryMarkdown, saving, onSave, streamResponse, onRetry, llmInfo}) {
 
   const previewBottomRef = useRef();
 
@@ -84,6 +84,7 @@ export default function SummaryPreview({loading, error, summaryHtml, saving, onS
           loading={loading}
           error={error}
           summaryHtml={summaryHtml}
+          summaryMarkdown={summaryMarkdown}
           saving={saving}
           onSave={onSave}
           onRetry={onRetry}

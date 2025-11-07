@@ -64,7 +64,7 @@ def generate_chunk_stream(chunks: list[str], prompt: str, llm_model: LLMInterfac
             for delta in response_stream:
                 md_total += delta
                 html_snapshot = sanitize_html(markdown_to_html(md_total))
-                yield f"data: {json.dumps({'summary_html': html_snapshot})}\n\n"
+                yield f"data: {json.dumps({'summary_html': html_snapshot, 'summary_markdown': md_total})}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': f'Streaming error: {e}'})}\n\n"
             return

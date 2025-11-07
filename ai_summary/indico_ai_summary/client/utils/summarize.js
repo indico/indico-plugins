@@ -80,8 +80,8 @@ async function processStreamResponse(response, callbacks, state) {
       }
 
       const {payload} = result;
-      if (payload?.summary_html && onChunk) {
-        onChunk(payload.summary_html);
+      if (payload?.summary_html && payload?.summary_markdown && onChunk) {
+        onChunk({'html': payload.summary_html, 'markdown': payload.summary_markdown});
         state.receivedAny = true;
       }
       if (payload?.error) {
@@ -106,8 +106,8 @@ async function fallbackToRegularRequest(eventId, prompt, callbacks) {
       prompt: prompt || '',
     });
     const data = resp.data || {};
-    if (data.summary_html && onChunk) {
-      onChunk(data.summary_html);
+    if (data.summary_html && data.summary_markdown && onChunk) {
+      onChunk({'html': data.summary_html, 'markdown': data.summary_markdown});
     }
     if (onDone) onDone();
   } catch (e) {

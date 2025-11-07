@@ -104,8 +104,8 @@ class RHSummarizeEvent(RHManageEventBase):
             summaries.append(response)
 
         combined_summary = '\n'.join(summaries)
-        html_output = markdown_to_html(combined_summary)
 
         return {
-            'summary_html': sanitize_html(html_output)
+            'summary_html': sanitize_html(markdown_to_html(combined_summary)),
+            'summary_markdown': combined_summary,
         }

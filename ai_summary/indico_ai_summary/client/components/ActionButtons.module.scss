@@ -22,6 +22,19 @@
   align-items: baseline;
   gap: 0;
 
+  .copy-button {
+    &:hover {
+      box-shadow: none !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+
+    display: flex;
+    gap: 5px;
+  }
+
   .save-button {
     margin-left: 10px;
   }

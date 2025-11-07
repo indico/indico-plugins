@@ -29,6 +29,7 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
   const [prompts, setPrompts] = useState([selectedPromptIndex]);
   const selectedPrompt = prompts[selectedPromptIndex];
   const [summaryHtml, setSummaryHtml] = useState('');
+  const [summaryMarkdown, setSummaryMarkdown] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -49,14 +50,15 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
     setLoading(true);
     setError(null);
     setSummaryHtml('');
+    setSummaryMarkdown('');
 
     if (streamResponse) {
       setStreamStopped(false);
       // Streaming via fetch
       const ctl = streamSummary(eventId, selectedPrompt.text, {
-        onChunk: html => {
-          // Replace each time with server snapshot
-          setSummaryHtml(html);
+        onChunk: data => {
+          setSummaryHtml(data['html']);
+          setSummaryMarkdown(data['markdown']);
         },
         onDone: () => {
           setLoading(false);
@@ -76,8 +78,9 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
     (async () => {
       try {
         const data = await fetchSummary(eventId, selectedPrompt.text);
-        if (data?.summary_html) {
+        if (data?.summary_html && data?.summary_markdown) {
           setSummaryHtml(data.summary_html);
+          setSummaryMarkdown(data.summary_markdown);
         } else {
           setError('No summary returned.');
         }
@@ -279,6 +282,7 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
                     loading={loading}
                     error={error}
                     summaryHtml={summaryHtml}
+                    summaryMarkdown={summaryMarkdown}
                     saving={saving}
                     onSave={handleSaveSummary}
                     streamResponse={streamResponse}
