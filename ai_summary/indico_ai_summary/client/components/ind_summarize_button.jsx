@@ -5,17 +5,12 @@
 // them and/or modify them under the terms of the MIT License;
 // see the LICENSE file for more details.
 
-// Main entry point of the summarization feature in the Indico plugin.
-// This file defines the Summarize button, manages modal states,
-// handles prompt selection, generates summaries, and integrates
-// with Indico's API to fetch and save meeting notes.
-
 import staticURL from 'indico-url:plugin_ai_summary.static';
 import getStoredPrompts from 'indico-url:plugin_ai_summary.llm_prompts';
 
 import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup} from 'semantic-ui-react';
+import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup, Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {handleAxiosError} from 'indico/utils/axios';
@@ -36,6 +31,9 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
   const [isSaved, setIsSaved] = useState(false);
   const [streamStopped, setStreamStopped] = useState(false);
   const [streamCtl, setStreamCtl] = useState(null);
+  const [isFeedbackDismissed, setIsFeedbackDismissed] = useState(
+    localStorage.getItem('ai_summary_feedback_dismissed') === 'true' || false
+  );
 
   // trigger summary generation from the backend
   const runSummarize = () => {
@@ -201,6 +199,11 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
     return null;
   };
 
+  const handleFeedbackDismiss = () => {
+    setIsFeedbackDismissed(true);
+    localStorage.setItem('ai_summary_feedback_dismissed', 'true');
+  };
+
   return (
     <>
       <Modal
@@ -232,28 +235,57 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
         style={{minWidth: '65vw'}}
       >
         <Modal.Header>
-          <Translate>Summarize Meeting</Translate>
+          <div styleName="modal-header-section">
+            <Translate as="span">Summarize Meeting</Translate>
+            <Popup
+              trigger={
+                <div styleName="badge">
+                  <Icon name="flask" />
+                  <Translate as="span">Experimental</Translate>
+                </div>
+              }
+              content={Translate.string('This is an experimental feature. Functionality may change or be withdrawn in future releases.')}
+              position="right center"
+            />
+          </div>
         </Modal.Header>
         <Modal.Content>
           <Grid celled="internally">
             <GridRow columns={2}>
-              <GridColumn width={5}>
-                <Form>
-                  <Header as="h3" content={Translate.string('Select a prompt')} />
-                  <PromptControls
-                    selectedPromptIndex={selectedPromptIndex}
-                    setSelectedPromptIndex={setSelectedPromptIndex}
-                    storedPrompts={prompts}
-                    disabled={loading}
-                  />
-                  <PromptEditor
-                    selectedPromptIndex={selectedPromptIndex}
-                    selectedPrompt={selectedPrompt}
-                    setPrompts={setPrompts}
-                    disabled={loading}
-                  />
-                  {renderSummarizeButton(loading, streamResponse, error)}
-                </Form>
+              <GridColumn width={5} style={{display: 'flex', flexDirection: 'column'}}>
+                <div style={{flex: 1}}>
+                  <Form>
+                    <Header as="h3" content={Translate.string('Select a prompt')} />
+                    <PromptControls
+                      selectedPromptIndex={selectedPromptIndex}
+                      setSelectedPromptIndex={setSelectedPromptIndex}
+                      storedPrompts={prompts}
+                      disabled={loading}
+                    />
+                    <PromptEditor
+                      selectedPromptIndex={selectedPromptIndex}
+                      selectedPrompt={selectedPrompt}
+                      setPrompts={setPrompts}
+                      disabled={loading}
+                    />
+                    {renderSummarizeButton(loading, streamResponse, error)}
+                  </Form>
+                </div>
+
+                {!isFeedbackDismissed && !loading && summaryHtml && (
+                  <Message icon info style={{marginTop: '10px'}} onDismiss={handleFeedbackDismiss}>
+                    <Icon name="comments outline" />
+                    <Message.Content>
+                      <Message.Header>
+                        <Translate>We want your feedback</Translate>
+                      </Message.Header>
+                      <Translate as="p">Share your feedback on this feature with us on our Mattermost channel</Translate>
+                      <Button as="a" href="https://mattermost.web.cern.ch/it-dep/channels/indico" target="_blank" primary>
+                        <Translate>Mattermost: Open #indico</Translate>
+                      </Button>
+                    </Message.Content>
+                  </Message>
+                )}
               </GridColumn>
               <GridColumn width={11} styleName="column-divider">
                   <Header as="h3">

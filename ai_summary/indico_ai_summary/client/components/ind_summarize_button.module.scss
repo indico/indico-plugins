@@ -14,6 +14,24 @@
   border-left: 1px solid $raincloud-gray;
 }
 
+.modal-header-section {
+  display: flex;
+  align-items: center;
+
+  .badge {
+    margin-left: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 0.7em;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba($light-purple, 1) 0%, rgba($purple, 1) 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.250);
+  }
+}
+
 .completion-status {
   margin-left: 5px !important;
 
