@@ -1,7 +1,9 @@
-<ind-summarize-button
-    category-id="{{ category.id }}"
-    event-id="{{ event.id }}"
-    stream-response="{{ stream_response | tojson | forceescape }}"
-    llm-info="{{ llm_info | tojson | forceescape }}"
->
-</ind-summarize-button>
+<li>
+    <ind-summarize-button
+        category-id="{{ category.id }}"
+        event-id="{{ event.id }}"
+        stream-response="{{ stream_response | tojson | forceescape }}"
+        llm-info="{{ llm_info | tojson | forceescape }}"
+    >
+    </ind-summarize-button>
+</li>

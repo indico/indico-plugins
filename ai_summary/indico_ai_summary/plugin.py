@@ -94,7 +94,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
 
     def init(self):
         super().init()
-        self.template_hook('event-manage-dropdown-notes-summarize', self._render_summarize_button)
+        self.template_hook('manage-button-after-notes_compile', self._render_summarize_button)
         self.inject_bundle('main.js', WPSimpleEventDisplay)
         self.inject_bundle('main.js', WPPlugins)
         self.inject_bundle('main.js', WPCategoryManagePrompts)
@@ -106,9 +106,10 @@ class IndicoAISummaryPlugin(IndicoPlugin):
     def get_blueprints(self):
         return blueprint
 
-    def _render_summarize_button(self, event):
+    def _render_summarize_button(self, item, item_type):
         stream_response = self.settings.get('llm_stream_response')
         show_info = self.settings.get('display_info')
+        event = item
 
         llm_info = None
         if show_info:
@@ -118,6 +119,8 @@ class IndicoAISummaryPlugin(IndicoPlugin):
             }
 
         return render_plugin_template('summarize_button.html',
+                                      item=item,
+                                      item_type=item_type,
                                       category=event.category,
                                       event=event,
                                       stream_response=stream_response,
