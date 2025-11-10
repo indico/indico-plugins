@@ -135,12 +135,16 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
   };
 
   const getPrompts = async () => {
+    let prompts = [];
     try {
-      const prompts =  await indicoAxios.get(getStoredPrompts({event_id: eventId}));
-      setPrompts(prompts.data);
+      prompts = await indicoAxios.get(getStoredPrompts({event_id: eventId}));
     } catch (e) {
       handleAxiosError(e);
     }
+    // Append a custom prompt option
+    prompts = prompts.data;
+    prompts.push({name: 'Custom Prompt', text: ''});
+    setPrompts(prompts);
   };
 
   const renderSummarizeButton = (loading, streamResponse, error) => {
