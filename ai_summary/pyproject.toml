@@ -2,7 +2,7 @@
 name = 'indico-plugin-ai-summary'
 description = 'Summarize Indico meeting minutes using a Large Language Model'
 readme = 'README.md'
-version = '3.3'
+version = '3.3-dev'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [
