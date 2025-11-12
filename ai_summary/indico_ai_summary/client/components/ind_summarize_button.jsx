@@ -11,7 +11,7 @@ import getStoredPrompts from 'indico-url:plugin_ai_summary.llm_prompts';
 import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button, Form, Grid, GridRow, GridColumn, Header, Icon, Loader, Popup, Message} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Translate} from '../i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {handleAxiosError} from 'indico/utils/axios';
 import {streamSummary, fetchSummary, fetchEventNote, saveSummaryToEvent} from '../utils/summarize';
@@ -32,7 +32,7 @@ function SummarizeButton({eventId, streamResponse, llmInfo}) {
   const [streamStopped, setStreamStopped] = useState(false);
   const [streamCtl, setStreamCtl] = useState(null);
   const [isFeedbackDismissed, setIsFeedbackDismissed] = useState(
-    localStorage.getItem('ai_summary_feedback_dismissed') === 'true' || false
+    localStorage.getItem('ai_summary_feedback_dismissed') === 'true'
   );
 
   // trigger summary generation from the backend

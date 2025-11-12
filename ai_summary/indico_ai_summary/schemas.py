@@ -8,8 +8,9 @@
 from webargs import fields
 
 from indico.core.marshmallow import mm
+from indico.util.marshmallow import not_empty
 
 
 class PromptSchema(mm.Schema):
-    name = fields.String(required=True)
-    text = fields.String(required=True)
+    name = fields.String(required=True, validate=not_empty)
+    text = fields.String(required=True, validate=not_empty)

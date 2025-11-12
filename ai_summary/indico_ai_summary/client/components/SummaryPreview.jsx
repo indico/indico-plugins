@@ -9,7 +9,7 @@ import staticURL from 'indico-url:plugin_ai_summary.static'
 
 import React, {useRef, useEffect} from 'react';
 import {Button, Segment, Header, HeaderSubheader, Icon, Dimmer, Image, Card} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Translate} from '../i18n';
 
 import './SummaryPreview.module.scss';
 import './ActionButtons.module.scss';

@@ -9,7 +9,7 @@ import _ from 'lodash';
 import React, {useCallback, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form, TextArea, Button, Input, Card, Icon} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Translate} from '../i18n';
 
 import {FinalField} from 'indico/react/forms';
 

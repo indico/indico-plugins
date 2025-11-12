@@ -6,7 +6,7 @@
 // see the LICENSE file for more details.
 
 import React from 'react';
-import {Translate} from 'indico/react/i18n';
+import {Translate} from '../i18n';
 import {Dropdown, TextArea, Form} from 'semantic-ui-react';
 
 // dropdown + manage saved prompts button (outside card)

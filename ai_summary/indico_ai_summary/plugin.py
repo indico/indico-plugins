@@ -106,7 +106,7 @@ class IndicoAISummaryPlugin(IndicoPlugin):
     def get_blueprints(self):
         return blueprint
 
-    def _render_summarize_button(self, item, item_type):
+    def _render_summarize_button(self, item, item_type, **kwargs):
         stream_response = self.settings.get('llm_stream_response')
         show_info = self.settings.get('display_info')
         event = item

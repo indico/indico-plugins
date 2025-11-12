@@ -7,7 +7,7 @@
 
 import React, {useState, useEffect} from 'react';
 import {Button, ButtonGroup, Icon, Popup, Dropdown, DropdownMenu, DropdownItem} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Translate} from '../i18n';
 
 import './ActionButtons.module.scss';
 
