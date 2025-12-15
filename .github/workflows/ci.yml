@@ -53,7 +53,7 @@ jobs:
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: cache-npm
         with:
           path: node_modules
@@ -78,7 +78,7 @@ jobs:
         run: tar cf /tmp/env.tar .venv node_modules
 
       - name: Upload environment
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: environment
           retention-days: 1
@@ -106,7 +106,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: environment
           path: /tmp
@@ -180,7 +180,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: environment
           path: /tmp
