@@ -1,5 +1,5 @@
 # This file is part of the Indico plugins.
-# Copyright (C) 2017 - 2025 Max Fischer, Martin Claus, CERN
+# Copyright (C) 2017 - 2026 Max Fischer, Martin Claus, CERN
 #
 # The Indico plugins are free software; you can redistribute
 # them and/or modify them under the terms of the MIT License;
