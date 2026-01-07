@@ -110,6 +110,11 @@ class MeetingComponent(BaseComponent):
             f'{self.base_uri}/meetings/{meeting_id}', json=kwargs
         )
 
+    def list_registrants(self, meeting_id, **kwargs):
+        return self.session.get(
+            f'{self.base_uri}/meetings/{meeting_id}/registrants', params=kwargs
+        )
+
     def get_registrant(self, meeting_id, registrant_id):
         return self.session.get(
             f'{self.base_uri}/meetings/{meeting_id}/registrants/{registrant_id}'
@@ -158,6 +163,11 @@ class WebinarComponent(BaseComponent):
     def list_registrants(self, webinar_id, **kwargs):
         return self.session.get(
             f'{self.base_uri}/webinars/{webinar_id}/registrants', params=kwargs
+        )
+
+    def get_registrant(self, webinar_id, registrant_id):
+        return self.session.get(
+            f'{self.base_uri}/webinars/{webinar_id}/registrants/{registrant_id}'
         )
 
     def add_registrant(self, webinar_id, **kwargs):
@@ -260,8 +270,8 @@ class ZoomIndicoClient:
     def delete_meeting(self, meeting_id):
         return _handle_response(self.client.meeting.delete(meeting_id), 204, expects_json=False)
 
-    def list_meeting_registrants(self, meeting_id, registrant_id):
-        return _handle_response(self.client.meeting.get_registrant(meeting_id, registrant_id))
+    def list_meeting_registrants(self, meeting_id, **kwargs):
+        return _handle_response(self.client.meeting.list_registrants(meeting_id, **kwargs))
 
     def add_meeting_registrant(self, meeting_id, data):
         return _handle_response(self.client.meeting.add_registrant(meeting_id, **data), 201)
@@ -281,7 +291,10 @@ class ZoomIndicoClient:
     def delete_webinar(self, webinar_id):
         return _handle_response(self.client.webinar.delete(webinar_id), 204, expects_json=False)
 
-    def list_webinar_registrants(self, webinar_id, registrant_id):
+    def list_webinar_registrants(self, webinar_id, **kwargs):
+        return _handle_response(self.client.webinar.list_registrants(webinar_id, **kwargs))
+
+    def get_webinar_registrant(self, webinar_id, registrant_id):
         return _handle_response(self.client.webinar.get_registrant(webinar_id, registrant_id))
 
     def add_webinar_registrant(self, webinar_id, data):
