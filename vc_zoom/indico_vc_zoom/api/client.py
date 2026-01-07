@@ -277,7 +277,8 @@ class ZoomIndicoClient:
         return _handle_response(self.client.meeting.add_registrant(meeting_id, **data), 201)
 
     def update_meeting_registrants_status(self, meeting_id, data):
-        return _handle_response(self.client.meeting.update_registrants_status(meeting_id, **data), 204, expects_json=False)
+        return _handle_response(self.client.meeting.update_registrants_status(meeting_id, **data), 204,
+                                expects_json=False)
 
     def create_webinar(self, user_id, **kwargs):
         return _handle_response(self.client.webinar.create(user_id, **kwargs), 201)
