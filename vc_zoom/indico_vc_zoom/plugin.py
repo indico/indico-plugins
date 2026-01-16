@@ -177,6 +177,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
+        self.connect(signals.event.registration_created, self._registration_created)
+        self.connect(signals.event.registration_deleted, self._registration_deleted)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
             self.inject_bundle('main.js', wp)
@@ -621,3 +623,74 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             desc = 'Zoom:\n' + '\n'.join(urls)
 
         return {'description': (data['description'] + '\n\n' + desc).strip()}
+
+    def _registration_created(self, registration, **kwargs):
+        self._sync_registration(registration)
+
+    def _registration_deleted(self, registration, **kwargs):
+        self._sync_registration(registration, remove=True)
+
+    def _sync_registration(self, registration, remove=False):
+        from indico.modules.events.registration.models.registrations import RegistrationState
+        event = registration.event or registration.registration_form.event
+        if event is None:
+            return
+        zoom_rooms = [assoc.vc_room for assoc in event.vc_room_associations
+                      if assoc.vc_room.type == self.service_name]
+        if not zoom_rooms:
+            return
+
+        is_active = registration.state == RegistrationState.complete
+        should_be_registered = not remove and is_active
+
+        client = ZoomIndicoClient()
+        for vc_room in zoom_rooms:
+            zoom_id = vc_room.data['zoom_id']
+            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+
+            if should_be_registered:
+                data = {
+                    'email': registration.email,
+                    'first_name': registration.first_name,
+                    'last_name': registration.last_name,
+                    'auto_approve': True,
+                }
+                try:
+                    if is_webinar:
+                        client.add_webinar_registrant(zoom_id, data)
+                    else:
+                        client.add_meeting_registrant(zoom_id, data)
+                except Exception:
+                    self.logger.exception('Could not add registrant %s to Zoom %s %s',
+                                          registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+            else:
+                try:
+                    registrant_id = self._get_zoom_registrant_id(client, vc_room, registration.email)
+                    if registrant_id:
+                        status_data = {
+                            'action': 'cancel',
+                            'registrants': [{'id': registrant_id, 'email': registration.email}]
+                        }
+                        if is_webinar:
+                            client.update_webinar_registrants_status(zoom_id, status_data)
+                        else:
+                            client.update_meeting_registrants_status(zoom_id, status_data)
+                except Exception:
+                    self.logger.exception('Could not remove registrant %s from Zoom %s %s',
+                                          registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+
+    def _get_zoom_registrant_id(self, client, vc_room, email):
+        zoom_id = vc_room.data['zoom_id']
+        is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+        list_func = client.list_webinar_registrants if is_webinar else client.list_meeting_registrants
+
+        params = {'page_size': 300}
+        while True:
+            resp = list_func(zoom_id, **params)
+            for r in resp.get('registrants', []):
+                if r['email'].lower() == email.lower():
+                    return r['id']
+            if not resp.get('next_page_token'):
+                break
+            params['next_page_token'] = resp['next_page_token']
+        return None
