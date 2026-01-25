@@ -12,6 +12,7 @@ from indico_vc_zoom.fixtures import JSON_DATA
 
 TZ = ZoneInfo('Europe/Zurich')
 
+
 def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp, app, mocker):
     event = create_event(
         creator=zoom_api['user'],
@@ -54,8 +55,7 @@ def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp
 
     # Check what was sent to Zoom API
     assert zoom_api['create_meeting'].called
-    args, kwargs = zoom_api['create_meeting'].call_args
-    sent_settings = kwargs['settings']
+    sent_settings = zoom_api['create_meeting'].call_args.kwargs['settings']
     assert sent_settings['language_interpretation']['enable'] is True
     assert sent_settings['language_interpretation']['interpreters'] == [
         {'email': i['email'], 'interpreter_languages': f"{i['src_lang']},{i['target_lang']}"}

@@ -414,12 +414,22 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
             changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
 
-        if (vc_room.data.get('language_interpretation', False) != zoom_meeting_settings.get('language_interpretation', {}).get('enable', False) or
-                (vc_room.data.get('interpreters') or []) != [
-                    {'email': i['email'], 'src_lang': i['interpreter_languages'].split(',')[0],
-                     'target_lang': i['interpreter_languages'].split(',')[1]}
-                    for i in zoom_meeting_settings.get('language_interpretation', {}).get('interpreters', [])
-                ]):
+        zoom_language_interpretation = zoom_meeting_settings.get('language_interpretation', {})
+        zoom_interpreters = [
+            {
+                'email': i['email'],
+                'src_lang': i['interpreter_languages'].split(',')[0],
+                'target_lang': i['interpreter_languages'].split(',')[1],
+            }
+            for i in zoom_language_interpretation.get('interpreters', [])
+        ]
+        local_interpreters = vc_room.data.get('interpreters') or []
+        interpretation_changed = (
+            vc_room.data.get('language_interpretation', False)
+            != zoom_language_interpretation.get('enable', False)
+        )
+        interpreters_changed = local_interpreters != zoom_interpreters
+        if interpretation_changed or interpreters_changed:
             changes.setdefault('settings', {})['language_interpretation'] = {
                 'enable': vc_room.data.get('language_interpretation', False),
                 'interpreters': [

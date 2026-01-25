@@ -50,9 +50,14 @@ class VCRoomAttachForm(VCRoomAttachFormBase):
 class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Zoom booking."""
 
-    advanced_fields = (['mute_audio', 'mute_host_video', 'mute_participant_video'] +
-                       list(VCRoomFormBase.advanced_fields) +
-                       ['language_interpretation', 'interpreters'])
+    advanced_fields = [
+        'mute_audio',
+        'mute_host_video',
+        'mute_participant_video',
+        *VCRoomFormBase.advanced_fields,
+        'language_interpretation',
+        'interpreters',
+    ]
 
     skip_fields = set(advanced_fields) | VCRoomFormBase.conditional_fields
 
@@ -126,8 +131,18 @@ class VCRoomForm(VCRoomFormBase):
                                       [HiddenUnless('language_interpretation')],
                                       fields=[
                                           {'id': 'email', 'caption': _('Email'), 'type': 'text', 'required': True},
-                                          {'id': 'src_lang', 'caption': _('Source Language'), 'type': 'select', 'required': True},
-                                          {'id': 'target_lang', 'caption': _('Target Language'), 'type': 'select', 'required': True}
+                                          {
+                                              'id': 'src_lang',
+                                              'caption': _('Source Language'),
+                                              'type': 'select',
+                                              'required': True,
+                                          },
+                                          {
+                                              'id': 'target_lang',
+                                              'caption': _('Target Language'),
+                                              'type': 'select',
+                                              'required': True,
+                                          },
                                       ],
                                       choices={
                                           'src_lang': INTERPRETER_LANGUAGE_CHOICES,
