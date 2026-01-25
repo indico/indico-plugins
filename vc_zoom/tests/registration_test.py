@@ -20,6 +20,7 @@ from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VC
 
 TZ = ZoneInfo('Europe/Zurich')
 
+
 @pytest.fixture
 def zoom_user(create_user):
     return create_user(1, email='don.orange@megacorp.xyz')
