@@ -359,6 +359,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'participant_video': not vc_room.data['mute_participant_video'],
                     'waiting_room': vc_room.data['waiting_room'],
                     'join_before_host': self.settings.get('join_before_host'),
+                    'approval_type': 0,
                 })
 
             kwargs.update({
@@ -661,7 +662,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     else:
                         client.add_meeting_registrant(zoom_id, data)
                 except Exception:
-                    self.logger.exception('Could not add registrant %s to Zoom %s %s',
+                    self.logger.warning('Could not add registrant %s to Zoom %s %s',
                                           registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
             else:
                 try:
@@ -676,7 +677,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         else:
                             client.update_meeting_registrants_status(zoom_id, status_data)
                 except Exception:
-                    self.logger.exception('Could not remove registrant %s from Zoom %s %s',
+                    self.logger.warning('Could not remove registrant %s from Zoom %s %s',
                                           registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
 
     def _get_zoom_registrant_id(self, client, vc_room, email):
