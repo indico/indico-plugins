@@ -12,15 +12,28 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
+from indico.util.string import is_valid_mail
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
-from indico.web.forms.fields import IndicoRadioField, PrincipalField
+from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, PrincipalField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 from indico_vc_zoom import _
 from indico_vc_zoom.util import find_enterprise_email
+
+INTERPRETER_LANGUAGE_CHOICES = {
+    'English': _('English'),
+    'Chinese': _('Chinese'),
+    'Japanese': _('Japanese'),
+    'German': _('German'),
+    'French': _('French'),
+    'Russian': _('Russian'),
+    'Portuguese': _('Portuguese'),
+    'Spanish': _('Spanish'),
+    'Korean': _('Korean'),
+}
 
 
 class VCRoomAttachForm(VCRoomAttachFormBase):
@@ -37,9 +50,11 @@ class VCRoomAttachForm(VCRoomAttachFormBase):
 class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Zoom booking."""
 
-    advanced_fields = {'mute_audio', 'mute_host_video', 'mute_participant_video'} | VCRoomFormBase.advanced_fields
+    advanced_fields = (['mute_audio', 'mute_host_video', 'mute_participant_video'] +
+                       list(VCRoomFormBase.advanced_fields) +
+                       ['language_interpretation', 'interpreters'])
 
-    skip_fields = advanced_fields | VCRoomFormBase.conditional_fields
+    skip_fields = set(advanced_fields) | VCRoomFormBase.conditional_fields
 
     meeting_type = IndicoRadioField(_('Meeting Type'),
                                     description=_('The type of Zoom meeting to be created'),
@@ -103,6 +118,23 @@ class VCRoomForm(VCRoomFormBase):
         if not allow_webinars:
             del self.meeting_type
 
+    language_interpretation = BooleanField(_('Language interpretation'),
+                                           widget=SwitchWidget(),
+                                           description=_('Enable interpretation for this meeting'))
+
+    interpreters = MultipleItemsField(_('Interpreters'),
+                                      [HiddenUnless('language_interpretation')],
+                                      fields=[
+                                          {'id': 'email', 'caption': _('Email'), 'type': 'text', 'required': True},
+                                          {'id': 'src_lang', 'caption': _('Source Language'), 'type': 'select', 'required': True},
+                                          {'id': 'target_lang', 'caption': _('Target Language'), 'type': 'select', 'required': True}
+                                      ],
+                                      choices={
+                                          'src_lang': INTERPRETER_LANGUAGE_CHOICES,
+                                          'target_lang': INTERPRETER_LANGUAGE_CHOICES,
+                                      },
+                                      description=_('The email address and the two languages for each interpreter.'))
+
     def validate_host_choice(self, field):
         if field.data == 'myself':
             self._check_zoom_user(session.user)
@@ -110,6 +142,17 @@ class VCRoomForm(VCRoomFormBase):
     def validate_host_user(self, field):
         if self.host_choice.data == 'someone_else':
             self._check_zoom_user(field.data)
+
+    def validate_interpreters(self, field):
+        items = field.serialized_data or field.data or []
+        for item in items:
+            email = (item.get('email') or '').strip()
+            src_lang = (item.get('src_lang') or '').strip()
+            target_lang = (item.get('target_lang') or '').strip()
+            if not is_valid_mail(email, multi=False):
+                raise ValidationError(_('Invalid email address'))
+            if src_lang == target_lang:
+                raise ValidationError(_('Source and target languages must be different.'))
 
     def _check_zoom_user(self, user):
         if find_enterprise_email(user) is None:
