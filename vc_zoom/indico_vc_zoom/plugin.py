@@ -46,7 +46,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                             'allow_webinars', 'allow_language_interpretation', 'phone_link']),
+                             'allow_webinars', 'allow_language_interpretation', 'auto_register', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                               'waiting_room']),
         (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
@@ -90,6 +90,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                                  widget=SwitchWidget(),
                                                  description=_('Allow enabling language interpretation for meetings '
                                                                'and webinars.'))
+
+    auto_register = BooleanField(_('Automatic registration'),
+                                 widget=SwitchWidget(),
+                                 description=_('Automatically register Indico registrants in Zoom meetings/webinars '
+                                               'once their Indico registration is complete.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -168,6 +173,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'enterprise_domain': '',
         'allow_webinars': False,
         'allow_language_interpretation': False,
+        'auto_register': False,
         'mute_host_video': True,
         'mute_audio': True,
         'mute_participant_video': True,
@@ -677,6 +683,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _sync_registration(self, registration, remove=False):
         from indico.modules.events.registration.models.registrations import RegistrationState
+        if not self.settings.get('auto_register'):
+            return
         event = registration.event or registration.registration_form.event
         if event is None:
             return
