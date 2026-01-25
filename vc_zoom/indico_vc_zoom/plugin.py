@@ -661,7 +661,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         client.add_webinar_registrant(zoom_id, data)
                     else:
                         client.add_meeting_registrant(zoom_id, data)
-                except Exception:
+                except HTTPError:
                     self.logger.warning('Could not add registrant %s to Zoom %s %s',
                                           registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
             else:
@@ -676,7 +676,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                             client.update_webinar_registrants_status(zoom_id, status_data)
                         else:
                             client.update_meeting_registrants_status(zoom_id, status_data)
-                except Exception:
+                except HTTPError:
                     self.logger.warning('Could not remove registrant %s from Zoom %s %s',
                                           registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
 
