@@ -24,6 +24,8 @@ from indico_vc_zoom import _
 from indico_vc_zoom.util import find_enterprise_email
 
 
+# Default Zoom-enabled languages for interpretation
+# See: https://developers.zoom.us/docs/api/meetings/#tag/meetings/post/users/{userId}/meetings
 INTERPRETER_LANGUAGE_CHOICES = {
     'English': _('English'),
     'Chinese': _('Chinese'),
