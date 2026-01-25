@@ -23,6 +23,7 @@ from indico.web.forms.widgets import SwitchWidget
 from indico_vc_zoom import _
 from indico_vc_zoom.util import find_enterprise_email
 
+
 INTERPRETER_LANGUAGE_CHOICES = {
     'English': _('English'),
     'Chinese': _('Chinese'),

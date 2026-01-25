@@ -335,13 +335,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         try:
             settings = {
                 'host_video': not vc_room.data['mute_host_video'],
-                'language_interpretation': {
-                    'enable': vc_room.data.get('language_interpretation', False),
-                    'interpreters': [
-                        {'email': i['email'], 'interpreter_languages': f"{i['src_lang']},{i['target_lang']}"}
-                        for i in (vc_room.data.get('interpreters') or [])
-                    ]
-                }
+                'language_interpretation': self._build_language_interpretation_settings(vc_room)
             }
 
             kwargs = {}
@@ -396,6 +390,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if self.settings.get('send_host_url'):
             notify_host_start_url(vc_room)
 
+    def _build_language_interpretation_settings(self, vc_room):
+        return {
+            'enable': vc_room.data.get('language_interpretation', False),
+            'interpreters': [
+                {'email': x['email'], 'interpreter_languages': f"{x['src_lang']},{x['target_lang']}"}
+                for x in (vc_room.data.get('interpreters') or [])
+            ]
+        }
+
     def update_room(self, vc_room, event):
         client = ZoomIndicoClient()
         zoom_meeting, is_webinar = fetch_zoom_meeting(vc_room, client=client)
@@ -430,13 +433,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         )
         interpreters_changed = local_interpreters != zoom_interpreters
         if interpretation_changed or interpreters_changed:
-            changes.setdefault('settings', {})['language_interpretation'] = {
-                'enable': vc_room.data.get('language_interpretation', False),
-                'interpreters': [
-                    {'email': i['email'], 'interpreter_languages': f"{i['src_lang']},{i['target_lang']}"}
-                    for i in (vc_room.data.get('interpreters') or [])
-                ]
-            }
+            changes.setdefault('settings', {})['language_interpretation'] = (
+                self._build_language_interpretation_settings(vc_room)
+            )
 
         alternative_hosts = process_alternative_hosts(zoom_meeting_settings.get('alternative_hosts', ''))
         if vc_room.data['alternative_hosts'] != alternative_hosts:
@@ -470,9 +469,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': not zoom_meeting['settings']['host_video'],
             'language_interpretation': zoom_meeting['settings'].get('language_interpretation', {}).get('enable', False),
             'interpreters': [
-                {'email': i['email'], 'src_lang': i['interpreter_languages'].split(',')[0],
-                 'target_lang': i['interpreter_languages'].split(',')[1]}
-                for i in zoom_meeting['settings'].get('language_interpretation', {}).get('interpreters', [])
+                {'email': x['email'], 'src_lang': x['interpreter_languages'].split(',')[0],
+                 'target_lang': x['interpreter_languages'].split(',')[1]}
+                for x in zoom_meeting['settings'].get('language_interpretation', {}).get('interpreters', [])
             ],
 
             # these options will be empty for webinars

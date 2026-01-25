@@ -5,10 +5,12 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import json
+
 from indico_vc_zoom.fixtures import JSON_DATA
+
 
 TZ = ZoneInfo('Europe/Zurich')
 
@@ -83,8 +85,9 @@ def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp
         }
     }, False))
 
-    from indico_vc_zoom.plugin import ZoomPlugin
     from indico.core.plugins import plugin_engine
+
+    from indico_vc_zoom.plugin import ZoomPlugin
     plugin = ZoomPlugin(plugin_engine, app)
     plugin.refresh_room(vc_room, event)
 
