@@ -420,11 +420,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_language_interpretation = zoom_meeting_settings.get('language_interpretation', {})
         zoom_interpreters = [
             {
-                'email': i['email'],
-                'src_lang': i['interpreter_languages'].split(',')[0],
-                'target_lang': i['interpreter_languages'].split(',')[1],
+                'email': x['email'],
+                'src_lang': x['interpreter_languages'].split(',')[0],
+                'target_lang': x['interpreter_languages'].split(',')[1],
             }
-            for i in zoom_language_interpretation.get('interpreters', [])
+            for x in zoom_language_interpretation.get('interpreters', [])
         ]
         local_interpreters = vc_room.data.get('interpreters') or []
         interpretation_changed = (
