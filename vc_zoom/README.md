@@ -181,12 +181,16 @@ The scopes to select when creating the app are:
 - `meeting:write:meeting:admin`
 - `meeting:update:meeting:admin`
 - `meeting:delete:meeting:admin`
+- `meeting:read:list_registrants:admin` (required for automatic registration feature)
+- `meeting:write:registrant:admin` (required for automatic registration feature)
 - `user:read:user:admin`
 
 - `webinar:read:webinar:admin` (optional, only needed when using webinars)
 - `webinar:write:webinar:admin` (optional, only needed when using webinars)
 - `webinar:update:webinar:admin` (optional, only needed when using webinars)
 - `webinar:delete:webinar:admin` (optional, only needed when using webinars)
+- `webinar:read:list_registrants:admin` (optional, required when using automatic registration with webinars)
+- `webinar:write:registrant:admin` (optional, required when using automatic registration with webinars)
 
 In case your app still uses classic scopes (unlikely, unless you created it a long time ago):
 
