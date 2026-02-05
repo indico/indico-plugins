@@ -158,6 +158,8 @@ class S3StorageBase(Storage):
                 # nginx can proxy the request to S3 to avoid exposing the redirect and
                 # bucket URL to the end user (since it is quite ugly and temporary)
                 response.headers['X-Accel-Redirect'] = '/.xsf/s3/' + quote(url.replace('://', '/', 1))
+                # img-src self is needed due to https://bugzilla.mozilla.org/show_bug.cgi?id=1735994
+                response.headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self'"
             return response
         except Exception as exc:
             raise StorageError(f'Could not send file "{file_id}": {exc}') from exc

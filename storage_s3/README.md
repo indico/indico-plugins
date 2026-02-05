@@ -15,6 +15,13 @@ to local storage (but it would of course be possible to write a script for this)
 
 ## Changelog
 
+### 3.3.3
+
+- Apply a restrictive CSP to prevent XSS in case the regular checks in Indico let something
+  though. Please note that you MUST update your nginx config as well when using `proxy=nginx`
+  so the CSP headers are actually preserved. See the "Proxying downloads through nginx" section
+  further below and add the lines containing `content_security_policy` to your config.
+
 ### 3.3.2
 
 - Adapt to Indico 3.3.6 changes
@@ -152,6 +159,10 @@ location ~ ^/\.xsf/s3/(?<download_protocol>https?)/(?<download_host>[^/]+)/(?<do
         proxy_hide_header Bucket;
         proxy_max_temp_file_size 0;
         proxy_intercept_errors on;
+        set $saved_content_security_policy '$upstream_http_content_security_policy';
+        set $saved_content_security_policy_report_only '$upstream_http_content_security_policy_report_only';
+        add_header Content-Security-Policy $saved_content_security_policy;
+        add_header Content-Security-Policy-Report-Only $saved_content_security_policy_report_only;
         error_page 301 302 307 = @s3_redirect;
         proxy_pass $download_url$is_args$args;
 }
@@ -160,6 +171,8 @@ location @s3_redirect {
         internal;
         resolver YOUR_RESOLVER;
         set $saved_redirect_location '$upstream_http_location';
+        add_header Content-Security-Policy $saved_content_security_policy;
+        add_header Content-Security-Policy-Report-Only $saved_content_security_policy_report_only;
         proxy_pass $saved_redirect_location;
 }
 ```
