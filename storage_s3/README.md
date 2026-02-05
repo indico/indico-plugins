@@ -161,8 +161,10 @@ location ~ ^/\.xsf/s3/(?<download_protocol>https?)/(?<download_host>[^/]+)/(?<do
         proxy_intercept_errors on;
         set $saved_content_security_policy '$upstream_http_content_security_policy';
         set $saved_content_security_policy_report_only '$upstream_http_content_security_policy_report_only';
+        set $saved_reporting_endpoints '$upstream_http_reporting_endpoints';
         add_header Content-Security-Policy $saved_content_security_policy;
         add_header Content-Security-Policy-Report-Only $saved_content_security_policy_report_only;
+        add_header Reporting-Endpoints $saved_reporting_endpoints;
         error_page 301 302 307 = @s3_redirect;
         proxy_pass $download_url$is_args$args;
 }
@@ -173,6 +175,7 @@ location @s3_redirect {
         set $saved_redirect_location '$upstream_http_location';
         add_header Content-Security-Policy $saved_content_security_policy;
         add_header Content-Security-Policy-Report-Only $saved_content_security_policy_report_only;
+        add_header Reporting-Endpoints $saved_reporting_endpoints;
         proxy_pass $saved_redirect_location;
 }
 ```
