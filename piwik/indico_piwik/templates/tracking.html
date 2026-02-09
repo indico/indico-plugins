@@ -9,6 +9,7 @@
         g.type = 'text/javascript';
         g.defer = true;
         g.async = true;
+        g.nonce = window.IndicoCSPNonce;
         g.src = url + 'piwik.js';
         g.onload = init_tracking;
         s.parentNode.insertBefore(g, s);
