@@ -5,6 +5,10 @@ gather statistics about the users accessing Indico or specific Indico events.
 
 ## Changelog
 
+### 3.3.4
+
+- Support Indico running with `CSP_ENABLED = True`
+
 ### 3.3.3
 
 - Update translations
