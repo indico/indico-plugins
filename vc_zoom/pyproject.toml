@@ -2,7 +2,7 @@
 name = 'indico-plugin-vc-zoom'
 description = 'Zoom video-conferencing plugin for Indico'
 readme = 'README.md'
-version = '3.3.6'
+version = '3.3.5'
 license = 'MIT'
 authors = [
     { name = 'Indico Team', email = 'indico-team@cern.ch' },
