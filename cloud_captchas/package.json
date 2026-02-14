@@ -2,7 +2,7 @@
   "private": true,
   "name": "indico-plugin-cloud-captchas",
   "dependencies": {
-    "@hcaptcha/react-hcaptcha": "^1.4.4",
-    "react-google-recaptcha": "^2.1.0"
+    "@hcaptcha/react-hcaptcha": "^2.0.2",
+    "react-google-recaptcha": "^3.1.0"
   }
 }
