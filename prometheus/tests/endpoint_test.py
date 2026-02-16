@@ -48,18 +48,18 @@ def test_endpoint_empty(get_metrics):
 
     metrics = get_metrics()[0]
 
-    assert metrics['indico_num_users'] == 1.0
-    assert metrics['indico_num_active_users'] == 0.0
-    assert metrics['indico_num_events'] == 0.0
-    assert metrics['indico_num_categories'] == 1.0
-    assert metrics['indico_num_attachment_files'] == 0.0
-    assert metrics['indico_num_active_attachment_files'] == 0.0
+    assert metrics['indico_num_users'] == 1
+    assert metrics['indico_num_active_users'] == 0
+    assert metrics['indico_num_events'] == 0
+    assert metrics['indico_num_categories'] == 1
+    assert metrics['indico_num_attachment_files'] == 0
+    assert metrics['indico_num_active_attachment_files'] == 0
 
 
 @pytest.mark.usefixtures('db', 'enable_plugin')
 def test_endpoint_cached(get_metrics, create_event):
     metrics, headers = get_metrics()
-    assert metrics['indico_num_events'] == 0.0
+    assert metrics['indico_num_events'] == 0
     assert headers['X-Cached'] == 'no'
 
     # create an event
@@ -68,7 +68,7 @@ def test_endpoint_cached(get_metrics, create_event):
     metrics, headers = get_metrics()
 
     # cached information should show zero events
-    assert metrics['indico_num_events'] == 0.0
+    assert metrics['indico_num_events'] == 0
     assert headers['X-Cached'] == 'yes'
 
 
@@ -78,12 +78,12 @@ def test_endpoint_returning_data(get_metrics, create_event):
     create_event(title='Test event #1')
 
     metrics = get_metrics()[0]
-    assert metrics['indico_num_users'] == 2.0
-    assert metrics['indico_num_active_users'] == 0.0
-    assert metrics['indico_num_events'] == 1.0
-    assert metrics['indico_num_categories'] == 2.0
-    assert metrics['indico_num_attachment_files'] == 0.0
-    assert metrics['indico_num_active_attachment_files'] == 0.0
+    assert metrics['indico_num_users'] == 2
+    assert metrics['indico_num_active_users'] == 0
+    assert metrics['indico_num_events'] == 1
+    assert metrics['indico_num_categories'] == 2
+    assert metrics['indico_num_attachment_files'] == 0
+    assert metrics['indico_num_active_attachment_files'] == 0
 
 
 @pytest.mark.usefixtures('db', 'enable_plugin')
