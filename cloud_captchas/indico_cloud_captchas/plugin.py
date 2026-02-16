@@ -10,10 +10,12 @@ from requests.exceptions import HTTPError, RequestException
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 
+from indico.core import signals
 from indico.core.plugins import IndicoPlugin
 from indico.modules.api.forms import IndicoEnumSelectField
 from indico.modules.core.plugins import CaptchaPluginMixin
 from indico.modules.users import EnumConverter
+from indico.util.caching import memoize_request
 from indico.util.enum import RichIntEnum
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import HiddenUnless
@@ -81,6 +83,18 @@ class CloudCaptchasPlugin(CaptchaPluginMixin, IndicoPlugin):
         super().init()
         self.inject_bundle('main.js', WPBase, condition=lambda: self.settings.get('provider') != CaptchaProvider.none)
         self.inject_bundle('main.css', WPBase, condition=lambda: self.settings.get('provider') != CaptchaProvider.none)
+        self.connect(signals.core.get_csp_script_sources, self._get_csp_script_sources)
+
+    def _get_csp_script_sources(self, sender, **kwargs):
+        match self.settings.get('provider'):
+            case CaptchaProvider.hcaptcha:
+                yield 'https://hcaptcha.com'
+                yield 'https://*.hcaptcha.com'
+            case CaptchaProvider.recaptcha:
+                # It would be much nicer to use a nonce, but react-google-recaptcha tries to read the nonce
+                # from a global var at import time, which is too late to set it nicely from our JS code, and
+                # I really do not want to inject another script tag in the HTML source for this
+                yield 'https://www.google.com/recaptcha/api.js'
 
     def is_captcha_available(self):
         provider = self.settings.get('provider')
@@ -121,6 +135,10 @@ class CloudCaptchasPlugin(CaptchaPluginMixin, IndicoPlugin):
             return None
         return resp
 
+    # This must be memoized so it can be validated twice during the same request, because in the
+    # registration form we parse the data twice, and the second time triggers another captcha
+    # validation, which would result in an error since there's replay protection.
+    @memoize_request
     def validate_captcha(self, answer):
         if self.settings.get('provider') == CaptchaProvider.recaptcha:
             return self._validate_recaptcha(answer)
