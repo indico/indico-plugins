@@ -21,6 +21,7 @@ to local storage (but it would of course be possible to write a script for this)
   though. Please note that you MUST update your nginx config as well when using `proxy=nginx`
   so the CSP headers are actually preserved. See the "Proxying downloads through nginx" section
   further below and add the lines containing `content_security_policy` to your config.
+- Update translations
 
 ### 3.3.2
 

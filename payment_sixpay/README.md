@@ -8,6 +8,10 @@ they are automatically sent back to Indico.
 
 ## Changelog
 
+### 3.3.5
+
+- Update translations
+
 ### 3.3.4
 
 - Fix some form field descriptions not using their translations

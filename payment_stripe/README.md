@@ -18,6 +18,10 @@ event. This can also be done when a global API key is set in order to override t
 
 ## Changelog
 
+### 3.3.1
+
+- Update translations
+
 ### 3.3
 
 - Initial release for Indico 3.3

@@ -2,7 +2,7 @@
 name = 'indico-plugin-payment-paypal'
 description = 'PayPal payments for Indico event registration fees'
 readme = 'README.md'
-version = '3.3.2'
+version = '3.3.3'
 license = 'MIT'
 authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
 classifiers = [

@@ -8,6 +8,7 @@ gather statistics about the users accessing Indico or specific Indico events.
 ### 3.3.4
 
 - Support Indico running with `CSP_ENABLED = True`
+- Update translations
 
 ### 3.3.3
 

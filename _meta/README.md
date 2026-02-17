@@ -8,6 +8,22 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.6
+
+- Require Indico v3.3.10
+- Update `indico-plugin-citadel`
+- Update `indico-plugin-cloud-captchas`
+- Update `indico-plugin-livesync`
+- Update `indico-plugin-owncloud`
+- Update `indico-plugin-payment-manual`
+- Update `indico-plugin-payment-paypal`
+- Update `indico-plugin-payment-sixpay`
+- Update `indico-plugin-payment-stripe`
+- Update `indico-plugin-piwik`
+- Update `indico-plugin-storage-s3`
+- Update `indico-plugin-ursh`
+- Update `indico-plugin-vc-zoom`
+
 ### 3.3.5
 
 - Update `indico-plugin-citadel`

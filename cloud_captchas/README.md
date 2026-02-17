@@ -23,6 +23,7 @@ When using hCaptcha the keys can be created on the [hCaptcha dashboard][hcaptcha
 
 - Support Indico running with `CSP_ENABLED = True`
 - Fix CAPTCHA validation failing in registration forms
+- Update translations
 
 ### 3.3.2
 
