@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-payment-sixpay.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-sixpay project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2021
@@ -10,16 +10,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-payment-sixpay 3.3.2\n"
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-07-29 12:01+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
@@ -42,14 +42,17 @@ msgid "Your payment has been confirmed."
 msgstr "Potvrzujeme přijetí Vaší platby. "
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Invalid format string key: {}"
 msgstr "Neplatný formát řetězce: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Malformed format string: {}"
 msgstr "Poškozený formát řetězce: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid ""
 "Format string too long: shortest replacement with {len}, expected {max}"
 msgstr ""
@@ -103,22 +106,8 @@ msgid "Order Description"
 msgstr "Detail objednávky"
 
 #: indico_payment_sixpay/forms.py
-msgid ""
-"The default description of each order in a human readable way. It is "
-"presented to the registrant during the transaction with Saferpay. Event "
-"managers will be able to override this. Supported placeholders: {}"
-msgstr "Přednastavený popis objednávky. Podporované zástupné symboly: {}"
-
-#: indico_payment_sixpay/forms.py
 msgid "Order Identifier"
 msgstr "Identifikátor objednávky"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Event managers "
-"will be able to override this. Supported placeholders: {}"
-msgstr ""
-"Přednastavený identifikátor objednávky. Podporované zástupné symboly: {}"
 
 #: indico_payment_sixpay/forms.py
 msgid "Notification Email"
@@ -132,23 +121,24 @@ msgid ""
 msgstr "E-mailová adresa pro příjem oznámení o transakcích. "
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default description of each order in a human readable way. It is "
+"presented to the registrant during the transaction with Saferpay. Event "
+"managers will be able to override this. Supported placeholders: {}"
+msgstr "Přednastavený popis objednávky. Podporované zástupné symboly: {}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Event managers "
+"will be able to override this. Supported placeholders: {}"
+msgstr ""
+"Přednastavený identifikátor objednávky. Podporované zástupné symboly: {}"
+
+#: indico_payment_sixpay/forms.py
 msgid "The Saferpay account ID, such as \"1234567-12345678\"."
 msgstr ""
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The description of each order in a human readable way. It is presented to "
-"the registrant during the transaction with Saferpay. Supported placeholders:"
-" {}"
-msgstr "Popis každé z objednávek. Podporované zástupné symboly: {}"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Supported "
-"placeholders: {}"
-msgstr ""
-"Přednastavený identifikátor každé obejdnávky pro další zpracování. "
-"Podporované zástupné symboly: {}"
 
 #: indico_payment_sixpay/forms.py
 msgid ""
@@ -156,13 +146,32 @@ msgid ""
 "of Indico's own payment notifications."
 msgstr "E-mailová adresa pto příjem oznámení o transakcích."
 
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The description of each order in a human readable way. It is presented to "
+"the registrant during the transaction with Saferpay. Supported placeholders:"
+" {}"
+msgstr "Popis každé z objednávek. Podporované zástupné symboly: {}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Supported "
+"placeholders: {}"
+msgstr ""
+"Přednastavený identifikátor každé obejdnávky pro další zpracování. "
+"Podporované zástupné symboly: {}"
+
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unsupported currency '{}' for SIXPay. Please contact the organizers"
 msgstr ""
 "Měna '{}' není podporovaná platformou SIXPay. Kontaktujte organizátory "
 "prosím. "
 
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unknown currency '{}' for SIXPay. Please contact the organizers"
 msgstr ""
 "Měna '{}' není rozpoznatelná platformou SIXPay. Kontaktujte organizátory "

@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-payment-sixpay.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-sixpay project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Lanxin Ma <ma@ihep.ac.cn>, 2021
@@ -9,16 +9,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-payment-sixpay 3.3.2\n"
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-07-29 12:01+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2021\n"
 "Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -40,14 +40,17 @@ msgid "Your payment has been confirmed."
 msgstr "您的付款已被确认。"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Invalid format string key: {}"
 msgstr "无效的格式字符串关键字：{}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Malformed format string: {}"
 msgstr "格式错误的字符串：{}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid ""
 "Format string too long: shortest replacement with {len}, expected {max}"
 msgstr "格式字符串太长：最短替换为 {len}，预期为 {max}"
@@ -97,21 +100,8 @@ msgid "Order Description"
 msgstr "订单说明"
 
 #: indico_payment_sixpay/forms.py
-msgid ""
-"The default description of each order in a human readable way. It is "
-"presented to the registrant during the transaction with Saferpay. Event "
-"managers will be able to override this. Supported placeholders: {}"
-msgstr "以人类可读的方式对每个订单的默认描述。 它在与 Saferpay 的交易期间呈现给注册人。 事件管理者将能够覆盖它。 支持的占位符：{}"
-
-#: indico_payment_sixpay/forms.py
 msgid "Order Identifier"
 msgstr "订单标识符"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Event managers "
-"will be able to override this. Supported placeholders: {}"
-msgstr "用于进一步处理的每个订单的默认标识符。 事件管理者将能够覆盖它。 支持的占位符：{}"
 
 #: indico_payment_sixpay/forms.py
 msgid "Notification Email"
@@ -125,21 +115,23 @@ msgid ""
 msgstr "用于接收交易通知的电子邮件地址。 这与 Indico 自己的付款通知无关。 事件管理者将能够覆盖它。"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default description of each order in a human readable way. It is "
+"presented to the registrant during the transaction with Saferpay. Event "
+"managers will be able to override this. Supported placeholders: {}"
+msgstr "以人类可读的方式对每个订单的默认描述。 它在与 Saferpay 的交易期间呈现给注册人。 事件管理者将能够覆盖它。 支持的占位符：{}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Event managers "
+"will be able to override this. Supported placeholders: {}"
+msgstr "用于进一步处理的每个订单的默认标识符。 事件管理者将能够覆盖它。 支持的占位符：{}"
+
+#: indico_payment_sixpay/forms.py
 msgid "The Saferpay account ID, such as \"1234567-12345678\"."
 msgstr ""
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The description of each order in a human readable way. It is presented to "
-"the registrant during the transaction with Saferpay. Supported placeholders:"
-" {}"
-msgstr "以人类可读的方式对每个订单的描述。 它在与 Saferpay 的交易期间呈现给注册人。 支持的占位符：{}"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Supported "
-"placeholders: {}"
-msgstr "用于进一步处理的每个订单的默认标识符。 支持的占位符：{}"
 
 #: indico_payment_sixpay/forms.py
 msgid ""
@@ -147,11 +139,28 @@ msgid ""
 "of Indico's own payment notifications."
 msgstr "用于接收交易通知的电子邮件地址。 这与 Indico 自己的付款通知无关。"
 
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The description of each order in a human readable way. It is presented to "
+"the registrant during the transaction with Saferpay. Supported placeholders:"
+" {}"
+msgstr "以人类可读的方式对每个订单的描述。 它在与 Saferpay 的交易期间呈现给注册人。 支持的占位符：{}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Supported "
+"placeholders: {}"
+msgstr "用于进一步处理的每个订单的默认标识符。 支持的占位符：{}"
+
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unsupported currency '{}' for SIXPay. Please contact the organizers"
 msgstr "SIXPay 不支持货币 ‘{}’。 请联系组织者"
 
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unknown currency '{}' for SIXPay. Please contact the organizers"
 msgstr "SIXPay 的未知货币“{}”。 请联系组织者"
 

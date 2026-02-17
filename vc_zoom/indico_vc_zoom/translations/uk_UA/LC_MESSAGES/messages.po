@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2024
@@ -9,16 +9,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.5\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2024\n"
 "Language-Team: Ukrainian (Ukraine) (https://app.transifex.com/indico/teams/6478/uk_UA/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
@@ -280,6 +280,7 @@ msgid "Link to instructions on joining a meeting via phone"
 msgstr "Посилання на інструкції для приєднання до зустрічі телефоном"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Invalid identity providers: {}"
 msgstr "Неправильні служби автентифікації: {}"
 
@@ -288,14 +289,17 @@ msgid "Zoom credentials not set; the plugin will not work correctly"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
-msgid "Successfully got a Zoom token ({})"
+#, python-brace-format
+msgid "Successfully got a Zoom token ({}); using API URL {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Could not get Zoom token: {}"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid ""
 "The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
 " another event"
@@ -312,6 +316,7 @@ msgid "Meeting didn't exist in Zoom anymore"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Zoom Error: \"{}\""
 msgstr "Помилка Zoom: \"{}\""
 
@@ -320,10 +325,12 @@ msgid "Problem deleting Zoom meeting"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid ""
 "The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
 " the new event"

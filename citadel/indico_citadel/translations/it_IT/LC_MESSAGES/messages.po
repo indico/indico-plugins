@@ -1,27 +1,28 @@
 # Translations template for indico-plugin-citadel.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-citadel project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Ruggero Turra, 2021
 # michele michelotto <michelotto@pd.infn.it>, 2022
 # Pierpaolo Gallo, 2023
 # Tomáš Roun <tomas.roun8@gmail.com>, 2024
+# Michelangelo Bottura <michelangelo.bottura@gmail.com>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-citadel 3.3.1\n"
+"Project-Id-Version: indico-plugin-citadel 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Last-Translator: Michelangelo Bottura <michelangelo.bottura@gmail.com>, 2025\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -62,11 +63,11 @@ msgid ""
 "file size first!"
 msgstr ""
 "Dimensione massima (in MB) da caricare per la ricerca full-text. Aumentando "
-"questo valore dopo l'esportazione iniziale, durante l'esecuzione della coda "
-"successiva verranno caricati tutti i file per l'indicizzazione che non sono "
-"stati caricati in precedenza, il che potrebbe richiedere molto tempo sulle "
-"istanze più grandi. Si consiglia di eseguire prima un caricamento manuale "
-"per la nuova dimensione del file!"
+"questo valore dopo l'esportazione iniziale, tutti i file per "
+"l'indicizzazione che non sono stati caricati in precedenza verranno caricati"
+" durante la successiva esecuzione della coda. Questo potrebbe richiedere "
+"molto tempo su istanze più grandi. Si consiglia di eseguire prima un "
+"caricamento manuale per le nuove dimensioni di file!"
 
 #: indico_citadel/plugin.py
 msgid "Parallel threads (records)"
@@ -125,7 +126,7 @@ msgstr ""
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "Soglia avviso categorie di grandi dimensioni"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -133,10 +134,14 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"Visualizza un avviso per i gestori delle categorie durante la modifica degli"
+" ACL di categorie di grandi dimensioni, poiché ciò comporterebbe l'invio di "
+"una grande quantità di dati al server Citadel. È possibile impostare la "
+"soglia a 0 per disattivare questo avviso."
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
-msgstr "Titolo di un evento, contributo, ..."
+msgstr "Titolo di un evento, contributo, ecc."
 
 #: indico_citadel/search.py
 msgid "A speaker, author or event chair's name"
@@ -164,7 +169,7 @@ msgstr "Indirizzo della sede"
 
 #: indico_citadel/search.py
 msgid "Name of the attached file"
-msgstr "Nome dell'allegato"
+msgstr "Nome del file allegato"
 
 #: indico_citadel/search.py
 msgid "A keyword associated with an event"
@@ -180,11 +185,11 @@ msgstr "Maggiore attinenza"
 
 #: indico_citadel/search.py
 msgid "Newest first"
-msgstr "Più recenti per prima"
+msgstr "Più recenti prima"
 
 #: indico_citadel/search.py
 msgid "Oldest first"
-msgstr "Più vecchi per primi"
+msgstr "Meno recenti prima"
 
 #: indico_citadel/search.py
 msgid "Affiliation"
@@ -220,7 +225,7 @@ msgstr "ID dell'evento"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "Questa categoria contiene un elevato numero di eventi."
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -228,3 +233,7 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"Si raccomanda di utilizzare gruppi invece di singoli utenti quando si "
+"concedono permessi di accesso o gestione, in quanto ogni modifica all'elenco"
+" sottostante richiede la risincronizzazione di tutti gli eventi con il "
+"motore di ricerca di Indico."

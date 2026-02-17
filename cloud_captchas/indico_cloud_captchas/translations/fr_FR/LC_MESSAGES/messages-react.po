@@ -1,14 +1,13 @@
-# 
 # Translators:
 # Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2024
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-03-25 17:53+0100\n"
+"POT-Creation-Date: 2026-02-26 15:57+0100\n"
 "Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2024\n"
 "Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: react-jsx-i18n-extract\n"
 "Language: fr_FR\n"

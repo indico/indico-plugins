@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-payment-sixpay.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-sixpay project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2022
@@ -10,16 +10,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-payment-sixpay 3.3.2\n"
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-07-29 12:01+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2024\n"
 "Language-Team: Ukrainian (Ukraine) (https://app.transifex.com/indico/teams/6478/uk_UA/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
@@ -43,14 +43,17 @@ msgid "Your payment has been confirmed."
 msgstr "Ваш платіж було підтверджено."
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Invalid format string key: {}"
 msgstr "Неправильний ключ стрічки формату: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Malformed format string: {}"
 msgstr "Неправильна стрічка формату: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid ""
 "Format string too long: shortest replacement with {len}, expected {max}"
 msgstr "Стрічка формату задовга: найкоротша заміна на {len}, очікувана {max} "
@@ -102,26 +105,8 @@ msgid "Order Description"
 msgstr "Опис замовлення"
 
 #: indico_payment_sixpay/forms.py
-msgid ""
-"The default description of each order in a human readable way. It is "
-"presented to the registrant during the transaction with Saferpay. Event "
-"managers will be able to override this. Supported placeholders: {}"
-msgstr ""
-"Опис кожного замовлення за замовчуванням у зрозумілій для людини формі. Він "
-"надається реєстранту під час транзакції з Saferpay. Менеджери подій можуть "
-"замінити його . Підтримувані заповнювачі: {}"
-
-#: indico_payment_sixpay/forms.py
 msgid "Order Identifier"
 msgstr "Ідентифікатор замовлення"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Event managers "
-"will be able to override this. Supported placeholders: {}"
-msgstr ""
-"За замовчуванням ідентифікатор кожного замовлення для подальшої обробки. "
-"Керівники подій зможуть перевизначити це. Підтримувані заповнювачі: {}"
 
 #: indico_payment_sixpay/forms.py
 msgid "Notification Email"
@@ -137,25 +122,28 @@ msgstr ""
 "від сповіщень Indico про платежі. Менеджери подій можуть її змінити."
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default description of each order in a human readable way. It is "
+"presented to the registrant during the transaction with Saferpay. Event "
+"managers will be able to override this. Supported placeholders: {}"
+msgstr ""
+"Опис кожного замовлення за замовчуванням у зрозумілій для людини формі. Він "
+"надається реєстранту під час транзакції з Saferpay. Менеджери подій можуть "
+"замінити його . Підтримувані заповнювачі: {}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Event managers "
+"will be able to override this. Supported placeholders: {}"
+msgstr ""
+"За замовчуванням ідентифікатор кожного замовлення для подальшої обробки. "
+"Керівники подій зможуть перевизначити це. Підтримувані заповнювачі: {}"
+
+#: indico_payment_sixpay/forms.py
 msgid "The Saferpay account ID, such as \"1234567-12345678\"."
 msgstr ""
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The description of each order in a human readable way. It is presented to "
-"the registrant during the transaction with Saferpay. Supported placeholders:"
-" {}"
-msgstr ""
-"Опис кожного замовлення у зрозумілій для людини формі. Він надається "
-"реєстранту під час транзакції з Saferpay. Підтримувані заповнювачі: {}"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Supported "
-"placeholders: {}"
-msgstr ""
-"Ідентифікатор за замовчуванням кожного замовлення для подальшої обробки. "
-"Підтримувані заповнювачі: {}"
 
 #: indico_payment_sixpay/forms.py
 msgid ""
@@ -165,13 +153,34 @@ msgstr ""
 "Електронна адреса для отримання повідомлень про транзакції. Вона незалежна "
 "від сповіщень Indico про платежі. "
 
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The description of each order in a human readable way. It is presented to "
+"the registrant during the transaction with Saferpay. Supported placeholders:"
+" {}"
+msgstr ""
+"Опис кожного замовлення у зрозумілій для людини формі. Він надається "
+"реєстранту під час транзакції з Saferpay. Підтримувані заповнювачі: {}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Supported "
+"placeholders: {}"
+msgstr ""
+"Ідентифікатор за замовчуванням кожного замовлення для подальшої обробки. "
+"Підтримувані заповнювачі: {}"
+
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unsupported currency '{}' for SIXPay. Please contact the organizers"
 msgstr ""
 "Непідтримувана для SIXPay валюта '{}' . Будь-ласка зв'яжіться з "
 "організаторами заходу."
 
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unknown currency '{}' for SIXPay. Please contact the organizers"
 msgstr ""
 "Невідома для SIXPay валюта '{}' .  Будь-ласка зв'яжіться з організаторами "

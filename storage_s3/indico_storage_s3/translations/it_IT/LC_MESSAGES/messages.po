@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-storage-s3.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-storage-s3 project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
@@ -11,16 +11,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-storage-s3 3.3.2\n"
+"Project-Id-Version: indico-plugin-storage-s3 3.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2020-08-19 18:43+0000\n"
 "Last-Translator: Pierpaolo Gallo, 2023\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -45,6 +45,7 @@ msgid "The password to access the S3 bucket info endpoint"
 msgstr "Password usata per l'accesso a S3 bucket info endpoint"
 
 #: indico_storage_s3/plugin.py
+#, python-brace-format
 msgid ""
 "Enables an API on {url} that returns information on all S3 buckets currently"
 " in use, including dynamically-named ones."

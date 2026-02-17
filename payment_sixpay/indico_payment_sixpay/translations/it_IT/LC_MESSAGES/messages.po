@@ -1,25 +1,26 @@
 # Translations template for indico-plugin-payment-sixpay.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-payment-sixpay project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # michele michelotto <michelotto@pd.infn.it>, 2022
 # Pierpaolo Gallo, 2023
+# Michelangelo Bottura <michelangelo.bottura@gmail.com>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-payment-sixpay 3.3.2\n"
+"Project-Id-Version: indico-plugin-payment-sixpay 3.3.4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-07-29 12:01+0000\n"
-"Last-Translator: Pierpaolo Gallo, 2023\n"
+"Last-Translator: Michelangelo Bottura <michelangelo.bottura@gmail.com>, 2025\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/indico/teams/6478/it_IT/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -43,14 +44,17 @@ msgid "Your payment has been confirmed."
 msgstr "Pagamento confermato."
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Invalid format string key: {}"
 msgstr "Formato stringa della chiave non valido: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid "Malformed format string: {}"
 msgstr "Formato stringa errato: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid ""
 "Format string too long: shortest replacement with {len}, expected {max}"
 msgstr ""
@@ -97,32 +101,16 @@ msgid ""
 "Default Saferpay account ID, such as \"1234567-12345678\". Event managers "
 "will be able to override this."
 msgstr ""
+"Account ID predefinito Saferpay, ad esempio \"1234567-12345678\". Questo "
+"valore può essere modificato dai responsabili degli eventi."
 
 #: indico_payment_sixpay/forms.py
 msgid "Order Description"
 msgstr "Descrizione ordine"
 
 #: indico_payment_sixpay/forms.py
-msgid ""
-"The default description of each order in a human readable way. It is "
-"presented to the registrant during the transaction with Saferpay. Event "
-"managers will be able to override this. Supported placeholders: {}"
-msgstr ""
-"Descrizione predefinita di ogni ordine in modo leggibile dall'uomo. Viene "
-"presentata al registrante durante la transazione con Saferpay. I gestori "
-"dell'evento potranno sovrascriverla. Segnaposto supportati: {}"
-
-#: indico_payment_sixpay/forms.py
 msgid "Order Identifier"
 msgstr "Identificatore dell'ordine"
-
-#: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Event managers "
-"will be able to override this. Supported placeholders: {}"
-msgstr ""
-"Identificatore predefinito di ogni ordine per l'ulteriore elaborazione. I "
-"manager dell'evento potranno sovrascriverlo. Segnaposto supportati: {}"
 
 #: indico_payment_sixpay/forms.py
 msgid "Notification Email"
@@ -139,26 +127,30 @@ msgstr ""
 "potranno sovrascriverlo."
 
 #: indico_payment_sixpay/forms.py
-msgid "The Saferpay account ID, such as \"1234567-12345678\"."
+#, python-brace-format
+msgid ""
+"The default description of each order in a human readable way. It is "
+"presented to the registrant during the transaction with Saferpay. Event "
+"managers will be able to override this. Supported placeholders: {}"
 msgstr ""
+"Descrizione predefinita di ogni ordine in un formato leggibile per gli "
+"esseri umani. Viene presentata all'utente iscritto durante la transazione "
+"con Saferpay. I manager dell'evento potranno sovrascrivere questo valore. "
+"Placeholder supportati: {}"
 
 #: indico_payment_sixpay/forms.py
+#, python-brace-format
 msgid ""
-"The description of each order in a human readable way. It is presented to "
-"the registrant during the transaction with Saferpay. Supported placeholders:"
-" {}"
+"The default identifier of each order for further processing. Event managers "
+"will be able to override this. Supported placeholders: {}"
 msgstr ""
-"Descrizione predefinita di ogni ordine in modo leggibile dall'uomo. Viene "
-"presentata al registrante durante la transazione con Saferpay. Segnaposto "
+"Identificatore predefinito di ogni ordine per l'ulteriore elaborazione. I "
+"manager dell'evento potranno sovrascrivere questo valore. Segnaposto "
 "supportati: {}"
 
 #: indico_payment_sixpay/forms.py
-msgid ""
-"The default identifier of each order for further processing. Supported "
-"placeholders: {}"
-msgstr ""
-"Identificatore predefinito di ogni ordine per l'ulteriore elaborazione. "
-"Segnaposto supportati: {}"
+msgid "The Saferpay account ID, such as \"1234567-12345678\"."
+msgstr "Saferpay account ID , ad esempio \"1234567-12345678\"."
 
 #: indico_payment_sixpay/forms.py
 msgid ""
@@ -168,11 +160,33 @@ msgstr ""
 "Indirizzo e-mail per ricevere le notifiche delle transazioni. Questo è "
 "indipendente dalle notifiche di pagamento di Indico."
 
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The description of each order in a human readable way. It is presented to "
+"the registrant during the transaction with Saferpay. Supported placeholders:"
+" {}"
+msgstr ""
+"Descrizione predefinita di ogni ordine in formato leggibile dall'uomo. Viene"
+" presentata al registrante durante la transazione con Saferpay. Segnaposto "
+"supportati: {}"
+
+#: indico_payment_sixpay/forms.py
+#, python-brace-format
+msgid ""
+"The default identifier of each order for further processing. Supported "
+"placeholders: {}"
+msgstr ""
+"Identificatore predefinito di ogni ordine per l'ulteriore elaborazione. "
+"Segnaposto supportati: {}"
+
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unsupported currency '{}' for SIXPay. Please contact the organizers"
 msgstr "Valuta '{}' non supportata da SIXPay. Contattare gli organizzatori"
 
 #: indico_payment_sixpay/util.py
+#, python-brace-format
 msgid "Unknown currency '{}' for SIXPay. Please contact the organizers"
 msgstr "Valuta '{}' sconosciuta a SIXPay. Contattare gli organizzatori"
 

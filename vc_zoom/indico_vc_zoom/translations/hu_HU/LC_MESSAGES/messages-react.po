@@ -1,15 +1,14 @@
-# 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2024
 # Anna Szabó, 2025
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-03-25 17:53+0100\n"
+"POT-Creation-Date: 2026-02-26 15:57+0100\n"
 "Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: react-jsx-i18n-extract\n"
 "Language: hu_HU\n"

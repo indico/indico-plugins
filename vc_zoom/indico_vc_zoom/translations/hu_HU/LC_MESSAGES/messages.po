@@ -1,7 +1,7 @@
 # Translations template for indico-plugin-vc-zoom.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the indico-plugin-vc-zoom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2022
@@ -10,16 +10,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico-plugin-vc-zoom 3.3.3\n"
+"Project-Id-Version: indico-plugin-vc-zoom 3.3.5\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:53+0100\n"
+"POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2020-11-25 15:06+0000\n"
 "Last-Translator: Anna Szabó, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: hu_HU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -286,6 +286,7 @@ msgid "Link to instructions on joining a meeting via phone"
 msgstr "Link az értekezlethez telefonos csatlakozásra vonatkozó utasításokhoz"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Invalid identity providers: {}"
 msgstr "Érvénytelen identitásszolgáltatók: {}"
 
@@ -296,14 +297,17 @@ msgstr ""
 "működni."
 
 #: indico_vc_zoom/plugin.py
-msgid "Successfully got a Zoom token ({})"
-msgstr "Sikeresen megszerezte a Zoom tokent ({})"
+#, python-brace-format
+msgid "Successfully got a Zoom token ({}); using API URL {}"
+msgstr ""
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Could not get Zoom token: {}"
 msgstr "Nem sikerült megszerezni a Zoom tokent: {}"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid ""
 "The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
 " another event"
@@ -324,6 +328,7 @@ msgid "Meeting didn't exist in Zoom anymore"
 msgstr "A megbeszélés már nem létezett a Zoomban"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "Zoom Error: \"{}\""
 msgstr "Nagyítási hiba: \"{}\""
 
@@ -332,12 +337,14 @@ msgid "Problem deleting Zoom meeting"
 msgstr "Probléma a Zoom megbeszélés törlésével"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid "The meeting \"{}\" no longer exists in Zoom and was removed from the event"
 msgstr ""
 "A(z) „{}” megbeszélés már nem létezik a Zoomban, és eltávolításra került az "
 "eseményből"
 
 #: indico_vc_zoom/plugin.py
+#, python-brace-format
 msgid ""
 "The meeting \"{}\" is using Zoom registration and thus cannot be attached to"
 " the new event"
