@@ -1,0 +1,41 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  .llm-info {
+    color: $dark-gray;
+  }
+}
+
+.action-buttons-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+
+  .copy-button {
+    &:hover {
+      box-shadow: none !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+
+    display: flex;
+    gap: 5px;
+  }
+
+  .save-button {
+    margin-left: 10px;
+  }
+}
