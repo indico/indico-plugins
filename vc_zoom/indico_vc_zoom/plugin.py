@@ -46,7 +46,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                             'allow_webinars', 'phone_link']),
+                             'allow_webinars', 'auto_register', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                               'waiting_room']),
         (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
@@ -85,6 +85,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     allow_webinars = BooleanField(_('Allow Webinars (Experimental)'),
                                   widget=SwitchWidget(),
                                   description=_('Allow webinars to be created through Indico. Use at your own risk.'))
+
+    auto_register = BooleanField(_('Automatic registration'),
+                                 widget=SwitchWidget(),
+                                 description=_('Automatically register Indico registrants in Zoom meetings/webinars '
+                                               'once their Indico registration is complete.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -162,6 +167,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'authenticators': [],
         'enterprise_domain': '',
         'allow_webinars': False,
+        'auto_register': False,
         'mute_host_video': True,
         'mute_audio': True,
         'mute_participant_video': True,
@@ -177,6 +183,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.plugin.cli, self._extend_indico_cli)
         self.connect(signals.event.times_changed, self._check_meetings)
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
+        self.connect(signals.event.registration_created, self._registration_created)
+        self.connect(signals.event.registration_deleted, self._registration_deleted)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
             self.inject_bundle('main.js', wp)
@@ -357,6 +365,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'participant_video': not vc_room.data['mute_participant_video'],
                     'waiting_room': vc_room.data['waiting_room'],
                     'join_before_host': self.settings.get('join_before_host'),
+                    'approval_type': 0,
                 })
 
             kwargs.update({
@@ -621,3 +630,76 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             desc = 'Zoom:\n' + '\n'.join(urls)
 
         return {'description': (data['description'] + '\n\n' + desc).strip()}
+
+    def _registration_created(self, registration, **kwargs):
+        self._sync_registration(registration)
+
+    def _registration_deleted(self, registration, **kwargs):
+        self._sync_registration(registration, remove=True)
+
+    def _sync_registration(self, registration, remove=False):
+        from indico.modules.events.registration.models.registrations import RegistrationState
+        if not self.settings.get('auto_register'):
+            return
+        event = registration.event or registration.registration_form.event
+        if event is None:
+            return
+        zoom_rooms = [assoc.vc_room for assoc in event.vc_room_associations
+                      if assoc.vc_room.type == self.service_name]
+        if not zoom_rooms:
+            return
+
+        is_active = registration.state == RegistrationState.complete
+        should_be_registered = not remove and is_active
+
+        client = ZoomIndicoClient()
+        for vc_room in zoom_rooms:
+            zoom_id = vc_room.data['zoom_id']
+            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+
+            if should_be_registered:
+                data = {
+                    'email': registration.email,
+                    'first_name': registration.first_name,
+                    'last_name': registration.last_name,
+                    'auto_approve': True,
+                }
+                try:
+                    if is_webinar:
+                        client.add_webinar_registrant(zoom_id, data)
+                    else:
+                        client.add_meeting_registrant(zoom_id, data)
+                except HTTPError:
+                    self.logger.warning('Could not add registrant %s to Zoom %s %s',
+                                          registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+            else:
+                try:
+                    registrant_id = self._get_zoom_registrant_id(client, vc_room, registration.email)
+                    if registrant_id:
+                        status_data = {
+                            'action': 'cancel',
+                            'registrants': [{'id': registrant_id, 'email': registration.email}]
+                        }
+                        if is_webinar:
+                            client.update_webinar_registrants_status(zoom_id, status_data)
+                        else:
+                            client.update_meeting_registrants_status(zoom_id, status_data)
+                except HTTPError:
+                    self.logger.warning('Could not remove registrant %s from Zoom %s %s',
+                                          registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+
+    def _get_zoom_registrant_id(self, client, vc_room, email):
+        zoom_id = vc_room.data['zoom_id']
+        is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+        list_func = client.list_webinar_registrants if is_webinar else client.list_meeting_registrants
+
+        params = {'page_size': 300}
+        while True:
+            resp = list_func(zoom_id, **params)
+            for r in resp.get('registrants', []):
+                if r['email'].lower() == email.lower():
+                    return r['id']
+            if not resp.get('next_page_token'):
+                break
+            params['next_page_token'] = resp['next_page_token']
+        return None
