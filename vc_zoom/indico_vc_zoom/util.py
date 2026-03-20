@@ -108,15 +108,6 @@ def gen_random_password():
     return ''.join(secrets.choice(string.digits) for _ in range(8))
 
 
-def _get_error_data(response):
-    """Safely extract JSON error data from an HTTP response."""
-    try:
-        data = response.json()
-        return data if isinstance(data, dict) else {}
-    except ValueError:
-        return {}
-
-
 def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):
     """Fetch a Zoom meeting from the Zoom API.
 
@@ -130,8 +121,7 @@ def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):
             return client.get_webinar(vc_room.data['zoom_id']), True
         return client.get_meeting(vc_room.data['zoom_id']), False
     except HTTPError as e:
-        error_data = _get_error_data(e.response)
-        if e.response.status_code == 400 and error_data.get('code') == 3000:
+        if e.response.status_code == 400 and e.response.json().get('code') == 3000:
             # this meeting is actually a webinar -> query the webinar endpoint
             return fetch_zoom_meeting(vc_room, client, _is_webinar=True)
         elif e.response.status_code in {400, 404}:
@@ -160,8 +150,7 @@ def update_zoom_meeting(zoom_id, changes, is_webinar=False):
         from indico_vc_zoom.plugin import ZoomPlugin
         ZoomPlugin.logger.exception("Error updating meeting '%s': %s", zoom_id, e.response.content)
 
-        error_data = _get_error_data(e.response)
-        if error_data.get('code') == 3001:
+        if e.response.json()['code'] == 3001:
             # "Meeting does not exist"
             raise VCRoomNotFoundError(_('Meeting no longer exists in Zoom'))
 

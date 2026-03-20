@@ -37,9 +37,9 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.task import refresh_meetings
-from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, _get_error_data, fetch_zoom_meeting,
-                                 find_enterprise_email, gen_random_password, get_alt_host_emails, get_schedule_args,
-                                 get_url_data_args, process_alternative_hosts, update_zoom_meeting)
+from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
+                                 gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
+                                 process_alternative_hosts, update_zoom_meeting)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -458,9 +458,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 client.delete_meeting(zoom_id)
         except HTTPError as e:
-            error_data = _get_error_data(e.response)
             # if it's a webinar, delete that instead
-            if not _is_webinar and e.response.status_code == 400 and error_data.get('code') == 3000:
+            if not _is_webinar and e.response.status_code == 400 and e.response.json().get('code') == 3000:
                 self.delete_room(vc_room, event, _is_webinar=True)
                 return
             # if there's a 404, there is no problem, since the room is supposed to be gone anyway
@@ -469,7 +468,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     flash(_("Meeting didn't exist in Zoom anymore"), 'warning')
             elif e.response.status_code == 400:
                 # some sort of operational error on Zoom's side, deserves a specific error message
-                raise VCRoomError(_('Zoom Error: "{}"').format(error_data.get('message', '')))
+                raise VCRoomError(_('Zoom Error: "{}"').format(e.response.json()['message']))
             else:
                 self.logger.error("Can't delete meeting")
                 raise VCRoomError(_('Problem deleting Zoom meeting'))
