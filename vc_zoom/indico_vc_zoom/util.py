@@ -6,8 +6,8 @@
 # see the LICENSE file for more details.
 
 import itertools
-import random
 import re
+import secrets
 import string
 
 from requests.exceptions import HTTPError
@@ -105,7 +105,7 @@ def find_enterprise_email(user):
 
 def gen_random_password():
     """Generate a random 8-character-long numeric string."""
-    return ''.join(random.choice(string.digits) for _ in range(8))
+    return ''.join(secrets.choice(string.digits) for _ in range(8))
 
 
 def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):

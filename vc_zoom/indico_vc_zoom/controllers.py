@@ -63,9 +63,8 @@ class RHWebhook(RH):
         zoom_signature_header = request.headers.get('x-zm-signature')
         signature = self._get_hmac(b'v0:%s:%s' % (timestamp.encode(), request.data))
         expected_header = f'v0={signature}'
-        if zoom_signature_header != expected_header:
-            current_plugin.logger.warning('Received request with invalid signature: Expected %s, got %s, payload %s',
-                                          expected_header, zoom_signature_header, request.data.decode())
+        if not hmac.compare_digest(zoom_signature_header, expected_header):
+            current_plugin.logger.warning('Received request with invalid signature, payload %s', request.data.decode())
             raise Forbidden('Zoom signature verification failed')
 
     @use_kwargs({
