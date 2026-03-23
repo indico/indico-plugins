@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.3.6
+
+- Compare webhook HMAC token in a more secure manner
+- Generate random meeting passcodes in a more secure manner
+
 ### 3.3.5
 
 - Improve formatting of Zoom links inserted in iCal event descriptions
