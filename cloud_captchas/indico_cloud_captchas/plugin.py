@@ -6,6 +6,7 @@
 # see the LICENSE file for more details.
 
 import requests
+from flask import request
 from requests.exceptions import HTTPError, RequestException
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
@@ -86,6 +87,8 @@ class CloudCaptchasPlugin(CaptchaPluginMixin, IndicoPlugin):
         self.connect(signals.core.get_csp_script_sources, self._get_csp_script_sources)
 
     def _get_csp_script_sources(self, sender, **kwargs):
+        if not request.endpoint or request.endpoint.endswith('.static') or request.blueprint == 'assets':
+            return
         match self.settings.get('provider'):
             case CaptchaProvider.hcaptcha:
                 yield 'https://hcaptcha.com'
