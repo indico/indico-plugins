@@ -21,6 +21,7 @@ def zoom_plugin(app):
     plugin.settings.set_multi({
         'email_domains': ('megacorp.xyz',),
         'user_lookup_mode': 'email_domains',
+        'allow_language_interpretation': True,
     })
     return plugin
 
