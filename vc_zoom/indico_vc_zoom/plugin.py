@@ -46,7 +46,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                             'allow_webinars', 'phone_link']),
+                             'allow_webinars', 'allow_language_interpretation', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                               'waiting_room']),
         (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
@@ -85,6 +85,11 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     allow_webinars = BooleanField(_('Allow Webinars (Experimental)'),
                                   widget=SwitchWidget(),
                                   description=_('Allow webinars to be created through Indico. Use at your own risk.'))
+
+    allow_language_interpretation = BooleanField(_('Allow Language Interpretation'),
+                                                 widget=SwitchWidget(),
+                                                 description=_('Allow enabling language interpretation for meetings '
+                                                               'and webinars.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -162,6 +167,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'authenticators': [],
         'enterprise_domain': '',
         'allow_webinars': False,
+        'allow_language_interpretation': False,
         'mute_host_video': True,
         'mute_audio': True,
         'mute_participant_video': True,

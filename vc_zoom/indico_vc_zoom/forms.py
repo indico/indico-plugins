@@ -126,6 +126,10 @@ class VCRoomForm(VCRoomFormBase):
         if not allow_webinars:
             del self.meeting_type
 
+        if not current_plugin.settings.get('allow_language_interpretation'):
+            del self.language_interpretation
+            del self.interpreters
+
     language_interpretation = BooleanField(_('Language interpretation'),
                                            widget=SwitchWidget(),
                                            description=_('Enable interpretation for this meeting'))
