@@ -108,6 +108,33 @@ class VCRoomForm(VCRoomFormBase):
 
     description = TextAreaField(_('Description'), description=_('Optional description for this meeting'))
 
+    language_interpretation = BooleanField(_('Language interpretation'), widget=SwitchWidget(),
+                                           description=_('Enable interpretation for this meeting'))
+
+    interpreters = MultipleItemsField(
+        _('Interpreters'),
+        [HiddenUnless('language_interpretation')],
+        fields=[
+            {'id': 'email', 'caption': _('Email'), 'type': 'text', 'required': True},
+            {
+                'id': 'src_lang',
+                'caption': _('Source Language'),
+                'type': 'select',
+                'required': True,
+            },
+            {
+                'id': 'target_lang',
+                'caption': _('Target Language'),
+                'type': 'select',
+                'required': True,
+            },
+        ],
+        choices={
+            'src_lang': INTERPRETER_LANGUAGE_CHOICES,
+            'target_lang': INTERPRETER_LANGUAGE_CHOICES,
+        },
+    )
+
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
         if defaults.host_user is None and defaults.host is not None:
@@ -129,33 +156,6 @@ class VCRoomForm(VCRoomFormBase):
         if not current_plugin.settings.get('allow_language_interpretation'):
             del self.language_interpretation
             del self.interpreters
-
-    language_interpretation = BooleanField(_('Language interpretation'),
-                                           widget=SwitchWidget(),
-                                           description=_('Enable interpretation for this meeting'))
-
-    interpreters = MultipleItemsField(_('Interpreters'),
-                                      [HiddenUnless('language_interpretation')],
-                                      fields=[
-                                          {'id': 'email', 'caption': _('Email'), 'type': 'text', 'required': True},
-                                          {
-                                              'id': 'src_lang',
-                                              'caption': _('Source Language'),
-                                              'type': 'select',
-                                              'required': True,
-                                          },
-                                          {
-                                              'id': 'target_lang',
-                                              'caption': _('Target Language'),
-                                              'type': 'select',
-                                              'required': True,
-                                          },
-                                      ],
-                                      choices={
-                                          'src_lang': INTERPRETER_LANGUAGE_CHOICES,
-                                          'target_lang': INTERPRETER_LANGUAGE_CHOICES,
-                                      },
-                                      description=_('The email address and the two languages for each interpreter.'))
 
     def validate_host_choice(self, field):
         if field.data == 'myself':
