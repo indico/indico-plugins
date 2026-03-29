@@ -20,6 +20,11 @@ from indico.util.string import crc32
 token_cache = make_scoped_cache('zoom-api-token')
 
 
+def _get_token_cache_key(config):
+    cache_key_source = '-'.join((config['account_id'], config['client_id'], config['client_secret']))
+    return f'token-{crc32(cache_key_source)}'
+
+
 def format_iso_dt(d):
     """Convert a datetime objects to a UTC-based string.
 
@@ -312,6 +317,31 @@ class ZoomIndicoClient:
         return _handle_response(resp)
 
 
+def get_zoom_scopes(config):
+    """Get the set of OAuth scopes for the given Zoom credentials."""
+    account_id = config['account_id']
+    client_id = config['client_id']
+    client_secret = config['client_secret']
+
+    if not (account_id and client_id and client_secret):
+        return set()
+
+    try:
+        access_token, *_rest = get_zoom_token(config, for_config_check=True)
+    except Exception:
+        return set()
+    if not access_token:
+        return set()
+
+    # get_zoom_token populates the token_cache as a side effect;
+    # read it back to access the scope field, which is not in the return tuple.
+    token_data = token_cache.get(_get_token_cache_key(config))
+    if not token_data:
+        return set()
+
+    return set(token_data.get('scope', '').split())
+
+
 def get_zoom_token(config, *, force=False, for_config_check=False):
     from indico_vc_zoom.plugin import ZoomPlugin
 
@@ -323,8 +353,7 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         raise Exception('Zoom authentication not configured')
 
     ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
-    hash_key = '-'.join((account_id, client_id, client_secret))
-    cache_key = f'token-{crc32(hash_key)}'
+    cache_key = _get_token_cache_key(config)
     if not force and (token_data := token_cache.get(cache_key)):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
