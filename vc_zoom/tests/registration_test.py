@@ -306,3 +306,126 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
     assert status_data['action'] == 'cancel'
     cancelled_emails = {r['email'] for r in status_data['registrants']}
     assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
+
+
+def _create_vc_room_with_assoc(db, event, zoom_user):
+    """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
+    vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
+    vc_room.data = {
+        'zoom_id': 'zmeeting_manual',
+        'meeting_type': 'regular',
+        'host': 'User:1',
+    }
+    assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
+                                   data={'password_visibility': 'everyone'})
+    db.session.add(vc_room)
+    db.session.add(assoc)
+    db.session.flush()
+    return vc_room, assoc
+
+
+def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, last_name):
+    """Create a completed registration while auto_register is off to avoid triggering sync."""
+    data = {'email': email, 'first_name': first_name, 'last_name': last_name, 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = email
+
+    prev = zoom_plugin.settings.get('auto_register')
+    zoom_plugin.settings.set('auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+    registration.state = RegistrationState.complete
+    db.session.flush()
+    zoom_plugin.settings.set('auto_register', prev)
+    return registration
+
+
+def test_vc_room_created_syncs_existing_registrations(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+    """Creating a Zoom meeting should sync pre-existing completed registrations."""
+    event = reg_form.event
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
+    assert reg_data['email'] == 'test@example.com'
+    assert reg_data['first_name'] == 'John'
+
+
+def test_vc_room_created_auto_register_disabled(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+    """No sync when auto_register is disabled."""
+    event = reg_form.event
+    _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('auto_register', False)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+
+def test_vc_room_created_skips_non_complete_registrations(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+    """Only completed registrations are synced to Zoom on room creation."""
+    event = reg_form.event
+
+    data = {'email': 'pending@example.com', 'first_name': 'Pending', 'last_name': 'User', 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = data['email']
+
+    zoom_plugin.settings.set('auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+    registration.state = RegistrationState.pending
+    db.session.flush()
+
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+
+def test_collect_room_ops_deduplicates_by_email(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                 create_event):
+    """Two registrations with the same email (from different forms) should produce one Zoom registrant."""
+    event = reg_form.event
+
+    # Create a second registration form on the same event
+    reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
+    section = RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    reg_form_2.sections.append(section)
+    create_personal_data_fields(reg_form_2)
+    event.registration_forms.append(reg_form_2)
+    db.session.flush()
+
+    # Register same email in both forms
+    reg1 = _make_complete_registration(db, zoom_plugin, reg_form, 'dupe@example.com', 'John', 'Doe')
+    reg2 = _make_complete_registration(db, zoom_plugin, reg_form_2, 'dupe@example.com', 'John', 'Doe')
+    assert reg1.id != reg2.id
+
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    # Should only call once despite two registrations with the same email
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
+    assert reg_data['email'] == 'dupe@example.com'
