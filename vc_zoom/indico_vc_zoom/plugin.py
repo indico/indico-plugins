@@ -248,6 +248,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.registration_deleted, self._registration_deleted)
         self.connect(signals.event.registration_state_updated, self._registration_state_updated)
         self.connect(signals.event.registration_form_deleted, self._registration_form_deleted)
+        self.connect(signals.vc.vc_room_created, self._vc_room_created)
         self.connect(signals.core.after_process, self._flush_pending_registrations)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
@@ -748,6 +749,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _registration_form_deleted(self, registration_form, **kwargs):
         for registration in registration_form.active_registrations:
             self._queue_registration_sync(registration, remove=True)
+
+    def _vc_room_created(self, vc_room, event, **kwargs):
+        if vc_room.type != self.service_name or not self.settings.get('auto_register'):
+            return
+        for regform in event.registration_forms:
+            for registration in regform.active_registrations:
+                if registration.state == RegistrationState.complete:
+                    self._queue_registration_sync(registration, remove=False)
 
     def _get_registrant_email(self, registration):
         if registration.user:
