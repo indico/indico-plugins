@@ -248,6 +248,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.registration_deleted, self._registration_deleted)
         self.connect(signals.event.registration_state_updated, self._registration_state_updated)
         self.connect(signals.event.registration_form_deleted, self._registration_form_deleted)
+        self.connect(signals.core.after_process, self._flush_pending_registrations)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
             self.inject_bundle('main.js', wp)
@@ -733,20 +734,20 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return {'description': (data['description'] + '\n\n' + desc).strip()}
 
     def _registration_created(self, registration, **kwargs):
-        self._sync_registration(registration, remove=False)
+        self._queue_registration_sync(registration, remove=False)
 
     def _registration_deleted(self, registration, **kwargs):
-        self._sync_registration(registration, remove=True)
+        self._queue_registration_sync(registration, remove=True)
 
     def _registration_state_updated(self, registration, **kwargs):
         if registration.state == RegistrationState.complete:
-            self._sync_registration(registration, remove=False)
+            self._queue_registration_sync(registration, remove=False)
         elif registration.state == RegistrationState.withdrawn:
-            self._sync_registration(registration, remove=True)
+            self._queue_registration_sync(registration, remove=True)
 
     def _registration_form_deleted(self, registration_form, **kwargs):
         for registration in registration_form.active_registrations:
-            self._sync_registration(registration, remove=True)
+            self._queue_registration_sync(registration, remove=True)
 
     def _get_registrant_email(self, registration):
         if registration.user:
@@ -755,69 +756,106 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return enterprise_email
         return registration.email
 
-    def _sync_registration(self, registration, *, remove):
+    def _queue_registration_sync(self, registration, *, remove):
         if not self.settings.get('auto_register'):
             return
-        event = registration.event or registration.registration_form.event
-        if event is None:
-            return
-        zoom_rooms = [assoc.vc_room for assoc in event.vc_room_associations
-                      if assoc.vc_room.type == self.service_name]
-        if not zoom_rooms:
+        pending = g.setdefault('zoom_pending_registrations', {})
+        pending[registration.id] = (registration, remove)
+
+    def _flush_pending_registrations(self, sender, **kwargs):
+        pending = g.pop('zoom_pending_registrations', None)
+        if not pending:
             return
 
-        is_active = registration.state == RegistrationState.complete
-        should_be_registered = not remove and is_active
-        email = self._get_registrant_email(registration)
+        room_ops = self._collect_room_ops(pending)
+        if not room_ops:
+            return
 
         client = ZoomIndicoClient()
-        for vc_room in zoom_rooms:
-            zoom_id = vc_room.data['zoom_id']
-            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+        for zoom_id, ops in room_ops.items():
+            is_webinar = ops['vc_room'].data.get('meeting_type') == 'webinar'
+            self._add_registrants(client, zoom_id, ops['add'], is_webinar)
+            self._remove_registrants(client, zoom_id, ops['vc_room'], ops['remove'], is_webinar)
 
-            if should_be_registered:
-                data = {
-                    'email': email,
-                    'first_name': registration.first_name,
-                    'last_name': registration.last_name,
-                    'auto_approve': True,
-                }
-                try:
-                    if is_webinar:
-                        client.add_webinar_registrant(zoom_id, data)
-                    else:
-                        client.add_meeting_registrant(zoom_id, data)
-                except HTTPError:
-                    self.logger.warning('Could not add registrant %s to Zoom %s %s',
-                                        email, 'webinar' if is_webinar else 'meeting', zoom_id)
+    def _collect_room_ops(self, pending):
+        room_ops = {}
+        for registration, remove in pending.values():
+            event = registration.event or registration.registration_form.event
+            if event is None:
+                continue
+            zoom_rooms = [assoc.vc_room for assoc in event.vc_room_associations
+                          if assoc.vc_room.type == self.service_name]
+            if not zoom_rooms:
+                continue
+
+            is_active = registration.state == RegistrationState.complete
+            should_add = not remove and is_active
+            email = self._get_registrant_email(registration)
+
+            for vc_room in zoom_rooms:
+                zoom_id = vc_room.data['zoom_id']
+                if zoom_id not in room_ops:
+                    room_ops[zoom_id] = {'add': {}, 'remove': set(), 'vc_room': vc_room}
+
+                if should_add:
+                    room_ops[zoom_id]['add'][email] = {
+                        'email': email,
+                        'first_name': registration.first_name,
+                        'last_name': registration.last_name,
+                    }
+                else:
+                    room_ops[zoom_id]['remove'].add(email)
+        for ops in room_ops.values():
+            ops['add'] = list(ops['add'].values())
+        return room_ops
+
+    def _add_registrants(self, client, zoom_id, registrants, is_webinar):
+        for reg_data in registrants:
+            data = {**reg_data, 'auto_approve': True}
+            try:
+                if is_webinar:
+                    client.add_webinar_registrant(zoom_id, data)
+                else:
+                    client.add_meeting_registrant(zoom_id, data)
+            except HTTPError:
+                self.logger.warning('Could not add registrant %s to Zoom %s %s',
+                                    reg_data['email'], 'webinar' if is_webinar else 'meeting', zoom_id)
+
+    def _remove_registrants(self, client, zoom_id, vc_room, emails, is_webinar):
+        if not emails:
+            return
+        try:
+            registrant_map = self._find_zoom_registrant_ids(client, vc_room, emails)
+            if not registrant_map:
+                return
+            status_data = {
+                'action': 'cancel',
+                'registrants': [{'id': rid, 'email': email}
+                                for email, rid in registrant_map.items()]
+            }
+            if is_webinar:
+                client.update_webinar_registrants_status(zoom_id, status_data)
             else:
-                try:
-                    registrant_id = self._get_zoom_registrant_id(client, vc_room, email)
-                    if registrant_id:
-                        status_data = {
-                            'action': 'cancel',
-                            'registrants': [{'id': registrant_id, 'email': email}]
-                        }
-                        if is_webinar:
-                            client.update_webinar_registrants_status(zoom_id, status_data)
-                        else:
-                            client.update_meeting_registrants_status(zoom_id, status_data)
-                except HTTPError:
-                    self.logger.warning('Could not remove registrant %s from Zoom %s %s',
-                                        email, 'webinar' if is_webinar else 'meeting', zoom_id)
+                client.update_meeting_registrants_status(zoom_id, status_data)
+        except HTTPError:
+            self.logger.warning('Could not remove registrants from Zoom %s %s',
+                                'webinar' if is_webinar else 'meeting', zoom_id)
 
-    def _get_zoom_registrant_id(self, client, vc_room, email):
+    def _find_zoom_registrant_ids(self, client, vc_room, emails):
         zoom_id = vc_room.data['zoom_id']
         is_webinar = vc_room.data.get('meeting_type') == 'webinar'
         list_func = client.list_webinar_registrants if is_webinar else client.list_meeting_registrants
 
+        found = {}
+        remaining = {e.lower() for e in emails}
         params = {'page_size': 300}
-        while True:
+        while remaining:
             resp = list_func(zoom_id, **params)
             for r in resp.get('registrants', []):
-                if r['email'].lower() == email.lower():
-                    return r['id']
+                if r['email'].lower() in remaining:
+                    found[r['email'].lower()] = r['id']
+                    remaining.discard(r['email'].lower())
             if not resp.get('next_page_token'):
                 break
             params['next_page_token'] = resp['next_page_token']
-        return None
+        return found
