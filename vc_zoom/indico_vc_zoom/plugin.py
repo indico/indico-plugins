@@ -18,6 +18,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
+from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -245,6 +246,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.metadata_postprocess, self._event_metadata_postprocess, sender='ical-export')
         self.connect(signals.event.registration_created, self._registration_created)
         self.connect(signals.event.registration_deleted, self._registration_deleted)
+        self.connect(signals.event.registration_state_updated, self._registration_state_updated)
+        self.connect(signals.event.registration_form_deleted, self._registration_form_deleted)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
             self.inject_bundle('main.js', wp)
@@ -735,6 +738,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _registration_deleted(self, registration, **kwargs):
         self._sync_registration(registration, remove=True)
 
+    def _registration_state_updated(self, registration, **kwargs):
+        if registration.state == RegistrationState.complete:
+            self._sync_registration(registration, remove=False)
+        elif registration.state == RegistrationState.withdrawn:
+            self._sync_registration(registration, remove=True)
+
+    def _registration_form_deleted(self, registration_form, **kwargs):
+        for registration in registration_form.active_registrations:
+            self._sync_registration(registration, remove=True)
+
     def _get_registrant_email(self, registration):
         if registration.user:
             enterprise_email = find_enterprise_email(registration.user)
@@ -743,7 +756,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return registration.email
 
     def _sync_registration(self, registration, *, remove):
-        from indico.modules.events.registration.models.registrations import RegistrationState
         if not self.settings.get('auto_register'):
             return
         event = registration.event or registration.registration_form.event
