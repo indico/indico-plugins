@@ -94,7 +94,8 @@ def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_fo
 
     zoom_plugin.settings.set('auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
-    zoom_plugin._sync_registration(registration, remove=False)
+    zoom_plugin._queue_registration_sync(registration, remove=False)
+    zoom_plugin._flush_pending_registrations(None)
 
     assert zoom_api_registrants['add_meeting_registrant'].called
     # We might have multiple calls, check if John Doe was registered
@@ -104,6 +105,7 @@ def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_fo
     # Delete registration
     zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
     signals.event.registration_deleted.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
 
     assert zoom_api_registrants['update_meeting_registrants_status'].called
     assert any(args[1]['action'] == 'cancel' and args[1]['registrants'][0]['email'] == 'test@example.com'
@@ -132,6 +134,7 @@ def test_registration_sync_disabled(db, zoom_plugin, zoom_api_registrants, reg_f
     registration.state = RegistrationState.complete
 
     signals.event.registration_created.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
@@ -162,6 +165,7 @@ def test_registration_state_updated_approve(db, zoom_plugin, zoom_api_registrant
     registration.state = RegistrationState.complete
     db.session.flush()
     signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.pending)
+    zoom_plugin._flush_pending_registrations(None)
 
     assert zoom_api_registrants['add_meeting_registrant'].called
 
@@ -194,6 +198,7 @@ def test_registration_state_updated_withdraw(db, zoom_plugin, zoom_api_registran
     registration.state = RegistrationState.withdrawn
     db.session.flush()
     signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.complete)
+    zoom_plugin._flush_pending_registrations(None)
 
     assert zoom_api_registrants['update_meeting_registrants_status'].called
     assert any(args[1]['action'] == 'cancel'
@@ -242,8 +247,62 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
 
     zoom_plugin.settings.set('auto_register', True)
     zoom_api_registrants['add_webinar_registrant'].reset_mock()
-    zoom_plugin._sync_registration(registration, remove=False)
+    zoom_plugin._queue_registration_sync(registration, remove=False)
+    zoom_plugin._flush_pending_registrations(None)
 
     assert zoom_api_registrants['add_webinar_registrant'].called
     assert any(args[1]['email'] == 'test@example.com' and args[1]['first_name'] == 'John'
                for args, _kwargs in zoom_api_registrants['add_webinar_registrant'].call_args_list)
+
+
+def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_registrants, reg_form,
+                                                     create_zoom_meeting, test_client, zoom_user):
+    """Deleting a form with multiple registrations should batch API calls (one list + one cancel per meeting)."""
+    zoom_plugin.settings.set('auto_register', True)
+    event = reg_form.event
+    event.update_principal(zoom_user, full_access=True)
+    db.session.flush()
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(zoom_user)
+    create_zoom_meeting(event, 'event')
+
+    # Create two registrations with different emails
+    zoom_plugin.settings.set('auto_register', False)
+    registrations = []
+    for email, first, last in [('alice@example.com', 'Alice', 'Smith'), ('bob@example.com', 'Bob', 'Jones')]:
+        person = {'email': email, 'first_name': first, 'last_name': last, 'affiliation': 'MegaCorp'}
+        form_data = {f.html_field_name: person[f.personal_data_type.name]
+                     for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in person}
+        form_data['email'] = email
+        reg = create_registration(reg_form, form_data)
+        db.session.flush()
+        reg.state = RegistrationState.complete
+        db.session.flush()
+        registrations.append(reg)
+
+    # Mock list to return both registrants in one page
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [
+            {'id': 'reg_alice', 'email': 'alice@example.com'},
+            {'id': 'reg_bob', 'email': 'bob@example.com'},
+        ]
+    }
+
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['list_meeting_registrants'].reset_mock()
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+
+    # Delete the registration form: should queue all removals, then batch them on flush
+    signals.event.registration_form_deleted.send(reg_form)
+    zoom_plugin._flush_pending_registrations(None)
+
+    # Only ONE list call and ONE status update (batched), not two of each
+    assert zoom_api_registrants['list_meeting_registrants'].call_count == 1
+    assert zoom_api_registrants['update_meeting_registrants_status'].call_count == 1
+
+    # The cancel should include both registrants
+    status_data = zoom_api_registrants['update_meeting_registrants_status'].call_args[0][1]
+    assert status_data['action'] == 'cancel'
+    cancelled_emails = {r['email'] for r in status_data['registrants']}
+    assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
