@@ -730,7 +730,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return {'description': (data['description'] + '\n\n' + desc).strip()}
 
     def _registration_created(self, registration, **kwargs):
-        self._sync_registration(registration)
+        self._sync_registration(registration, remove=False)
 
     def _registration_deleted(self, registration, **kwargs):
         self._sync_registration(registration, remove=True)
@@ -742,7 +742,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return enterprise_email
         return registration.email
 
-    def _sync_registration(self, registration, remove=False):
+    def _sync_registration(self, registration, *, remove):
         from indico.modules.events.registration.models.registrations import RegistrationState
         if not self.settings.get('auto_register'):
             return
