@@ -94,7 +94,7 @@ def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_fo
 
     zoom_plugin.settings.set('auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
-    zoom_plugin._sync_registration(registration)
+    zoom_plugin._sync_registration(registration, remove=False)
 
     assert zoom_api_registrants['add_meeting_registrant'].called
     # We might have multiple calls, check if John Doe was registered
@@ -178,7 +178,7 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
 
     zoom_plugin.settings.set('auto_register', True)
     zoom_api_registrants['add_webinar_registrant'].reset_mock()
-    zoom_plugin._sync_registration(registration)
+    zoom_plugin._sync_registration(registration, remove=False)
 
     assert zoom_api_registrants['add_webinar_registrant'].called
     assert any(args[1]['email'] == 'test@example.com' and args[1]['first_name'] == 'John'
