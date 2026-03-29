@@ -238,6 +238,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'send_host_url': False,
         'phone_link': '',
     }
+    # Limited to 30 by Zoom API.
+    # See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
+    _BATCH_REGISTRANTS_MAX = 30
 
     def init(self):
         super().init()
@@ -819,16 +822,35 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return room_ops
 
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
-        for reg_data in registrants:
-            data = {**reg_data, 'auto_approve': True}
+        if not registrants:
+            return
+        if len(registrants) == 1:
+            self._add_single_registrant(client, zoom_id, registrants[0], is_webinar)
+        else:
+            self._add_batch_registrants(client, zoom_id, registrants, is_webinar)
+
+    def _add_single_registrant(self, client, zoom_id, reg_data, is_webinar):
+        data = {**reg_data, 'auto_approve': True}
+        try:
+            if is_webinar:
+                client.add_webinar_registrant(zoom_id, data)
+            else:
+                client.add_meeting_registrant(zoom_id, data)
+        except HTTPError:
+            self.logger.warning('Could not add registrant %s to Zoom %s %s',
+                                reg_data['email'], 'webinar' if is_webinar else 'meeting', zoom_id)
+
+    def _add_batch_registrants(self, client, zoom_id, registrants, is_webinar):
+        batch_func = client.batch_webinar_registrants if is_webinar else client.batch_meeting_registrants
+        for i in range(0, len(registrants), self._BATCH_REGISTRANTS_MAX):
+            chunk = registrants[i:i + self._BATCH_REGISTRANTS_MAX]
+            data = {'auto_approve': True, 'registrants': chunk}
             try:
-                if is_webinar:
-                    client.add_webinar_registrant(zoom_id, data)
-                else:
-                    client.add_meeting_registrant(zoom_id, data)
+                batch_func(zoom_id, data)
             except HTTPError:
-                self.logger.warning('Could not add registrant %s to Zoom %s %s',
-                                    reg_data['email'], 'webinar' if is_webinar else 'meeting', zoom_id)
+                emails = ', '.join(r['email'] for r in chunk)
+                self.logger.warning('Could not batch-add registrants to Zoom %s %s: %s',
+                                    'webinar' if is_webinar else 'meeting', zoom_id, emails)
 
     def _remove_registrants(self, client, zoom_id, vc_room, emails, is_webinar):
         if not emails:

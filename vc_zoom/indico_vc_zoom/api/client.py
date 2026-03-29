@@ -130,6 +130,11 @@ class MeetingComponent(BaseComponent):
             f'{self.base_uri}/meetings/{meeting_id}/registrants', json=kwargs
         )
 
+    def batch_registrants(self, meeting_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/meetings/{meeting_id}/batch_registrants', json=kwargs
+        )
+
     def update_registrants_status(self, meeting_id, **kwargs):
         return self.session.put(
             f'{self.base_uri}/meetings/{meeting_id}/registrants/status', json=kwargs
@@ -178,6 +183,11 @@ class WebinarComponent(BaseComponent):
     def add_registrant(self, webinar_id, **kwargs):
         return self.session.post(
             f'{self.base_uri}/webinars/{webinar_id}/registrants', json=kwargs
+        )
+
+    def batch_registrants(self, webinar_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/webinars/{webinar_id}/batch_registrants', json=kwargs
         )
 
     def update_registrants_status(self, webinar_id, **kwargs):
@@ -281,6 +291,9 @@ class ZoomIndicoClient:
     def add_meeting_registrant(self, meeting_id, data):
         return _handle_response(self.client.meeting.add_registrant(meeting_id, **data), 201)
 
+    def batch_meeting_registrants(self, meeting_id, data):
+        return _handle_response(self.client.meeting.batch_registrants(meeting_id, **data), 201)
+
     def update_meeting_registrants_status(self, meeting_id, data):
         return _handle_response(self.client.meeting.update_registrants_status(meeting_id, **data), 204,
                                 expects_json=False)
@@ -305,6 +318,9 @@ class ZoomIndicoClient:
 
     def add_webinar_registrant(self, webinar_id, data):
         return _handle_response(self.client.webinar.add_registrant(webinar_id, **data), 201)
+
+    def batch_webinar_registrants(self, webinar_id, data):
+        return _handle_response(self.client.webinar.batch_registrants(webinar_id, **data), 201)
 
     def update_webinar_registrants_status(self, webinar_id, data):
         return _handle_response(self.client.webinar.update_registrants_status(webinar_id, **data), 204,
