@@ -736,6 +736,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _registration_deleted(self, registration, **kwargs):
         self._sync_registration(registration, remove=True)
 
+    def _get_registrant_email(self, registration):
+        if registration.user:
+            enterprise_email = find_enterprise_email(registration.user)
+            if enterprise_email:
+                return enterprise_email
+        return registration.email
+
     def _sync_registration(self, registration, remove=False):
         from indico.modules.events.registration.models.registrations import RegistrationState
         if not self.settings.get('auto_register'):
@@ -750,6 +757,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         is_active = registration.state == RegistrationState.complete
         should_be_registered = not remove and is_active
+        email = self._get_registrant_email(registration)
 
         client = ZoomIndicoClient()
         for vc_room in zoom_rooms:
@@ -758,7 +766,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             if should_be_registered:
                 data = {
-                    'email': registration.email,
+                    'email': email,
                     'first_name': registration.first_name,
                     'last_name': registration.last_name,
                     'auto_approve': True,
@@ -770,14 +778,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         client.add_meeting_registrant(zoom_id, data)
                 except HTTPError:
                     self.logger.warning('Could not add registrant %s to Zoom %s %s',
-                                        registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+                                        email, 'webinar' if is_webinar else 'meeting', zoom_id)
             else:
                 try:
-                    registrant_id = self._get_zoom_registrant_id(client, vc_room, registration.email)
+                    registrant_id = self._get_zoom_registrant_id(client, vc_room, email)
                     if registrant_id:
                         status_data = {
                             'action': 'cancel',
-                            'registrants': [{'id': registrant_id, 'email': registration.email}]
+                            'registrants': [{'id': registrant_id, 'email': email}]
                         }
                         if is_webinar:
                             client.update_webinar_registrants_status(zoom_id, status_data)
@@ -785,7 +793,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                             client.update_meeting_registrants_status(zoom_id, status_data)
                 except HTTPError:
                     self.logger.warning('Could not remove registrant %s from Zoom %s %s',
-                                        registration.email, 'webinar' if is_webinar else 'meeting', zoom_id)
+                                        email, 'webinar' if is_webinar else 'meeting', zoom_id)
 
     def _get_zoom_registrant_id(self, client, vc_room, email):
         zoom_id = vc_room.data['zoom_id']
