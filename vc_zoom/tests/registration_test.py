@@ -344,7 +344,7 @@ def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, la
 def test_vc_room_created_syncs_existing_registrations(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Creating a Zoom meeting should sync pre-existing completed registrations."""
     event = reg_form.event
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
@@ -374,7 +374,8 @@ def test_vc_room_created_auto_register_disabled(db, smtp, zoom_plugin, zoom_api_
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
-def test_vc_room_created_skips_non_complete_registrations(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_vc_room_created_skips_non_complete_registrations(db, smtp, zoom_plugin, zoom_api_registrants,
+                                                          reg_form, zoom_user):
     """Only completed registrations are synced to Zoom on room creation."""
     event = reg_form.event
 
