@@ -125,7 +125,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                  widget=SwitchWidget(),
                                  description=_('Automatically register Indico registrants in Zoom meetings/webinars '
                                                'once their Indico registration is complete. Requires the Zoom API '
-                                               'scopes {}. If webinars are enabled, add {} as well.')
+                                               'scopes {}. If webinars are enabled, add {} as well. Consider setting '
+                                               '"Passcode visibility" to "No one" so participants '
+                                               'only receive their personalized join link.')
                                  .format(_format_zoom_scopes(AUTO_REGISTRATION_MEETING_SCOPES),
                                          _format_zoom_scopes(AUTO_REGISTRATION_WEBINAR_SCOPES)))
 
