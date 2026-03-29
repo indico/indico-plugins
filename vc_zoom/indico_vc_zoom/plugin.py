@@ -791,6 +791,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             self._remove_registrants(client, zoom_id, ops['vc_room'], ops['remove'], is_webinar)
 
     def _collect_room_ops(self, pending):
+        pending_remove_ids = {reg.id for reg, remove in pending.values() if remove}
         room_ops = {}
         for registration, remove in pending.values():
             event = registration.event or registration.registration_form.event
@@ -804,6 +805,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             is_active = registration.state == RegistrationState.complete
             should_add = not remove and is_active
             email = self._get_registrant_email(registration)
+
+            if not should_add and self._has_other_active_registration(event, email, pending_remove_ids):
+                continue
 
             for vc_room in zoom_rooms:
                 zoom_id = vc_room.data['zoom_id']
@@ -821,6 +825,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         for ops in room_ops.values():
             ops['add'] = list(ops['add'].values())
         return room_ops
+
+    def _has_other_active_registration(self, event, email, exclude_ids):
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        from indico.modules.events.registration.models.registrations import Registration
+
+        return (Registration.query.with_parent(event)
+                .join(Registration.registration_form)
+                .filter(Registration.email == email.lower(),
+                        Registration.state == RegistrationState.complete,
+                        ~Registration.is_deleted,
+                        ~RegistrationForm.is_deleted,
+                        Registration.id.notin_(exclude_ids))
+                .has_rows())
 
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
         if not registrants:
