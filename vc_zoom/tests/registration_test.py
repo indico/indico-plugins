@@ -56,6 +56,11 @@ def zoom_api_registrants(zoom_api, mocker):
     zoom_api['list_webinar_registrants'] = mocker.patch(
         'indico_vc_zoom.plugin.ZoomIndicoClient.list_webinar_registrants')
 
+    zoom_api['batch_meeting_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_meeting_registrants')
+    zoom_api['batch_webinar_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_webinar_registrants')
+
     zoom_api['list_meeting_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
     zoom_api['list_webinar_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
 
@@ -430,3 +435,56 @@ def test_collect_room_ops_deduplicates_by_email(db, smtp, zoom_plugin, zoom_api_
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
     reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
     assert reg_data['email'] == 'dupe@example.com'
+
+
+def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registrants, reg_form,
+                                               create_zoom_meeting, test_client, zoom_user):
+    """A single registrant should use add_meeting_registrant, not batch."""
+    zoom_plugin.settings.set('auto_register', True)
+    event = reg_form.event
+    event.update_principal(zoom_user, full_access=True)
+    db.session.flush()
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(zoom_user)
+    create_zoom_meeting(event, 'event')
+
+    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'solo@example.com', 'Solo', 'User')
+
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    zoom_api_registrants['batch_meeting_registrants'].reset_mock()
+
+    zoom_plugin._queue_registration_sync(reg, remove=False)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    zoom_api_registrants['batch_meeting_registrants'].assert_not_called()
+
+
+def test_multiple_registrants_uses_batch_api(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+    """Two or more registrants should use batch_meeting_registrants."""
+    event = reg_form.event
+    _make_complete_registration(db, zoom_plugin, reg_form, 'alice@example.com', 'Alice', 'Smith')
+
+    reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
+    section = RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    reg_form_2.sections.append(section)
+    create_personal_data_fields(reg_form_2)
+    event.registration_forms.append(reg_form_2)
+    db.session.flush()
+    _make_complete_registration(db, zoom_plugin, reg_form_2, 'bob@example.com', 'Bob', 'Jones')
+
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    zoom_api_registrants['batch_meeting_registrants'].reset_mock()
+
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
+    batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
+    batch_emails = {r['email'] for r in batch_data['registrants']}
+    assert batch_emails == {'alice@example.com', 'bob@example.com'}
