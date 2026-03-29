@@ -488,3 +488,42 @@ def test_multiple_registrants_uses_batch_api(db, smtp, zoom_plugin, zoom_api_reg
     batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
     batch_emails = {r['email'] for r in batch_data['registrants']}
     assert batch_emails == {'alice@example.com', 'bob@example.com'}
+
+
+def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin, zoom_api_registrants, reg_form,
+                                                                  create_zoom_meeting, test_client, zoom_user):
+    """Deleting a form should not cancel a user's Zoom registration if they're still registered via another form."""
+    zoom_plugin.settings.set('auto_register', True)
+    event = reg_form.event
+    event.update_principal(zoom_user, full_access=True)
+    db.session.flush()
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(zoom_user)
+    create_zoom_meeting(event, 'event')
+
+    # Create a second registration form on the same event
+    reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
+    section = RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    reg_form_2.sections.append(section)
+    create_personal_data_fields(reg_form_2)
+    event.registration_forms.append(reg_form_2)
+    db.session.flush()
+
+    # Register same user in both forms
+    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
+    _make_complete_registration(db, zoom_plugin, reg_form_2, 'shared@example.com', 'Shared', 'User')
+
+    # Mock list to return the shared registrant so the cancel would actually fire
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg_shared', 'email': 'shared@example.com'}]
+    }
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+
+    # Delete the first form; user still has a valid registration via form 2
+    signals.event.registration_form_deleted.send(reg_form)
+    zoom_plugin._flush_pending_registrations(None)
+
+    # Should NOT cancel the Zoom registration since user is still registered via form 2
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
