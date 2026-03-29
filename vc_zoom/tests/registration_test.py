@@ -136,6 +136,70 @@ def test_registration_sync_disabled(db, zoom_plugin, zoom_api_registrants, reg_f
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
+def test_registration_state_updated_approve(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
+                                             test_client, zoom_user):
+    zoom_plugin.settings.set('auto_register', True)
+    event = reg_form.event
+    event.update_principal(zoom_user, full_access=True)
+    db.session.flush()
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(zoom_user)
+    create_zoom_meeting(event, 'event')
+
+    data = {'email': 'test@example.com', 'first_name': 'John', 'last_name': 'Doe', 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = data['email']
+
+    zoom_plugin.settings.set('auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+
+    # Simulate approving a pending registration
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    registration.state = RegistrationState.complete
+    db.session.flush()
+    signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.pending)
+
+    assert zoom_api_registrants['add_meeting_registrant'].called
+
+
+def test_registration_state_updated_withdraw(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
+                                              test_client, zoom_user):
+    zoom_plugin.settings.set('auto_register', True)
+    event = reg_form.event
+    event.update_principal(zoom_user, full_access=True)
+    db.session.flush()
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(zoom_user)
+    create_zoom_meeting(event, 'event')
+
+    data = {'email': 'test@example.com', 'first_name': 'John', 'last_name': 'Doe', 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = data['email']
+
+    zoom_plugin.settings.set('auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+    registration.state = RegistrationState.complete
+    db.session.flush()
+
+    # Simulate withdrawing a registration
+    zoom_plugin.settings.set('auto_register', True)
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+    registration.state = RegistrationState.withdrawn
+    db.session.flush()
+    signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.complete)
+
+    assert zoom_api_registrants['update_meeting_registrants_status'].called
+    assert any(args[1]['action'] == 'cancel'
+               for args, _kwargs in zoom_api_registrants['update_meeting_registrants_status'].call_args_list)
+
+
 def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, mocker,
                                    zoom_user):
     zoom_plugin.settings.set('auto_register', True)
