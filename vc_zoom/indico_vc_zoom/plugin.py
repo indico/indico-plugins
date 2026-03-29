@@ -31,7 +31,7 @@ from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
-from indico_vc_zoom.api.client import get_zoom_token
+from indico_vc_zoom.api.client import get_zoom_scopes, get_zoom_token
 from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
@@ -40,6 +40,36 @@ from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
                                  process_alternative_hosts, update_zoom_meeting)
+
+
+AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin')
+AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin')
+AUTO_REGISTRATION_WEBINAR_SCOPES = ('webinar:read:list_registrants:admin', 'webinar:write:registrant:admin')
+AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES = ('webinar:read:admin', 'webinar:write:admin')
+# Zoom may return broad webinar scopes in the token instead of the granular registrant ones
+AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES = ('webinar:read:webinar:admin', 'webinar:write:webinar:admin')
+AUTO_REGISTRATION_SCOPE_OPTIONS = {
+    'meeting': (frozenset(AUTO_REGISTRATION_MEETING_SCOPES), frozenset(AUTO_REGISTRATION_LEGACY_MEETING_SCOPES)),
+    'webinar': (frozenset(AUTO_REGISTRATION_WEBINAR_SCOPES), frozenset(AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES),
+                frozenset(AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES)),
+}
+
+
+def _format_zoom_scopes(scopes):
+    return ', '.join(f'"{scope}"' for scope in scopes)
+
+
+def _has_required_zoom_scopes(granted_scopes, scope_options):
+    return any(required_scopes <= granted_scopes for required_scopes in scope_options)
+
+
+def _get_missing_auto_registration_scopes(granted_scopes, *, allow_webinars):
+    missing_scopes = []
+    if not _has_required_zoom_scopes(granted_scopes, AUTO_REGISTRATION_SCOPE_OPTIONS['meeting']):
+        missing_scopes.extend(AUTO_REGISTRATION_MEETING_SCOPES)
+    if allow_webinars and not _has_required_zoom_scopes(granted_scopes, AUTO_REGISTRATION_SCOPE_OPTIONS['webinar']):
+        missing_scopes.extend(AUTO_REGISTRATION_WEBINAR_SCOPES)
+    return tuple(missing_scopes)
 
 
 class PluginSettingsForm(VCPluginSettingsFormBase):
@@ -94,7 +124,10 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     auto_register = BooleanField(_('Automatic registration'),
                                  widget=SwitchWidget(),
                                  description=_('Automatically register Indico registrants in Zoom meetings/webinars '
-                                               'once their Indico registration is complete.'))
+                                               'once their Indico registration is complete. Requires the Zoom API '
+                                               'scopes {}. If webinars are enabled, add {} as well.')
+                                 .format(_format_zoom_scopes(AUTO_REGISTRATION_MEETING_SCOPES),
+                                         _format_zoom_scopes(AUTO_REGISTRATION_WEBINAR_SCOPES)))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -134,18 +167,37 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         if invalid:
             raise ValidationError(_('Invalid identity providers: {}').format(escape(', '.join(invalid))))
 
+    def _get_zoom_config(self):
+        return {
+            'account_id': self.account_id.data,
+            'client_id': self.client_id.data,
+            'client_secret': self.client_secret.data,
+        }
+
+    def validate_auto_register(self, field):
+        if not field.data:
+            return
+        config = self._get_zoom_config()
+        if not all(config.values()):
+            return
+        scopes = get_zoom_scopes(config)
+        if not scopes:
+            return
+        missing_scopes = _get_missing_auto_registration_scopes(scopes, allow_webinars=self.allow_webinars.data)
+        if missing_scopes:
+            raise ValidationError(
+                _('The Zoom app is missing the required scopes for automatic registration. '
+                  'Please add: {}.').format(_format_zoom_scopes(missing_scopes))
+            )
+
     def validate_client_secret(self, field):
-        account_id = self.account_id.data
-        client_id = self.client_id.data
-        client_secret = self.client_secret.data
-        if not account_id or not client_id or not client_secret:
+        config = self._get_zoom_config()
+        if not all(config.values()):
             flash(_('Zoom credentials not set; the plugin will not work correctly'), 'error')
             return
 
-        ok, url, msg = get_zoom_token({'account_id': account_id, 'client_id': client_id,
-                                       'client_secret': client_secret},
-                                      for_config_check=True)
-        if ok:
+        access_token, url, msg = get_zoom_token(config, for_config_check=True)
+        if access_token:
             flash(_('Successfully got a Zoom token ({}); using API URL {}').format(msg, url), 'info')
             return
         raise ValidationError(_('Could not get Zoom token: {}').format(msg))
