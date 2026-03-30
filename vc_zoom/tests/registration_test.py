@@ -346,7 +346,8 @@ def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, la
     return registration
 
 
-def test_vc_room_created_syncs_existing_registrations(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+@pytest.mark.usefixtures('smtp')
+def test_vc_room_created_syncs_existing_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Creating a Zoom meeting should sync pre-existing completed registrations."""
     event = reg_form.event
     _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
@@ -364,7 +365,8 @@ def test_vc_room_created_syncs_existing_registrations(db, smtp, zoom_plugin, zoo
     assert reg_data['first_name'] == 'John'
 
 
-def test_vc_room_created_auto_register_disabled(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+@pytest.mark.usefixtures('smtp')
+def test_vc_room_created_auto_register_disabled(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """No sync when auto_register is disabled."""
     event = reg_form.event
     _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
@@ -379,8 +381,8 @@ def test_vc_room_created_auto_register_disabled(db, smtp, zoom_plugin, zoom_api_
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
-def test_vc_room_created_skips_non_complete_registrations(db, smtp, zoom_plugin, zoom_api_registrants,
-                                                          reg_form, zoom_user):
+@pytest.mark.usefixtures('smtp')
+def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Only completed registrations are synced to Zoom on room creation."""
     event = reg_form.event
 
@@ -405,8 +407,8 @@ def test_vc_room_created_skips_non_complete_registrations(db, smtp, zoom_plugin,
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
-def test_collect_room_ops_deduplicates_by_email(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
-                                                 create_event):
+@pytest.mark.usefixtures('smtp')
+def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Two registrations with the same email (from different forms) should produce one Zoom registrant."""
     event = reg_form.event
 
@@ -437,8 +439,8 @@ def test_collect_room_ops_deduplicates_by_email(db, smtp, zoom_plugin, zoom_api_
     assert reg_data['email'] == 'dupe@example.com'
 
 
-def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registrants, reg_form,
-                                               create_zoom_meeting, test_client, zoom_user):
+def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
+                                               test_client, zoom_user):
     """A single registrant should use add_meeting_registrant, not batch."""
     zoom_plugin.settings.set('auto_register', True)
     event = reg_form.event
@@ -461,7 +463,8 @@ def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registr
     zoom_api_registrants['batch_meeting_registrants'].assert_not_called()
 
 
-def test_multiple_registrants_uses_batch_api(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+@pytest.mark.usefixtures('smtp')
+def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Two or more registrants should use batch_meeting_registrants."""
     event = reg_form.event
     _make_complete_registration(db, zoom_plugin, reg_form, 'alice@example.com', 'Alice', 'Smith')
@@ -491,7 +494,7 @@ def test_multiple_registrants_uses_batch_api(db, smtp, zoom_plugin, zoom_api_reg
 
 
 def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin, zoom_api_registrants, reg_form,
-                                                                  create_zoom_meeting, test_client, zoom_user):
+                                                                 create_zoom_meeting, test_client, zoom_user):
     """Deleting a form should not cancel a user's Zoom registration if they're still registered via another form."""
     zoom_plugin.settings.set('auto_register', True)
     event = reg_form.event
