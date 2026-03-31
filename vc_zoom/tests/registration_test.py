@@ -412,7 +412,8 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
-@pytest.mark.parametrize(('allow_auto_register', 'expected'), [(True, True), (False, False)])
+
+@pytest.mark.parametrize(('allow_auto_register', 'expected'), ((True, True), (False, False)))
 def test_vc_room_form_defaults_follow_auto_register_setting(zoom_plugin, reg_form, allow_auto_register, expected):
     zoom_plugin.settings.set('allow_auto_register', allow_auto_register)
 
