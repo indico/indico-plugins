@@ -343,22 +343,16 @@ def get_zoom_scopes(config):
         return set()
 
     try:
-        access_token, *_rest = get_zoom_token(config, for_config_check=True)
-    except Exception:
+        token_data = get_zoom_token(config, force=True, full=True)
+    except requests.RequestException:
         return set()
-    if not access_token:
-        return set()
-
-    # get_zoom_token populates the token_cache as a side effect;
-    # read it back to access the scope field, which is not in the return tuple.
-    token_data = token_cache.get(_get_token_cache_key(config))
     if not token_data:
         return set()
 
     return set(token_data.get('scope', '').split())
 
 
-def get_zoom_token(config, *, force=False, for_config_check=False):
+def get_zoom_token(config, *, force=False, for_config_check=False, full=False):
     from indico_vc_zoom.plugin import ZoomPlugin
 
     account_id = config['account_id']
@@ -373,6 +367,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
     if not force and (token_data := token_cache.get(cache_key)):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
+        if full:
+            return token_data
         if for_config_check:
             return True, token_data['api_url'], 'cached'
         return token_data['access_token'], token_data['api_url'], token_data['expires_at']
@@ -384,6 +380,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         )
         resp.raise_for_status()
     except HTTPError as exc:
+        if full:
+            return None
         if for_config_check:
             return False, None, exc.response.text
         ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
@@ -395,6 +393,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
     expires_at = int(time.time() + token_data['expires_in'])
     token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
     token_cache.set(cache_key, token_data, token_data['expires_in'])
+    if full:
+        return token_data
     if for_config_check:
         return True, token_data['api_url'], 'fresh'
     return token_data['access_token'], token_data['api_url'], token_data['expires_at']
