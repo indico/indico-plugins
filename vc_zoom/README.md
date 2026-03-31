@@ -175,6 +175,9 @@ These are the most relevant configuration options:
  * **Notification email addresses** - Additional e-mails which will receive notifications
  * **E-mail domains** - List of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
  * **Webhook Secret Token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
+ * **Allow automatic registration** - Enable this to allow event managers to opt-in to automatic Zoom
+   registration on individual meetings/webinars. Requires the registration-related scopes listed below.
+   When enabled, a per-room "Automatic registration" toggle becomes available in the meeting settings.
 
 
 ### Zoom Server-to-Server OAuth
@@ -188,8 +191,8 @@ The scopes to select when creating the app are:
 - `meeting:write:meeting:admin`
 - `meeting:update:meeting:admin`
 - `meeting:delete:meeting:admin`
-- `meeting:read:list_registrants:admin` (required for automatic registration feature)
-- `meeting:write:registrant:admin` (required for automatic registration feature)
+- `meeting:read:list_registrants:admin` (optional, only needed for automatic registration)
+- `meeting:write:registrant:admin` (optional, only needed for automatic registration)
 - `user:read:user:admin`
 
 - `webinar:read:webinar:admin` (optional, only needed when using webinars)

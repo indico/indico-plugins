@@ -77,7 +77,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
-                             'allow_webinars', 'allow_language_interpretation', 'auto_register', 'phone_link']),
+                             'allow_webinars', 'allow_language_interpretation', 'allow_auto_register', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
                               'waiting_room']),
         (_('Notifications'), ['creation_email_footer', 'send_host_url', 'notification_emails']),
@@ -122,15 +122,13 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                                  description=_('Allow enabling language interpretation for meetings '
                                                                'and webinars.'))
 
-    auto_register = BooleanField(_('Automatic registration'),
-                                 widget=SwitchWidget(),
-                                 description=_('Automatically register Indico registrants in Zoom meetings/webinars '
-                                               'once their Indico registration is complete. Requires the Zoom API '
-                                               'scopes {}. If webinars are enabled, add {} as well. Consider setting '
-                                               '"Passcode visibility" to "No one" so participants '
-                                               'only receive their personalized join link.')
-                                 .format(_format_zoom_scopes(AUTO_REGISTRATION_MEETING_SCOPES),
-                                         _format_zoom_scopes(AUTO_REGISTRATION_WEBINAR_SCOPES)))
+    allow_auto_register = BooleanField(_('Allow automatic registration'),
+                                      widget=SwitchWidget(),
+                                      description=_('Allow event managers to enable automatic Zoom registration on '
+                                                    'individual meetings/webinars. Requires the Zoom API scopes {}. '
+                                                    'If webinars are enabled, add {} as well.')
+                                      .format(_format_zoom_scopes(AUTO_REGISTRATION_MEETING_SCOPES),
+                                              _format_zoom_scopes(AUTO_REGISTRATION_WEBINAR_SCOPES)))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -177,7 +175,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
             'client_secret': self.client_secret.data,
         }
 
-    def validate_auto_register(self, field):
+    def validate_allow_auto_register(self, field):
         if not field.data:
             return
         config = self._get_zoom_config()
@@ -228,7 +226,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'enterprise_domain': '',
         'allow_webinars': False,
         'allow_language_interpretation': False,
-        'auto_register': False,
+        'allow_auto_register': False,
         'mute_host_video': True,
         'mute_audio': True,
         'mute_participant_video': True,
@@ -366,7 +364,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password'}
+        fields = {'description', 'password', 'auto_register'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)
@@ -434,8 +432,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'participant_video': not vc_room.data['mute_participant_video'],
                     'waiting_room': vc_room.data['waiting_room'],
                     'join_before_host': self.settings.get('join_before_host'),
-                    'approval_type': 0,
                 })
+                if vc_room.data.get('auto_register'):
+                    settings['approval_type'] = 0
 
             kwargs.update({
                 'topic': vc_room.name,
@@ -641,6 +640,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
+            'auto_register': self.settings.get('allow_auto_register'),
             'language_interpretation': False,
             'interpreters': [],
             'host_choice': 'myself',
@@ -754,7 +754,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             self._queue_registration_sync(registration, remove=True)
 
     def _vc_room_created(self, vc_room, event, **kwargs):
-        if vc_room.type != self.service_name or not self.settings.get('auto_register'):
+        if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
+            return
+        if not vc_room.data.get('auto_register'):
             return
         for regform in event.registration_forms:
             for registration in regform.active_registrations:
@@ -769,7 +771,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return registration.email
 
     def _queue_registration_sync(self, registration, *, remove):
-        if not self.settings.get('auto_register'):
+        if not self.settings.get('allow_auto_register'):
             return
         pending = g.setdefault('zoom_pending_registrations', {})
         pending[registration.id] = (registration, remove)
@@ -797,7 +799,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if event is None:
                 continue
             zoom_rooms = [assoc.vc_room for assoc in event.vc_room_associations
-                          if assoc.vc_room.type == self.service_name]
+                          if assoc.vc_room.type == self.service_name
+                          and assoc.vc_room.data.get('auto_register')]
             if not zoom_rooms:
                 continue
 

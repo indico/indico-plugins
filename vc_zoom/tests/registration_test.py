@@ -69,14 +69,15 @@ def zoom_api_registrants(zoom_api, mocker):
 
 def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, test_client,
                                    zoom_user):
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     # Create registration
     data = {
@@ -91,13 +92,13 @@ def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_fo
     form_data['email'] = data['email']
 
     # We need to set state to complete during creation for the plugin to sync
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.complete
     db.session.flush()
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     zoom_plugin._queue_registration_sync(registration, remove=False)
     zoom_plugin._flush_pending_registrations(None)
@@ -119,7 +120,7 @@ def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_fo
 
 def test_registration_sync_disabled(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, test_client,
                                     zoom_user):
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
@@ -133,7 +134,7 @@ def test_registration_sync_disabled(db, zoom_plugin, zoom_api_registrants, reg_f
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = data['email']
     # Create registration with sync disabled to avoid triggers during creation
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.complete
@@ -146,26 +147,27 @@ def test_registration_sync_disabled(db, zoom_plugin, zoom_api_registrants, reg_f
 
 def test_registration_state_updated_approve(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
                                              test_client, zoom_user):
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     data = {'email': 'test@example.com', 'first_name': 'John', 'last_name': 'Doe', 'affiliation': 'MegaCorp'}
     form_data = {f.html_field_name: data[f.personal_data_type.name]
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = data['email']
 
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
 
     # Simulate approving a pending registration
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     registration.state = RegistrationState.complete
     db.session.flush()
@@ -177,28 +179,29 @@ def test_registration_state_updated_approve(db, zoom_plugin, zoom_api_registrant
 
 def test_registration_state_updated_withdraw(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
                                               test_client, zoom_user):
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     data = {'email': 'test@example.com', 'first_name': 'John', 'last_name': 'Doe', 'affiliation': 'MegaCorp'}
     form_data = {f.html_field_name: data[f.personal_data_type.name]
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = data['email']
 
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.complete
     db.session.flush()
 
     # Simulate withdrawing a registration
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
     registration.state = RegistrationState.withdrawn
     db.session.flush()
@@ -212,7 +215,7 @@ def test_registration_state_updated_withdraw(db, zoom_plugin, zoom_api_registran
 
 def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, mocker,
                                    zoom_user):
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_plugin.settings.set('allow_webinars', True)
     event = reg_form.event
 
@@ -230,7 +233,8 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
     vc_room.data = {
         'zoom_id': 'zwebinar1',
         'meeting_type': 'webinar',
-        'host': 'User:1'  # Should match zoom_api user
+        'host': 'User:1',  # Should match zoom_api user
+        'auto_register': True,
     }
     assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                    data={'password_visibility': 'everyone'})
@@ -244,13 +248,13 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
     form_data['email'] = data['email']
 
     # We need to set state to complete during creation for the plugin to sync
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.complete
     db.session.flush()
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_webinar_registrant'].reset_mock()
     zoom_plugin._queue_registration_sync(registration, remove=False)
     zoom_plugin._flush_pending_registrations(None)
@@ -263,17 +267,18 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
 def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_registrants, reg_form,
                                                      create_zoom_meeting, test_client, zoom_user):
     """Deleting a form with multiple registrations should batch API calls (one list + one cancel per meeting)."""
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     # Create two registrations with different emails
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registrations = []
     for email, first, last in [('alice@example.com', 'Alice', 'Smith'), ('bob@example.com', 'Bob', 'Jones')]:
         person = {'email': email, 'first_name': first, 'last_name': last, 'affiliation': 'MegaCorp'}
@@ -294,7 +299,7 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
         ]
     }
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['list_meeting_registrants'].reset_mock()
     zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
 
@@ -313,13 +318,14 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
     assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
 
 
-def _create_vc_room_with_assoc(db, event, zoom_user):
+def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True):
     """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
     vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
     vc_room.data = {
         'zoom_id': 'zmeeting_manual',
         'meeting_type': 'regular',
         'host': 'User:1',
+        'auto_register': auto_register,
     }
     assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                    data={'password_visibility': 'everyone'})
@@ -336,13 +342,13 @@ def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, la
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = email
 
-    prev = zoom_plugin.settings.get('auto_register')
-    zoom_plugin.settings.set('auto_register', False)
+    prev = zoom_plugin.settings.get('allow_auto_register')
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.complete
     db.session.flush()
-    zoom_plugin.settings.set('auto_register', prev)
+    zoom_plugin.settings.set('allow_auto_register', prev)
     return registration
 
 
@@ -352,7 +358,7 @@ def test_vc_room_created_syncs_existing_registrations(db, zoom_plugin, zoom_api_
     event = reg_form.event
     _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
@@ -371,7 +377,7 @@ def test_vc_room_created_auto_register_disabled(db, zoom_plugin, zoom_api_regist
     event = reg_form.event
     _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
 
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
@@ -391,13 +397,13 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = data['email']
 
-    zoom_plugin.settings.set('auto_register', False)
+    zoom_plugin.settings.set('allow_auto_register', False)
     registration = create_registration(reg_form, form_data)
     db.session.flush()
     registration.state = RegistrationState.pending
     db.session.flush()
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
@@ -405,6 +411,14 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_plugin._flush_pending_registrations(None)
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+@pytest.mark.parametrize(('allow_auto_register', 'expected'), [(True, True), (False, False)])
+def test_vc_room_form_defaults_follow_auto_register_setting(zoom_plugin, reg_form, allow_auto_register, expected):
+    zoom_plugin.settings.set('allow_auto_register', allow_auto_register)
+
+    defaults = zoom_plugin.get_vc_room_form_defaults(reg_form.event)
+
+    assert defaults['auto_register'] is expected
 
 
 @pytest.mark.usefixtures('smtp')
@@ -426,7 +440,7 @@ def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_regist
     reg2 = _make_complete_registration(db, zoom_plugin, reg_form_2, 'dupe@example.com', 'John', 'Doe')
     assert reg1.id != reg2.id
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
@@ -442,14 +456,15 @@ def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_regist
 def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
                                                test_client, zoom_user):
     """A single registrant should use add_meeting_registrant, not batch."""
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     reg = _make_complete_registration(db, zoom_plugin, reg_form, 'solo@example.com', 'Solo', 'User')
 
@@ -478,7 +493,7 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
     db.session.flush()
     _make_complete_registration(db, zoom_plugin, reg_form_2, 'bob@example.com', 'Bob', 'Jones')
 
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     zoom_api_registrants['batch_meeting_registrants'].reset_mock()
 
@@ -496,14 +511,15 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
 def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin, zoom_api_registrants, reg_form,
                                                                  create_zoom_meeting, test_client, zoom_user):
     """Deleting a form should not cancel a user's Zoom registration if they're still registered via another form."""
-    zoom_plugin.settings.set('auto_register', True)
+    zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
     event.update_principal(zoom_user, full_access=True)
     db.session.flush()
 
     with test_client.session_transaction() as sess:
         sess.set_session_user(zoom_user)
-    create_zoom_meeting(event, 'event')
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
 
     # Create a second registration form on the same event
     reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
