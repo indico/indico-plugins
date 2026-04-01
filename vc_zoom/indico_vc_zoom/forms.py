@@ -106,6 +106,13 @@ class VCRoomForm(VCRoomFormBase):
                                 widget=SwitchWidget(),
                                 description=_('Participants may be kept in a waiting room by the host'))
 
+    auto_register = BooleanField(_('Automatic registration'),
+                                 widget=SwitchWidget(),
+                                 description=_('Automatically register Indico registrants in this Zoom '
+                                               'meeting/webinar. Consider setting "Passcode visibility" '
+                                               'to "No one" so participants only receive their '
+                                               'personalized join link.'))
+
     description = TextAreaField(_('Description'), description=_('Optional description for this meeting'))
 
     language_interpretation = BooleanField(_('Language interpretation'), widget=SwitchWidget(),
@@ -152,6 +159,9 @@ class VCRoomForm(VCRoomFormBase):
 
         if not allow_webinars:
             del self.meeting_type
+
+        if not current_plugin.settings.get('allow_auto_register'):
+            del self.auto_register
 
         if not current_plugin.settings.get('allow_language_interpretation'):
             del self.language_interpretation
