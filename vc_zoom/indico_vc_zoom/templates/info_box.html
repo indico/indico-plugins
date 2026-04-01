@@ -1,4 +1,5 @@
 {% from '_clipboard_input.html' import clipboard_input %}
+{% set personalized_join_url = vc_room.plugin.get_personalized_join_url(vc_room, event_vc_room, session.user) %}
 {% set host = vc_room.data.host %}
 {% set alt_hosts = vc_room.data.alternative_hosts %}
 {% set phone_link = settings.get('phone_link') %}
@@ -53,7 +54,7 @@
     {% endif %}
     <div class="item">
         <div class="header">{% trans %}Zoom URL{% endtrans %}</div>
-        {{ clipboard_input(vc_room.data.url if passcode_visible else vc_room.data.public_url,
+        {{ clipboard_input(personalized_join_url or (vc_room.data.url if passcode_visible else vc_room.data.public_url),
                         name="vc-room-url-%s"|format(event_vc_room.id)) }}
     </div>
 </div>
