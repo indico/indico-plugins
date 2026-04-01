@@ -5,12 +5,15 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
+from flask import session
 
 from indico.core import signals
+from indico.modules.events.features.util import set_feature_enabled
+from indico.modules.events.operations import clone_event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
@@ -338,7 +341,7 @@ def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True):
 def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, last_name):
     """Create a completed registration while auto_register is off to avoid triggering sync."""
     data = {'email': email, 'first_name': first_name, 'last_name': last_name, 'affiliation': 'MegaCorp'}
-    form_data = {f.html_field_name: data[f.personal_data_type.name]
+    form_data = {(getattr(f, 'html_field_name', None) or f.personal_data_type.name): data[f.personal_data_type.name]
                  for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
     form_data['email'] = email
 
@@ -350,6 +353,114 @@ def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, la
     db.session.flush()
     zoom_plugin.settings.set('allow_auto_register', prev)
     return registration
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_event_clone_with_registrations_reuses_zoom_room_without_resync(
+    db,
+    zoom_plugin,
+    zoom_api_registrants,
+    reg_form,
+    zoom_user,
+):
+    event = reg_form.event
+    set_feature_enabled(event, 'registration', True)
+    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    session.set_session_user(zoom_user)
+    cloned_event = clone_event(
+        event,
+        1,
+        event.start_dt + timedelta(days=30),
+        {'vc', 'registration_forms', 'registrations'},
+    )
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert cloned_event.registrations.one().email == 'shared@example.com'
+    assert cloned_event.vc_room_associations[0].vc_room.id == vc_room.id
+    assert len(vc_room.events) == 2
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_sync_skips_duplicate_add_on_cloned_event_shared_zoom_room(
+    db,
+    zoom_plugin,
+    zoom_api_registrants,
+    reg_form,
+    zoom_user,
+):
+    event = reg_form.event
+    set_feature_enabled(event, 'registration', True)
+    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+
+    session.set_session_user(zoom_user)
+    cloned_event = clone_event(
+        event,
+        1,
+        event.start_dt + timedelta(days=30),
+        {'vc', 'registration_forms'},
+    )
+    cloned_form_id = cloned_event.registration_forms[0].id
+    db.session.expire_all()
+    cloned_reg = _make_complete_registration(
+        db,
+        zoom_plugin,
+        db.session.get(RegistrationForm, cloned_form_id),
+        'shared@example.com',
+        'Shared',
+        'User',
+    )
+
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    zoom_plugin._queue_registration_sync(cloned_reg, remove=False)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert cloned_event.vc_room_associations[0].vc_room.id == vc_room.id
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_sync_skips_cancel_if_cloned_event_still_shares_zoom_registration(
+    db,
+    zoom_plugin,
+    zoom_api_registrants,
+    reg_form,
+    zoom_user,
+):
+    event = reg_form.event
+    set_feature_enabled(event, 'registration', True)
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    _create_vc_room_with_assoc(db, event, zoom_user)
+
+    session.set_session_user(zoom_user)
+    cloned_event = clone_event(
+        event,
+        1,
+        event.start_dt + timedelta(days=30),
+        {'vc', 'registration_forms', 'registrations'},
+    )
+    assert cloned_event.registrations.one().email == 'shared@example.com'
+
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg_shared', 'email': 'shared@example.com'}]
+    }
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+
+    signals.event.registration_deleted.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
 @pytest.mark.usefixtures('smtp')
@@ -413,13 +524,44 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
-@pytest.mark.parametrize(('allow_auto_register', 'expected'), ((True, True), (False, False)))
-def test_vc_room_form_defaults_follow_auto_register_setting(zoom_plugin, reg_form, allow_auto_register, expected):
+@pytest.mark.parametrize(
+    ('allow_auto_register', 'expected_auto_register', 'expected_password_visibility'),
+    (
+        (True, True, 'no_one'),
+        (False, False, 'logged_in'),
+    ),
+)
+def test_vc_room_form_defaults_follow_auto_register_setting(
+    zoom_plugin,
+    reg_form,
+    allow_auto_register,
+    expected_auto_register,
+    expected_password_visibility,
+):
     zoom_plugin.settings.set('allow_auto_register', allow_auto_register)
 
     defaults = zoom_plugin.get_vc_room_form_defaults(reg_form.event)
 
-    assert defaults['auto_register'] is expected
+    assert defaults['auto_register'] is expected_auto_register
+    assert defaults['password_visibility'] == expected_password_visibility
+
+
+def test_get_personalized_join_url_for_registered_user(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                       create_user):
+    participant = create_user(2, email='jane.doe@megacorp.xyz')
+    event = reg_form.event
+    _make_complete_registration(db, zoom_plugin, reg_form, participant.email, 'Jane', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg123', 'email': participant.email, 'join_url': 'https://example.com/personal'}]
+    }
+
+    join_url = zoom_plugin.get_personalized_join_url(vc_room, assoc, participant)
+
+    assert join_url == 'https://example.com/personal'
+    zoom_api_registrants['list_meeting_registrants'].assert_called_once_with(vc_room.data['zoom_id'], page_size=300)
 
 
 @pytest.mark.usefixtures('smtp')
