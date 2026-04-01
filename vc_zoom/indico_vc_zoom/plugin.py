@@ -635,18 +635,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_vc_room_form_defaults(self, event):
         defaults = super().get_vc_room_form_defaults(event)
+        auto_register_enabled = self.settings.get('allow_auto_register')
         defaults.update({
             'meeting_type': 'regular' if self.settings.get('allow_webinars') else None,
             'mute_audio': self.settings.get('mute_audio'),
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'auto_register': self.settings.get('allow_auto_register'),
+            'auto_register': auto_register_enabled,
             'language_interpretation': False,
             'interpreters': [],
             'host_choice': 'myself',
             'host_user': None,
-            'password_visibility': 'logged_in'
+            'password_visibility': 'no_one' if auto_register_enabled else 'logged_in'
         })
         return defaults
 
@@ -771,6 +772,50 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return enterprise_email
         return registration.email
 
+    def _get_user_registration(self, event, user):
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        from indico.modules.events.registration.models.registrations import Registration
+
+        return (Registration.query.with_parent(event)
+                .join(Registration.registration_form)
+                .filter(Registration.user == user,
+                        Registration.state == RegistrationState.complete,
+                        ~Registration.is_deleted,
+                        ~RegistrationForm.is_deleted)
+                .first())
+
+    def get_personalized_join_url(self, vc_room, event_vc_room, user):
+        if user is None or vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
+            return None
+        if not vc_room.data.get('auto_register'):
+            return None
+
+        cache_key = None
+        if has_request_context():
+            cache_key = (vc_room.id, user.id)
+            cached_urls = g.setdefault('zoom_personalized_join_urls', {})
+            if cache_key in cached_urls:
+                return cached_urls[cache_key]
+
+        registration = self._get_user_registration(event_vc_room.event, user)
+        if registration is None:
+            result = None
+        else:
+            email = self._get_registrant_email(registration)
+            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+            try:
+                registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
+            except HTTPError:
+                self.logger.warning('Could not fetch registrants for Zoom %s %s',
+                                    'webinar' if is_webinar else 'meeting', vc_room.data['zoom_id'])
+                result = None
+            else:
+                result = registrant.get('join_url') if registrant else None
+
+        if cache_key is not None:
+            cached_urls[cache_key] = result
+        return result
+
     def _queue_registration_sync(self, registration, *, remove):
         if not self.settings.get('allow_auto_register'):
             return
@@ -794,6 +839,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _collect_room_ops(self, pending):
         pending_remove_ids = {reg.id for reg, remove in pending.values() if remove}
+        pending_add_ids = {reg.id for reg, remove in pending.values() if not remove}
         room_ops = {}
         for registration, remove in pending.values():
             event = registration.event or registration.registration_form.event
@@ -809,10 +855,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             should_add = not remove and is_active
             email = self._get_registrant_email(registration)
 
-            if not should_add and self._has_other_active_registration(event, email, pending_remove_ids):
-                continue
-
             for vc_room in zoom_rooms:
+                if should_add and self._has_other_active_room_registration(vc_room, email, pending_add_ids):
+                    continue
+                if not should_add and self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
+                    continue
+
                 zoom_id = vc_room.data['zoom_id']
                 if zoom_id not in room_ops:
                     room_ops[zoom_id] = {'add': {}, 'remove': set(), 'vc_room': vc_room}
@@ -829,18 +877,24 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             ops['add'] = list(ops['add'].values())
         return room_ops
 
-    def _has_other_active_registration(self, event, email, exclude_ids):
+    def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration
 
-        return (Registration.query.with_parent(event)
-                .join(Registration.registration_form)
-                .filter(Registration.email == email.lower(),
-                        Registration.state == RegistrationState.complete,
-                        ~Registration.is_deleted,
-                        ~RegistrationForm.is_deleted,
-                        Registration.id.notin_(exclude_ids))
-                .has_rows())
+        event_ids = {assoc.event_id for assoc in vc_room.events}
+        if not event_ids:
+            return False
+
+        query = (Registration.query
+                 .join(Registration.registration_form)
+                 .filter(RegistrationForm.event_id.in_(event_ids),
+                         Registration.state == RegistrationState.complete,
+                         ~Registration.is_deleted,
+                         ~RegistrationForm.is_deleted))
+        if exclude_ids:
+            query = query.filter(Registration.id.notin_(exclude_ids))
+        email = email.lower()
+        return any(self._get_registrant_email(registration).lower() == email for registration in query)
 
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
         if not registrants:
@@ -894,6 +948,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                                 'webinar' if is_webinar else 'meeting', zoom_id)
 
     def _find_zoom_registrant_ids(self, client, vc_room, emails):
+        registrants = self._find_zoom_registrants(client, vc_room, emails)
+        return {email: registrant['id'] for email, registrant in registrants.items()}
+
+    def _find_zoom_registrants(self, client, vc_room, emails):
         zoom_id = vc_room.data['zoom_id']
         is_webinar = vc_room.data.get('meeting_type') == 'webinar'
         list_func = client.list_webinar_registrants if is_webinar else client.list_meeting_registrants
@@ -905,7 +963,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             resp = list_func(zoom_id, **params)
             for r in resp.get('registrants', []):
                 if r['email'].lower() in remaining:
-                    found[r['email'].lower()] = r['id']
+                    found[r['email'].lower()] = r
                     remaining.discard(r['email'].lower())
             if not resp.get('next_page_token'):
                 break
