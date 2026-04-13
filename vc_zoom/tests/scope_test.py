@@ -25,5 +25,15 @@ def test_auto_registration_scope_check_accepts_broad_webinar_scopes():
 
 
 def test_auto_registration_scope_check_requires_webinar_scopes_when_enabled():
-    assert (_get_missing_auto_registration_scopes(set(AUTO_REGISTRATION_MEETING_SCOPES),
-                                                  allow_webinars=True) == AUTO_REGISTRATION_WEBINAR_SCOPES)
+    # When no webinar scopes are present, the function reports the option set with fewest missing scopes
+    # (legacy: 2 scopes) rather than the modern set (3 scopes)
+    from indico_vc_zoom.plugin import AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES
+    missing = _get_missing_auto_registration_scopes(set(AUTO_REGISTRATION_MEETING_SCOPES), allow_webinars=True)
+    assert set(missing) == set(AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES)
+
+
+def test_auto_registration_scope_check_only_reports_actually_missing_scopes():
+    # User has all modern meeting scopes except the status update one — only that one should appear
+    partial_meeting_scopes = set(AUTO_REGISTRATION_MEETING_SCOPES) - {'meeting:update:registrant_status:admin'}
+    missing = _get_missing_auto_registration_scopes(partial_meeting_scopes, allow_webinars=False)
+    assert missing == ('meeting:update:registrant_status:admin',)
