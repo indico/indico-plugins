@@ -129,7 +129,10 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
                                       widget=SwitchWidget(),
                                       description=_('Allow event managers to enable automatic Zoom registration on '
                                                     'individual meetings/webinars. Requires additional Zoom API '
-                                                    'scopes; see the plugin README for details.'))
+                                                    'scopes; see the '
+                                                    '<a href="https://github.com/indico/indico-plugins/tree/master/'
+                                                    'vc_zoom#zoom-server-to-server-oauth">plugin README</a> '
+                                                    'for details.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
