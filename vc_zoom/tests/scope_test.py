@@ -6,8 +6,7 @@
 # see the LICENSE file for more details.
 
 from indico_vc_zoom.plugin import (AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES, AUTO_REGISTRATION_LEGACY_MEETING_SCOPES,
-                                   AUTO_REGISTRATION_MEETING_SCOPES, AUTO_REGISTRATION_WEBINAR_SCOPES,
-                                   _get_missing_auto_registration_scopes)
+                                   AUTO_REGISTRATION_MEETING_SCOPES, _get_missing_auto_registration_scopes)
 
 
 def test_auto_registration_scope_check_accepts_modern_meeting_scopes():
