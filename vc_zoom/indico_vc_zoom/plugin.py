@@ -71,10 +71,12 @@ def _has_required_zoom_scopes(granted_scopes, scope_options):
 
 def _get_missing_auto_registration_scopes(granted_scopes, *, allow_webinars):
     missing_scopes = []
-    if not _has_required_zoom_scopes(granted_scopes, AUTO_REGISTRATION_SCOPE_OPTIONS['meeting']):
-        missing_scopes.extend(AUTO_REGISTRATION_MEETING_SCOPES)
-    if allow_webinars and not _has_required_zoom_scopes(granted_scopes, AUTO_REGISTRATION_SCOPE_OPTIONS['webinar']):
-        missing_scopes.extend(AUTO_REGISTRATION_WEBINAR_SCOPES)
+    keys = ('meeting', 'webinar') if allow_webinars else ('meeting',)
+    for key in keys:
+        scope_options = AUTO_REGISTRATION_SCOPE_OPTIONS[key]
+        if not _has_required_zoom_scopes(granted_scopes, scope_options):
+            best_missing = min((required - granted_scopes for required in scope_options), key=len)
+            missing_scopes.extend(sorted(best_missing))
     return tuple(missing_scopes)
 
 
