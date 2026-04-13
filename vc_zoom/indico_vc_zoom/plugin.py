@@ -883,6 +883,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return room_ops
 
     def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
+        from indico.modules.events.models.events import Event
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration
 
@@ -891,10 +892,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         query = (Registration.query
                  .join(Registration.registration_form)
+                 .join(RegistrationForm.event)
                  .filter(RegistrationForm.event_id.in_(event_ids),
                          Registration.state == RegistrationState.complete,
                          ~Registration.is_deleted,
-                         ~RegistrationForm.is_deleted))
+                         ~RegistrationForm.is_deleted,
+                         ~Event.is_deleted))
         if exclude_ids:
             query = query.filter(Registration.id.notin_(exclude_ids))
         return any(self._get_registrant_email(registration) == email for registration in query)
