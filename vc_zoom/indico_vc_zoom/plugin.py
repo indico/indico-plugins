@@ -325,6 +325,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                             _('The meeting "{}" is using Zoom registration and thus cannot be attached to another '
                               'event').format(vc_room.name)
                         )
+                    if vc_room.data.get('auto_register'):
+                        raise UserValueError(
+                            _('The meeting "{}" has automatic registration enabled and cannot be attached to another '
+                              'event').format(vc_room.name)
+                        )
                     # this means we are updating an existing meeting with a new vc_room-event association
                     update_zoom_meeting(vc_room.data['zoom_id'], {
                         'start_time': None,
@@ -615,6 +620,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         if vc_room.data.get('registration_required'):
             flash(_('The meeting "{}" is using Zoom registration and thus cannot be attached to the new event')
+                  .format(vc_room.name), 'warning')
+            return None
+
+        if vc_room.data.get('auto_register'):
+            flash(_('The meeting "{}" has automatic registration enabled and cannot be cloned to the new event')
                   .format(vc_room.name), 'warning')
             return None
 
