@@ -356,7 +356,7 @@ def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, la
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_event_clone_with_registrations_reuses_zoom_room_without_resync(
+def test_event_clone_skips_zoom_room_when_auto_register_enabled(
     db,
     zoom_plugin,
     zoom_api_registrants,
@@ -381,86 +381,9 @@ def test_event_clone_with_registrations_reuses_zoom_room_without_resync(
     zoom_plugin._flush_pending_registrations(None)
 
     assert cloned_event.registrations.one().email == 'shared@example.com'
-    assert cloned_event.vc_room_associations[0].vc_room.id == vc_room.id
-    assert len(vc_room.events) == 2
+    assert len(cloned_event.vc_room_associations) == 0
+    assert len(vc_room.events) == 1
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
-
-
-@pytest.mark.usefixtures('request_context', 'smtp')
-def test_registration_sync_skips_duplicate_add_on_cloned_event_shared_zoom_room(
-    db,
-    zoom_plugin,
-    zoom_api_registrants,
-    reg_form,
-    zoom_user,
-):
-    event = reg_form.event
-    set_feature_enabled(event, 'registration', True)
-    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
-
-    zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user)
-
-    session.set_session_user(zoom_user)
-    cloned_event = clone_event(
-        event,
-        1,
-        event.start_dt + timedelta(days=30),
-        {'vc', 'registration_forms'},
-    )
-    cloned_form_id = cloned_event.registration_forms[0].id
-    db.session.expire_all()
-    cloned_reg = _make_complete_registration(
-        db,
-        zoom_plugin,
-        db.session.get(RegistrationForm, cloned_form_id),
-        'shared@example.com',
-        'Shared',
-        'User',
-    )
-
-    zoom_api_registrants['add_meeting_registrant'].reset_mock()
-
-    zoom_plugin._queue_registration_sync(cloned_reg, remove=False)
-    zoom_plugin._flush_pending_registrations(None)
-
-    assert cloned_event.vc_room_associations[0].vc_room.id == vc_room.id
-    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
-
-
-@pytest.mark.usefixtures('request_context', 'smtp')
-def test_registration_sync_skips_cancel_if_cloned_event_still_shares_zoom_registration(
-    db,
-    zoom_plugin,
-    zoom_api_registrants,
-    reg_form,
-    zoom_user,
-):
-    event = reg_form.event
-    set_feature_enabled(event, 'registration', True)
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
-
-    zoom_plugin.settings.set('allow_auto_register', True)
-    _create_vc_room_with_assoc(db, event, zoom_user)
-
-    session.set_session_user(zoom_user)
-    cloned_event = clone_event(
-        event,
-        1,
-        event.start_dt + timedelta(days=30),
-        {'vc', 'registration_forms', 'registrations'},
-    )
-    assert cloned_event.registrations.one().email == 'shared@example.com'
-
-    zoom_api_registrants['list_meeting_registrants'].return_value = {
-        'registrants': [{'id': 'reg_shared', 'email': 'shared@example.com'}]
-    }
-    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
-
-    signals.event.registration_deleted.send(registration)
-    zoom_plugin._flush_pending_registrations(None)
-
-    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
 @pytest.mark.usefixtures('smtp')
