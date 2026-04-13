@@ -930,6 +930,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         except HTTPError:
             self.logger.warning(f'Could not add registrant %s to Zoom {zoom_type} %s',  # noqa: G004
                                 reg_data['email'], zoom_id)
+        else:
+            self.logger.info(f'Added registrant %s to Zoom {zoom_type} %s',  # noqa: G004
+                             reg_data['email'], zoom_id)
 
     def _add_batch_registrants(self, client, zoom_id, registrants, is_webinar):
         zoom_type = 'webinar' if is_webinar else 'meeting'
@@ -943,6 +946,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 emails = ', '.join(r['email'] for r in chunk)
                 self.logger.warning(f'Could not batch-add registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
                                     zoom_id, emails)
+            else:
+                emails = ', '.join(r['email'] for r in chunk)
+                self.logger.info(f'Batch-added registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
+                                 zoom_id, emails)
 
     def _remove_registrants(self, client, zoom_id, vc_room, emails, is_webinar):
         if not emails:
@@ -964,6 +971,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         except HTTPError:
             self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s',  # noqa: G004
                                 zoom_id)
+        else:
+            self.logger.info(f'Removed registrants from Zoom {zoom_type} %s',  # noqa: G004
+                             zoom_id)
 
     def _find_zoom_registrant_ids(self, client, vc_room, emails):
         registrants = self._find_zoom_registrants(client, vc_room, emails)
