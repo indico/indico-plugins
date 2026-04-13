@@ -715,7 +715,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 (visibility == 'registered' and user is not None and event.is_user_registered(user)) or
                 event.can_manage(user)
             ):
-                items.append((assoc.vc_room.name, assoc.vc_room.data['url']))
+                url = assoc.vc_room.data['url']
+                if user is not None:
+                    if personalized_url := self.get_personalized_join_url(assoc.vc_room, assoc, user):
+                        url = personalized_url
+                items.append((assoc.vc_room.name, url))
             elif visibility == 'no_one':
                 # XXX: Not sure if showing this is useful, but on the event page we show the join link
                 # with no passcode as well, so let's keep the logic identical here.
