@@ -235,6 +235,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'send_host_url': False,
         'phone_link': '',
     }
+
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
@@ -637,7 +638,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'auto_register': False,
+            'auto_register': auto_register_enabled,
             'language_interpretation': False,
             'interpreters': [],
             'host_choice': 'myself',
