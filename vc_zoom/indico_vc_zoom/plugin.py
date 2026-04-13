@@ -54,6 +54,9 @@ AUTO_REGISTRATION_SCOPE_OPTIONS = {
     'webinar': (frozenset(AUTO_REGISTRATION_WEBINAR_SCOPES), frozenset(AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES),
                 frozenset(AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES)),
 }
+# Limited to 30 by Zoom API.
+# See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
+BATCH_REGISTRANTS_MAX = 30
 
 
 def _format_zoom_scopes(scopes):
@@ -125,10 +128,8 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     allow_auto_register = BooleanField(_('Allow automatic registration'),
                                       widget=SwitchWidget(),
                                       description=_('Allow event managers to enable automatic Zoom registration on '
-                                                    'individual meetings/webinars. Requires the Zoom API scopes {}. '
-                                                    'If webinars are enabled, add {} as well.')
-                                      .format(_format_zoom_scopes(AUTO_REGISTRATION_MEETING_SCOPES),
-                                              _format_zoom_scopes(AUTO_REGISTRATION_WEBINAR_SCOPES)))
+                                                    'individual meetings/webinars. Requires additional Zoom API '
+                                                    'scopes; see the plugin README for details.'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -181,11 +182,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
         config = self._get_zoom_config()
         if not all(config.values()):
             return
-        scopes = get_zoom_scopes(config)
-        if not scopes:
+        if not (scopes := get_zoom_scopes(config)):
             return
-        missing_scopes = _get_missing_auto_registration_scopes(scopes, allow_webinars=self.allow_webinars.data)
-        if missing_scopes:
+        if missing_scopes := _get_missing_auto_registration_scopes(scopes, allow_webinars=self.allow_webinars.data):
             raise ValidationError(
                 _('The Zoom app is missing the required scopes for automatic registration. '
                   'Please add: {}.').format(_format_zoom_scopes(missing_scopes))
@@ -236,10 +235,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'send_host_url': False,
         'phone_link': '',
     }
-    # Limited to 30 by Zoom API.
-    # See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
-    _BATCH_REGISTRANTS_MAX = 30
-
     def init(self):
         super().init()
         self.connect(signals.plugin.cli, self._extend_indico_cli)
@@ -642,7 +637,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'auto_register': auto_register_enabled,
+            'auto_register': False,
             'language_interpretation': False,
             'interpreters': [],
             'host_choice': 'myself',
@@ -767,9 +762,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _get_registrant_email(self, registration):
         if registration.user:
-            enterprise_email = find_enterprise_email(registration.user)
-            if enterprise_email:
-                return enterprise_email
+            if enterprise_email := find_enterprise_email(registration.user):
+                return enterprise_email.lower()
         return registration.email
 
     def _get_user_registration(self, event, user):
@@ -804,10 +798,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             email = self._get_registrant_email(registration)
             is_webinar = vc_room.data.get('meeting_type') == 'webinar'
             try:
-                registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
+                registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email)
             except HTTPError:
-                self.logger.warning('Could not fetch registrants for Zoom %s %s',
-                                    'webinar' if is_webinar else 'meeting', vc_room.data['zoom_id'])
+                zoom_type = 'webinar' if is_webinar else 'meeting'
+                self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
+                                    vc_room.data['zoom_id'])
                 result = None
             else:
                 result = registrant.get('join_url') if registrant else None
@@ -823,12 +818,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         pending[registration.id] = (registration, remove)
 
     def _flush_pending_registrations(self, sender, **kwargs):
-        pending = g.pop('zoom_pending_registrations', None)
-        if not pending:
+        if not (pending := g.pop('zoom_pending_registrations', None)):
             return
 
-        room_ops = self._collect_room_ops(pending)
-        if not room_ops:
+        if not (room_ops := self._collect_room_ops(pending)):
             return
 
         client = ZoomIndicoClient()
@@ -881,8 +874,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration
 
-        event_ids = {assoc.event_id for assoc in vc_room.events}
-        if not event_ids:
+        if not (event_ids := {assoc.event_id for assoc in vc_room.events}):
             return False
 
         query = (Registration.query
@@ -893,8 +885,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                          ~RegistrationForm.is_deleted))
         if exclude_ids:
             query = query.filter(Registration.id.notin_(exclude_ids))
-        email = email.lower()
-        return any(self._get_registrant_email(registration).lower() == email for registration in query)
+        return any(self._get_registrant_email(registration) == email for registration in query)
 
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
         if not registrants:
@@ -905,6 +896,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             self._add_batch_registrants(client, zoom_id, registrants, is_webinar)
 
     def _add_single_registrant(self, client, zoom_id, reg_data, is_webinar):
+        zoom_type = 'webinar' if is_webinar else 'meeting'
         data = {**reg_data, 'auto_approve': True}
         try:
             if is_webinar:
@@ -912,24 +904,26 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 client.add_meeting_registrant(zoom_id, data)
         except HTTPError:
-            self.logger.warning('Could not add registrant %s to Zoom %s %s',
-                                reg_data['email'], 'webinar' if is_webinar else 'meeting', zoom_id)
+            self.logger.warning(f'Could not add registrant %s to Zoom {zoom_type} %s',  # noqa: G004
+                                reg_data['email'], zoom_id)
 
     def _add_batch_registrants(self, client, zoom_id, registrants, is_webinar):
+        zoom_type = 'webinar' if is_webinar else 'meeting'
         batch_func = client.batch_webinar_registrants if is_webinar else client.batch_meeting_registrants
-        for i in range(0, len(registrants), self._BATCH_REGISTRANTS_MAX):
-            chunk = registrants[i:i + self._BATCH_REGISTRANTS_MAX]
+        for i in range(0, len(registrants), BATCH_REGISTRANTS_MAX):
+            chunk = registrants[i:i + BATCH_REGISTRANTS_MAX]
             data = {'auto_approve': True, 'registrants': chunk}
             try:
                 batch_func(zoom_id, data)
             except HTTPError:
                 emails = ', '.join(r['email'] for r in chunk)
-                self.logger.warning('Could not batch-add registrants to Zoom %s %s: %s',
-                                    'webinar' if is_webinar else 'meeting', zoom_id, emails)
+                self.logger.warning(f'Could not batch-add registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
+                                    zoom_id, emails)
 
     def _remove_registrants(self, client, zoom_id, vc_room, emails, is_webinar):
         if not emails:
             return
+        zoom_type = 'webinar' if is_webinar else 'meeting'
         try:
             registrant_map = self._find_zoom_registrant_ids(client, vc_room, emails)
             if not registrant_map:
@@ -944,8 +938,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 client.update_meeting_registrants_status(zoom_id, status_data)
         except HTTPError:
-            self.logger.warning('Could not remove registrants from Zoom %s %s',
-                                'webinar' if is_webinar else 'meeting', zoom_id)
+            self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s',  # noqa: G004
+                                zoom_id)
 
     def _find_zoom_registrant_ids(self, client, vc_room, emails):
         registrants = self._find_zoom_registrants(client, vc_room, emails)
