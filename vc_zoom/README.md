@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.3.8
+
+- Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
+  Indico participants in the corresponding Zoom meeting or webinar
+
 ### 3.3.7
 
 - Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
