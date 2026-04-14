@@ -377,6 +377,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return assoc_has_changed
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
+        auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
         fields = {'description', 'password', 'auto_register'}
 
@@ -399,6 +400,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 vc_room.data[key] = data.pop(key)
 
         flag_modified(vc_room, 'data')
+
+        # If auto_register was just enabled on an existing room, sync existing registrants
+        if not is_new and not auto_register_before and vc_room.data.get('auto_register'):
+            for event_assoc in vc_room.events:
+                for regform in event_assoc.event.registration_forms:
+                    for registration in regform.active_registrations:
+                        if registration.state == RegistrationState.complete:
+                            self._queue_registration_sync(registration, remove=False)
 
     def create_room(self, vc_room, event):
         """Create a new Zoom meeting for an event, given a VC room.
@@ -924,15 +933,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         data = {**reg_data, 'auto_approve': True}
         try:
             if is_webinar:
-                client.add_webinar_registrant(zoom_id, data)
+                resp = client.add_webinar_registrant(zoom_id, data)
             else:
-                client.add_meeting_registrant(zoom_id, data)
+                resp = client.add_meeting_registrant(zoom_id, data)
         except HTTPError:
             self.logger.warning(f'Could not add registrant %s to Zoom {zoom_type} %s',  # noqa: G004
                                 reg_data['email'], zoom_id)
         else:
-            self.logger.info(f'Added registrant %s to Zoom {zoom_type} %s',  # noqa: G004
-                             reg_data['email'], zoom_id)
+            self.logger.info(f'Added registrant %s (id=%s) to Zoom {zoom_type} %s',  # noqa: G004
+                             reg_data['email'], resp.get('registrant_id'), zoom_id)
 
     def _add_batch_registrants(self, client, zoom_id, registrants, is_webinar):
         zoom_type = 'webinar' if is_webinar else 'meeting'
@@ -940,14 +949,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         for i in range(0, len(registrants), BATCH_REGISTRANTS_MAX):
             chunk = registrants[i:i + BATCH_REGISTRANTS_MAX]
             data = {'auto_approve': True, 'registrants': chunk}
+            emails = ', '.join(r['email'] for r in chunk)
             try:
                 batch_func(zoom_id, data)
             except HTTPError:
-                emails = ', '.join(r['email'] for r in chunk)
                 self.logger.warning(f'Could not batch-add registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
                                     zoom_id, emails)
             else:
-                emails = ', '.join(r['email'] for r in chunk)
                 self.logger.info(f'Batch-added registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
                                  zoom_id, emails)
 
@@ -969,11 +977,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 client.update_meeting_registrants_status(zoom_id, status_data)
         except HTTPError:
-            self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s',  # noqa: G004
-                                zoom_id)
+            self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
+                                zoom_id, ', '.join(sorted(emails)))
         else:
-            self.logger.info(f'Removed registrants from Zoom {zoom_type} %s',  # noqa: G004
-                             zoom_id)
+            removed = ', '.join(f'{email} (id={rid})' for email, rid in registrant_map.items())
+            self.logger.info(f'Removed registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
+                             zoom_id, removed)
 
     def _find_zoom_registrant_ids(self, client, vc_room, emails):
         registrants = self._find_zoom_registrants(client, vc_room, emails)
