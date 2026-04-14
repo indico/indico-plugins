@@ -18,7 +18,9 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
-from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.models.events import Event
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -74,9 +76,13 @@ def _get_missing_auto_registration_scopes(granted_scopes, *, allow_webinars):
     keys = ('meeting', 'webinar') if allow_webinars else ('meeting',)
     for key in keys:
         scope_options = AUTO_REGISTRATION_SCOPE_OPTIONS[key]
-        if not _has_required_zoom_scopes(granted_scopes, scope_options):
-            best_missing = min((required - granted_scopes for required in scope_options), key=len)
-            missing_scopes.extend(sorted(best_missing))
+        if _has_required_zoom_scopes(granted_scopes, scope_options):
+            continue
+        # Only consider option sets the app already overlaps with, so we never propose deprecated
+        # legacy scopes unless the app is already using them. Falls back to the primary (modern) set.
+        candidates = [opt for opt in scope_options if opt & granted_scopes] or [scope_options[0]]
+        best_missing = min((opt - granted_scopes for opt in candidates), key=len)
+        missing_scopes.extend(sorted(best_missing))
     return tuple(missing_scopes)
 
 
@@ -788,9 +794,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return registration.email
 
     def _get_user_registration(self, event, user):
-        from indico.modules.events.registration.models.forms import RegistrationForm
-        from indico.modules.events.registration.models.registrations import Registration
-
         return (Registration.query.with_parent(event)
                 .join(Registration.registration_form)
                 .filter(Registration.user == user,
@@ -892,10 +895,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return room_ops
 
     def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
-        from indico.modules.events.models.events import Event
-        from indico.modules.events.registration.models.forms import RegistrationForm
-        from indico.modules.events.registration.models.registrations import Registration
-
         if not (event_ids := {assoc.event_id for assoc in vc_room.events}):
             return False
 

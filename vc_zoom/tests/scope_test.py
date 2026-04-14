@@ -6,7 +6,8 @@
 # see the LICENSE file for more details.
 
 from indico_vc_zoom.plugin import (AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES, AUTO_REGISTRATION_LEGACY_MEETING_SCOPES,
-                                   AUTO_REGISTRATION_MEETING_SCOPES, _get_missing_auto_registration_scopes)
+                                   AUTO_REGISTRATION_MEETING_SCOPES, AUTO_REGISTRATION_WEBINAR_SCOPES,
+                                   _get_missing_auto_registration_scopes)
 
 
 def test_auto_registration_scope_check_accepts_modern_meeting_scopes():
@@ -24,11 +25,24 @@ def test_auto_registration_scope_check_accepts_broad_webinar_scopes():
 
 
 def test_auto_registration_scope_check_requires_webinar_scopes_when_enabled():
-    # When no webinar scopes are present, the function reports the option set with fewest missing scopes
-    # (legacy: 2 scopes) rather than the modern set (3 scopes)
-    from indico_vc_zoom.plugin import AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES
+    # When no webinar scopes are present at all, the function should propose the modern set
+    # (legacy/broad variants are only suggested when the app already uses some of them).
     missing = _get_missing_auto_registration_scopes(set(AUTO_REGISTRATION_MEETING_SCOPES), allow_webinars=True)
-    assert set(missing) == set(AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES)
+    assert set(missing) == set(AUTO_REGISTRATION_WEBINAR_SCOPES)
+
+
+def test_auto_registration_scope_check_proposes_legacy_when_already_in_use():
+    # User has one legacy meeting scope; the function should propose only the missing legacy one,
+    # not the modern set.
+    granted = {AUTO_REGISTRATION_LEGACY_MEETING_SCOPES[0]}
+    missing = _get_missing_auto_registration_scopes(granted, allow_webinars=False)
+    assert set(missing) == set(AUTO_REGISTRATION_LEGACY_MEETING_SCOPES) - granted
+
+
+def test_auto_registration_scope_check_proposes_modern_when_no_overlap():
+    # User has no auto-registration scopes at all: must propose the modern set, never legacy.
+    missing = _get_missing_auto_registration_scopes(set(), allow_webinars=False)
+    assert set(missing) == set(AUTO_REGISTRATION_MEETING_SCOPES)
 
 
 def test_auto_registration_scope_check_only_reports_actually_missing_scopes():
