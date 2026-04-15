@@ -20,6 +20,11 @@ from indico.util.string import crc32
 token_cache = make_scoped_cache('zoom-api-token')
 
 
+def _get_token_cache_key(config):
+    cache_key_source = '-'.join((config['account_id'], config['client_id'], config['client_secret']))
+    return f'token-{crc32(cache_key_source)}'
+
+
 def format_iso_dt(d):
     """Convert a datetime objects to a UTC-based string.
 
@@ -110,6 +115,31 @@ class MeetingComponent(BaseComponent):
             f'{self.base_uri}/meetings/{meeting_id}', json=kwargs
         )
 
+    def list_registrants(self, meeting_id, **kwargs):
+        return self.session.get(
+            f'{self.base_uri}/meetings/{meeting_id}/registrants', params=kwargs
+        )
+
+    def get_registrant(self, meeting_id, registrant_id):
+        return self.session.get(
+            f'{self.base_uri}/meetings/{meeting_id}/registrants/{registrant_id}'
+        )
+
+    def add_registrant(self, meeting_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/meetings/{meeting_id}/registrants', json=kwargs
+        )
+
+    def batch_registrants(self, meeting_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/meetings/{meeting_id}/batch_registrants', json=kwargs
+        )
+
+    def update_registrants_status(self, meeting_id, **kwargs):
+        return self.session.put(
+            f'{self.base_uri}/meetings/{meeting_id}/registrants/status', json=kwargs
+        )
+
 
 class WebinarComponent(BaseComponent):
     def list(self, user_id, **kwargs):
@@ -138,6 +168,31 @@ class WebinarComponent(BaseComponent):
     def delete(self, meeting_id, **kwargs):
         return self.session.delete(
             f'{self.base_uri}/webinars/{meeting_id}', json=kwargs
+        )
+
+    def list_registrants(self, webinar_id, **kwargs):
+        return self.session.get(
+            f'{self.base_uri}/webinars/{webinar_id}/registrants', params=kwargs
+        )
+
+    def get_registrant(self, webinar_id, registrant_id):
+        return self.session.get(
+            f'{self.base_uri}/webinars/{webinar_id}/registrants/{registrant_id}'
+        )
+
+    def add_registrant(self, webinar_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/webinars/{webinar_id}/registrants', json=kwargs
+        )
+
+    def batch_registrants(self, webinar_id, **kwargs):
+        return self.session.post(
+            f'{self.base_uri}/webinars/{webinar_id}/batch_registrants', json=kwargs
+        )
+
+    def update_registrants_status(self, webinar_id, **kwargs):
+        return self.session.put(
+            f'{self.base_uri}/webinars/{webinar_id}/registrants/status', json=kwargs
         )
 
 
@@ -230,6 +285,19 @@ class ZoomIndicoClient:
     def delete_meeting(self, meeting_id):
         return _handle_response(self.client.meeting.delete(meeting_id), 204, expects_json=False)
 
+    def list_meeting_registrants(self, meeting_id, **kwargs):
+        return _handle_response(self.client.meeting.list_registrants(meeting_id, **kwargs))
+
+    def add_meeting_registrant(self, meeting_id, data):
+        return _handle_response(self.client.meeting.add_registrant(meeting_id, **data), 201)
+
+    def batch_meeting_registrants(self, meeting_id, data):
+        return _handle_response(self.client.meeting.batch_registrants(meeting_id, **data), 201)
+
+    def update_meeting_registrants_status(self, meeting_id, data):
+        return _handle_response(self.client.meeting.update_registrants_status(meeting_id, **data), 204,
+                                expects_json=False)
+
     def create_webinar(self, user_id, **kwargs):
         return _handle_response(self.client.webinar.create(user_id, **kwargs), 201)
 
@@ -242,6 +310,22 @@ class ZoomIndicoClient:
     def delete_webinar(self, webinar_id):
         return _handle_response(self.client.webinar.delete(webinar_id), 204, expects_json=False)
 
+    def list_webinar_registrants(self, webinar_id, **kwargs):
+        return _handle_response(self.client.webinar.list_registrants(webinar_id, **kwargs))
+
+    def get_webinar_registrant(self, webinar_id, registrant_id):
+        return _handle_response(self.client.webinar.get_registrant(webinar_id, registrant_id))
+
+    def add_webinar_registrant(self, webinar_id, data):
+        return _handle_response(self.client.webinar.add_registrant(webinar_id, **data), 201)
+
+    def batch_webinar_registrants(self, webinar_id, data):
+        return _handle_response(self.client.webinar.batch_registrants(webinar_id, **data), 201)
+
+    def update_webinar_registrants_status(self, webinar_id, data):
+        return _handle_response(self.client.webinar.update_registrants_status(webinar_id, **data), 204,
+                                expects_json=False)
+
     def get_user(self, user_id, silent=False):
         resp = self.client.user.get(user_id)
         if resp.status_code == 404 and silent:
@@ -249,7 +333,26 @@ class ZoomIndicoClient:
         return _handle_response(resp)
 
 
-def get_zoom_token(config, *, force=False, for_config_check=False):
+def get_zoom_scopes(config):
+    """Get the set of OAuth scopes for the given Zoom credentials."""
+    account_id = config['account_id']
+    client_id = config['client_id']
+    client_secret = config['client_secret']
+
+    if not (account_id and client_id and client_secret):
+        return set()
+
+    try:
+        token_data = get_zoom_token(config, force=True, full=True)
+    except requests.RequestException:
+        return set()
+    if not token_data:
+        return set()
+
+    return set(token_data.get('scope', '').split())
+
+
+def get_zoom_token(config, *, force=False, for_config_check=False, full=False):
     from indico_vc_zoom.plugin import ZoomPlugin
 
     account_id = config['account_id']
@@ -260,11 +363,12 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         raise Exception('Zoom authentication not configured')
 
     ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
-    hash_key = '-'.join((account_id, client_id, client_secret))
-    cache_key = f'token-{crc32(hash_key)}'
+    cache_key = _get_token_cache_key(config)
     if not force and (token_data := token_cache.get(cache_key)):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
+        if full:
+            return token_data
         if for_config_check:
             return True, token_data['api_url'], 'cached'
         return token_data['access_token'], token_data['api_url'], token_data['expires_at']
@@ -276,6 +380,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
         )
         resp.raise_for_status()
     except HTTPError as exc:
+        if full:
+            return None
         if for_config_check:
             return False, None, exc.response.text
         ZoomPlugin.logger.error('Could not get zoom token: %s', exc.response.text if exc.response else exc)
@@ -287,6 +393,8 @@ def get_zoom_token(config, *, force=False, for_config_check=False):
     expires_at = int(time.time() + token_data['expires_in'])
     token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
     token_cache.set(cache_key, token_data, token_data['expires_in'])
+    if full:
+        return token_data
     if for_config_check:
         return True, token_data['api_url'], 'fresh'
     return token_data['access_token'], token_data['api_url'], token_data['expires_at']

@@ -11,12 +11,11 @@
 
 ## Changelog
 
-### 3.3.7
-
-- Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
-
 ### 3.3.6
 
+- Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
+  Indico participants in the corresponding Zoom meeting or webinar
+- Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
 - Compare webhook HMAC token in a more secure manner
 - Generate random meeting passcodes in a more secure manner
 
@@ -175,6 +174,9 @@ These are the most relevant configuration options:
  * **Notification email addresses** - Additional e-mails which will receive notifications
  * **E-mail domains** - List of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
  * **Webhook Secret Token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
+ * **Allow automatic registration** - Enable this to allow event managers to opt-in to automatic Zoom
+   registration on individual meetings/webinars. Requires the registration-related scopes listed below.
+   When enabled, a per-room "Automatic registration" toggle becomes available in the meeting settings.
 
 
 ### Zoom Server-to-Server OAuth
@@ -188,12 +190,20 @@ The scopes to select when creating the app are:
 - `meeting:write:meeting:admin`
 - `meeting:update:meeting:admin`
 - `meeting:delete:meeting:admin`
+- `meeting:read:list_registrants:admin` (optional, only needed for automatic registration)
+- `meeting:write:registrant:admin` (optional, only needed for automatic registration)
+- `meeting:write:batch_registrants:admin` (optional, only needed for automatic registration)
+- `meeting:update:registrant_status:admin` (optional, only needed for automatic registration)
 - `user:read:user:admin`
 
 - `webinar:read:webinar:admin` (optional, only needed when using webinars)
 - `webinar:write:webinar:admin` (optional, only needed when using webinars)
 - `webinar:update:webinar:admin` (optional, only needed when using webinars)
 - `webinar:delete:webinar:admin` (optional, only needed when using webinars)
+- `webinar:read:list_registrants:admin` (optional, required when using automatic registration with webinars)
+- `webinar:write:registrant:admin` (optional, required when using automatic registration with webinars)
+- `webinar:write:batch_registrants:admin` (optional, required when using automatic registration with webinars)
+- `webinar:update:registrant_status:admin` (optional, required when using automatic registration with webinars)
 
 In case your app still uses classic scopes (unlikely, unless you created it a long time ago):
 
