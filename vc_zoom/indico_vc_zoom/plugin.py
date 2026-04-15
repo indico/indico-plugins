@@ -797,7 +797,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _registration_state_updated(self, registration, **kwargs):
         if registration.state == RegistrationState.complete:
             self._queue_registration_sync(registration, remove=False)
-        elif registration.state == RegistrationState.withdrawn:
+        elif registration.state in {RegistrationState.pending, RegistrationState.withdrawn}:
             self._queue_registration_sync(registration, remove=True)
 
     def _registration_form_deleted(self, registration_form, **kwargs):
