@@ -831,46 +831,41 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         ~RegistrationForm.is_deleted)
                 .first())
 
-    def get_personalized_join_url(self, vc_room, event_vc_room, user):
-        if user is None or vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
+    def get_personalized_join_url(self, vc_room, event_vc_room, user=None, *, registration=None):
+        if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
             return None
         if not vc_room.data.get('auto_register'):
             return None
 
         cache_key = None
-        if has_request_context():
-            cache_key = (vc_room.id, user.id)
-            cached_urls = g.setdefault('zoom_personalized_join_urls', {})
-            if cache_key in cached_urls:
-                return cached_urls[cache_key]
+        if registration is None:
+            if user is None:
+                return None
+            if has_request_context():
+                cache_key = (vc_room.id, user.id)
+                cached_urls = g.setdefault('zoom_personalized_join_urls', {})
+                if cache_key in cached_urls:
+                    return cached_urls[cache_key]
+            registration = self._get_user_registration(event_vc_room.event, user)
 
-        registration = self._get_user_registration(event_vc_room.event, user)
-        result = self._get_join_url_for_registration(vc_room, registration)
+        if registration is None:
+            result = None
+        else:
+            email = self._get_registrant_email(registration)
+            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+            try:
+                registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
+            except HTTPError:
+                zoom_type = 'webinar' if is_webinar else 'meeting'
+                self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
+                                    vc_room.data['zoom_id'])
+                result = None
+            else:
+                result = registrant.get('join_url') if registrant else None
 
         if cache_key is not None:
             cached_urls[cache_key] = result
         return result
-
-    def _get_personalized_join_url_for_registration(self, vc_room, registration):
-        if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
-            return None
-        if not vc_room.data.get('auto_register'):
-            return None
-        return self._get_join_url_for_registration(vc_room, registration)
-
-    def _get_join_url_for_registration(self, vc_room, registration):
-        if registration is None:
-            return None
-        email = self._get_registrant_email(registration)
-        is_webinar = vc_room.data.get('meeting_type') == 'webinar'
-        try:
-            registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
-        except HTTPError:
-            zoom_type = 'webinar' if is_webinar else 'meeting'
-            self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
-                                vc_room.data['zoom_id'])
-            return None
-        return registrant.get('join_url') if registrant else None
 
     def _render_registration_zoom_link(self, registration, from_management=False, **kwargs):
         if from_management or registration.state != RegistrationState.complete:
@@ -880,7 +875,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             vc_room = assoc.vc_room
             if vc_room.type != self.service_name or not vc_room.data.get('auto_register'):
                 continue
-            join_url = self._get_personalized_join_url_for_registration(vc_room, registration)
+            join_url = self.get_personalized_join_url(vc_room, assoc, registration=registration)
             if join_url:
                 join_urls.append({'name': vc_room.name, 'url': join_url})
         if not join_urls:
