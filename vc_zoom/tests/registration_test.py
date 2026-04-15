@@ -512,6 +512,27 @@ def test_get_personalized_join_url_for_registered_user(db, smtp, zoom_plugin, zo
     zoom_api_registrants['list_meeting_registrants'].assert_called_once_with(vc_room.data['zoom_id'], page_size=300)
 
 
+def test_get_personalized_join_url_email_case_insensitive(db, smtp, zoom_plugin, zoom_api_registrants, reg_form,
+                                                           zoom_user, create_user, monkeypatch):
+    """get_personalized_join_url must find the registrant even when _get_registrant_email returns mixed case."""
+    participant = create_user(3, email='jane.doe@megacorp.xyz')
+    event = reg_form.event
+    _make_complete_registration(db, zoom_plugin, reg_form, participant.email, 'Jane', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    # Simulate _get_registrant_email returning a mixed-case enterprise email
+    monkeypatch.setattr(zoom_plugin, '_get_registrant_email', lambda reg: 'Jane.Doe@MegaCorp.XYZ')
+    # _find_zoom_registrants normalises keys to lowercase, so the key is lowercased
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg456', 'email': 'jane.doe@megacorp.xyz', 'join_url': 'https://example.com/personal2'}]
+    }
+
+    join_url = zoom_plugin.get_personalized_join_url(vc_room, assoc, participant)
+
+    assert join_url == 'https://example.com/personal2'
+
+
 @pytest.mark.usefixtures('smtp')
 def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
     """Two registrations with the same email (from different forms) should produce one Zoom registrant."""
