@@ -263,6 +263,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.vc.vc_room_created, self._vc_room_created)
         self.connect(signals.core.after_process, self._flush_pending_registrations)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
+        self.template_hook('before-render-registration-info', self._render_registration_zoom_link)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
             self.inject_bundle('main.js', wp)
             self.inject_bundle('main.css', wp)
@@ -862,6 +863,50 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if cache_key is not None:
             cached_urls[cache_key] = result
         return result
+
+    def _get_personalized_join_url_for_registration(self, vc_room, registration):
+        if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
+            return None
+        if not vc_room.data.get('auto_register'):
+            return None
+
+        cache_key = None
+        if has_request_context():
+            cache_key = (vc_room.id, registration.id)
+            cached_urls = g.setdefault('zoom_personalized_join_urls_by_registration', {})
+            if cache_key in cached_urls:
+                return cached_urls[cache_key]
+
+        email = self._get_registrant_email(registration)
+        is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+        try:
+            registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
+        except HTTPError:
+            zoom_type = 'webinar' if is_webinar else 'meeting'
+            self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
+                                vc_room.data['zoom_id'])
+            result = None
+        else:
+            result = registrant.get('join_url') if registrant else None
+
+        if cache_key is not None:
+            cached_urls[cache_key] = result
+        return result
+
+    def _render_registration_zoom_link(self, registration, from_management=False, **kwargs):
+        if from_management or registration.state != RegistrationState.complete:
+            return ''
+        join_urls = []
+        for assoc in registration.event.vc_room_associations:
+            vc_room = assoc.vc_room
+            if vc_room.type != self.service_name or not vc_room.data.get('auto_register'):
+                continue
+            join_url = self._get_personalized_join_url_for_registration(vc_room, registration)
+            if join_url:
+                join_urls.append({'name': vc_room.name, 'url': join_url})
+        if not join_urls:
+            return ''
+        return render_plugin_template('vc_zoom:registration_zoom_link.html', join_urls=join_urls)
 
     def _queue_registration_sync(self, registration, *, remove):
         if not self.settings.get('allow_auto_register'):

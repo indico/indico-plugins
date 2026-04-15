@@ -637,3 +637,73 @@ def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin
 
     # Should NOT cancel the Zoom registration since user is still registered via form 2
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_summary_shows_zoom_link(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+    """The token-based registration summary should show the personalized Zoom join URL."""
+    event = reg_form.event
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg123', 'email': 'test@example.com', 'join_url': 'https://example.com/personal'}]
+    }
+
+    html = zoom_plugin._render_registration_zoom_link(registration, from_management=False)
+
+    assert 'https://example.com/personal' in html
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_summary_hides_zoom_link_from_management(db, zoom_plugin, zoom_api_registrants, reg_form,
+                                                              zoom_user):
+    """Management view should never see the participant's personal join URL."""
+    event = reg_form.event
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg123', 'email': 'test@example.com', 'join_url': 'https://example.com/personal'}]
+    }
+
+    html = zoom_plugin._render_registration_zoom_link(registration, from_management=True)
+
+    assert html == ''
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_summary_hides_zoom_link_when_auto_register_disabled(
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+):
+    """Rooms without auto_register enabled must not produce a join link row."""
+    event = reg_form.event
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False)
+
+    html = zoom_plugin._render_registration_zoom_link(registration, from_management=False)
+
+    assert html == ''
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_registration_summary_hides_zoom_link_if_not_registered_in_zoom(
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+):
+    """If the registrant is not in Zoom (yet), no link row should be produced."""
+    event = reg_form.event
+    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {'registrants': []}
+
+    html = zoom_plugin._render_registration_zoom_link(registration, from_management=False)
+
+    assert html == ''
