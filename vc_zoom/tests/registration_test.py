@@ -447,6 +447,31 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_enable_auto_register_skips_existing_zoom_registrants(
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+):
+    """Enabling auto_register on an existing room should skip registrants already in Zoom."""
+    event = reg_form.event
+    _make_complete_registration(db, zoom_plugin, reg_form, 'existing@example.com', 'Already', 'Registered')
+    _make_complete_registration(db, zoom_plugin, reg_form, 'new@example.com', 'Brand', 'New')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False)
+
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg_existing', 'email': 'existing@example.com'}]
+    }
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+
+    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True}, is_new=False)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
+    assert reg_data['email'] == 'new@example.com'
+
+
 @pytest.mark.parametrize(
     ('allow_auto_register', 'expected_auto_register', 'expected_password_visibility'),
     (

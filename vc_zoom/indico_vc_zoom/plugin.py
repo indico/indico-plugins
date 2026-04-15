@@ -405,11 +405,27 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         # If auto_register was just enabled on an existing room, sync existing registrants
         if not is_new and not auto_register_before and vc_room.data.get('auto_register'):
-            for event_assoc in vc_room.events:
-                for regform in event_assoc.event.registration_forms:
-                    for registration in regform.active_registrations:
-                        if registration.state == RegistrationState.complete:
-                            self._queue_registration_sync(registration, remove=False)
+            candidates = [
+                registration
+                for event_assoc in vc_room.events
+                for regform in event_assoc.event.registration_forms
+                for registration in regform.active_registrations
+                if registration.state == RegistrationState.complete
+            ]
+            if candidates:
+                candidate_emails = {self._get_registrant_email(r) for r in candidates}
+                try:
+                    already_registered = set(
+                        self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails)
+                    )
+                except HTTPError:
+                    zoom_type = 'webinar' if vc_room.data.get('meeting_type') == 'webinar' else 'meeting'
+                    self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
+                                        'syncing all existing registrants', vc_room.data['zoom_id'])
+                    already_registered = set()
+                for registration in candidates:
+                    if self._get_registrant_email(registration).lower() not in already_registered:
+                        self._queue_registration_sync(registration, remove=False)
 
     def create_room(self, vc_room, event):
         """Create a new Zoom meeting for an event, given a VC room.
