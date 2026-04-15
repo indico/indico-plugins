@@ -27,6 +27,7 @@ from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
+from indico.util.caching import memoize_request
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
 from indico.web.forms.validators import HiddenUnless
@@ -831,41 +832,30 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         ~RegistrationForm.is_deleted)
                 .first())
 
+    @memoize_request
     def get_personalized_join_url(self, vc_room, event_vc_room, user=None, *, registration=None):
         if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
             return None
         if not vc_room.data.get('auto_register'):
             return None
 
-        cache_key = None
         if registration is None:
             if user is None:
                 return None
-            if has_request_context():
-                cache_key = (vc_room.id, user.id)
-                cached_urls = g.setdefault('zoom_personalized_join_urls', {})
-                if cache_key in cached_urls:
-                    return cached_urls[cache_key]
             registration = self._get_user_registration(event_vc_room.event, user)
+            if registration is None:
+                return None
 
-        if registration is None:
-            result = None
-        else:
-            email = self._get_registrant_email(registration)
-            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
-            try:
-                registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
-            except HTTPError:
-                zoom_type = 'webinar' if is_webinar else 'meeting'
-                self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
-                                    vc_room.data['zoom_id'])
-                result = None
-            else:
-                result = registrant.get('join_url') if registrant else None
-
-        if cache_key is not None:
-            cached_urls[cache_key] = result
-        return result
+        email = self._get_registrant_email(registration)
+        is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+        try:
+            registrant = self._find_zoom_registrants(ZoomIndicoClient(), vc_room, {email}).get(email.lower())
+        except HTTPError:
+            zoom_type = 'webinar' if is_webinar else 'meeting'
+            self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s',  # noqa: G004
+                                vc_room.data['zoom_id'])
+            return None
+        return registrant.get('join_url') if registrant else None
 
     def _render_registration_zoom_link(self, registration, from_management=False, **kwargs):
         if from_management or registration.state != RegistrationState.complete:
