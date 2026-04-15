@@ -46,9 +46,11 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
 
 
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
+                                    'meeting:write:batch_registrants:admin',
                                     'meeting:update:registrant_status:admin')
 AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin')
 AUTO_REGISTRATION_WEBINAR_SCOPES = ('webinar:read:list_registrants:admin', 'webinar:write:registrant:admin',
+                                    'webinar:write:batch_registrants:admin',
                                     'webinar:update:registrant_status:admin')
 AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES = ('webinar:read:admin', 'webinar:write:admin')
 # Zoom may return broad webinar scopes in the token instead of the granular registrant ones
