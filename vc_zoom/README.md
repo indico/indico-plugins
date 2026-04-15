@@ -15,8 +15,6 @@
 
 - Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
   Indico participants in the corresponding Zoom meeting or webinar
-- Show the personalized Zoom join URL on the registration summary page so participants
-  without an Indico account can retrieve it from their registration token link
 - Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
 - Compare webhook HMAC token in a more secure manner
 - Generate random meeting passcodes in a more secure manner
