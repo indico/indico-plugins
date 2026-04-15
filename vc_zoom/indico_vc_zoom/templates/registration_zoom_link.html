@@ -11,7 +11,11 @@
             {% endif %}
         </th>
         <td class="regform-done-data">
-            <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer" style="word-break: break-all;">{{ entry.url }}</a>
+            <a class="i-button highlight icon-camera" href="{{ entry.url }}"
+               target="_blank" rel="noopener noreferrer"
+               title="{% trans %}Join the Zoom Meeting{% endtrans %}">
+                {% trans %}Join{% endtrans %}
+            </a>
         </td>
     </tr>
 {% endfor %}
