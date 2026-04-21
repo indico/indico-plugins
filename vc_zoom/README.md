@@ -11,14 +11,12 @@
 
 ## Changelog
 
-### 3.3.7
-
-- Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
-
 ### 3.3.6
 
 - Compare webhook HMAC token in a more secure manner
 - Generate random meeting passcodes in a more secure manner
+- Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
+- Never use a PMI meeting ID when creating a new meeting
 
 ### 3.3.5
 

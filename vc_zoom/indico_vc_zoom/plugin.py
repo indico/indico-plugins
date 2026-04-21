@@ -340,6 +340,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         try:
             settings = {
+                'use_pmi': False,
                 'host_video': not vc_room.data['mute_host_video'],
                 'language_interpretation': self._build_language_interpretation_settings(vc_room)
             }
