@@ -9,9 +9,9 @@ from flask import after_this_request, flash, g, has_request_context, request, se
 from markupsafe import escape
 from requests.exceptions import HTTPError
 from sqlalchemy.orm.attributes import flag_modified
-from wtforms.fields import BooleanField, TextAreaField, URLField
+from wtforms.fields import BooleanField, IntegerField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import URL, DataRequired, Optional, ValidationError
+from wtforms.validators import URL, DataRequired, NumberRange, Optional, ValidationError
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -42,7 +42,7 @@ from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
-                                 gen_random_password, get_alt_host_emails, get_schedule_args, get_url_data_args,
+                                 gen_random_passcode, get_alt_host_emails, get_schedule_args, get_url_data_args,
                                  process_alternative_hosts, update_zoom_meeting)
 
 
@@ -92,6 +92,7 @@ def _get_missing_auto_registration_scopes(granted_scopes, *, allow_webinars):
 class PluginSettingsForm(VCPluginSettingsFormBase):
     _fieldsets = [
         (_('API Credentials'), ['account_id', 'client_id', 'client_secret', 'webhook_token']),
+        (_('Security'), ['passcode_length']),
         (_('Zoom Account'), ['user_lookup_mode', 'email_domains', 'authenticators', 'enterprise_domain',
                              'allow_webinars', 'allow_language_interpretation', 'allow_auto_register', 'phone_link']),
         (_('Room Settings'), ['mute_audio', 'mute_host_video', 'mute_participant_video', 'join_before_host',
@@ -106,6 +107,9 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     webhook_token = IndicoPasswordField(_('Webhook Secret Token'), toggle=True,
                                         description=_('Specify the "Secret Token" of your Zoom Webhook if you want '
                                                       'live updates in case of modified/deleted Zoom meetings.'))
+
+    passcode_length = IntegerField(_('Passcode length'), [DataRequired(), NumberRange(min=8, max=10)],
+                                   description=_('Length of auto-generated Zoom meeting passcodes'))
 
     user_lookup_mode = IndicoEnumSelectField(_('User lookup mode'), [DataRequired()], enum=UserLookupMode,
                                              description=_('Specify how Indico should look up the zoom user that '
@@ -235,6 +239,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'client_id': '',
         'client_secret': '',
         'webhook_token': '',
+        'passcode_length': 8,
         'user_lookup_mode': UserLookupMode.email_domains,
         'email_domains': [],
         'authenticators': [],
@@ -307,7 +312,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     form.host_choice.render_kw = {'disabled': True}
                     form.host_user.render_kw = {'disabled': True}
         elif not form.is_submitted():
-            form.password.data = gen_random_password()
+            form.password.data = gen_random_passcode(self.settings.get('passcode_length'))
         return form
 
     def get_extra_delete_msg(self, vc_room, event_vc_room):
