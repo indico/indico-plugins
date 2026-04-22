@@ -475,7 +475,7 @@ def test_enable_auto_register_skips_existing_zoom_registrants(
 @pytest.mark.parametrize(
     ('allow_auto_register', 'expected_auto_register', 'expected_password_visibility'),
     (
-        (True, True, 'no_one'),
+        (True, False, 'logged_in'),
         (False, False, 'logged_in'),
     ),
 )

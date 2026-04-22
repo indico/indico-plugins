@@ -683,19 +683,18 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def get_vc_room_form_defaults(self, event):
         defaults = super().get_vc_room_form_defaults(event)
-        auto_register_enabled = self.settings.get('allow_auto_register')
         defaults.update({
             'meeting_type': 'regular' if self.settings.get('allow_webinars') else None,
             'mute_audio': self.settings.get('mute_audio'),
             'mute_host_video': self.settings.get('mute_host_video'),
             'mute_participant_video': self.settings.get('mute_participant_video'),
             'waiting_room': self.settings.get('waiting_room'),
-            'auto_register': auto_register_enabled,
+            'auto_register': False,
             'language_interpretation': False,
             'interpreters': [],
             'host_choice': 'myself',
             'host_user': None,
-            'password_visibility': 'no_one' if auto_register_enabled else 'logged_in'
+            'password_visibility': 'logged_in'
         })
         return defaults
 
