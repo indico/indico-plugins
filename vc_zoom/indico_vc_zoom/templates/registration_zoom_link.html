@@ -1,0 +1,21 @@
+<tr class="regform-done-title">
+    <td colspan="2">{% trans %}Zoom{% endtrans %}</td>
+</tr>
+{% for entry in join_urls %}
+    <tr>
+        <th class="regform-done-caption">
+            {% if join_urls|length > 1 %}
+                {{ entry.name }}
+            {% else %}
+                {% trans %}Join link{% endtrans %}
+            {% endif %}
+        </th>
+        <td class="regform-done-data">
+            <a class="i-button highlight icon-camera" href="{{ entry.url }}"
+               target="_blank" rel="noopener noreferrer"
+               title="{% trans %}Join the Zoom Meeting{% endtrans %}">
+                {% trans %}Join{% endtrans %}
+            </a>
+        </td>
+    </tr>
+{% endfor %}

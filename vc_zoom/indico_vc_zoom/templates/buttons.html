@@ -1,7 +1,9 @@
 {% macro render_join_button(vc_room, event_vc_room, show_logo=false, extra_classes='') %}
     {% set event = event_vc_room.event %}
     {% set plugin = vc_room.plugin %}
+    {% set personalized_join_url = plugin.get_personalized_join_url(vc_room, event_vc_room, session.user) %}
     {% set show_full_join_link = (
+        personalized_join_url or
         event_vc_room.data.password_visibility == 'everyone' or
         event.can_manage(session.user) or
         (session.user and event_vc_room.data.password_visibility == 'logged_in') or
@@ -11,16 +13,39 @@
         {% if show_full_join_link %}
             classes="blue {{ extra_classes }}"
             description="{% trans %}Join the Zoom Meeting{% endtrans %}"
-            href="{{ vc_room.data.url }}"
+            href="{{ personalized_join_url or vc_room.data.url }}"
             target="_blank"
             icon="play"
             caption="{% trans %}Join{% endtrans %}"
         {% elif event_vc_room.data.password_visibility == 'no_one' %}
-            classes="orange {{ extra_classes }}"
-            description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
-            href="{{ vc_room.data.public_url }}"
-            icon="lock"
-            caption="{% trans %}Join{% endtrans %}"
+            {% if vc_room.data.auto_register %}
+                {% if session.user %}
+                    {% if event.type == 'conference' %}
+                        classes="blue {{ extra_classes }}"
+                        description="{% trans %}Register to get your personal Zoom join link{% endtrans %}"
+                        href="{{ url_for('event_registration.display_regform_list', event) }}"
+                        icon="ticket"
+                        caption="{% trans %}Please register{% endtrans %}"
+                    {% else %}
+                        classes="disabled {{ extra_classes }}"
+                        description="{% trans %}This Zoom Meeting can only be joined by registered participants{% endtrans %}"
+                        icon="ticket"
+                        caption="{% trans %}Registration required{% endtrans %}"
+                    {% endif %}
+                {% else %}
+                    classes="blue {{ extra_classes }}"
+                    description="{% trans %}This Zoom Meeting can only be joined by registered participants{% endtrans %}"
+                    href="{{ url_for_login(request.relative_url) }}"
+                    icon="ticket"
+                    caption="{% trans %}Please log in and register{% endtrans %}"
+                {% endif %}
+            {% else %}
+                classes="orange {{ extra_classes }}"
+                description="{% trans %}You will need a passcode to join this Zoom meeting{% endtrans %}"
+                href="{{ vc_room.data.public_url }}"
+                icon="lock"
+                caption="{% trans %}Join{% endtrans %}"
+            {% endif %}
         {% elif event_vc_room.data.password_visibility == 'registered' %}
             {% if session.user %}
                 {% if event.type == 'conference' %}
