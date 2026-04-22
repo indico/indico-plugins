@@ -13,13 +13,12 @@
 
 ### 3.3.6
 
-- Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
-  Indico participants in the corresponding Zoom meeting or webinar
-- Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
 - Compare webhook HMAC token in a more secure manner
 - Generate random meeting passcodes in a more secure manner
 - Support Zoom's [Language Interpretation](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064768) feature
 - Never use a PMI meeting ID when creating a new meeting
+- Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
+  Indico participants in the corresponding Zoom meeting or webinar
 
 ### 3.3.5
 
