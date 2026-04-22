@@ -103,9 +103,9 @@ def find_enterprise_email(user):
     return next((email for email in iter_user_emails(user) if client.get_user(email, silent=True)), None)
 
 
-def gen_random_password():
-    """Generate a random 8-character-long numeric string."""
-    return ''.join(secrets.choice(string.digits) for _ in range(8))
+def gen_random_passcode(length=8):
+    """Generate a random numeric string."""
+    return ''.join(secrets.choice(string.digits) for _ in range(length))
 
 
 def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):
