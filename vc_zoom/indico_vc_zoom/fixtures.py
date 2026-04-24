@@ -6,10 +6,18 @@
 # see the LICENSE file for more details.
 
 import itertools
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 
 from indico.core.plugins import plugin_engine
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.events.registration.util import create_personal_data_fields
+
+
+TZ = ZoneInfo('Europe/Zurich')
 
 
 @pytest.fixture
@@ -24,6 +32,27 @@ def zoom_plugin(app):
         'allow_language_interpretation': True,
     })
     return plugin
+
+
+@pytest.fixture
+def zoom_user(zoom_api):
+    return zoom_api['user']
+
+
+@pytest.fixture
+def reg_form(create_event, db):
+    event = create_event(
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+    )
+    regform = RegistrationForm(event=event, title='Test Form', currency='EUR')
+    section = RegistrationFormSection(registration_form=regform, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    regform.sections.append(section)
+    create_personal_data_fields(regform)
+    event.registration_forms.append(regform)
+    db.session.flush()
+    return regform
 
 
 @pytest.fixture
@@ -128,3 +157,28 @@ def zoom_api(zoom_plugin, create_user, mocker):
         'api_delete_meeting': api_delete_meeting,
         'get_user': api_get_user,
     }
+
+
+@pytest.fixture
+def zoom_api_registrants(zoom_api, mocker):
+    zoom_api['add_meeting_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_meeting_registrant')
+    zoom_api['add_webinar_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_webinar_registrant')
+    zoom_api['update_meeting_registrants_status'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.update_meeting_registrants_status')
+    zoom_api['update_webinar_registrants_status'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.update_webinar_registrants_status')
+    zoom_api['list_meeting_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.list_meeting_registrants')
+    zoom_api['list_webinar_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.list_webinar_registrants')
+    zoom_api['batch_meeting_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_meeting_registrants')
+    zoom_api['batch_webinar_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_webinar_registrants')
+
+    zoom_api['add_meeting_registrant'].return_value = {}
+    zoom_api['add_webinar_registrant'].return_value = {}
+    zoom_api['list_meeting_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
+    zoom_api['list_webinar_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
+
+    return zoom_api

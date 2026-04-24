@@ -5,8 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from datetime import timedelta
 
 import pytest
 from flask import session
@@ -19,55 +18,6 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_personal_data_fields, create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
-
-
-TZ = ZoneInfo('Europe/Zurich')
-
-
-@pytest.fixture
-def zoom_user(create_user):
-    return create_user(1, email='don.orange@megacorp.xyz')
-
-
-@pytest.fixture
-def reg_form(create_event, db):
-    event = create_event(
-        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
-        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
-    )
-    regform = RegistrationForm(event=event, title='Test Form', currency='EUR')
-    # Add personal data section
-    section = RegistrationFormSection(registration_form=regform, title='Personal Data',
-                                      type=RegistrationFormItemType.section_pd)
-    regform.sections.append(section)
-    create_personal_data_fields(regform)
-    event.registration_forms.append(regform)
-    db.session.flush()
-    return regform
-
-
-@pytest.fixture
-def zoom_api_registrants(zoom_api, mocker):
-    zoom_api['add_meeting_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_meeting_registrant')
-    zoom_api['add_webinar_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_webinar_registrant')
-    zoom_api['update_meeting_registrants_status'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.update_meeting_registrants_status')
-    zoom_api['update_webinar_registrants_status'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.update_webinar_registrants_status')
-    zoom_api['list_meeting_registrants'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.list_meeting_registrants')
-    zoom_api['list_webinar_registrants'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.list_webinar_registrants')
-
-    zoom_api['batch_meeting_registrants'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_meeting_registrants')
-    zoom_api['batch_webinar_registrants'] = mocker.patch(
-        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_webinar_registrants')
-
-    zoom_api['list_meeting_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
-    zoom_api['list_webinar_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
-
-    return zoom_api
 
 
 def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, test_client,
@@ -321,7 +271,7 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
     assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
 
 
-def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True):
+def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True, auto_checkin=False):
     """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
     vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
     vc_room.data = {
@@ -329,6 +279,7 @@ def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True):
         'meeting_type': 'regular',
         'host': 'User:1',
         'auto_register': auto_register,
+        'auto_checkin': auto_checkin,
     }
     assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                    data={'password_visibility': 'everyone'})

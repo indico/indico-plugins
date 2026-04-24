@@ -383,7 +383,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password', 'auto_register'}
+        fields = {'description', 'password', 'auto_register', 'auto_checkin'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)
@@ -988,6 +988,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             else:
                 self.logger.info(f'Batch-added registrants to Zoom {zoom_type} %s: %s',  # noqa: G004
                                  zoom_id, emails)
+
+    def _find_registration_by_participant_email(self, vc_room, email):
+        event_ids = {assoc.event_id for assoc in vc_room.events}
+        if not event_ids:
+            return None
+        candidates = (Registration.query
+                      .join(Registration.registration_form)
+                      .filter(RegistrationForm.event_id.in_(event_ids),
+                              Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
+                              ~Registration.is_deleted,
+                              ~RegistrationForm.is_deleted))
+        email_lower = email.lower()
+        return next((c for c in candidates if self._get_registrant_email(c).lower() == email_lower), None)
 
     def _remove_registrants(self, client, zoom_id, vc_room, email_ids, is_webinar):
         if not email_ids:
