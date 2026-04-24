@@ -383,7 +383,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password', 'auto_register'}
+        fields = {'description', 'password', 'auto_register', 'webhook_checkin'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)

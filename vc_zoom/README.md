@@ -20,7 +20,7 @@
 - Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
   Indico participants in the corresponding Zoom meeting or webinar
 - Automatically check in Indico registrations when a participant joins the corresponding Zoom
-  meeting or webinar (requires automatic registration to be enabled on the room)
+  meeting or webinar (opt-in per room, requires automatic registration to be enabled on the room)
 
 ### 3.3.5
 
@@ -168,6 +168,8 @@ Select the following "Event types":
  * `Meeting has been deleted`
  * `Webinar has been updated`
  * `Webinar has been deleted`
+ * `Meeting participant joined` (optional, only needed for automatic check-in)
+ * `Webinar participant joined` (optional, only needed for automatic check-in)
 
 
 ## Plugin Configuration
