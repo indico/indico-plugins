@@ -62,7 +62,7 @@ def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zo
                                                     webhook_client):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, webhook_checkin=True)
 
     reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
@@ -88,7 +88,7 @@ def test_participant_joined_emits_checkin_signal(db, zoom_plugin, reg_form, zoom
                                                   webhook_client, mocker):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, webhook_checkin=True)
 
     reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
@@ -110,7 +110,7 @@ def test_participant_joined_emits_checkin_signal(db, zoom_plugin, reg_form, zoom
 def test_participant_joined_unknown_email_returns_200(db, zoom_plugin, reg_form, zoom_user, webhook_client):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, webhook_checkin=True)
     db.session.flush()
 
     payload = {
@@ -126,7 +126,27 @@ def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin,
                                                                   zoom_user, webhook_client):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False, webhook_checkin=True)
+
+    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    db.session.flush()
+
+    payload = {
+        'event': 'meeting.participant_joined',
+        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
+    }
+    resp = webhook_client(payload)
+    assert resp.status_code == 200
+    db.session.refresh(reg)
+    assert not reg.checked_in
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_participant_joined_skipped_when_webhook_checkin_disabled(db, zoom_plugin, reg_form,
+                                                                   zoom_user, webhook_client):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    event = reg_form.event
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, webhook_checkin=False)
 
     reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
@@ -146,7 +166,7 @@ def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, 
                                                                 zoom_user, webhook_client):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, webhook_checkin=True)
 
     reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
     reg.checked_in = True
@@ -173,6 +193,7 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
         'meeting_type': 'webinar',
         'host': 'User:1',
         'auto_register': True,
+        'webhook_checkin': True,
     }
     assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                    data={'password_visibility': 'everyone'})
