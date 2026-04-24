@@ -19,6 +19,8 @@
 - Never use a PMI meeting ID when creating a new meeting
 - Add automatic Zoom registration: event managers can opt-in to automatically register/unregister
   Indico participants in the corresponding Zoom meeting or webinar
+- Automatically check in Indico registrations when a participant joins the corresponding Zoom
+  meeting or webinar (requires automatic registration to be enabled on the room)
 
 ### 3.3.5
 
