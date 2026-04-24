@@ -115,7 +115,7 @@ class VCRoomForm(VCRoomFormBase):
                                                'to "No one" so participants only receive their '
                                                'personalized join link'))
 
-    webhook_checkin = BooleanField(_('Automatic check-in'),
+    auto_checkin = BooleanField(_('Automatic check-in'),
                                    [HiddenUnless('auto_register')],
                                    widget=SwitchWidget(),
                                    description=_('Automatically check in registrants when they join this '
@@ -170,7 +170,7 @@ class VCRoomForm(VCRoomFormBase):
 
         if not current_plugin.settings.get('allow_auto_register'):
             del self.auto_register
-            del self.webhook_checkin
+            del self.auto_checkin
 
         self._auto_register_locked = False
         if getattr(self, 'auto_register', None) is not None and self._is_link_target_in_past():

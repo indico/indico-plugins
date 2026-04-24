@@ -271,7 +271,7 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
     assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
 
 
-def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True, webhook_checkin=False):
+def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True, auto_checkin=False):
     """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
     vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
     vc_room.data = {
@@ -279,7 +279,7 @@ def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True, webh
         'meeting_type': 'regular',
         'host': 'User:1',
         'auto_register': auto_register,
-        'webhook_checkin': webhook_checkin,
+        'auto_checkin': auto_checkin,
     }
     assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                    data={'password_visibility': 'everyone'})

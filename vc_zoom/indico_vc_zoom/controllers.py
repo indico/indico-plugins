@@ -100,7 +100,7 @@ class RHWebhook(RH):
             current_plugin.logger.info('Zoom meeting deleted: %s', meeting_id)
             vc_room.status = VCRoomStatus.deleted
         elif event in ('meeting.participant_joined', 'webinar.participant_joined'):
-            if not vc_room.data.get('auto_register') or not vc_room.data.get('webhook_checkin'):
+            if not vc_room.data.get('auto_register') or not vc_room.data.get('auto_checkin'):
                 return
             email = payload['object'].get('participant', {}).get('email', '')
             if not email:
