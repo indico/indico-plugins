@@ -49,8 +49,7 @@ def test_webhook_bad_signature_returns_403(db, test_client, zoom_plugin):
     ts = str(int(_time.time()))
     resp = test_client.post(
         '/api/plugin/zoom/webhook',
-        data=b'{"event":"meeting.updated","payload":{"object":{"id":"z1"}}}',
-        content_type='application/json',
+        json={'event': 'meeting.updated', 'payload': {'object': {'id': 'z1'}}},
         headers={'x-zm-request-timestamp': ts, 'x-zm-signature': 'v0=badsig'},
     )
     assert resp.status_code == 403
@@ -80,7 +79,7 @@ def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zo
     resp = webhook_client(payload)
     assert resp.status_code == 200
     db.session.refresh(reg)
-    assert reg.checked_in is True
+    assert reg.checked_in
     assert reg.checked_in_dt is not None
 
 
@@ -139,7 +138,7 @@ def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin,
     resp = webhook_client(payload)
     assert resp.status_code == 200
     db.session.refresh(reg)
-    assert reg.checked_in is False
+    assert not reg.checked_in
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
@@ -159,7 +158,7 @@ def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, 
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200
-    assert reg.checked_in is True
+    assert reg.checked_in
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
@@ -190,4 +189,4 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
     resp = webhook_client(payload)
     assert resp.status_code == 200
     db.session.refresh(reg)
-    assert reg.checked_in is True
+    assert reg.checked_in
