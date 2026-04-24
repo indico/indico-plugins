@@ -16,6 +16,7 @@ from webargs import fields
 from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import Forbidden, ServiceUnavailable
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.vc.controllers import RHVCSystemEventBase
@@ -98,5 +99,22 @@ class RHWebhook(RH):
         elif event in ('meeting.deleted', 'webinar.deleted'):
             current_plugin.logger.info('Zoom meeting deleted: %s', meeting_id)
             vc_room.status = VCRoomStatus.deleted
+        elif event in ('meeting.participant_joined', 'webinar.participant_joined'):
+            if not vc_room.data.get('auto_register'):
+                return
+            email = payload['object'].get('participant', {}).get('email', '')
+            if not email:
+                current_plugin.logger.debug('participant_joined with no email for meeting %s', meeting_id)
+                return
+            registration = current_plugin._find_registration_by_participant_email(vc_room, email)
+            if registration is None:
+                current_plugin.logger.debug('No Indico registration for email %s in meeting %s', email, meeting_id)
+                return
+            if registration.checked_in:
+                return
+            registration.checked_in = True
+            signals.event.registration_checkin_updated.send(registration)
+            current_plugin.logger.info('Checked in registration %s via Zoom webhook (meeting %s)',
+                                       registration.id, meeting_id)
         else:
             current_plugin.logger.warning('Unhandled Zoom webhook payload: %s', event)
