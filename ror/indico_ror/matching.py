@@ -10,7 +10,7 @@ from langchain_ollama import OllamaEmbeddings
 from sqlalchemy import delete, literal, select, union_all
 
 from indico.core.db import db
-from indico.modules.affiliations.search import AffiliationSearch, AffiliationSearchMatch
+from indico.modules.affiliations.search import AffiliationSearchMatch, AffiliationSearchProvider
 
 from indico_ror.models.affiliation_vs_document import AffiliationVectorStoreDocument
 
@@ -28,7 +28,7 @@ def ensure_model(model_name: str):
         ollama.pull(model_name)
 
 
-class PSQLVectorStoreBackedAffiliationSearch(AffiliationSearch):
+class PSQLVectorStoreAffiliationSearchProvider(AffiliationSearchProvider):
     def __init__(
          self, model: str = 'jina/jina-embeddings-v2-small-en', batch_size: int = 512, threshold: float = 0.3
     ) -> None:

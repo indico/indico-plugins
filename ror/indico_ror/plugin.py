@@ -29,7 +29,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import User
 from indico.util.console import verbose_iterator
 
-from indico_ror.matching import PSQLVectorStoreBackedAffiliationSearch
+from indico_ror.matching import PSQLVectorStoreAffiliationSearchProvider
 
 
 AFFILIATION_BACKREF_CLASSES = [
@@ -253,7 +253,7 @@ def do_ror_sync(csv_dict: dict, reset: bool, dry_run: bool, batch_size: int) -> 
     updated_texts, updated_ids = make_vectorstore_data(updated)
     __, deleted_ids = make_vectorstore_data(deleted)
 
-    search_engine = PSQLVectorStoreBackedAffiliationSearch(batch_size=batch_size)
+    search_engine = PSQLVectorStoreAffiliationSearchProvider(batch_size=batch_size)
     search_engine.delete(deleted_ids)
     search_engine.update(updated_texts, updated_ids, updated_ids)
     search_engine.add(added_texts, added_ids)
@@ -273,7 +273,12 @@ class RORPlugin(IndicoPlugin):
 
     def init(self):
         super().init()
+        self.connect(signals.affiliations.get_affiliation_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
+
+    def get_search_providers(self, sender, **kwargs):
+        from indico_ror.matching import PSQLVectorStoreAffiliationSearchProvider
+        return PSQLVectorStoreAffiliationSearchProvider
 
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_group()
@@ -319,7 +324,7 @@ class RORPlugin(IndicoPlugin):
         )
         def match(output: pathlib.Path) -> None:
             """Match "free-text" affiliations with affiliations stored in the database."""
-            search_engine = PSQLVectorStoreBackedAffiliationSearch()
+            search_engine = PSQLVectorStoreAffiliationSearchProvider()
 
             click.echo('loading affiliations...')
             affiliations: set[str] = set()
