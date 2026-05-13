@@ -28,6 +28,7 @@ from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.caching import memoize_request
+from indico.util.signals import make_interceptable
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
 from indico.web.forms.validators import HiddenUnless
@@ -949,6 +950,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             query = query.filter(Registration.id.notin_(exclude_ids))
         return any(self._get_registrant_email(registration) == email for registration in query)
 
+    @make_interceptable
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
         if not registrants:
             return
