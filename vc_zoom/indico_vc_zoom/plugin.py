@@ -406,8 +406,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         flag_modified(vc_room, 'data')
 
-        # If auto_register was just enabled on an existing room, sync existing registrants
+        # If auto_register was just enabled on an existing room, push approval_type to Zoom
+        # before syncing registrants so the initial backfill can hit the registrants endpoint.
         if not is_new and not auto_register_before and vc_room.data.get('auto_register'):
+            is_webinar = vc_room.data.get('meeting_type') == 'webinar'
+            if not is_webinar:
+                try:
+                    update_zoom_meeting(vc_room.data['zoom_id'],
+                                        {'settings': {'approval_type': 0}}, is_webinar=False)
+                except HTTPError:
+                    self.logger.warning('Could not enable registration on Zoom meeting %s',
+                                        vc_room.data['zoom_id'])
             candidates = [
                 registration
                 for event_assoc in vc_room.events
@@ -422,7 +431,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                         self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails)
                     )
                 except HTTPError:
-                    zoom_type = 'webinar' if vc_room.data.get('meeting_type') == 'webinar' else 'meeting'
+                    zoom_type = 'webinar' if is_webinar else 'meeting'
                     self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
                                         'syncing all existing registrants', vc_room.data['zoom_id'])
                     already_registered = set()
@@ -570,6 +579,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 changes.setdefault('settings', {})['participant_video'] = not vc_room.data['mute_participant_video']
             if vc_room.data['waiting_room'] != zoom_meeting_settings['waiting_room']:
                 changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
+            desired_approval_type = 0 if vc_room.data.get('auto_register') else 2
+            if zoom_meeting_settings.get('approval_type') != desired_approval_type:
+                changes.setdefault('settings', {})['approval_type'] = desired_approval_type
 
         if changes:
             update_zoom_meeting(vc_room.data['zoom_id'], changes, is_webinar=is_webinar)
