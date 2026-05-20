@@ -15,6 +15,9 @@ on:
       - master
       - '*.x'
 
+permissions:
+  contents: read
+
 jobs:
   setup:
     runs-on: ubuntu-22.04
@@ -23,15 +26,17 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
       - name: Pick Indico core repo
         env:
@@ -53,14 +58,14 @@ jobs:
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         id: cache-npm
         with:
           path: node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -78,7 +83,7 @@ jobs:
         run: tar cf /tmp/env.tar .venv node_modules
 
       - name: Upload environment
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: environment
           retention-days: 1
@@ -93,20 +98,22 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: environment
           path: /tmp
@@ -164,23 +171,25 @@ jobs:
           - plugin: vc_zoom
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Download environment
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: environment
           path: /tmp
@@ -209,15 +218,18 @@ jobs:
       - name: Setup database
         run: |
           export PGHOST=localhost
-          export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
           createuser indicotest
           createdb -O indicotest indicotest
           psql indicotest -c 'CREATE EXTENSION unaccent;'
           psql indicotest -c 'CREATE EXTENSION pg_trgm;'
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
 
       - name: Run tests
         run: |
-          export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${{ job.services.postgres.ports[5432] }}/indicotest"
+          export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${PGPORT}/indicotest"
           cd "${GITHUB_WORKSPACE}/${{ matrix.plugin }}"
           pytest --color=yes
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}

@@ -66,20 +66,20 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           merge-multiple: true
           pattern: plugin-wheel-*
           path: dist
       - name: List artifacts 📃
         run: ls -al dist/
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         name: Upload build artifacts 📦
         with:
           name: plugin-wheels
           retention-days: 7
           path: dist
       - name: Delete individual artifacts 🚮
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@f275313e70c08f6120db482d7a6b98377786765b # v5.1.0
         with:
           name: plugin-wheel-*
