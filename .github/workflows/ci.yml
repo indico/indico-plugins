@@ -15,6 +15,9 @@ on:
       - master
       - '*.x'
 
+permissions:
+  contents: read
+
 jobs:
   setup:
     runs-on: ubuntu-22.04
@@ -24,6 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -94,6 +99,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -165,6 +172,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -209,15 +218,18 @@ jobs:
       - name: Setup database
         run: |
           export PGHOST=localhost
-          export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
           createuser indicotest
           createdb -O indicotest indicotest
           psql indicotest -c 'CREATE EXTENSION unaccent;'
           psql indicotest -c 'CREATE EXTENSION pg_trgm;'
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
 
       - name: Run tests
         run: |
-          export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${{ job.services.postgres.ports[5432] }}/indicotest"
+          export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${PGPORT}/indicotest"
           cd "${GITHUB_WORKSPACE}/${{ matrix.plugin }}"
           pytest --color=yes
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}

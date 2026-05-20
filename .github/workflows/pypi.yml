@@ -55,6 +55,8 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v6
         name: Set up Python 🐍
         with:
@@ -92,6 +94,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
 
       - name: Install Indico 🔧
         run: |
@@ -126,8 +130,8 @@ jobs:
           gh release create
           --draft
           --repo ${{ github.repository }}
-          --title ${{ github.ref_name }}
-          ${{ github.ref_name }}
+          --title ${GITHUB_REF_NAME}
+          ${GITHUB_REF_NAME}
           dist/*
         env:
           GH_TOKEN: ${{ github.token }}
@@ -171,6 +175,6 @@ jobs:
           gh release edit
           --draft=false
           --repo ${{ github.repository }}
-          ${{ github.ref_name }}
+          ${GITHUB_REF_NAME}
         env:
           GH_TOKEN: ${{ github.token }}
