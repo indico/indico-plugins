@@ -92,6 +92,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
     assert vc_room.data['url'] == 'https://example.com/llamas'
 
 
+@pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
 @pytest.mark.parametrize(('auto_register_before', 'auto_register_after', 'current_approval_type', 'expected'), (
     (False, True, 2, {'settings': {'approval_type': 0}}),
     (True, False, 0, {'settings': {'approval_type': 2}}),
@@ -100,7 +101,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 ))
 def test_update_room_pushes_approval_type(
     mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-    auto_register_before, auto_register_after, current_approval_type, expected,
+    auto_register_before, auto_register_after, current_approval_type, expected, meeting_type,
 ):
     event = create_event(
         creator=zoom_api['user'],
@@ -111,85 +112,52 @@ def test_update_room_pushes_approval_type(
     )
 
     vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['meeting_type'] = meeting_type
     vc_room.data['auto_register'] = auto_register_after
 
-    zoom_api['get_meeting'].side_effect = (
-        lambda meeting_id, *a, **kw: _aligned_meeting(meeting_id, approval_type=current_approval_type)
-    )
-
-    zoom_api['update_meeting'].reset_mock()
-    zoom_plugin.update_room(vc_room, vc_room.events[0].event)
-
-    if expected is None:
-        zoom_api['update_meeting'].assert_not_called()
-    else:
-        zoom_api['update_meeting'].assert_called_with('zmeeting1', expected)
-
-
-def test_update_data_vc_room_pushes_approval_type_before_sync(
-    create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-):
-    event = create_event(
-        creator=zoom_api['user'],
-        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
-        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
-        title='Test Event #1',
-        creator_has_privileges=True,
-    )
-
-    vc_room = create_zoom_meeting(event, 'event')
-    vc_room.data['auto_register'] = False
-
-    zoom_api['update_meeting'].reset_mock()
-    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True})
-
-    zoom_api['update_meeting'].assert_called_once_with('zmeeting1', {'settings': {'approval_type': 0}})
-
-
-def test_update_data_vc_room_skips_approval_type_for_webinar(
-    create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-):
-    event = create_event(
-        creator=zoom_api['user'],
-        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
-        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
-        title='Test Event #1',
-        creator_has_privileges=True,
-    )
-
-    vc_room = create_zoom_meeting(event, 'event')
-    vc_room.data['meeting_type'] = 'webinar'
-    vc_room.data['auto_register'] = False
-
-    zoom_api['update_meeting'].reset_mock()
-    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True})
-
-    zoom_api['update_meeting'].assert_not_called()
-
-
-def test_update_room_skips_approval_type_for_webinar(
-    mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-):
-    event = create_event(
-        creator=zoom_api['user'],
-        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
-        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
-        title='Test Event #1',
-        creator_has_privileges=True,
-    )
-
-    vc_room = create_zoom_meeting(event, 'event')
-    vc_room.data['meeting_type'] = 'webinar'
-    vc_room.data['auto_register'] = True
-
+    is_webinar = meeting_type == 'webinar'
     mocker.patch(
         'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=2), True),
+        return_value=(_aligned_meeting('zmeeting1', approval_type=current_approval_type), is_webinar),
     )
 
-    zoom_api['update_meeting'].reset_mock()
+    api_mock = zoom_api['update_webinar' if is_webinar else 'update_meeting']
+    other_mock = zoom_api['update_meeting' if is_webinar else 'update_webinar']
+    api_mock.reset_mock()
+    other_mock.reset_mock()
+
     zoom_plugin.update_room(vc_room, vc_room.events[0].event)
 
-    for call in zoom_api['update_meeting'].call_args_list:
-        settings = (call.args[1] if len(call.args) > 1 else call.kwargs.get('changes', {})).get('settings', {})
-        assert 'approval_type' not in settings
+    other_mock.assert_not_called()
+    if expected is None:
+        api_mock.assert_not_called()
+    else:
+        api_mock.assert_called_with('zmeeting1', expected)
+
+
+@pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
+def test_update_data_vc_room_pushes_approval_type_before_sync(
+    create_event, create_zoom_meeting, zoom_plugin, zoom_api, meeting_type,
+):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['meeting_type'] = meeting_type
+    vc_room.data['auto_register'] = False
+
+    is_webinar = meeting_type == 'webinar'
+    api_mock = zoom_api['update_webinar' if is_webinar else 'update_meeting']
+    other_mock = zoom_api['update_meeting' if is_webinar else 'update_webinar']
+    api_mock.reset_mock()
+    other_mock.reset_mock()
+
+    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True})
+
+    api_mock.assert_called_once_with('zmeeting1', {'settings': {'approval_type': 0}})
+    other_mock.assert_not_called()
