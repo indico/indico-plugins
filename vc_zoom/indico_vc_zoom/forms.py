@@ -12,6 +12,7 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
+from indico.util.date_time import now_utc
 from indico.util.string import is_valid_mail
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
@@ -163,9 +164,42 @@ class VCRoomForm(VCRoomFormBase):
         if not current_plugin.settings.get('allow_auto_register'):
             del self.auto_register
 
+        self._auto_register_locked = False
+        if getattr(self, 'auto_register', None) is not None and self._is_link_target_in_past():
+            self._auto_register_locked = True
+            self.auto_register.render_kw = {'disabled': True}
+            self.auto_register.description = _(
+                'Automatic registration cannot be changed once the event has started. '
+                'Zoom does not honor registration changes on meetings without a future '
+                'start time.'
+            )
+
         if not current_plugin.settings.get('allow_language_interpretation'):
             del self.language_interpretation
             del self.interpreters
+
+    def _is_link_target_in_past(self):
+        """Return True if the form's link target is in the past.
+
+        Falls back to the event start_dt for new rooms where no link target is bound
+        yet. Zoom creates type=3/6/9 meetings when scheduling args are missing and
+        silently drops approval_type on those, so the auto_register toggle must be
+        treated as immutable in that case.
+        """
+        link_object = None
+        if self.vc_room is not None and self.vc_room.events:
+            link_object = self.vc_room.events[0].link_object
+        target = link_object if link_object is not None else self.event
+        return target.start_dt is None or target.start_dt < now_utc()
+
+    def validate_auto_register(self, field):
+        if self._auto_register_locked:
+            # The toggle is disabled in the UI for past/unscheduled targets, so an empty
+            # submission must not flip the persisted value. Restore the current state.
+            if self.vc_room is not None:
+                field.data = self.vc_room.data.get('auto_register', False)
+            else:
+                field.data = False
 
     def validate_host_choice(self, field):
         if field.data == 'myself':

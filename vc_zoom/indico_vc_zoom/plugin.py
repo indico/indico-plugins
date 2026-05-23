@@ -381,6 +381,37 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         return assoc_has_changed
 
+    def _push_approval_type(self, vc_room, approval_type, *, is_webinar):
+        """Push approval_type to Zoom and verify the change took effect.
+
+        Zoom returns 204 for an ``approval_type`` PATCH on recurring meetings without a
+        fixed time (type=3/9) but silently drops the value, so we read the meeting back
+        and log a warning when the new value did not stick.
+        """
+        try:
+            update_zoom_meeting(vc_room.data['zoom_id'],
+                                {'settings': {'approval_type': approval_type}},
+                                is_webinar=is_webinar)
+        except HTTPError:
+            self.logger.warning('Could not push approval_type to Zoom %s %s',
+                                'webinar' if is_webinar else 'meeting',
+                                vc_room.data['zoom_id'])
+            return False
+        try:
+            meeting, __ = fetch_zoom_meeting(vc_room)
+        except VCRoomNotFoundError:
+            return False
+        actual = meeting.get('settings', {}).get('approval_type')
+        if actual != approval_type:
+            self.logger.warning(
+                'Zoom %s %s did not honor approval_type=%s (got %s); this typically happens '
+                'on recurring meetings without a fixed time',
+                'webinar' if is_webinar else 'meeting',
+                vc_room.data['zoom_id'], approval_type, actual,
+            )
+            return False
+        return True
+
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
@@ -406,38 +437,34 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         flag_modified(vc_room, 'data')
 
-        # If auto_register was just enabled on an existing room, push approval_type to Zoom
-        # before syncing registrants so the initial backfill can hit the registrants endpoint.
-        if not is_new and not auto_register_before and vc_room.data.get('auto_register'):
+        # Push approval_type whenever auto_register is toggled. On enable we also sync any
+        # existing registrants so the initial backfill can hit the registrants endpoint.
+        if not is_new and auto_register_before != vc_room.data.get('auto_register'):
             is_webinar = vc_room.data.get('meeting_type') == 'webinar'
-            try:
-                update_zoom_meeting(vc_room.data['zoom_id'],
-                                    {'settings': {'approval_type': 0}}, is_webinar=is_webinar)
-            except HTTPError:
-                self.logger.warning('Could not enable registration on Zoom %s %s',
-                                    'webinar' if is_webinar else 'meeting',
-                                    vc_room.data['zoom_id'])
-            candidates = [
-                registration
-                for event_assoc in vc_room.events
-                for regform in event_assoc.event.registration_forms
-                for registration in regform.active_registrations
-                if registration.state == RegistrationState.complete
-            ]
-            if candidates:
-                candidate_emails = {self._get_registrant_email(r) for r in candidates}
-                try:
-                    already_registered = set(
-                        self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails)
-                    )
-                except HTTPError:
-                    zoom_type = 'webinar' if is_webinar else 'meeting'
-                    self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
-                                        'syncing all existing registrants', vc_room.data['zoom_id'])
-                    already_registered = set()
-                for registration in candidates:
-                    if self._get_registrant_email(registration).lower() not in already_registered:
-                        self._queue_registration_sync(registration, remove=False)
+            desired_approval_type = 0 if vc_room.data.get('auto_register') else 2
+            self._push_approval_type(vc_room, desired_approval_type, is_webinar=is_webinar)
+            if vc_room.data.get('auto_register'):
+                candidates = [
+                    registration
+                    for event_assoc in vc_room.events
+                    for regform in event_assoc.event.registration_forms
+                    for registration in regform.active_registrations
+                    if registration.state == RegistrationState.complete
+                ]
+                if candidates:
+                    candidate_emails = {self._get_registrant_email(r) for r in candidates}
+                    try:
+                        already_registered = set(
+                            self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails)
+                        )
+                    except HTTPError:
+                        zoom_type = 'webinar' if is_webinar else 'meeting'
+                        self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
+                                            'syncing all existing registrants', vc_room.data['zoom_id'])
+                        already_registered = set()
+                    for registration in candidates:
+                        if self._get_registrant_email(registration).lower() not in already_registered:
+                            self._queue_registration_sync(registration, remove=False)
 
     def create_room(self, vc_room, event):
         """Create a new Zoom meeting for an event, given a VC room.
@@ -458,6 +485,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         link_obj = vc_room_assoc.link_object
         is_webinar = vc_room.data.setdefault('meeting_type', 'regular') == 'webinar'
         scheduling_args = get_schedule_args(link_obj) if link_obj.start_dt else {}
+
+        # Zoom only honors approval_type on meetings with a fixed start time (type=2/5).
+        # Without scheduling_args the meeting becomes type=3/6/9, which silently drops the
+        # registration setting, so refuse to create such a room with auto_register enabled.
+        if vc_room.data.get('auto_register') and not scheduling_args:
+            raise VCRoomError(_('Automatic registration is not supported for events that have '
+                                'already started or have no scheduled start time. Disable '
+                                'automatic registration or reschedule the event in the future.'))
 
         try:
             settings = {
@@ -581,7 +616,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
 
         desired_approval_type = 0 if vc_room.data.get('auto_register') else 2
-        if zoom_meeting_settings.get('approval_type') != desired_approval_type:
+        approval_type_changed = zoom_meeting_settings.get('approval_type') != desired_approval_type
+        if approval_type_changed:
             changes.setdefault('settings', {})['approval_type'] = desired_approval_type
 
         if changes:
@@ -589,6 +625,17 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             # always refresh meeting URL (it may have changed if password changed)
             zoom_meeting, _is_webinar = fetch_zoom_meeting(vc_room, client=client)
             vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
+            # Zoom silently drops approval_type on recurring meetings without a fixed time
+            # (type=3/9), so verify it stuck against the refreshed snapshot we just fetched.
+            if approval_type_changed:
+                actual_approval_type = zoom_meeting.get('settings', {}).get('approval_type')
+                if actual_approval_type != desired_approval_type:
+                    self.logger.warning(
+                        'Zoom %s %s did not honor approval_type=%s (got %s); this typically '
+                        'happens on recurring meetings without a fixed time',
+                        'webinar' if is_webinar else 'meeting',
+                        vc_room.data['zoom_id'], desired_approval_type, actual_approval_type,
+                    )
 
     def refresh_room(self, vc_room, event):
         is_webinar = vc_room.data['meeting_type'] == 'webinar'
@@ -596,6 +643,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if is_webinar != is_really_webinar:
             vc_room.data['meeting_type'] = 'webinar' if is_really_webinar else 'regular'
         vc_room.name = zoom_meeting['topic']
+        zoom_approval_type = zoom_meeting['settings'].get('approval_type')
+        expected_approval_type = 0 if vc_room.data.get('auto_register') else 2
+        if zoom_approval_type != expected_approval_type and has_request_context():
+            flash(_('Zoom registration setting for this meeting differs from the Indico '
+                    'configuration. Save the videoconference to push the local setting to Zoom.'),
+                  'warning')
         vc_room.data.update({
             'description': zoom_meeting.get('agenda', ''),
             'zoom_id': zoom_meeting['id'],
@@ -613,7 +666,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
             'waiting_room': zoom_meeting['settings'].get('waiting_room'),
             'alternative_hosts': process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts')),
-            'registration_required': zoom_meeting['settings'].get('approval_type') != 2,
+            'registration_required': zoom_approval_type != 2,
         })
         vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
         flag_modified(vc_room, 'data')
