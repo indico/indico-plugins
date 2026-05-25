@@ -644,11 +644,6 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             vc_room.data['meeting_type'] = 'webinar' if is_really_webinar else 'regular'
         vc_room.name = zoom_meeting['topic']
         zoom_approval_type = zoom_meeting['settings'].get('approval_type')
-        expected_approval_type = 0 if vc_room.data.get('auto_register') else 2
-        if zoom_approval_type != expected_approval_type and has_request_context():
-            flash(_('Zoom registration setting for this meeting differs from the Indico '
-                    'configuration. Save the videoconference to push the local setting to Zoom.'),
-                  'warning')
         vc_room.data.update({
             'description': zoom_meeting.get('agenda', ''),
             'zoom_id': zoom_meeting['id'],

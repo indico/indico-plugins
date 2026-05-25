@@ -218,35 +218,6 @@ def test_create_room_blocks_past_event_with_auto_register(
     zoom_api['create_meeting'].assert_not_called()
 
 
-def test_refresh_room_flashes_on_approval_type_divergence(
-    mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-):
-    event = create_event(
-        creator=zoom_api['user'],
-        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
-        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
-        title='Test Event #1',
-        creator_has_privileges=True,
-    )
-
-    vc_room = create_zoom_meeting(event, 'event')
-    vc_room.data['auto_register'] = True  # local expects approval_type=0
-
-    mocker.patch(
-        'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=2), False),
-    )
-    mocker.patch('indico_vc_zoom.plugin.has_request_context', return_value=True)
-    flash_mock = mocker.patch('indico_vc_zoom.plugin.flash')
-
-    zoom_plugin.refresh_room(vc_room, event)
-
-    flash_mock.assert_called_once()
-    args, _kwargs = flash_mock.call_args
-    assert 'Zoom registration setting' in str(args[0])
-    assert args[1] == 'warning'
-
-
 @pytest.mark.parametrize('is_webinar', (False, True))
 def test_push_approval_type_warns_when_zoom_drops_patch(
     mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api, is_webinar,
