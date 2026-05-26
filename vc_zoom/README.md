@@ -175,6 +175,7 @@ These are the most relevant configuration options:
  * **Notification email addresses** - Additional e-mails which will receive notifications
  * **E-mail domains** - List of e-mail domains which can be used for the Zoom API (e.g. `cern.ch`)
  * **Webhook Secret Token** (optional) - the token which Zoom requests will authenticate with (get it from Zoom Marketplace)
+ * **Passcode length** - Length of auto-generated Zoom meeting passcodes (default 8, allowed range 8-10)
  * **Allow automatic registration** - Enable this to allow event managers to opt-in to automatic Zoom
    registration on individual meetings/webinars. Requires the registration-related scopes listed below.
    When enabled, a per-room "Automatic registration" toggle becomes available in the meeting settings.
