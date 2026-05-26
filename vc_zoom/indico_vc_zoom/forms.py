@@ -80,6 +80,7 @@ class VCRoomForm(VCRoomFormBase):
 
     password = StringField(_('Passcode'),
                            [DataRequired(), IndicoRegexp(r'^\d{8,10}$')],
+                           render_kw={'maxlength': 10},
                            description=_('Meeting passcode (8-10 digits)'))
 
     password_visibility = IndicoRadioField(_('Passcode visibility'),
