@@ -393,9 +393,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                                 {'settings': {'approval_type': approval_type}},
                                 is_webinar=is_webinar)
         except HTTPError:
-            self.logger.warning('Could not push approval_type to Zoom %s %s',
-                                'webinar' if is_webinar else 'meeting',
-                                vc_room.data['zoom_id'])
+            zoom_type = 'webinar' if is_webinar else 'meeting'
+            self.logger.warning(
+                f'Could not push approval_type to Zoom {zoom_type} %s',  # noqa: G004
+                vc_room.data['zoom_id'],
+            )
             return False
         try:
             meeting, __ = fetch_zoom_meeting(vc_room)
@@ -403,11 +405,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             return False
         actual = meeting.get('settings', {}).get('approval_type')
         if actual != approval_type:
+            zoom_type = 'webinar' if is_webinar else 'meeting'
             self.logger.warning(
-                'Zoom %s %s did not honor approval_type=%s (got %s); this typically happens '
-                'on recurring meetings without a fixed time',
-                'webinar' if is_webinar else 'meeting',
-                vc_room.data['zoom_id'], approval_type, actual,
+                f'Zoom {zoom_type} %s did not honor approval_type=%s (got %s); this typically happens '  # noqa: G004
+                f'on recurring meetings without a fixed time',
+                vc_room.data['zoom_id'],
+                approval_type,
+                actual,
             )
             return False
         return True
@@ -630,11 +634,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if approval_type_changed:
                 actual_approval_type = zoom_meeting.get('settings', {}).get('approval_type')
                 if actual_approval_type != desired_approval_type:
+                    zoom_type = 'webinar' if is_webinar else 'meeting'
                     self.logger.warning(
-                        'Zoom %s %s did not honor approval_type=%s (got %s); this typically '
-                        'happens on recurring meetings without a fixed time',
-                        'webinar' if is_webinar else 'meeting',
-                        vc_room.data['zoom_id'], desired_approval_type, actual_approval_type,
+                        f'Zoom {zoom_type} %s did not honor approval_type=%s (got %s); this typically '  # noqa: G004
+                        f'happens on recurring meetings without a fixed time',
+                        vc_room.data['zoom_id'],
+                        desired_approval_type,
+                        actual_approval_type,
                     )
 
     def refresh_room(self, vc_room, event):
