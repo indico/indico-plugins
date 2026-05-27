@@ -86,7 +86,8 @@ class RHWebhook(RH):
         })
 
     def _handle_zoom_event(self, event, payload):
-        meeting_id = payload['object']['id']
+        # XXX Some Zoom events receive the ID as a string, others as a number
+        meeting_id = int(payload['object']['id'])
         vc_room = VCRoom.query.filter(VCRoom.data.contains({'zoom_id': meeting_id})).first()
 
         if not vc_room:
