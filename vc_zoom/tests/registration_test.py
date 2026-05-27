@@ -271,41 +271,6 @@ def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_re
     assert cancelled_emails == {'alice@example.com', 'bob@example.com'}
 
 
-def _create_vc_room_with_assoc(db, event, zoom_user, *, auto_register=True, auto_checkin=False):
-    """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
-    vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
-    vc_room.data = {
-        'zoom_id': 'zmeeting_manual',
-        'meeting_type': 'regular',
-        'host': 'User:1',
-        'auto_register': auto_register,
-        'auto_checkin': auto_checkin,
-    }
-    assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
-                                   data={'password_visibility': 'everyone'})
-    db.session.add(vc_room)
-    db.session.add(assoc)
-    db.session.flush()
-    return vc_room, assoc
-
-
-def _make_complete_registration(db, zoom_plugin, reg_form, email, first_name, last_name):
-    """Create a completed registration while auto_register is off to avoid triggering sync."""
-    data = {'email': email, 'first_name': first_name, 'last_name': last_name, 'affiliation': 'MegaCorp'}
-    form_data = {(getattr(f, 'html_field_name', None) or f.personal_data_type.name): data[f.personal_data_type.name]
-                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
-    form_data['email'] = email
-
-    prev = zoom_plugin.settings.get('allow_auto_register')
-    zoom_plugin.settings.set('allow_auto_register', False)
-    registration = create_registration(reg_form, form_data)
-    db.session.flush()
-    registration.state = RegistrationState.complete
-    db.session.flush()
-    zoom_plugin.settings.set('allow_auto_register', prev)
-    return registration
-
-
 @pytest.mark.usefixtures('request_context', 'smtp')
 def test_event_clone_skips_zoom_room_when_auto_register_enabled(
     db,
@@ -313,13 +278,15 @@ def test_event_clone_skips_zoom_room_when_auto_register_enabled(
     zoom_api_registrants,
     reg_form,
     zoom_user,
+    create_vc_room_with_assoc,
+    make_complete_registration,
 ):
     event = reg_form.event
     set_feature_enabled(event, 'registration', True)
-    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
+    make_complete_registration(reg_form, 'shared@example.com', 'Shared', 'User')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     session.set_session_user(zoom_user)
@@ -338,15 +305,16 @@ def test_event_clone_skips_zoom_room_when_auto_register_enabled(
 
 
 @pytest.mark.usefixtures('smtp')
-def test_vc_room_created_syncs_existing_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_vc_room_created_syncs_existing_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                       create_vc_room_with_assoc, make_complete_registration):
     """Creating a Zoom meeting should sync pre-existing completed registrations."""
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
@@ -357,15 +325,16 @@ def test_vc_room_created_syncs_existing_registrations(db, zoom_plugin, zoom_api_
 
 
 @pytest.mark.usefixtures('smtp')
-def test_vc_room_created_auto_register_disabled(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_vc_room_created_auto_register_disabled(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                  create_vc_room_with_assoc, make_complete_registration):
     """No sync when auto_register is disabled."""
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', False)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
@@ -373,7 +342,8 @@ def test_vc_room_created_auto_register_disabled(db, zoom_plugin, zoom_api_regist
 
 
 @pytest.mark.usefixtures('smtp')
-def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                            create_vc_room_with_assoc):
     """Only completed registrations are synced to Zoom on room creation."""
     event = reg_form.event
 
@@ -391,7 +361,7 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
@@ -400,15 +370,16 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
 
 @pytest.mark.usefixtures('request_context', 'smtp')
 def test_enable_auto_register_skips_existing_zoom_registrants(
-    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+    create_vc_room_with_assoc, make_complete_registration,
 ):
     """Enabling auto_register on an existing room should skip registrants already in Zoom."""
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, 'existing@example.com', 'Already', 'Registered')
-    _make_complete_registration(db, zoom_plugin, reg_form, 'new@example.com', 'Brand', 'New')
+    make_complete_registration(reg_form, 'existing@example.com', 'Already', 'Registered')
+    make_complete_registration(reg_form, 'new@example.com', 'Brand', 'New')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=False)
 
     zoom_api_registrants['list_meeting_registrants'].return_value = {
         'registrants': [{'id': 'reg_existing', 'email': 'existing@example.com'}]
@@ -446,13 +417,14 @@ def test_vc_room_form_defaults_follow_auto_register_setting(
 
 
 def test_get_personalized_join_url_for_registered_user(db, smtp, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
-                                                       create_user):
+                                                       create_user, create_vc_room_with_assoc,
+                                                       make_complete_registration):
     participant = create_user(2, email='jane.doe@megacorp.xyz')
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, participant.email, 'Jane', 'Doe')
+    make_complete_registration(reg_form, participant.email, 'Jane', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     zoom_api_registrants['list_meeting_registrants'].return_value = {
         'registrants': [{'id': 'reg123', 'email': participant.email, 'join_url': 'https://example.com/personal'}]
     }
@@ -464,14 +436,15 @@ def test_get_personalized_join_url_for_registered_user(db, smtp, zoom_plugin, zo
 
 
 def test_get_personalized_join_url_email_case_insensitive(db, smtp, zoom_plugin, zoom_api_registrants, reg_form,
-                                                           zoom_user, create_user, monkeypatch):
+                                                           zoom_user, create_user, monkeypatch,
+                                                           create_vc_room_with_assoc, make_complete_registration):
     """get_personalized_join_url must find the registrant even when _get_registrant_email returns mixed case."""
     participant = create_user(3, email='jane.doe@megacorp.xyz')
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, participant.email, 'Jane', 'Doe')
+    make_complete_registration(reg_form, participant.email, 'Jane', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     # Simulate _get_registrant_email returning a mixed-case enterprise email
     monkeypatch.setattr(zoom_plugin, '_get_registrant_email', lambda reg: 'Jane.Doe@MegaCorp.XYZ')
     # _find_zoom_registrants normalises keys to lowercase, so the key is lowercased
@@ -485,7 +458,8 @@ def test_get_personalized_join_url_email_case_insensitive(db, smtp, zoom_plugin,
 
 
 @pytest.mark.usefixtures('smtp')
-def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                  create_vc_room_with_assoc, make_complete_registration):
     """Two registrations with the same email (from different forms) should produce one Zoom registrant."""
     event = reg_form.event
 
@@ -499,14 +473,14 @@ def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_regist
     db.session.flush()
 
     # Register same email in both forms
-    reg1 = _make_complete_registration(db, zoom_plugin, reg_form, 'dupe@example.com', 'John', 'Doe')
-    reg2 = _make_complete_registration(db, zoom_plugin, reg_form_2, 'dupe@example.com', 'John', 'Doe')
+    reg1 = make_complete_registration(reg_form, 'dupe@example.com', 'John', 'Doe')
+    reg2 = make_complete_registration(reg_form_2, 'dupe@example.com', 'John', 'Doe')
     assert reg1.id != reg2.id
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
@@ -517,7 +491,7 @@ def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_regist
 
 
 def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting,
-                                               test_client, zoom_user):
+                                               test_client, zoom_user, make_complete_registration):
     """A single registrant should use add_meeting_registrant, not batch."""
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
@@ -529,7 +503,7 @@ def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registr
     vc_room = create_zoom_meeting(event, 'event')
     vc_room.data['auto_register'] = True
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'solo@example.com', 'Solo', 'User')
+    reg = make_complete_registration(reg_form, 'solo@example.com', 'Solo', 'User')
 
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     zoom_api_registrants['batch_meeting_registrants'].reset_mock()
@@ -542,10 +516,11 @@ def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registr
 
 
 @pytest.mark.usefixtures('smtp')
-def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                               create_vc_room_with_assoc, make_complete_registration):
     """Two or more registrants should use batch_meeting_registrants."""
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, 'alice@example.com', 'Alice', 'Smith')
+    make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
 
     reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
     section = RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
@@ -554,13 +529,13 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
     create_personal_data_fields(reg_form_2)
     event.registration_forms.append(reg_form_2)
     db.session.flush()
-    _make_complete_registration(db, zoom_plugin, reg_form_2, 'bob@example.com', 'Bob', 'Jones')
+    make_complete_registration(reg_form_2, 'bob@example.com', 'Bob', 'Jones')
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     zoom_api_registrants['batch_meeting_registrants'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
@@ -572,7 +547,8 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
 
 
 def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin, zoom_api_registrants, reg_form,
-                                                                 create_zoom_meeting, test_client, zoom_user):
+                                                                 create_zoom_meeting, test_client, zoom_user,
+                                                                 make_complete_registration):
     """Deleting a form should not cancel a user's Zoom registration if they're still registered via another form."""
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
@@ -594,8 +570,8 @@ def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin
     db.session.flush()
 
     # Register same user in both forms
-    _make_complete_registration(db, zoom_plugin, reg_form, 'shared@example.com', 'Shared', 'User')
-    _make_complete_registration(db, zoom_plugin, reg_form_2, 'shared@example.com', 'Shared', 'User')
+    make_complete_registration(reg_form, 'shared@example.com', 'Shared', 'User')
+    make_complete_registration(reg_form_2, 'shared@example.com', 'Shared', 'User')
 
     # Mock list to return the shared registrant so the cancel would actually fire
     zoom_api_registrants['list_meeting_registrants'].return_value = {
@@ -612,13 +588,14 @@ def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_registration_summary_shows_zoom_link(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user):
+def test_registration_summary_shows_zoom_link(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                create_vc_room_with_assoc, make_complete_registration):
     """The token-based registration summary should show the personalized Zoom join URL."""
     event = reg_form.event
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=True)
 
     zoom_api_registrants['list_meeting_registrants'].return_value = {
         'registrants': [{'id': 'reg123', 'email': 'test@example.com', 'join_url': 'https://example.com/personal'}]
@@ -631,13 +608,14 @@ def test_registration_summary_shows_zoom_link(db, zoom_plugin, zoom_api_registra
 
 @pytest.mark.usefixtures('request_context', 'smtp')
 def test_registration_summary_hides_zoom_link_from_management(db, zoom_plugin, zoom_api_registrants, reg_form,
-                                                              zoom_user):
+                                                              zoom_user, create_vc_room_with_assoc,
+                                                              make_complete_registration):
     """Management view should never see the participant's personal join URL."""
     event = reg_form.event
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=True)
     zoom_api_registrants['list_meeting_registrants'].return_value = {
         'registrants': [{'id': 'reg123', 'email': 'test@example.com', 'join_url': 'https://example.com/personal'}]
     }
@@ -649,14 +627,15 @@ def test_registration_summary_hides_zoom_link_from_management(db, zoom_plugin, z
 
 @pytest.mark.usefixtures('request_context', 'smtp')
 def test_registration_summary_hides_zoom_link_when_auto_register_disabled(
-    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+    create_vc_room_with_assoc, make_complete_registration,
 ):
     """Rooms without auto_register enabled must not produce a join link row."""
     event = reg_form.event
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=False)
 
     html = zoom_plugin._render_registration_zoom_link(registration, from_management=False)
 
@@ -666,14 +645,15 @@ def test_registration_summary_hides_zoom_link_when_auto_register_disabled(
 
 @pytest.mark.usefixtures('request_context', 'smtp')
 def test_registration_summary_hides_zoom_link_if_not_registered_in_zoom(
-    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user
+    db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+    create_vc_room_with_assoc, make_complete_registration,
 ):
     """If the registrant is not in Zoom (yet), no link row should be produced."""
     event = reg_form.event
-    registration = _make_complete_registration(db, zoom_plugin, reg_form, 'test@example.com', 'John', 'Doe')
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
 
     zoom_plugin.settings.set('allow_auto_register', True)
-    _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=True)
     zoom_api_registrants['list_meeting_registrants'].return_value = {'registrants': []}
 
     html = zoom_plugin._render_registration_zoom_link(registration, from_management=False)

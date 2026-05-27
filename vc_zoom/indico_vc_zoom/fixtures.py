@@ -14,7 +14,9 @@ import pytest
 from indico.core.plugins import plugin_engine
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
-from indico.modules.events.registration.util import create_personal_data_fields
+from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.util import create_personal_data_fields, create_registration
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
 
 TZ = ZoneInfo('Europe/Zurich')
@@ -161,6 +163,47 @@ def zoom_api(zoom_plugin, create_user, mocker):
         'api_delete_meeting': api_delete_meeting,
         'get_user': api_get_user,
     }
+
+
+@pytest.fixture
+def create_vc_room_with_assoc(db):
+    """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
+    def _create(event, zoom_user, *, auto_register=True, auto_checkin=False):
+        vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
+        vc_room.data = {
+            'zoom_id': 'zmeeting_manual',
+            'meeting_type': 'regular',
+            'host': 'User:1',
+            'auto_register': auto_register,
+            'auto_checkin': auto_checkin,
+        }
+        assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
+                                       data={'password_visibility': 'everyone'})
+        db.session.add(vc_room)
+        db.session.add(assoc)
+        db.session.flush()
+        return vc_room, assoc
+    return _create
+
+
+@pytest.fixture
+def make_complete_registration(db, zoom_plugin):
+    """Create a completed registration while auto_register is off to avoid triggering sync."""
+    def _make(reg_form, email, first_name, last_name):
+        data = {'email': email, 'first_name': first_name, 'last_name': last_name, 'affiliation': 'MegaCorp'}
+        form_data = {(getattr(f, 'html_field_name', None) or f.personal_data_type.name): data[f.personal_data_type.name]
+                     for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+        form_data['email'] = email
+
+        prev = zoom_plugin.settings.get('allow_auto_register')
+        zoom_plugin.settings.set('allow_auto_register', False)
+        registration = create_registration(reg_form, form_data)
+        db.session.flush()
+        registration.state = RegistrationState.complete
+        db.session.flush()
+        zoom_plugin.settings.set('allow_auto_register', prev)
+        return registration
+    return _make
 
 
 @pytest.fixture

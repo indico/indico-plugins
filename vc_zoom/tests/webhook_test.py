@@ -6,12 +6,11 @@
 # see the LICENSE file for more details.
 
 import hashlib
-import hmac as _hmac
+import hmac
 import json
-import time as _time
+import time
 
 import pytest
-from registration_test import _create_vc_room_with_assoc, _make_complete_registration
 
 from indico.core import signals
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
@@ -26,9 +25,9 @@ def webhook_client(test_client, zoom_plugin):
 
     def _post(payload, *, timestamp=None):
         if timestamp is None:
-            timestamp = str(int(_time.time()))
+            timestamp = str(int(time.time()))
         body = json.dumps(payload).encode()
-        sig = _hmac.new(TOKEN.encode(), b'v0:' + timestamp.encode() + b':' + body, hashlib.sha256).hexdigest()
+        sig = hmac.new(TOKEN.encode(), b'v0:' + timestamp.encode() + b':' + body, hashlib.sha256).hexdigest()
         return test_client.post(
             '/api/plugin/zoom/webhook',
             data=body,
@@ -46,7 +45,7 @@ def webhook_client(test_client, zoom_plugin):
 
 def test_webhook_bad_signature_returns_403(db, test_client, zoom_plugin):
     zoom_plugin.settings.set('webhook_token', TOKEN)
-    ts = str(int(_time.time()))
+    ts = str(int(time.time()))
     resp = test_client.post(
         '/api/plugin/zoom/webhook',
         json={'event': 'meeting.updated', 'payload': {'object': {'id': 'z1'}}},
@@ -58,13 +57,13 @@ def test_webhook_bad_signature_returns_403(db, test_client, zoom_plugin):
 # ── participant_joined check-in tests ─────────────────────────────────────────
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zoom_user,
-                                                    webhook_client):
+def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                    create_vc_room_with_assoc, make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, auto_checkin=True)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    reg = make_complete_registration(reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
 
     payload = {
@@ -84,33 +83,32 @@ def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zo
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_emits_checkin_signal(db, zoom_plugin, reg_form, zoom_user,
-                                                  webhook_client, mocker):
+def test_participant_joined_emits_checkin_signal(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                  create_vc_room_with_assoc, make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, auto_checkin=True)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    reg = make_complete_registration(reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
 
     received = []
-    signals.event.registration_checkin_updated.connect(received.append, weak=False)
-
     payload = {
         'event': 'meeting.participant_joined',
         'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
     }
-    webhook_client(payload)
+    with signals.event.registration_checkin_updated.connected_to(received.append):
+        webhook_client(payload)
 
-    signals.event.registration_checkin_updated.disconnect(received.append)
     assert received == [reg]
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_unknown_email_returns_200(db, zoom_plugin, reg_form, zoom_user, webhook_client):
+def test_participant_joined_unknown_email_returns_200(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                       create_vc_room_with_assoc):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, auto_checkin=True)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
     db.session.flush()
 
     payload = {
@@ -122,13 +120,14 @@ def test_participant_joined_unknown_email_returns_200(db, zoom_plugin, reg_form,
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin, reg_form,
-                                                                  zoom_user, webhook_client):
+def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                                  create_vc_room_with_assoc,
+                                                                  make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=False, auto_checkin=True)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=False, auto_checkin=True)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    reg = make_complete_registration(reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
 
     payload = {
@@ -142,13 +141,14 @@ def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin,
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, reg_form,
-                                                                   zoom_user, webhook_client):
+def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                                   create_vc_room_with_assoc,
+                                                                   make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, auto_checkin=False)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=False)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    reg = make_complete_registration(reg_form, 'test@megacorp.xyz', 'Test', 'User')
     db.session.flush()
 
     payload = {
@@ -162,13 +162,14 @@ def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, 
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, reg_form,
-                                                                zoom_user, webhook_client):
+def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                                create_vc_room_with_assoc,
+                                                                make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    vc_room, _assoc = _create_vc_room_with_assoc(db, event, zoom_user, auto_register=True, auto_checkin=True)
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'test@megacorp.xyz', 'Test', 'User')
+    reg = make_complete_registration(reg_form, 'test@megacorp.xyz', 'Test', 'User')
     reg.checked_in = True
     db.session.flush()
 
@@ -182,8 +183,8 @@ def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, 
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_form,
-                                                            zoom_user, webhook_client):
+def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                            make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
 
@@ -200,7 +201,7 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
     db.session.add(vc_room)
     db.session.add(assoc)
 
-    reg = _make_complete_registration(db, zoom_plugin, reg_form, 'webinar@megacorp.xyz', 'Web', 'User')
+    reg = make_complete_registration(reg_form, 'webinar@megacorp.xyz', 'Web', 'User')
     db.session.flush()
 
     payload = {
