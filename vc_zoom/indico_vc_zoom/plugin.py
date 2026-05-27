@@ -895,6 +895,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 return enterprise_email.lower()
         return registration.email
 
+    def _get_zoom_host_emails(self, vc_room):
+        # Zoom rejects registering the meeting host or any pre-assigned alt host (API error 3027).
+        identifiers = [vc_room.data['host'], *(vc_room.data.get('alternative_hosts') or [])]
+        emails = set()
+        for ident in identifiers:
+            principal = principal_from_identifier(ident, require_user_token=False)
+            if principal and (email := find_enterprise_email(principal)):
+                emails.add(email.lower())
+        return emails
+
     def _get_user_registration(self, event, user):
         return (Registration.query.with_parent(event)
                 .join(Registration.registration_form)
@@ -1003,7 +1013,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 else:
                     room_ops[zoom_id]['remove'][email] = registration.id
         for ops in room_ops.values():
-            ops['add'] = list(ops['add'].values())
+            skip = self._get_zoom_host_emails(ops['vc_room'])
+            ops['add'] = [e for e in ops['add'].values() if e['data']['email'].lower() not in skip]
         return room_ops
 
     def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
