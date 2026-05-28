@@ -371,8 +371,10 @@ def monkeypatch_registration_file_time():
 
     orig_time = registrations.time
     registrations.time = FakeTime()
-    yield
-    registrations.time = orig_time
+    try:
+        yield
+    finally:
+        registrations.time = orig_time
 
 
 @cli_group()
