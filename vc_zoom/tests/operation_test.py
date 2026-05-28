@@ -117,6 +117,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
     assert vc_room.data['url'] == 'https://example.com/llamas'
 
 
+@pytest.mark.usefixtures('auto_register_before')
 @pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
 @pytest.mark.parametrize(('auto_register_before', 'auto_register_after', 'current_approval_type', 'expected'), (
     (False, True, 2, {'settings': {'approval_type': 0}}),
@@ -126,7 +127,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 ))
 def test_update_room_pushes_approval_type(
     mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-    auto_register_before, auto_register_after, current_approval_type, expected, meeting_type,
+    auto_register_after, current_approval_type, expected, meeting_type,
 ):
     event = create_event(
         creator=zoom_api['user'],
