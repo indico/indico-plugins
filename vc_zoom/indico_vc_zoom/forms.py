@@ -67,7 +67,7 @@ class VCRoomForm(VCRoomFormBase):
 
     # Override the core 60-char cap: Zoom's meeting/webinar `topic` accepts up to 200.
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=200)],
-                       description=_('The name of the videoconference.'))
+                       description=_('The name of the Zoom meeting.'))
 
     meeting_type = IndicoRadioField(_('Meeting Type'),
                                     description=_('The type of Zoom meeting to be created'),
