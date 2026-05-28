@@ -48,7 +48,7 @@ def test_webhook_bad_signature_returns_403(db, test_client, zoom_plugin):
     ts = str(int(time.time()))
     resp = test_client.post(
         '/api/plugin/zoom/webhook',
-        json={'event': 'meeting.updated', 'payload': {'object': {'id': 'z1'}}},
+        json={'event': 'meeting.updated', 'payload': {'object': {'id': 100000}}},
         headers={'x-zm-request-timestamp': ts, 'x-zm-signature': 'v0=badsig'},
     )
     assert resp.status_code == 403
@@ -70,7 +70,7 @@ def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zo
         'event': 'meeting.participant_joined',
         'payload': {
             'object': {
-                'id': vc_room.data['zoom_id'],
+                'id': str(vc_room.data['zoom_id']),
                 'participant': {'email': 'test@megacorp.xyz'},
             }
         },
@@ -95,7 +95,7 @@ def test_participant_joined_emits_checkin_signal(db, zoom_plugin, reg_form, zoom
     received = []
     payload = {
         'event': 'meeting.participant_joined',
-        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'test@megacorp.xyz'}}},
     }
     with signals.event.registration_checkin_updated.connected_to(received.append):
         webhook_client(payload)
@@ -113,7 +113,7 @@ def test_participant_joined_unknown_email_returns_200(db, zoom_plugin, reg_form,
 
     payload = {
         'event': 'meeting.participant_joined',
-        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'nobody@megacorp.xyz'}}},
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'nobody@megacorp.xyz'}}},
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200
@@ -132,7 +132,7 @@ def test_participant_joined_skipped_when_auto_register_disabled(db, zoom_plugin,
 
     payload = {
         'event': 'meeting.participant_joined',
-        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'test@megacorp.xyz'}}},
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200
@@ -153,7 +153,7 @@ def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, 
 
     payload = {
         'event': 'meeting.participant_joined',
-        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'test@megacorp.xyz'}}},
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200
@@ -175,7 +175,7 @@ def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, 
 
     payload = {
         'event': 'meeting.participant_joined',
-        'payload': {'object': {'id': vc_room.data['zoom_id'], 'participant': {'email': 'test@megacorp.xyz'}}},
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'test@megacorp.xyz'}}},
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200
@@ -190,7 +190,7 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
 
     vc_room = VCRoom(name='Test Webinar', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
     vc_room.data = {
-        'zoom_id': 'zwebinar_test',
+        'zoom_id': 26262601,
         'meeting_type': 'webinar',
         'host': 'User:1',
         'auto_register': True,
@@ -206,7 +206,7 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
 
     payload = {
         'event': 'webinar.participant_joined',
-        'payload': {'object': {'id': 'zwebinar_test', 'participant': {'email': 'webinar@megacorp.xyz'}}},
+        'payload': {'object': {'id': '26262601', 'participant': {'email': 'webinar@megacorp.xyz'}}},
     }
     resp = webhook_client(payload)
     assert resp.status_code == 200

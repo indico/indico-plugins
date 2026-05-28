@@ -126,7 +126,7 @@ JSON_DATA = {
 @pytest.fixture
 def zoom_api(zoom_plugin, create_user, mocker):
     """Mock some Zoom API endpoints."""
-    meeting_ids = iter(f'zmeeting{n}' for n in itertools.count(start=1, step=1))
+    meeting_ids = itertools.count(start=100000, step=1)
 
     def _create_meeting(*args, **kwargs):
         return {**JSON_DATA, 'id': next(meeting_ids)}
@@ -171,7 +171,7 @@ def create_vc_room_with_assoc(db):
     def _create(event, zoom_user, *, auto_register=True, auto_checkin=False):
         vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
         vc_room.data = {
-            'zoom_id': 'zmeeting_manual',
+            'zoom_id': 26262600,
             'meeting_type': 'regular',
             'host': 'User:1',
             'auto_register': auto_register,
