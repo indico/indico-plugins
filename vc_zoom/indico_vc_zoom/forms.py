@@ -113,7 +113,13 @@ class VCRoomForm(VCRoomFormBase):
                                  description=_('Automatically register Indico registrants in this Zoom '
                                                'meeting/webinar. Consider setting "Passcode visibility" '
                                                'to "No one" so participants only receive their '
-                                               'personalized join link.'))
+                                               'personalized join link'))
+
+    auto_checkin = BooleanField(_('Automatic check-in'),
+                                   [HiddenUnless('auto_register')],
+                                   widget=SwitchWidget(),
+                                   description=_('Automatically check in registrants when they join this '
+                                                 'Zoom meeting/webinar'))
 
     description = TextAreaField(_('Description'), description=_('Optional description for this meeting'))
 
@@ -164,6 +170,7 @@ class VCRoomForm(VCRoomFormBase):
 
         if not current_plugin.settings.get('allow_auto_register'):
             del self.auto_register
+            del self.auto_checkin
 
         self._auto_register_locked = False
         if getattr(self, 'auto_register', None) is not None and self._is_link_target_in_past():

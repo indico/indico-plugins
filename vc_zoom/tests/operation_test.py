@@ -109,7 +109,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 
     zoom_plugin.update_room(vc_room, vc_room.events[0].event)
 
-    zoom_api['update_meeting'].assert_called_with('zmeeting1', {
+    zoom_api['update_meeting'].assert_called_with(100000, {
         'password': '12341234',
     })
 
@@ -117,6 +117,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
     assert vc_room.data['url'] == 'https://example.com/llamas'
 
 
+@pytest.mark.usefixtures('auto_register_before')
 @pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
 @pytest.mark.parametrize(('auto_register_before', 'auto_register_after', 'current_approval_type', 'expected'), (
     (False, True, 2, {'settings': {'approval_type': 0}}),
@@ -126,7 +127,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 ))
 def test_update_room_pushes_approval_type(
     mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
-    auto_register_before, auto_register_after, current_approval_type, expected, meeting_type,
+    auto_register_after, current_approval_type, expected, meeting_type,
 ):
     event = create_event(
         creator=zoom_api['user'],
@@ -143,7 +144,7 @@ def test_update_room_pushes_approval_type(
     is_webinar = meeting_type == 'webinar'
     mocker.patch(
         'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=current_approval_type), is_webinar),
+        return_value=(_aligned_meeting(100000, approval_type=current_approval_type), is_webinar),
     )
 
     api_mock = zoom_api['update_webinar' if is_webinar else 'update_meeting']
@@ -157,7 +158,7 @@ def test_update_room_pushes_approval_type(
     if expected is None:
         api_mock.assert_not_called()
     else:
-        api_mock.assert_called_with('zmeeting1', expected)
+        api_mock.assert_called_with(100000, expected)
 
 
 @pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
@@ -184,7 +185,7 @@ def test_update_data_vc_room_pushes_approval_type_before_sync(
     is_webinar = meeting_type == 'webinar'
     mocker.patch(
         'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=expected_approval_type), is_webinar),
+        return_value=(_aligned_meeting(100000, approval_type=expected_approval_type), is_webinar),
     )
     api_mock = zoom_api['update_webinar' if is_webinar else 'update_meeting']
     other_mock = zoom_api['update_meeting' if is_webinar else 'update_webinar']
@@ -193,7 +194,7 @@ def test_update_data_vc_room_pushes_approval_type_before_sync(
 
     zoom_plugin.update_data_vc_room(vc_room, {'auto_register': auto_register_after})
 
-    api_mock.assert_called_once_with('zmeeting1', {'settings': {'approval_type': expected_approval_type}})
+    api_mock.assert_called_once_with(100000, {'settings': {'approval_type': expected_approval_type}})
     other_mock.assert_not_called()
 
 
@@ -235,7 +236,7 @@ def test_push_approval_type_warns_when_zoom_drops_patch(
     # Zoom accepts the PATCH (no error) but the read-back shows the value was not honored
     mocker.patch(
         'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=2), is_webinar),
+        return_value=(_aligned_meeting(100000, approval_type=2), is_webinar),
     )
     warning_mock = mocker.patch.object(zoom_plugin.logger, 'warning')
 
@@ -263,7 +264,7 @@ def test_update_room_warns_when_zoom_drops_approval_type_patch(
     # Both the pre- and post-PATCH fetches return approval_type=2 (Zoom dropped the change)
     mocker.patch(
         'indico_vc_zoom.plugin.fetch_zoom_meeting',
-        return_value=(_aligned_meeting('zmeeting1', approval_type=2), False),
+        return_value=(_aligned_meeting(100000, approval_type=2), False),
     )
     warning_mock = mocker.patch.object(zoom_plugin.logger, 'warning')
 

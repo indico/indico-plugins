@@ -6,10 +6,20 @@
 # see the LICENSE file for more details.
 
 import itertools
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 
 from indico.core.plugins import plugin_engine
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.util import create_personal_data_fields, create_registration
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+
+
+TZ = ZoneInfo('Europe/Zurich')
 
 
 @pytest.fixture
@@ -24,6 +34,27 @@ def zoom_plugin(app):
         'allow_language_interpretation': True,
     })
     return plugin
+
+
+@pytest.fixture
+def zoom_user(zoom_api):
+    return zoom_api['user']
+
+
+@pytest.fixture
+def reg_form(create_event, db):
+    event = create_event(
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+    )
+    regform = RegistrationForm(event=event, title='Test Form', currency='EUR')
+    section = RegistrationFormSection(registration_form=regform, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    regform.sections.append(section)
+    create_personal_data_fields(regform)
+    event.registration_forms.append(regform)
+    db.session.flush()
+    return regform
 
 
 @pytest.fixture
@@ -95,7 +126,7 @@ JSON_DATA = {
 @pytest.fixture
 def zoom_api(zoom_plugin, create_user, mocker):
     """Mock some Zoom API endpoints."""
-    meeting_ids = iter(f'zmeeting{n}' for n in itertools.count(start=1, step=1))
+    meeting_ids = itertools.count(start=100000, step=1)
 
     def _create_meeting(*args, **kwargs):
         return {**JSON_DATA, 'id': next(meeting_ids)}
@@ -132,3 +163,69 @@ def zoom_api(zoom_plugin, create_user, mocker):
         'api_delete_meeting': api_delete_meeting,
         'get_user': api_get_user,
     }
+
+
+@pytest.fixture
+def create_vc_room_with_assoc(db):
+    """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
+    def _create(event, zoom_user, *, auto_register=True, auto_checkin=False):
+        vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
+        vc_room.data = {
+            'zoom_id': 26262600,
+            'meeting_type': 'regular',
+            'host': 'User:1',
+            'auto_register': auto_register,
+            'auto_checkin': auto_checkin,
+        }
+        assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
+                                       data={'password_visibility': 'everyone'})
+        db.session.add(vc_room)
+        db.session.add(assoc)
+        db.session.flush()
+        return vc_room, assoc
+    return _create
+
+
+@pytest.fixture
+def make_complete_registration(db, zoom_plugin):
+    """Create a completed registration while auto_register is off to avoid triggering sync."""
+    def _make(reg_form, email, first_name, last_name):
+        data = {'email': email, 'first_name': first_name, 'last_name': last_name, 'affiliation': 'MegaCorp'}
+        form_data = {(getattr(f, 'html_field_name', None) or f.personal_data_type.name): data[f.personal_data_type.name]
+                     for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+        form_data['email'] = email
+
+        prev = zoom_plugin.settings.get('allow_auto_register')
+        zoom_plugin.settings.set('allow_auto_register', False)
+        registration = create_registration(reg_form, form_data)
+        db.session.flush()
+        registration.state = RegistrationState.complete
+        db.session.flush()
+        zoom_plugin.settings.set('allow_auto_register', prev)
+        return registration
+    return _make
+
+
+@pytest.fixture
+def zoom_api_registrants(zoom_api, mocker):
+    zoom_api['add_meeting_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_meeting_registrant')
+    zoom_api['add_webinar_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_webinar_registrant')
+    zoom_api['update_meeting_registrants_status'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.update_meeting_registrants_status')
+    zoom_api['update_webinar_registrants_status'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.update_webinar_registrants_status')
+    zoom_api['list_meeting_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.list_meeting_registrants')
+    zoom_api['list_webinar_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.list_webinar_registrants')
+    zoom_api['batch_meeting_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_meeting_registrants')
+    zoom_api['batch_webinar_registrants'] = mocker.patch(
+        'indico_vc_zoom.plugin.ZoomIndicoClient.batch_webinar_registrants')
+
+    zoom_api['add_meeting_registrant'].return_value = {}
+    zoom_api['add_webinar_registrant'].return_value = {}
+    zoom_api['list_meeting_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
+    zoom_api['list_webinar_registrants'].return_value = {'registrants': [{'id': 'reg123', 'email': 'test@example.com'}]}
+
+    return zoom_api
