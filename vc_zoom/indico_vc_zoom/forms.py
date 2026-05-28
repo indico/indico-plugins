@@ -9,7 +9,7 @@ from flask import session
 from flask_pluginengine import current_plugin
 from wtforms.fields import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.util.date_time import now_utc
@@ -64,6 +64,10 @@ class VCRoomForm(VCRoomFormBase):
     ]
 
     skip_fields = set(advanced_fields) | VCRoomFormBase.conditional_fields
+
+    # Override the core 60-char cap: Zoom's meeting/webinar `topic` accepts up to 200.
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=200)],
+                       description=_('The name of the videoconference.'))
 
     meeting_type = IndicoRadioField(_('Meeting Type'),
                                     description=_('The type of Zoom meeting to be created'),
