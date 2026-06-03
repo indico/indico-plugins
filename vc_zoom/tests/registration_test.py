@@ -678,20 +678,29 @@ def test_registration_summary_hides_zoom_link_if_not_registered_in_zoom(
 
 
 @pytest.mark.usefixtures('smtp')
-def test_batch_excludes_host_and_alt_host(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user, create_user):
+def test_batch_excludes_host_and_alt_host(
+    db,
+    zoom_plugin,
+    zoom_api_registrants,
+    reg_form,
+    zoom_user,
+    create_user,
+    make_complete_registration,
+    create_vc_room_with_assoc,
+):
     """When the queue mixes host, alt host, and regular participants, only the regular ones reach Zoom."""
     alt_host = create_user(2, email='alt.host@megacorp.xyz')
     event = reg_form.event
-    _make_complete_registration(db, zoom_plugin, reg_form, zoom_user.email, 'Don', 'Orange')
-    _make_complete_registration(db, zoom_plugin, reg_form, alt_host.email, 'Alt', 'Host')
-    _make_complete_registration(db, zoom_plugin, reg_form, 'alice@example.com', 'Alice', 'Smith')
-    _make_complete_registration(db, zoom_plugin, reg_form, 'bob@example.com', 'Bob', 'Jones')
+    make_complete_registration(reg_form, zoom_user.email, 'Don', 'Orange')
+    make_complete_registration(reg_form, alt_host.email, 'Alt', 'Host')
+    make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
+    make_complete_registration(reg_form, 'bob@example.com', 'Bob', 'Jones')
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
     zoom_api_registrants['batch_meeting_registrants'].reset_mock()
 
-    vc_room, assoc = _create_vc_room_with_assoc(db, event, zoom_user)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     vc_room.data['alternative_hosts'] = [alt_host.persistent_identifier]
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
