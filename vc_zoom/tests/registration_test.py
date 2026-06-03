@@ -545,6 +545,21 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
     batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
     batch_emails = {r['email'] for r in batch_data['registrants']}
     assert batch_emails == {'alice@example.com', 'bob@example.com'}
+    assert batch_data['registrants_confirmation_email'] is True
+
+
+def test_batch_webinar_registrants_omit_confirmation_email(zoom_plugin, mocker):
+    """Webinar batch registrations must not set the meeting-only confirmation email flag."""
+    client = mocker.MagicMock()
+    entries = [
+        {'indico_id': 1, 'data': {'email': 'alice@example.com'}},
+        {'indico_id': 2, 'data': {'email': 'bob@example.com'}},
+    ]
+    zoom_plugin._add_batch_registrants(client, 'zwebinar1', entries, is_webinar=True)
+
+    client.batch_meeting_registrants.assert_not_called()
+    batch_data = client.batch_webinar_registrants.call_args[0][1]
+    assert 'registrants_confirmation_email' not in batch_data
 
 
 def test_form_deletion_skips_remove_if_registered_via_other_form(db, zoom_plugin, zoom_api_registrants, reg_form,
