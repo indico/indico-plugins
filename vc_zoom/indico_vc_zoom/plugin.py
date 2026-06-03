@@ -1053,6 +1053,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         for i in range(0, len(entries), BATCH_REGISTRANTS_MAX):
             chunk = entries[i:i + BATCH_REGISTRANTS_MAX]
             data = {'auto_approve': True, 'registrants': [e['data'] for e in chunk]}
+            if not is_webinar:
+                data['registrants_confirmation_email'] = True
             emails = ', '.join(f'{e["data"]["email"]} (indico_id={e["indico_id"]})' for e in chunk)
             try:
                 batch_func(zoom_id, data)
