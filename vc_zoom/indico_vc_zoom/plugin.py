@@ -446,11 +446,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
         flag_modified(vc_room, 'data')
 
-        # Push approval_type whenever auto_register is toggled. On enable we also sync any
-        # existing registrants so the initial backfill can hit the registrants endpoint.
+        # Push approval_type whenever auto_register is toggled. Manual approval (1) keeps the public
+        # registration page gated (self-registrants stay "pending"); Indico-pushed registrants are
+        # auto-approved via auto_approve. On enable we also sync any existing registrants so the
+        # initial backfill can hit the registrants endpoint.
         if not is_new and auto_register_before != vc_room.data.get('auto_register'):
             is_webinar = vc_room.data.get('meeting_type') == 'webinar'
-            desired_approval_type = 0 if vc_room.data.get('auto_register') else 2
+            desired_approval_type = 1 if vc_room.data.get('auto_register') else 2
             self._push_approval_type(vc_room, desired_approval_type, is_webinar=is_webinar)
             if vc_room.data.get('auto_register'):
                 candidates = [
@@ -532,7 +534,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'join_before_host': self.settings.get('join_before_host'),
                 })
                 if vc_room.data.get('auto_register'):
-                    settings['approval_type'] = 0
+                    # Manual approval (1), not automatic (0): the public Zoom registration page then
+                    # holds self-registrants in "pending", so a leaked link can't self-approve into
+                    # the meeting. Indico's own registrants are still approved automatically via the
+                    # auto_approve flag on the registrant push. Zoom only honors auto_approve when the
+                    # meeting was originally created with approval_type=1, hence setting it here.
+                    settings['approval_type'] = 1
 
             kwargs.update({
                 'topic': vc_room.name,
@@ -624,7 +631,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             if vc_room.data['waiting_room'] != zoom_meeting_settings['waiting_room']:
                 changes.setdefault('settings', {})['waiting_room'] = vc_room.data['waiting_room']
 
-        desired_approval_type = 0 if vc_room.data.get('auto_register') else 2
+        # Manual approval (1) when auto_register is on; see create_room for the rationale.
+        desired_approval_type = 1 if vc_room.data.get('auto_register') else 2
         approval_type_changed = zoom_meeting_settings.get('approval_type') != desired_approval_type
         if approval_type_changed:
             changes.setdefault('settings', {})['approval_type'] = desired_approval_type
