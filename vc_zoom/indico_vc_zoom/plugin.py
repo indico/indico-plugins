@@ -534,11 +534,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'join_before_host': self.settings.get('join_before_host'),
                 })
                 if vc_room.data.get('auto_register'):
-                    # Manual approval (1), not automatic (0): the public Zoom registration page then
-                    # holds self-registrants in "pending", so a leaked link can't self-approve into
-                    # the meeting. Indico's own registrants are still approved automatically via the
-                    # auto_approve flag on the registrant push. Zoom only honors auto_approve when the
-                    # meeting was originally created with approval_type=1, hence setting it here.
+                    # Manual approval (1), not automatic (0): the public Zoom registration page holds
+                    # self-registrants in "pending", so a leaked link can't self-approve into the
+                    # meeting. Indico's own registrants are still approved via the auto_approve flag on
+                    # the registrant push, which Zoom honors whenever the meeting's current
+                    # approval_type is 1.
                     settings['approval_type'] = 1
 
             kwargs.update({
