@@ -5,7 +5,7 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -120,9 +120,9 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
 @pytest.mark.usefixtures('auto_register_before')
 @pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
 @pytest.mark.parametrize(('auto_register_before', 'auto_register_after', 'current_approval_type', 'expected'), (
-    (False, True, 2, {'settings': {'approval_type': 0}}),
-    (True, False, 0, {'settings': {'approval_type': 2}}),
-    (True, True, 0, None),
+    (False, True, 2, {'settings': {'approval_type': 1}}),
+    (True, False, 1, {'settings': {'approval_type': 2}}),
+    (True, True, 1, None),
     (False, False, 2, None),
 ))
 def test_update_room_pushes_approval_type(
@@ -163,7 +163,7 @@ def test_update_room_pushes_approval_type(
 
 @pytest.mark.parametrize('meeting_type', ('regular', 'webinar'))
 @pytest.mark.parametrize(('auto_register_before', 'auto_register_after', 'expected_approval_type'), (
-    (False, True, 0),
+    (False, True, 1),
     (True, False, 2),
 ))
 def test_update_data_vc_room_pushes_approval_type_before_sync(
@@ -217,6 +217,31 @@ def test_create_room_blocks_past_event_with_auto_register(
         zoom_plugin.create_room(vc_room, event)
 
     zoom_api['create_meeting'].assert_not_called()
+
+
+def test_create_room_with_auto_register_uses_manual_approval(
+    create_event, create_zoom_meeting, zoom_plugin, zoom_api,
+):
+    """auto_register meetings are created with approval_type=1 so the public registration page
+    holds self-registrants in 'pending'; Indico's own registrants are approved via auto_approve.
+    """
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime.now(TZ) + timedelta(days=30),
+        end_dt=datetime.now(TZ) + timedelta(days=30, hours=2),
+        title='Future Event',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['auto_register'] = True
+    zoom_api['create_meeting'].reset_mock()
+
+    zoom_plugin.create_room(vc_room, event)
+
+    zoom_api['create_meeting'].assert_called_once()
+    settings = zoom_api['create_meeting'].call_args.kwargs['settings']
+    assert settings['approval_type'] == 1
 
 
 @pytest.mark.parametrize('is_webinar', (False, True))
