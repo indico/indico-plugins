@@ -210,3 +210,32 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
     assert resp.status_code == 200
     db.session.refresh(reg)
     assert reg.checked_in
+
+
+# ── meeting.deleted tests ─────────────────────────────────────────────────────
+
+@pytest.mark.usefixtures('request_context')
+def test_meeting_deleted_marks_room_deleted(db, zoom_user, reg_form, webhook_client, create_vc_room_with_assoc):
+    vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user)
+    payload = {'event': 'meeting.deleted', 'payload': {'object': {'id': str(vc_room.data['zoom_id'])}}}
+
+    resp = webhook_client(payload)
+
+    assert resp.status_code == 200
+    db.session.refresh(vc_room)
+    assert vc_room.status == VCRoomStatus.deleted
+
+
+def test_meeting_deleted_tolerates_already_removed_room(db, zoom_plugin, zoom_user):
+    from indico_vc_zoom.controllers import RHWebhook
+
+    vc_room = VCRoom(name='Gone', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
+    vc_room.data = {'zoom_id': 99999}
+    db.session.add(vc_room)
+    db.session.flush()
+    # Simulate Indico having hard-deleted the row in the transaction that triggered this webhook.
+    db.session.execute(VCRoom.__table__.delete().where(VCRoom.__table__.c.id == vc_room.id))
+
+    with zoom_plugin.plugin_context():
+        # Must not raise StaleDataError even though the row is gone.
+        RHWebhook()._mark_room_deleted(vc_room)

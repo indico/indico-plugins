@@ -12,6 +12,7 @@ from flask import jsonify, request, session
 from flask_pluginengine import current_plugin
 from marshmallow import EXCLUDE
 from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm.exc import StaleDataError
 from webargs import fields
 from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import Forbidden, ServiceUnavailable
@@ -85,6 +86,16 @@ class RHWebhook(RH):
             'encryptedToken': signed_token
         })
 
+    def _mark_room_deleted(self, vc_room):
+        vc_room.status = VCRoomStatus.deleted
+        try:
+            db.session.flush()
+        except StaleDataError:
+            # The VC room was already removed in Indico (the deletion that triggered this
+            # webhook), so the row is gone and there is nothing left to update.
+            db.session.rollback()
+            current_plugin.logger.info('VC room for the deleted Zoom meeting was already removed in Indico')
+
     def _handle_zoom_event(self, event, payload):
         # XXX Some Zoom events receive the ID as a string, others as a number
         meeting_id = int(payload['object']['id'])
@@ -99,7 +110,7 @@ class RHWebhook(RH):
             current_plugin.refresh_room(vc_room, None)
         elif event in ('meeting.deleted', 'webinar.deleted'):
             current_plugin.logger.info('Zoom meeting deleted: %s', meeting_id)
-            vc_room.status = VCRoomStatus.deleted
+            self._mark_room_deleted(vc_room)
         elif event in ('meeting.participant_joined', 'webinar.participant_joined'):
             if not vc_room.data.get('auto_register') or not vc_room.data.get('auto_checkin'):
                 return
