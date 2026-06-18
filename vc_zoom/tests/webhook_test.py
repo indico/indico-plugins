@@ -13,10 +13,25 @@ import time
 import pytest
 
 from indico.core import signals
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.events.registration.util import create_personal_data_fields
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
 
 TOKEN = 'test-webhook-secret'
+
+
+def _add_registration_form(db, event, title):
+    """Attach an extra registration form (with personal-data fields) to an existing event."""
+    regform = RegistrationForm(event=event, title=title, currency='EUR')
+    section = RegistrationFormSection(registration_form=regform, title='Personal Data',
+                                      type=RegistrationFormItemType.section_pd)
+    regform.sections.append(section)
+    create_personal_data_fields(regform)
+    event.registration_forms.append(regform)
+    db.session.flush()
+    return regform
 
 
 @pytest.fixture
@@ -210,6 +225,32 @@ def test_webinar_participant_joined_checks_in_registration(db, zoom_plugin, reg_
     assert resp.status_code == 200
     db.session.refresh(reg)
     assert reg.checked_in
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_participant_joined_checks_in_across_two_forms(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                       create_vc_room_with_assoc, make_complete_registration):
+    """A participant registered in two of the event's forms must be checked in on both."""
+    zoom_plugin.settings.set('allow_auto_register', True)
+    event = reg_form.event
+    second_form = _add_registration_form(db, event, 'Second Form')
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
+
+    email = 'test@megacorp.xyz'
+    reg_a = make_complete_registration(reg_form, email, 'Test', 'User')
+    reg_b = make_complete_registration(second_form, email, 'Test', 'User')
+    db.session.flush()
+
+    payload = {
+        'event': 'meeting.participant_joined',
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': email}}},
+    }
+    resp = webhook_client(payload)
+    assert resp.status_code == 200
+    db.session.refresh(reg_a)
+    db.session.refresh(reg_b)
+    assert reg_a.checked_in
+    assert reg_b.checked_in
 
 
 # ── meeting.deleted tests ─────────────────────────────────────────────────────
