@@ -332,6 +332,9 @@ class ZoomIndicoClient:
             return None
         return _handle_response(resp)
 
+    def list_users(self, **kwargs):
+        return _handle_response(self.client.user.list(**kwargs))
+
 
 def get_zoom_scopes(config):
     """Get the set of OAuth scopes for the given Zoom credentials."""

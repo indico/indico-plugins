@@ -202,6 +202,7 @@ The scopes to select when creating the app are:
 - `meeting:write:batch_registrants:admin` (optional, only needed for automatic registration)
 - `meeting:update:registrant_status:admin` (optional, only needed for automatic registration)
 - `user:read:user:admin`
+- `user:read:list_users:admin` (optional, only needed for automatic registration)
 
 - `webinar:read:webinar:admin` (optional, only needed when using webinars)
 - `webinar:write:webinar:admin` (optional, only needed when using webinars)

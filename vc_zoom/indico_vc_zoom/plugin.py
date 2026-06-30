@@ -44,7 +44,7 @@ from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_passcode, get_alt_host_emails, get_schedule_args, get_url_data_args,
-                                 process_alternative_hosts, update_zoom_meeting)
+                                 preload_zoom_account_directory, process_alternative_hosts, update_zoom_meeting)
 
 
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
@@ -463,6 +463,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     if registration.state == RegistrationState.complete
                 ]
                 if candidates:
+                    preload_zoom_account_directory()
                     candidate_emails = {self._get_registrant_email(r) for r in candidates}
                     try:
                         already_registered = set(
