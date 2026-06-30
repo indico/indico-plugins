@@ -10,6 +10,7 @@ import re
 import secrets
 import string
 
+from flask import g
 from requests.exceptions import HTTPError
 
 from indico.core.db import db
@@ -96,9 +97,35 @@ def iter_user_emails(user):
             yield f'{username}@{domain}'
 
 
+# List Users returns up to 2000 per page.
+# See https://developers.zoom.us/docs/api/users/#tag/users/get/users
+LIST_USERS_MAX_PAGE_SIZE = 2000
+
+
+def _iter_zoom_account_emails(client):
+    params = {'page_size': LIST_USERS_MAX_PAGE_SIZE, 'status': 'active'}
+    while True:
+        resp = client.list_users(**params)
+        for user in resp.get('users', []):
+            if email := user.get('email'):
+                yield email.lower()
+        if not (token := resp.get('next_page_token')):
+            break
+        params['next_page_token'] = token
+
+
+def preload_zoom_account_directory():
+    """Cache the Zoom account directory on ``g`` so bulk syncs resolve emails locally."""
+    if 'zoom_account_emails' not in g:
+        g.zoom_account_emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
+    return g.zoom_account_emails
+
+
 @memoize_request
 def find_enterprise_email(user):
     """Get the email address of a user that has a zoom account."""
+    if (directory := g.get('zoom_account_emails')) is not None:
+        return next((email for email in iter_user_emails(user) if email.lower() in directory), None)
     client = ZoomIndicoClient()
     return next((email for email in iter_user_emails(user) if client.get_user(email, silent=True)), None)
 

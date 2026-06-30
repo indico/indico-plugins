@@ -145,6 +145,9 @@ def zoom_api(zoom_plugin, create_user, mocker):
     api_get_user = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_user')
     api_get_user.return_value = {'id': '7890abcd', 'email': 'don.orange@megacorp.xyz'}
 
+    api_list_users = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.list_users')
+    api_list_users.return_value = {'users': [{'email': user.email}], 'next_page_token': ''}
+
     def _get_meeting(id_, *args, **kwargs):
         return dict(JSON_DATA, id=id_)
 
@@ -162,6 +165,7 @@ def zoom_api(zoom_plugin, create_user, mocker):
         'update_webinar': api_update_webinar,
         'api_delete_meeting': api_delete_meeting,
         'get_user': api_get_user,
+        'list_users': api_list_users,
     }
 
 
