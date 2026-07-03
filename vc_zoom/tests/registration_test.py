@@ -324,6 +324,24 @@ def test_vc_room_created_syncs_existing_registrations(zoom_plugin, zoom_api_regi
 
 
 @pytest.mark.usefixtures('db', 'smtp')
+def test_flush_preloads_account_directory(zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
+                                          create_vc_room_with_assoc, make_complete_registration):
+    event = reg_form.event
+    make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
+    zoom_api['list_users'].reset_mock()
+    zoom_api['get_user'].reset_mock()
+
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api['list_users'].called
+    zoom_api['get_user'].assert_not_called()
+
+
+@pytest.mark.usefixtures('db', 'smtp')
 def test_vc_room_created_auto_register_disabled(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                 create_vc_room_with_assoc, make_complete_registration):
     """No sync when auto_register is disabled."""
@@ -702,6 +720,9 @@ def test_batch_excludes_host_and_alt_host(
 
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     vc_room.data['alternative_hosts'] = [alt_host.persistent_identifier]
+    zoom_api_registrants['list_users'].return_value = {
+        'users': [{'email': zoom_user.email}, {'email': alt_host.email}], 'next_page_token': ''
+    }
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 

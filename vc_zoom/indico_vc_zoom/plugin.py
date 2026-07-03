@@ -463,7 +463,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     if registration.state == RegistrationState.complete
                 ]
                 if candidates:
-                    preload_zoom_account_directory()
+                    self._preload_directory()
                     candidate_emails = {self._get_registrant_email(r) for r in candidates}
                     try:
                         already_registered = set(
@@ -969,10 +969,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         pending = g.setdefault('zoom_pending_registrations', {})
         pending[registration.id] = (registration, remove)
 
+    def _preload_directory(self):
+        # Cache the account directory so enterprise-email lookups become local set lookups instead
+        # of one Zoom API call per user; fall back to per-user lookups if it cannot be fetched.
+        try:
+            preload_zoom_account_directory()
+        except HTTPError:
+            self.logger.warning('Could not preload the Zoom account directory; falling back to per-user lookups')
+
     def _flush_pending_registrations(self, sender, **kwargs):
         if not (pending := g.pop('zoom_pending_registrations', None)):
             return
 
+        self._preload_directory()
         if not (room_ops := self._collect_room_ops(pending)):
             return
 
@@ -1095,6 +1104,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                               Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
                               ~Registration.is_deleted,
                               ~RegistrationForm.is_deleted))
+        self._preload_directory()
         email_lower = email.lower()
         return [c for c in candidates if self._get_registrant_email(c).lower() == email_lower]
 
