@@ -72,6 +72,8 @@ class ZoomSession(Session):
             ZoomPlugin.logger.warning('Request failed with invalid token; getting a new one')
             self.__configure_zoom_api(force=True)
             resp = super().request(method, url, *args, **kwargs)
+        ZoomPlugin.logger.debug('[zoom-api] %s %s params=%s json=%s -> %s', method, url,
+                                kwargs.get('params'), kwargs.get('json'), resp.status_code)
         return resp
 
 
