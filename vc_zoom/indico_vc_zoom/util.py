@@ -9,10 +9,12 @@ import itertools
 import re
 import secrets
 import string
+from datetime import timedelta
 
 from flask import g
 from requests.exceptions import HTTPError
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.modules.auth.models.identities import Identity
 from indico.modules.users.models.emails import UserEmail
@@ -101,6 +103,10 @@ def iter_user_emails(user):
 # See https://developers.zoom.us/docs/api/users/#tag/users/get/users
 LIST_USERS_MAX_PAGE_SIZE = 2000
 
+_zoom_directory_cache = make_scoped_cache('vc-zoom')
+# How long the account email directory is reused before it is fetched from Zoom again.
+ZOOM_DIRECTORY_CACHE_TTL = timedelta(minutes=10)
+
 
 def _iter_zoom_account_emails(client):
     params = {'page_size': LIST_USERS_MAX_PAGE_SIZE, 'status': 'active'}
@@ -115,9 +121,13 @@ def _iter_zoom_account_emails(client):
 
 
 def preload_zoom_account_directory():
-    """Cache the Zoom account directory on ``g`` so bulk syncs resolve emails locally."""
+    """Cache the Zoom account email directory so bulk syncs resolve emails locally."""
     if 'zoom_account_emails' not in g:
-        g.zoom_account_emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
+        emails = _zoom_directory_cache.get('account-emails')
+        if emails is None:
+            emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
+            _zoom_directory_cache.set('account-emails', emails, ZOOM_DIRECTORY_CACHE_TTL)
+        g.zoom_account_emails = emails
     return g.zoom_account_emails
 
 
