@@ -5,9 +5,12 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from collections import defaultdict
+
 from flask import after_this_request, flash, g, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import BooleanField, IntegerField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
@@ -997,6 +1000,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         pending_remove_ids = {reg.id for reg, remove in pending.values() if remove}
         pending_add_ids = {reg.id for reg, remove in pending.values() if not remove}
         room_ops = {}
+        active_email_index = {}
         for registration, remove in pending.values():
             event = registration.event or registration.registration_form.event
             if event is None:
@@ -1013,10 +1017,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
             for vc_room in zoom_rooms:
                 if should_add:
-                    if self._has_other_active_room_registration(vc_room, email, pending_add_ids):
+                    if self._has_other_active_room_registration(vc_room, email, pending_add_ids, active_email_index):
                         continue
                 elif remove:
-                    if self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
+                    if self._has_other_active_room_registration(vc_room, email, pending_remove_ids, active_email_index):
                         continue
                 else:
                     # a freshly created registration that is not complete yet (e.g. pending
@@ -1043,10 +1047,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             ops['add'] = [e for e in ops['add'].values() if e['data']['email'].lower() not in skip]
         return room_ops
 
-    def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
-        if not (event_ids := {assoc.event_id for assoc in vc_room.events}):
+    def _has_other_active_room_registration(self, vc_room, email, exclude_ids, index):
+        if not (event_ids := frozenset(assoc.event_id for assoc in vc_room.events)):
             return False
+        if event_ids not in index:
+            index[event_ids] = self._build_active_email_index(event_ids)
+        return bool(index[event_ids].get(email, frozenset()) - exclude_ids)
 
+    def _build_active_email_index(self, event_ids):
         query = (Registration.query
                  .join(Registration.registration_form)
                  .join(RegistrationForm.event)
@@ -1054,10 +1062,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                          Registration.state == RegistrationState.complete,
                          ~Registration.is_deleted,
                          ~RegistrationForm.is_deleted,
-                         ~Event.is_deleted))
-        if exclude_ids:
-            query = query.filter(Registration.id.notin_(exclude_ids))
-        return any(self._get_registrant_email(registration) == email for registration in query)
+                         ~Event.is_deleted)
+                 .options(joinedload(Registration.user)))
+        index = defaultdict(set)
+        for registration in query:
+            index[self._get_registrant_email(registration)].add(registration.id)
+        return index
 
     @make_interceptable
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
