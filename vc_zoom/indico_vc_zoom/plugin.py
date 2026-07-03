@@ -1081,9 +1081,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 regform_ids = self._get_synced_regform_ids(vc_room)
                 if should_add and regform_ids is not None and registration.registration_form_id not in regform_ids:
                     continue
-                if should_add and self._has_other_active_room_registration(vc_room, email, pending_add_ids):
-                    continue
-                if not should_add and self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
+                if should_add:
+                    if self._has_other_active_room_registration(vc_room, email, pending_add_ids):
+                        continue
+                elif remove:
+                    if self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
+                        continue
+                else:
+                    # a freshly created registration that is not complete yet (e.g. pending
+                    # moderation) was never pushed to Zoom, so there is nothing to cancel
                     continue
 
                 zoom_id = vc_room.data['zoom_id']

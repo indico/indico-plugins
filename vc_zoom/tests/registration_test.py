@@ -408,6 +408,38 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
+@pytest.mark.usefixtures('smtp')
+def test_pending_registration_created_does_not_cancel(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                      create_vc_room_with_assoc):
+    """A newly created registration still awaiting moderation was never pushed to Zoom, so it must not be cancelled."""
+    event = reg_form.event
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=True)
+
+    data = {'email': 'pending@example.com', 'first_name': 'Pending', 'last_name': 'User', 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = data['email']
+
+    zoom_plugin.settings.set('allow_auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+    registration.state = RegistrationState.pending
+    db.session.flush()
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    zoom_api_registrants['list_meeting_registrants'].reset_mock()
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+
+    signals.event.registration_created.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
 @pytest.mark.usefixtures('request_context', 'db', 'smtp')
 def test_enable_auto_register_skips_existing_zoom_registrants(
     zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
