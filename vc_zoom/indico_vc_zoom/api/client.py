@@ -250,17 +250,17 @@ class ZoomClient:
 
     @property
     def meeting(self):
-        """Get the meeting component."""
+        """The meeting component."""
         return self.components['meeting']
 
     @property
     def user(self):
-        """Get the user component."""
+        """The user component."""
         return self.components['user']
 
     @property
     def webinar(self):
-        """Get the webinar component."""
+        """The webinar component."""
         return self.components['webinar']
 
 

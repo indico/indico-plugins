@@ -245,7 +245,7 @@ class LiveSyncQueueEntry(db.Model):
 
     @property
     def object(self):
-        """Return the changed object."""
+        """The changed object."""
         if self.type == EntryType.category:
             return self.category
         elif self.type == EntryType.event:
