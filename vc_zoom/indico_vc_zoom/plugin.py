@@ -21,6 +21,7 @@ from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_pl
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.timetable.views import WPDisplayTimetable, WPManageTimetable
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
@@ -271,7 +272,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.core.after_process, self._flush_pending_registrations)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.template_hook('before-render-registration-info', self._render_registration_zoom_link)
-        for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
+        for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay,
+                   WPDisplayTimetable, WPManageTimetable):
             self.inject_bundle('main.js', wp)
             self.inject_bundle('main.css', wp)
 
