@@ -47,10 +47,10 @@ from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.task import refresh_meetings
-from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
-                                 gen_random_passcode, get_alt_host_emails, get_schedule_args, get_url_data_args,
-                                 preload_zoom_account_directory, process_alternative_hosts, resolve_alternative_hosts,
-                                 update_zoom_meeting)
+from indico_vc_zoom.util import (DIRECTORY_PRELOAD_THRESHOLD, UserLookupMode, ZoomMeetingType, fetch_zoom_meeting,
+                                 find_enterprise_email, gen_random_passcode, get_alt_host_emails, get_schedule_args,
+                                 get_url_data_args, preload_zoom_account_directory, process_alternative_hosts,
+                                 resolve_alternative_hosts, update_zoom_meeting)
 
 
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
@@ -502,7 +502,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _backfill_registrants(self, vc_room, candidates):
         if not candidates:
             return
-        self._preload_directory()
+        if len(candidates) >= DIRECTORY_PRELOAD_THRESHOLD:
+            self._preload_directory()
         candidate_emails = {self._get_registrant_email(r) for r in candidates}
         try:
             already_registered = set(self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails))
@@ -1052,7 +1053,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if not (pending := g.pop('zoom_pending_registrations', None)):
             return
 
-        self._preload_directory()
+        if len(pending) >= DIRECTORY_PRELOAD_THRESHOLD:
+            self._preload_directory()
         if not (room_ops := self._collect_room_ops(pending)):
             return
 
@@ -1137,8 +1139,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                  .options(joinedload(Registration.user)))
         if regform_ids is not None:
             query = query.filter(Registration.registration_form_id.in_(regform_ids))
+        registrations = query.all()
+        if len(registrations) >= DIRECTORY_PRELOAD_THRESHOLD:
+            self._preload_directory()
         index = defaultdict(set)
-        for registration in query:
+        for registration in registrations:
             index[self._get_registrant_email(registration)].add(registration.id)
         return index
 
