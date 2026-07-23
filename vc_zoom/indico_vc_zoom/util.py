@@ -103,9 +103,13 @@ def iter_user_emails(user):
 # See https://developers.zoom.us/docs/api/users/#tag/users/get/users
 LIST_USERS_MAX_PAGE_SIZE = 2000
 
+# Only walk the whole account directory when at least this many registrants are resolved in one
+# sync; for fewer, the per-user lookup is cheaper than paging through every Zoom account.
+DIRECTORY_PRELOAD_THRESHOLD = 25
+
 _zoom_directory_cache = make_scoped_cache('vc-zoom')
 # How long the account email directory is reused before it is fetched from Zoom again.
-ZOOM_DIRECTORY_CACHE_TTL = timedelta(minutes=10)
+ZOOM_DIRECTORY_CACHE_TTL = timedelta(hours=1)
 
 
 def _iter_zoom_account_emails(client):
