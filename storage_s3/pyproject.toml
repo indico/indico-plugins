@@ -21,7 +21,7 @@ GitHub = 'https://github.com/indico/indico-plugins'
 storage_s3 = 'indico_storage_s3.plugin:S3StoragePlugin'
 
 [build-system]
-requires = ['hatchling==1.28.0']
+requires = ['hatchling==1.31.0']
 build-backend = 'hatchling.build'
 
 [tool.hatch.build]
