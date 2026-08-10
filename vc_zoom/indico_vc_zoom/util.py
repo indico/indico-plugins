@@ -5,7 +5,6 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
-import itertools
 import re
 import secrets
 import string
@@ -184,26 +183,42 @@ def get_url_data_args(url):
     }
 
 
-def process_alternative_hosts(emails):
-    """Convert a comma-concatenated list of alternative host e-mails into a list of identifiers."""
+def _find_alternative_host(email):
+    """Get the Indico user owning an alternative host e-mail, if any."""
     from indico_vc_zoom.plugin import ZoomPlugin
     mode = ZoomPlugin.settings.get('user_lookup_mode')
-    emails = re.findall(r'[^,;]+', emails)
     if mode in (UserLookupMode.all_emails, UserLookupMode.email_domains):
-        users = {get_user_by_email(email) for email in emails}
+        return get_user_by_email(email)
     elif mode == UserLookupMode.authenticators:
-        users = set()
         domain = ZoomPlugin.settings.get('enterprise_domain')
-        usernames = {email.split('@')[0] for email in emails if email.endswith(f'@{domain}')}
         providers = ZoomPlugin.settings.get('authenticators')
-        users = []
-        if providers and usernames:
-            criteria = db.or_(((Identity.provider == provider) & (Identity.identifier == username))
-                              for provider, username in itertools.product(providers, usernames))
-            users = [identity.user for identity in Identity.query.filter(criteria)]
+        if not providers or not email.endswith(f'@{domain}'):
+            return None
+        username = email.split('@')[0]
+        criteria = db.or_((Identity.provider == provider) & (Identity.identifier == username)
+                          for provider in providers)
+        identity = Identity.query.filter(criteria).first()
+        return identity.user if identity else None
     else:
         raise TypeError('invalid mode')
-    return [u.persistent_identifier for u in users if u is not None]
+
+
+def resolve_alternative_hosts(emails):
+    """Split alternative host e-mails into Indico user identifiers and unmatched e-mails."""
+    identifiers, unknown_emails = [], []
+    for email in re.findall(r'[^,;]+', emails or ''):
+        email = email.strip()
+        user = _find_alternative_host(email)
+        if user is None:
+            unknown_emails.append(email)
+        elif user.persistent_identifier not in identifiers:
+            identifiers.append(user.persistent_identifier)
+    return identifiers, unknown_emails
+
+
+def process_alternative_hosts(emails):
+    """Convert a comma-concatenated list of alternative host e-mails into a list of identifiers."""
+    return resolve_alternative_hosts(emails)[0]
 
 
 def get_alt_host_emails(identifiers):

@@ -44,7 +44,7 @@ from indico_vc_zoom.notifications import notify_host_start_url
 from indico_vc_zoom.task import refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_passcode, get_alt_host_emails, get_schedule_args, get_url_data_args,
-                                 process_alternative_hosts, update_zoom_meeting)
+                                 process_alternative_hosts, resolve_alternative_hosts, update_zoom_meeting)
 
 
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
@@ -65,6 +65,10 @@ AUTO_REGISTRATION_SCOPE_OPTIONS = {
 # Limited to 30 by Zoom API.
 # See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
 BATCH_REGISTRANTS_MAX = 30
+
+
+def _exclude_host(identifiers, host_identifier):
+    return [ident for ident in identifiers if ident != host_identifier]
 
 
 def _format_zoom_scopes(scopes):
@@ -424,7 +428,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password', 'auto_register', 'auto_checkin'}
+        fields = {'description', 'password', 'auto_register', 'auto_checkin', 'alternative_hosts'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)
@@ -490,6 +494,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         client = ZoomIndicoClient()
         host = principal_from_identifier(vc_room.data['host'], require_user_token=False)
         host_email = find_enterprise_email(host)
+        alt_host_emails = get_alt_host_emails(vc_room.data.get('alternative_hosts') or [])
 
         # get the object that this booking is linked to
         vc_room_assoc = vc_room.events[0]
@@ -517,7 +522,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 kwargs['type'] = (ZoomMeetingType.webinar
                                   if scheduling_args
                                   else ZoomMeetingType.recurring_webinar_no_time)
-                settings['alternative_hosts'] = host_email
+                settings['alternative_hosts'] = ','.join(dict.fromkeys([host_email, *alt_host_emails]))
             else:
                 kwargs = {
                     'type': (
@@ -533,6 +538,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                     'waiting_room': vc_room.data['waiting_room'],
                     'join_before_host': self.settings.get('join_before_host'),
                 })
+                if alt_host_emails:
+                    settings['alternative_hosts'] = ','.join(alt_host_emails)
                 if vc_room.data.get('auto_register'):
                     # Manual approval (1), not automatic (0): the public Zoom registration page holds
                     # self-registrants in "pending", so a leaked link can't self-approve into the
@@ -561,7 +568,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'zoom_id': meeting_obj['id'],
             'start_url': meeting_obj['start_url'],
             'host': host.persistent_identifier,
-            'alternative_hosts': process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', '')),
+            'alternative_hosts': _exclude_host(
+                process_alternative_hosts(meeting_obj['settings'].get('alternative_hosts', '')),
+                host.persistent_identifier
+            ),
             'registration_required': meeting_obj['settings'].get('approval_type') != 2,
         })
         vc_room.data.update(get_url_data_args(meeting_obj['join_url']))
@@ -618,10 +628,19 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 self._build_language_interpretation_settings(vc_room)
             )
 
-        alternative_hosts = process_alternative_hosts(zoom_meeting_settings.get('alternative_hosts', ''))
-        if vc_room.data['alternative_hosts'] != alternative_hosts:
-            new_alt_host_emails = get_alt_host_emails(vc_room.data['alternative_hosts'])
-            changes.setdefault('settings', {})['alternative_hosts'] = ','.join(new_alt_host_emails)
+        host_identifier = vc_room.data['host']
+        alternative_hosts, unknown_alt_host_emails = resolve_alternative_hosts(
+            zoom_meeting_settings.get('alternative_hosts', ''))
+        local_alt_hosts = vc_room.data.get('alternative_hosts') or []
+        if set(local_alt_hosts) != set(_exclude_host(alternative_hosts, host_identifier)):
+            # alternative hosts with no Indico user are not editable here, so keep them
+            new_alt_host_emails = get_alt_host_emails(_exclude_host(local_alt_hosts, host_identifier))
+            if is_webinar:
+                host_email = find_enterprise_email(
+                    principal_from_identifier(host_identifier, require_user_token=False))
+                new_alt_host_emails = [host_email, *new_alt_host_emails]
+            changes.setdefault('settings', {})['alternative_hosts'] = ','.join(
+                dict.fromkeys([*new_alt_host_emails, *unknown_alt_host_emails]))
 
         if not is_webinar:
             if vc_room.data['mute_audio'] != zoom_meeting_settings['mute_upon_entry']:
@@ -679,7 +698,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'mute_audio': zoom_meeting['settings'].get('mute_upon_entry'),
             'mute_participant_video': not zoom_meeting['settings'].get('participant_video'),
             'waiting_room': zoom_meeting['settings'].get('waiting_room'),
-            'alternative_hosts': process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts')),
+            'alternative_hosts': _exclude_host(
+                process_alternative_hosts(zoom_meeting['settings'].get('alternative_hosts')),
+                vc_room.data['host']
+            ),
             'registration_required': zoom_approval_type != 2,
         })
         vc_room.data.update(get_url_data_args(zoom_meeting['join_url']))
@@ -775,6 +797,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'interpreters': [],
             'host_choice': 'myself',
             'host_user': None,
+            'alternative_hosts': [],
             'password_visibility': 'logged_in'
         })
         return defaults
