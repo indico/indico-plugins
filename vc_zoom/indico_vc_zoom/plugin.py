@@ -424,7 +424,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password', 'auto_register', 'auto_checkin'}
+        fields = {'description', 'password', 'auto_register', 'auto_checkin', 'audio'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)
@@ -508,6 +508,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         try:
             settings = {
                 'use_pmi': False,
+                'audio': vc_room.data['audio'],
                 'host_video': not vc_room.data['mute_host_video'],
                 'language_interpretation': self._build_language_interpretation_settings(vc_room)
             }
@@ -595,6 +596,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             changes['password'] = vc_room.data['password']
 
         zoom_meeting_settings = zoom_meeting['settings']
+        if vc_room.data['audio'] != zoom_meeting_settings.get('audio'):
+            changes.setdefault('settings', {})['audio'] = vc_room.data['audio']
+
         if vc_room.data['mute_host_video'] == zoom_meeting_settings['host_video']:
             changes.setdefault('settings', {})['host_video'] = not vc_room.data['mute_host_video']
 
@@ -667,6 +671,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             'description': zoom_meeting.get('agenda', ''),
             'zoom_id': zoom_meeting['id'],
             'password': zoom_meeting['password'],
+            'audio': zoom_meeting['settings'].get('audio'),
             'mute_host_video': not zoom_meeting['settings']['host_video'],
             'language_interpretation': zoom_meeting['settings'].get('language_interpretation', {}).get('enable', False),
             'interpreters': [

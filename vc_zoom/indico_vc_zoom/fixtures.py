@@ -89,6 +89,7 @@ def create_zoom_meeting(db, test_client, no_csrf_check, smtp, zoom_api):
                     'vc-mute_host_video': 'y',
                     'vc-mute_audio': 'y',
                     f'vc-{link_type}': obj.id,
+                    **{f'vc-{key}': value for key, value in kwargs.items()},
                 },
             )
             assert resp.status_code == 200
@@ -134,6 +135,9 @@ def zoom_api(zoom_plugin, create_user, mocker):
     api_create_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.create_meeting')
     api_create_meeting.side_effect = _create_meeting
 
+    api_create_webinar = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.create_webinar')
+    api_create_webinar.side_effect = _create_meeting
+
     api_update_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.update_meeting')
     api_update_meeting.return_value = {}
 
@@ -157,6 +161,7 @@ def zoom_api(zoom_plugin, create_user, mocker):
     return {
         'user': user,
         'create_meeting': api_create_meeting,
+        'create_webinar': api_create_webinar,
         'get_meeting': api_get_meeting,
         'update_meeting': api_update_meeting,
         'update_webinar': api_update_webinar,
