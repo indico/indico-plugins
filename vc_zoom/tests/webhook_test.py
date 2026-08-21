@@ -176,6 +176,29 @@ def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, 
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
+def test_participant_joined_skipped_for_unselected_regform(db, zoom_plugin, reg_form, create_reg_form, zoom_user,
+                                                           webhook_client, create_vc_room_with_assoc,
+                                                           make_complete_registration):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    event = reg_form.event
+    other_form = create_reg_form(event, 'Second Form')
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True,
+                                                registration_forms=[reg_form.id])
+
+    reg = make_complete_registration(other_form, 'test@megacorp.xyz', 'Test', 'User')
+    db.session.flush()
+
+    payload = {
+        'event': 'meeting.participant_joined',
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'test@megacorp.xyz'}}},
+    }
+    resp = webhook_client(payload)
+    assert resp.status_code == 200
+    db.session.refresh(reg)
+    assert not reg.checked_in
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
 def test_participant_joined_idempotent_when_already_checked_in(db, zoom_plugin, reg_form, zoom_user, webhook_client,
                                                                create_vc_room_with_assoc, make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
