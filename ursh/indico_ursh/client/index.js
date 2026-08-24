@@ -140,11 +140,3 @@ $(document)
       );
     }
   });
-
-$(document).ready(() => {
-  // keep dropdown menu open when clicking on an entry
-  $('.ursh-dropdown')
-    .next('ul')
-    .find('li a')
-    .on('menu_select', () => true);
-});
