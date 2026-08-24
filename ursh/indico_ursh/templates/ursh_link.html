@@ -9,21 +9,22 @@
         </ind-with-tooltip>
         <menu>
             <li>
-                <a class="ursh-get" href="#" data-original-url="{{ target }}">
+                <button class="ursh-get" data-original-url="{{ target }}">
                     {% trans %}Get short URL{% endtrans %}
-                </a>
+                </button>
             </li>
             {%- if event_manager %}
                 <li>
-                    <a href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
-                       class="ursh-create" data-original-url="{{ target }}"
-                       data-title="{{ _('Create short URL') }}"
-                       data-href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
-                       data-params='{"original_url": "{{ target }}"}'
-                       data-ajax-dialog
-                       data-hide-page-header>
+                    <button href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                            class="ursh-create"
+                            data-original-url="{{ target }}"
+                            data-title="{{ _('Create short URL') }}"
+                            data-href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                            data-params='{"original_url": "{{ target }}"}'
+                            data-ajax-dialog
+                            data-hide-page-header>
                         {% trans %}Create custom short URL{% endtrans %}
-                    </a>
+                    </button>
                 </li>
             {% endif -%}
         </menu>
