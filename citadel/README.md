@@ -5,6 +5,10 @@ to provide advanced search functionality using an Elasticsearch backend.
 
 ## Changelog
 
+### 3.3.5
+
+- Update translations
+
 ### 3.3.4
 
 - Update translations

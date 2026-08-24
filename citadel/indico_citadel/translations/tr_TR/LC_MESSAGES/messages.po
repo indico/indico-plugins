@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
-# selcuk bilmis <selcukbilmis@gmail.com>, 2021
+# selcuk bilmis <selcukbilmis@gmail.com>, 2026
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-02-17 15:57+0100\n"
 "PO-Revision-Date: 2021-05-26 16:26+0000\n"
-"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
+"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2026\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/indico/teams/6478/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -121,7 +121,7 @@ msgstr ""
 
 #: indico_citadel/plugin.py
 msgid "Large Category Warning Threshold"
-msgstr ""
+msgstr "Büyük Kategori Uyarı Eşiği"
 
 #: indico_citadel/plugin.py
 msgid ""
@@ -129,6 +129,10 @@ msgid ""
 "categories that would result in sending a large amount of data to the "
 "Citadel server. You can set the threshold to 0 to suppress this warning."
 msgstr ""
+"Kategori yöneticilerine, Citadel sunucusuna büyük miktarda veri "
+"gönderilmesine neden olacak büyük kategorilerin erişim kontrol listesi -ACL-"
+" değiştirilirken bir uyarı görüntüler. Bu uyarıyı devre dışı bırakmak için "
+"eşik değerini 0 olarak ayarlayabilirsiniz."
 
 #: indico_citadel/search.py
 msgid "The title of an event, contribution, etc."
@@ -216,7 +220,7 @@ msgstr "Etkinlik ID"
 
 #: indico_citadel/templates/event_category_warning.html
 msgid "This category contains a large number of events."
-msgstr ""
+msgstr "Bu kategori çok sayıda etkinlik içeriyor."
 
 #: indico_citadel/templates/event_category_warning.html
 msgid ""
@@ -224,3 +228,7 @@ msgid ""
 "access or management permissions since any change to the list below requires"
 " re-synchronizing all events with Indico's search engine."
 msgstr ""
+"Erişim veya yönetim yetkileri verirken lütfen bireysel kullanıcılar yerine "
+"grupları kullanmayı düşünün; çünkü aşağıdaki listede yapılacak herhangi bir "
+"değişiklik, tüm etkinliklerin Indico'm arama motoruyla yeniden senkronize "
+"edilmesini gerektirir."

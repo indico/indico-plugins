@@ -22,6 +22,7 @@
 - Automatically check in Indico registrations when a participant joins the corresponding Zoom
   meeting or webinar (opt-in per room, requires automatic registration to be enabled on the room)
 - Zoom meeting names can now be up to 200 characters long
+- Update translations
 
 ### 3.3.5
 
