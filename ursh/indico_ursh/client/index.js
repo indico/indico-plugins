@@ -112,7 +112,8 @@ async function _handleUrshClick(evt) {
   evt.preventDefault();
   const originalURL = evt.target.dataset.originalUrl;
   const result = await _makeUrshRequest(originalURL);
-  $(evt.target).copyURLTooltip(result, 'unfocus');
+  const parent = evt.target.closest('ind-menu') || evt.target;
+  $(parent).copyURLTooltip(result, 'unfocus');
 }
 
 function _validateUrshCustomShortcut(shortcut) {
