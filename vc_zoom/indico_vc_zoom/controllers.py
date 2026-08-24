@@ -118,15 +118,17 @@ class RHWebhook(RH):
             if not email:
                 current_plugin.logger.debug('participant_joined with no email for meeting %s', meeting_id)
                 return
-            registration = current_plugin._find_registration_by_participant_email(vc_room, email)
-            if registration is None:
+            registrations = current_plugin._find_registrations_by_participant_email(vc_room, email)
+            if not registrations:
                 current_plugin.logger.debug('No Indico registration for email %s in meeting %s', email, meeting_id)
                 return
-            if registration.checked_in:
-                return
-            registration.checked_in = True
-            signals.event.registration_checkin_updated.send(registration)
-            current_plugin.logger.info('Checked in registration %s via Zoom webhook (meeting %s)',
-                                       registration.id, meeting_id)
+            # The participant may be registered in several of the event's forms; check in all of them.
+            for registration in registrations:
+                if registration.checked_in:
+                    continue
+                registration.checked_in = True
+                signals.event.registration_checkin_updated.send(registration)
+                current_plugin.logger.info('Checked in registration %s via Zoom webhook (meeting %s)',
+                                           registration.id, meeting_id)
         else:
             current_plugin.logger.warning('Unhandled Zoom webhook payload: %s', event)
