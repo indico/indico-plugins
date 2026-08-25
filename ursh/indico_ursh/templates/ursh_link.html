@@ -1,32 +1,39 @@
 {% set event_manager = event and event.can_manage(session.user) %}
 {% set target = event.url if event else target %}
 {% if dropdown or event_manager %}
-    <a href="#" class="arrow js-dropdown ursh-dropdown {{ classes }}" data-toggle="dropdown"
-       title="{% trans %}Short URL options{% endtrans %}"></a>
-    <ul class="i-dropdown">
-        <li>
-            <a class="ursh-get" data-original-url="{{ target }}">
-                {% trans %}Get short URL{% endtrans %}
-            </a>
-        </li>
-        {%- if event_manager %}
+    <ind-menu>
+        <ind-with-tooltip>
+            <button class="i-button text-color subtle icon-only icon-link">
+                <span data-tip-content>{% trans %}Short URL options{% endtrans %}</span>
+            </button>
+        </ind-with-tooltip>
+        <menu>
             <li>
-                <a href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
-                   class="ursh-create" data-original-url="{{ target }}"
-                   data-title="{{ _('Create short URL') }}"
-                   data-href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
-                   data-params='{"original_url": "{{ target }}"}'
-                   data-ajax-dialog
-                   data-hide-page-header>
-                    {% trans %}Create custom short URL{% endtrans %}
-                </a>
+                <button class="ursh-get" data-original-url="{{ target }}">
+                    {% trans %}Get short URL{% endtrans %}
+                </button>
             </li>
-        {% endif -%}
-    </ul>
+            {%- if event_manager %}
+                <li>
+                    <button href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                            class="ursh-create"
+                            data-original-url="{{ target }}"
+                            data-title="{{ _('Create short URL') }}"
+                            data-href="{{ url_for('plugin_ursh.shorten_event_url', event) }}"
+                            data-params='{"original_url": "{{ target }}"}'
+                            data-ajax-dialog
+                            data-hide-page-header>
+                        {% trans %}Create custom short URL{% endtrans %}
+                    </button>
+                </li>
+            {% endif -%}
+        </menu>
+    </ind-menu>
 {% else %}
-    <a class="ursh-get {{ classes }}"
-       title="{% trans %}Obtain short URL{% endtrans %}"
-       data-original-url="{{ target }}">
-        {{- text -}}
-    </a>
+    <ind-with-tooltip>
+        <button class="ursh-get {{ classes }}" data-original-url="{{ target }}">
+            <span data-tip-content>{% trans %}Obtain short URL{% endtrans %}</span>
+            {{- text -}}
+        </button>
+    </ind-with-tooltip>
 {% endif %}

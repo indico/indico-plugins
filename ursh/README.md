@@ -13,6 +13,10 @@ human-friendly shortcuts pointing to an event (such as `https://indico.example.c
 
 ## Changelog
 
+### 3.3.4
+
+- Use more accessible dropdown menu in event header
+
 ### 3.3.3
 
 - Update translations
