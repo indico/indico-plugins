@@ -8,6 +8,14 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.7
+
+- Require Indico v3.3.13
+- Update `indico-plugin-citadel`
+- Update `indico-plugin-payment-sixpay`
+- Update `indico-plugin-ursh`
+- Update `indico-plugin-vc-zoom`
+
 ### 3.3.6
 
 - Require Indico v3.3.10
