@@ -52,10 +52,11 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
                                  process_alternative_hosts, update_zoom_meeting)
 
 
+# the user scope backs the account directory registrant emails are resolved against
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
                                     'meeting:write:batch_registrants:admin',
-                                    'meeting:update:registrant_status:admin')
-AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin')
+                                    'meeting:update:registrant_status:admin', 'user:read:list_users:admin')
+AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin', 'user:read:admin')
 AUTO_REGISTRATION_WEBINAR_SCOPES = ('webinar:read:list_registrants:admin', 'webinar:write:registrant:admin',
                                     'webinar:write:batch_registrants:admin',
                                     'webinar:update:registrant_status:admin')
