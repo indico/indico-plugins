@@ -244,9 +244,6 @@ class VCRoomForm(VCRoomFormBase):
     def validate_registration_forms(self, field):
         if not field.data:
             raise ValidationError(_('Select at least one registration form.'))
-        # the widget only offers this event's forms, so a meeting shared with another
-        # event would lose that event's selection on save
-        field.data = sorted(set(field.data) | self._other_event_regform_ids())
 
     def validate_host_choice(self, field):
         if field.data == 'myself':
@@ -266,6 +263,13 @@ class VCRoomForm(VCRoomFormBase):
                 raise ValidationError(_('Invalid email address'))
             if src_lang == target_lang:
                 raise ValidationError(_('Source and target languages must be different.'))
+
+    def post_validate(self):
+        field = getattr(self, 'registration_forms', None)
+        if field is not None and field.data:
+            # the widget only offers this event's forms, so a meeting shared with another
+            # event would lose that event's selection on save
+            field.data = sorted(set(field.data) | self._other_event_regform_ids())
 
     def _check_zoom_user(self, user):
         if find_enterprise_email(user) is None:

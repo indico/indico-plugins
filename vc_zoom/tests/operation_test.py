@@ -428,7 +428,7 @@ def test_regform_field_keeps_selection_of_other_events(db, zoom_plugin, app, reg
 
     form = _make_zoom_form(zoom_plugin, app, reg_form.event, vc_room=vc_room)
     form.registration_forms.data = [reg_form.id]
-    form.validate_registration_forms(form.registration_forms)
+    form.post_validate()
 
     assert form.registration_forms.data == sorted([reg_form.id, other_form.id])
 
@@ -443,7 +443,7 @@ def test_regform_field_drops_selection_of_gone_regform(db, zoom_plugin, app, reg
 
     form = _make_zoom_form(zoom_plugin, app, reg_form.event, vc_room=vc_room)
     form.registration_forms.data = [reg_form.id]
-    form.validate_registration_forms(form.registration_forms)
+    form.post_validate()
 
     assert form.registration_forms.data == [reg_form.id]
 

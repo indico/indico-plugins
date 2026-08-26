@@ -451,26 +451,30 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # registration page gated (self-registrants stay "pending"); Indico-pushed registrants are
         # auto-approved via auto_approve. On enable we also sync any existing registrants so the
         # initial backfill can hit the registrants endpoint.
-        if not is_new and auto_register_before != vc_room.data.get('auto_register'):
+        if is_new:
+            return
+        if auto_register_before != vc_room.data.get('auto_register'):
             is_webinar = vc_room.data.get('meeting_type') == 'webinar'
             desired_approval_type = 1 if vc_room.data.get('auto_register') else 2
             self._push_approval_type(vc_room, desired_approval_type, is_webinar=is_webinar)
             if vc_room.data.get('auto_register'):
                 regform_ids = self._get_synced_regform_ids(vc_room)
                 self._backfill_registrants(vc_room, self._get_syncable_registrations(vc_room, regform_ids))
-        elif not is_new and vc_room.data.get('auto_register'):
+        elif vc_room.data.get('auto_register'):
             self._sync_regform_selection_change(vc_room, regform_ids_before)
 
     def _get_synced_regform_ids(self, vc_room):
         return set(ids) if (ids := vc_room.data.get('registration_forms')) else None
 
     def _get_syncable_registrations(self, vc_room, regform_ids):
-        return [registration
-                for event_assoc in vc_room.events
-                for regform in event_assoc.event.registration_forms
-                if regform_ids is None or regform.id in regform_ids
-                for registration in regform.active_registrations
-                if registration.state == RegistrationState.complete]
+        registrations = []
+        for event_assoc in vc_room.events:
+            for regform in event_assoc.event.registration_forms:
+                if regform_ids is not None and regform.id not in regform_ids:
+                    continue
+                registrations.extend(registration for registration in regform.active_registrations
+                                     if registration.state == RegistrationState.complete)
+        return registrations
 
     def _backfill_registrants(self, vc_room, candidates):
         if not candidates:
