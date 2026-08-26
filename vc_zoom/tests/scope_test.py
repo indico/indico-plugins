@@ -45,6 +45,14 @@ def test_auto_registration_scope_check_proposes_modern_when_no_overlap():
     assert set(missing) == set(AUTO_REGISTRATION_MEETING_SCOPES)
 
 
+def test_auto_registration_scope_check_requires_list_users_scope():
+    # The account directory lookup needs its own scope, which is easy to miss when only the
+    # registrant scopes were granted.
+    granted = set(AUTO_REGISTRATION_MEETING_SCOPES) - {'user:read:list_users:admin'}
+    missing = _get_missing_auto_registration_scopes(granted, allow_webinars=False)
+    assert missing == ('user:read:list_users:admin',)
+
+
 def test_auto_registration_scope_check_only_reports_actually_missing_scopes():
     # User has all modern meeting scopes except the status update one — only that one should appear
     partial_meeting_scopes = set(AUTO_REGISTRATION_MEETING_SCOPES) - {'meeting:update:registrant_status:admin'}
