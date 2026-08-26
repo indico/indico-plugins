@@ -10,6 +10,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
+from flask import g
 
 from indico.core.plugins import plugin_engine
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -18,8 +19,19 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import create_personal_data_fields, create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
+from indico_vc_zoom.util import ZOOM_DIRECTORY_CACHE_KEY, _zoom_directory_cache
+
 
 TZ = ZoneInfo('Europe/Zurich')
+
+
+@pytest.fixture
+def zoom_directory_cache():
+    """Isolate the cached Zoom account directory, which outlives a single test."""
+    _zoom_directory_cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
+    g.pop('zoom_account_emails', None)
+    yield _zoom_directory_cache
+    _zoom_directory_cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
 
 
 @pytest.fixture

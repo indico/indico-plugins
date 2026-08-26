@@ -8,7 +8,7 @@
 from datetime import timedelta
 
 import pytest
-from flask import g, session
+from flask import session
 
 from indico.core import signals
 from indico.modules.events.features.util import set_feature_enabled
@@ -18,8 +18,6 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_personal_data_fields, create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
-
-from indico_vc_zoom import util
 
 
 def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, test_client,
@@ -325,87 +323,19 @@ def test_vc_room_created_syncs_existing_registrations(zoom_plugin, zoom_api_regi
     assert reg_data['first_name'] == 'John'
 
 
-@pytest.mark.usefixtures('db', 'smtp')
-def test_flush_preloads_account_directory(zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
-                                          create_vc_room_with_assoc, make_complete_registration, mocker):
-    mocker.patch('indico_vc_zoom.plugin.DIRECTORY_PRELOAD_THRESHOLD', 1)
+@pytest.mark.usefixtures('db', 'smtp', 'zoom_directory_cache')
+def test_flush_never_walks_account_directory(zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
+                                             create_vc_room_with_assoc, make_complete_registration):
     event = reg_form.event
     make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
 
     zoom_plugin.settings.set('allow_auto_register', True)
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     zoom_api['list_users'].reset_mock()
-    zoom_api['get_user'].reset_mock()
-    util._zoom_directory_cache.delete('account-emails')
-    g.pop('zoom_account_emails', None)
 
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
-    assert zoom_api['list_users'].called
-    zoom_api['get_user'].assert_not_called()
-
-
-@pytest.mark.usefixtures('smtp')
-def test_flush_below_threshold_skips_directory(db, zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
-                                               create_user, create_vc_room_with_assoc, make_complete_registration):
-    event = reg_form.event
-    user = create_user(5, email='jane@megacorp.xyz')
-    reg = make_complete_registration(reg_form, 'jane.reg@example.com', 'Jane', 'Doe')
-    reg.user = user
-    db.session.flush()
-
-    zoom_plugin.settings.set('allow_auto_register', True)
-    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
-    zoom_api['list_users'].reset_mock()
-    zoom_api['get_user'].reset_mock()
-    util._zoom_directory_cache.delete('account-emails')
-    g.pop('zoom_account_emails', None)
-
-    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
-
-    zoom_api['list_users'].assert_not_called()
-    assert zoom_api['get_user'].called
-
-
-@pytest.mark.usefixtures('db', 'smtp')
-def test_large_active_index_preloads_directory(zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
-                                               create_vc_room_with_assoc, make_complete_registration, mocker):
-    mocker.patch('indico_vc_zoom.plugin.DIRECTORY_PRELOAD_THRESHOLD', 3)
-    event = reg_form.event
-    for name in ('a', 'b', 'c'):
-        make_complete_registration(reg_form, f'{name}@example.com', name.upper(), 'User')
-
-    zoom_plugin.settings.set('allow_auto_register', True)
-    create_vc_room_with_assoc(event, zoom_user)
-    zoom_api['list_users'].reset_mock()
-    util._zoom_directory_cache.delete('account-emails')
-    g.pop('zoom_account_emails', None)
-
-    new_reg = make_complete_registration(reg_form, 'd@example.com', 'D', 'User')
-    signals.event.registration_created.send(new_reg)
-    zoom_plugin._flush_pending_registrations(None)
-
-    assert zoom_api['list_users'].called
-
-
-@pytest.mark.usefixtures('db', 'smtp')
-def test_preload_directory_reuses_shared_cache(zoom_plugin, zoom_api, mocker):
-    store = {}
-    mocker.patch.object(util._zoom_directory_cache, 'get', side_effect=store.get)
-    cache_set = mocker.patch.object(util._zoom_directory_cache, 'set',
-                                    side_effect=lambda key, value, timeout=None: store.__setitem__(key, value))
-
-    g.pop('zoom_account_emails', None)
-    util.preload_zoom_account_directory()
-    assert zoom_api['list_users'].called
-    assert cache_set.call_args.args[2] == util.ZOOM_DIRECTORY_CACHE_TTL
-
-    # a later request finds the cache warm and skips the account walk
-    g.pop('zoom_account_emails', None)
-    zoom_api['list_users'].reset_mock()
-    util.preload_zoom_account_directory()
     zoom_api['list_users'].assert_not_called()
 
 

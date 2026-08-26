@@ -103,13 +103,11 @@ def iter_user_emails(user):
 # See https://developers.zoom.us/docs/api/users/#tag/users/get/users
 LIST_USERS_MAX_PAGE_SIZE = 2000
 
-# Only walk the whole account directory when at least this many registrants are resolved in one
-# sync; for fewer, the per-user lookup is cheaper than paging through every Zoom account.
-DIRECTORY_PRELOAD_THRESHOLD = 25
-
 _zoom_directory_cache = make_scoped_cache('vc-zoom')
-# How long the account email directory is reused before it is fetched from Zoom again.
-ZOOM_DIRECTORY_CACHE_TTL = timedelta(hours=1)
+ZOOM_DIRECTORY_CACHE_KEY = 'account-emails'
+# Kept well above the refresh interval of the task populating it, so a failed run does not leave
+# the directory unavailable until the next one.
+ZOOM_DIRECTORY_CACHE_TTL = timedelta(days=2)
 
 
 def _iter_zoom_account_emails(client):
@@ -124,24 +122,34 @@ def _iter_zoom_account_emails(client):
         params['next_page_token'] = token
 
 
-def preload_zoom_account_directory():
-    """Cache the Zoom account email directory so bulk syncs resolve emails locally."""
+def refresh_zoom_account_directory():
+    """Fetch the Zoom account email directory and cache it.
+
+    Walking the whole account is far too slow to do while serving a request, so this is meant to
+    be called from a periodic task.
+    """
+    emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
+    _zoom_directory_cache.set(ZOOM_DIRECTORY_CACHE_KEY, emails, ZOOM_DIRECTORY_CACHE_TTL)
+    return emails
+
+
+def get_zoom_account_directory():
+    """Get the cached Zoom account email directory, or `None` if it has not been cached yet."""
     if 'zoom_account_emails' not in g:
-        emails = _zoom_directory_cache.get('account-emails')
-        if emails is None:
-            emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
-            _zoom_directory_cache.set('account-emails', emails, ZOOM_DIRECTORY_CACHE_TTL)
-        g.zoom_account_emails = emails
+        g.zoom_account_emails = _zoom_directory_cache.get(ZOOM_DIRECTORY_CACHE_KEY)
     return g.zoom_account_emails
 
 
 @memoize_request
 def find_enterprise_email(user):
     """Get the email address of a user that has a zoom account."""
-    if (directory := g.get('zoom_account_emails')) is not None:
-        return next((email for email in iter_user_emails(user) if email.lower() in directory), None)
+    emails = list(iter_user_emails(user))
+    directory = get_zoom_account_directory()
+    if directory and (email := next((e for e in emails if e.lower() in directory), None)):
+        return email
+    # the directory may be unavailable or predate the Zoom account, so fall back to asking Zoom
     client = ZoomIndicoClient()
-    return next((email for email in iter_user_emails(user) if client.get_user(email, silent=True)), None)
+    return next((email for email in emails if client.get_user(email, silent=True)), None)
 
 
 def gen_random_passcode(length=8):
