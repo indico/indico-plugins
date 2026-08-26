@@ -21,6 +21,7 @@ from indico.cli.core import cli_group
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import IndicoPlugin
+from indico.modules.affiliations.search import AffiliationSearchProvider, get_search_provider
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
@@ -28,8 +29,6 @@ from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import User
 from indico.util.console import verbose_iterator
-
-from indico_ror.matching import PSQLVectorStoreAffiliationSearchProvider
 
 
 AFFILIATION_BACKREF_CLASSES = [
@@ -197,18 +196,7 @@ def update_ror_affiliations(ror_affiliations) -> tuple:
     return added, updated, deleted
 
 
-def make_vectorstore_data(affiliations: dict[int, Affiliation]) -> tuple[list[str], list[int]]:
-    names, metadatas = [], []
-    for affiliation_id, affiliation in affiliations.items():
-        names.append(affiliation.name)
-        metadatas.append(affiliation_id)
-        for name in affiliation.alt_names:
-            names.append(name)
-            metadatas.append(affiliation_id)
-    return names, metadatas
-
-
-def do_ror_sync(csv_dict: dict, reset: bool, dry_run: bool, batch_size: int) -> None:
+def do_ror_sync(search_provider: AffiliationSearchProvider, csv_dict: dict, reset: bool, dry_run: bool) -> None:
     filtered = extract_csv_rows(
         csv_dict,
         {
@@ -248,15 +236,7 @@ def do_ror_sync(csv_dict: dict, reset: bool, dry_run: bool, batch_size: int) -> 
         )
 
     click.echo('updating vector store...')
-    added, updated, deleted = update_ror_affiliations(affiliations)
-    added_texts, added_ids = make_vectorstore_data(added)
-    updated_texts, updated_ids = make_vectorstore_data(updated)
-    __, deleted_ids = make_vectorstore_data(deleted)
-
-    search_engine = PSQLVectorStoreAffiliationSearchProvider(batch_size=batch_size)
-    search_engine.delete(deleted_ids)
-    search_engine.update(updated_texts, updated_ids, updated_ids)
-    search_engine.add(added_texts, added_ids)
+    update_ror_affiliations(affiliations)
 
     if not dry_run:
         click.echo('committing database changes...')
@@ -273,12 +253,7 @@ class RORPlugin(IndicoPlugin):
 
     def init(self):
         super().init()
-        self.connect(signals.affiliations.get_affiliation_search_providers, self.get_search_providers)
         self.connect(signals.plugin.cli, self._extend_indico_cli)
-
-    def get_search_providers(self, sender, **kwargs):
-        from indico_ror.matching import PSQLVectorStoreAffiliationSearchProvider
-        return PSQLVectorStoreAffiliationSearchProvider
 
     def _extend_indico_cli(self, sender, **kwargs):
         @cli_group()
@@ -303,10 +278,7 @@ class RORPlugin(IndicoPlugin):
             '--reset', is_flag=True, help='Delete all previously existing affiliations from ROR before starting.'
         )
         @click.option('--dry-run', is_flag=True, help="Don't persist any changes to the database.")
-        @click.option(
-            '--batch-size', default=512, type=click.INT, help='Change the batch size when calculating embeddings.'
-        )
-        def sync(csv: pathlib.Path | None, reset: bool, dry_run: bool, batch_size: int) -> None:
+        def sync(csv: pathlib.Path | None, reset: bool, dry_run: bool) -> None:
             """Update the affiliations in the database from ROR registry."""
             if csv is None:
                 csv_contents = get_ror_csv()
@@ -315,7 +287,8 @@ class RORPlugin(IndicoPlugin):
 
             click.echo('parsing ROR affiliations CSV...')
             csv_dict = parse_csv(csv_contents)
-            do_ror_sync(csv_dict, reset, dry_run, batch_size)
+            search_provider = get_search_provider()()
+            do_ror_sync(search_provider, csv_dict, reset, dry_run)
             click.echo('done')
 
         @ror.command()
@@ -324,20 +297,20 @@ class RORPlugin(IndicoPlugin):
         )
         def match(output: pathlib.Path) -> None:
             """Match "free-text" affiliations with affiliations stored in the database."""
-            search_engine = PSQLVectorStoreAffiliationSearchProvider()
+            search_provider = get_search_provider()()
 
             click.echo('loading affiliations...')
             affiliations: set[str] = set()
             for cls in AFFILIATION_BACKREF_CLASSES:
                 affiliations = affiliations.union(
                     str(cwa.affiliation)
-                    for cwa in cls.query.filter(cls.affiliation.is_not(None), cls.affiliation != '').all()  # noqa: PLC1901
+                    for cwa in cls.query.filter(cls.affiliation.is_not(None), cls.affiliation != '').all()  # ruff: ignore[compare-to-empty-string]
                 )
 
             def process_affiliation(
                 affiliation: str
             ):
-                results = search_engine.match(affiliation, 1)
+                results = search_provider.match(affiliation, 1)
                 if len(results) == 0:
                     return None
                 return (affiliation, results[0])

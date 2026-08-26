@@ -14,4 +14,4 @@ _ = make_bound_gettext('ror')
 
 @signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico_ror.task  # noqa: F401
+    import indico_ror.task  # ruff: ignore[unused-import]
