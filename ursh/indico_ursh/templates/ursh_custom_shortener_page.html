@@ -34,7 +34,7 @@
             </button>
             <input id="ursh-custom-shortcut-input" name="shortcut" type="text" style="font-family:monospace;"
                    spellcheck="false" autocomplete="off" autocapitalize="off"
-                   pattern="^[0-9a-zA-Z-]{5,}$"
+                   pattern="^[0-9a-zA-Z\-]{5,}$"
                    {% if shortcut %}value="{{ shortcut }}"{% endif %}
                    placeholder="{% trans %}Enter a shortcut...{% endtrans %}">
             <button id="ursh-custom-shortcut-submit-button" type="submit" class="i-button" disabled>
