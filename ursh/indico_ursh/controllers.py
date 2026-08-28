@@ -8,12 +8,15 @@
 import posixpath
 from urllib.parse import urlsplit, urlunsplit
 
-from flask import jsonify, request, session
+from flask import jsonify, session
 from flask_pluginengine import render_plugin_template
+from marshmallow import fields
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.config import config
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.util.marshmallow import not_empty
+from indico.web.args import use_kwargs
 from indico.web.rh import RH
 from indico.web.util import jsonify_template
 
@@ -40,8 +43,10 @@ class RHGetShortURL(RH):
         if urlsplit(full_url).hostname != urlsplit(config.BASE_URL).hostname:
             raise BadRequest('Invalid host for URL shortening service')
 
-    def _process(self):
-        original_url = request.json.get('original_url')
+    @use_kwargs({
+        'original_url': fields.String(required=True, validate=not_empty),
+    })
+    def _process(self, original_url):
         full_url = self._resolve_full_url(original_url)
         self._check_host(full_url)
         short_url = request_short_url(full_url)
@@ -76,8 +81,11 @@ class RHCustomShortURLPage(RHManageEventBase):
         api_host = urlsplit(UrshPlugin.settings.get('api_host'))
         self.ursh_host = strip_end(urlunsplit(api_host), api_host.path[1:]).rstrip('/') + '/'
 
-    def _process_GET(self):
-        original_url = self._make_absolute_url(request.args['original_url'])
+    @use_kwargs({
+        'original_url': fields.String(required=True, validate=not_empty),
+    }, location='query')
+    def _process_GET(self, original_url):
+        original_url = self._make_absolute_url(original_url)
         return WPShortenURLPage.render_template('ursh_custom_shortener_page.html',
                                                 event=self.event,
                                                 ursh_host=self.ursh_host,
@@ -85,9 +93,15 @@ class RHCustomShortURLPage(RHManageEventBase):
                                                 submitted=False,
                                                 shortcut=None)
 
-    def _process_POST(self):
-        original_url = self._make_absolute_url(request.args['original_url'])
-        shortcut = request.form['shortcut'].strip()
+    @use_kwargs({
+        'original_url': fields.String(required=True, validate=not_empty),
+    }, location='query')
+    @use_kwargs({
+        'shortcut': fields.String(required=True, validate=not_empty),
+    })
+    def _process_POST(self, original_url, shortcut):
+        original_url = self._make_absolute_url(original_url)
+        shortcut = shortcut.strip()
 
         if not (set(shortcut) <= CUSTOM_SHORTCUT_ALPHABET):
             raise BadRequest('Invalid shortcut')
