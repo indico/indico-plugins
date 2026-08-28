@@ -1,0 +1,15 @@
+{% extends 'categories/management/base.html' %}
+
+{% block title %}
+    {% trans %}Predefined Prompts{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div
+        id="plugin-ai-summary-prompts"
+        data-category-id="{{ category.id }}"
+        data-prompts="{{ stored_prompts | tojson | forceescape }}"></div>
+    <script>
+        setupCategoryManagePrompts();
+    </script>
+{% endblock %}

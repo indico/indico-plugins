@@ -1,0 +1,104 @@
+// This file is part of the Indico plugins.
+// Copyright (C) 2002 - 2025 CERN
+//
+// The Indico plugins are free software; you can redistribute
+// them and/or modify them under the terms of the MIT License;
+// see the LICENSE file for more details.
+
+.preview-card-wrapper {
+  flex-grow: 1;
+  margin-top: 0 !important;
+  height: 52.5vh;
+  max-height: 52.5vh;
+  overflow-y: auto;
+
+  .preview-card {
+    flex-grow: 1;
+
+      ul li {
+        margin-left: 1.5em;
+      }
+
+      h1, h2, h3 {
+        font-size: 1.5em;
+      }
+  }
+}
+
+.no-preview-placeholder {
+  margin-top: 0 !important;
+  height: 52.5vh;
+
+  .placeholder-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    img {
+      margin-bottom: 10px;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .subheader::before {
+      content: none !important;
+    }
+
+    .subheader {
+      padding-top: 5px !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  }
+}
+
+.placeholder-message :global(.ui.div.subheader::before) {
+  display: none;
+}
+
+// Hide scrollbar when streaming back the generated summary
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+// Text shimmer effect when loading (e.g. "Generating summary...")
+.shimmer-text {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    #4b5563 0%,
+    #6b7280 20%,
+    #9ca3af 40%,
+    #6b7280 60%,
+    #4b5563 80%,
+    #4b5563 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shimmer 1.25s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% center;
+  }
+  to {
+    background-position: 0% center;
+  }
+}
+
+.error-dimmer {
+  background-color: #c8c8c84d !important;
+  backdrop-filter: blur(7.5px) !important;
+
+  .error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
