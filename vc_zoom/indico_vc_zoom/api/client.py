@@ -72,6 +72,8 @@ class ZoomSession(Session):
             ZoomPlugin.logger.warning('Request failed with invalid token; getting a new one')
             self.__configure_zoom_api(force=True)
             resp = super().request(method, url, *args, **kwargs)
+        ZoomPlugin.logger.debug('[zoom-api] %s %s params=%s json=%s -> %s', method, url,
+                                kwargs.get('params'), kwargs.get('json'), resp.status_code)
         return resp
 
 
@@ -331,6 +333,9 @@ class ZoomIndicoClient:
         if resp.status_code == 404 and silent:
             return None
         return _handle_response(resp)
+
+    def list_users(self, **kwargs):
+        return _handle_response(self.client.user.list(**kwargs))
 
 
 def get_zoom_scopes(config):

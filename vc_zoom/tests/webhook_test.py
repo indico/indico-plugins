@@ -13,6 +13,7 @@ import time
 import pytest
 
 from indico.core import signals
+from indico.modules.auth.models.identities import Identity
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import create_personal_data_fields
@@ -96,6 +97,56 @@ def test_participant_joined_checks_in_registration(db, zoom_plugin, reg_form, zo
     db.session.refresh(reg)
     assert reg.checked_in
     assert reg.checked_in_dt is not None
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_participant_joined_checks_in_via_account_email(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                        create_user, create_vc_room_with_assoc,
+                                                        make_complete_registration):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    event = reg_form.event
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
+
+    user = create_user(9, email='jane@megacorp.xyz')
+    reg = make_complete_registration(reg_form, 'jane.typed@example.com', 'Jane', 'Doe')
+    reg.user = user
+    db.session.flush()
+
+    payload = {
+        'event': 'meeting.participant_joined',
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'jane@megacorp.xyz'}}},
+    }
+    resp = webhook_client(payload)
+    assert resp.status_code == 200
+    db.session.refresh(reg)
+    assert reg.checked_in
+
+
+@pytest.mark.usefixtures('request_context', 'smtp')
+def test_participant_joined_checks_in_via_authenticator_identity(db, zoom_plugin, reg_form, zoom_user, webhook_client,
+                                                                 create_user, create_vc_room_with_assoc,
+                                                                 make_complete_registration):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    zoom_plugin.settings.set('user_lookup_mode', 'authenticators')
+    zoom_plugin.settings.set('enterprise_domain', 'megacorp.xyz')
+    zoom_plugin.settings.set('authenticators', ['test-idp'])
+    event = reg_form.event
+    vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True)
+
+    user = create_user(9, email='jsmith.personal@example.com')
+    db.session.add(Identity(user=user, provider='test-idp', identifier='jsmith', multipass_data={}))
+    reg = make_complete_registration(reg_form, 'jsmith.reg@example.com', 'John', 'Smith')
+    reg.user = user
+    db.session.flush()
+
+    payload = {
+        'event': 'meeting.participant_joined',
+        'payload': {'object': {'id': str(vc_room.data['zoom_id']), 'participant': {'email': 'jsmith@megacorp.xyz'}}},
+    }
+    resp = webhook_client(payload)
+    assert resp.status_code == 200
+    db.session.refresh(reg)
+    assert reg.checked_in
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')

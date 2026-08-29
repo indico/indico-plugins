@@ -15,6 +15,7 @@ from indico.core.celery import celery
 from indico.core.db import db
 
 from indico_vc_zoom.api.client import get_zoom_token
+from indico_vc_zoom.util import refresh_zoom_account_directory
 
 
 def update_state_log(log_entry, failed):
@@ -62,3 +63,14 @@ def refresh_token(threshold=600):
 
     ZoomPlugin.logger.info('Token expires in %ds, getting a new one', expires_in)
     get_zoom_token(config, force=True)
+
+
+@celery.periodic_task(run_every=crontab(minute='0', hour='3'), plugin='vc_zoom', autoretry_for=(HTTPError,))
+def refresh_account_directory():
+    from indico_vc_zoom.plugin import ZoomPlugin
+
+    if not ZoomPlugin.settings.get('allow_auto_register'):
+        return
+
+    emails = refresh_zoom_account_directory()
+    ZoomPlugin.logger.info('Cached %d Zoom account emails', len(emails))

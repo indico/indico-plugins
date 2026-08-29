@@ -50,3 +50,27 @@ def test_meeting_reschedule(dummy_event, zoom_client):
         refresh_meetings([room.vc_room for room in dummy_event.vc_room_associations], dummy_event, log_entry)
     assert zoom_client.update_meeting.call_count == 2
     assert log_entry.data['State'] == 'failed'
+
+
+@pytest.mark.usefixtures('db')
+def test_refresh_account_directory(zoom_plugin, zoom_api, zoom_directory_cache):
+    from indico_vc_zoom.task import refresh_account_directory
+    from indico_vc_zoom.util import ZOOM_DIRECTORY_CACHE_KEY
+    zoom_plugin.settings.set('allow_auto_register', True)
+    zoom_api['list_users'].reset_mock()
+
+    refresh_account_directory()
+
+    assert zoom_api['list_users'].called
+    assert zoom_directory_cache.get(ZOOM_DIRECTORY_CACHE_KEY) == {'don.orange@megacorp.xyz'}
+
+
+@pytest.mark.usefixtures('db', 'zoom_directory_cache')
+def test_refresh_account_directory_skipped_without_auto_register(zoom_plugin, zoom_api):
+    from indico_vc_zoom.task import refresh_account_directory
+    zoom_plugin.settings.set('allow_auto_register', False)
+    zoom_api['list_users'].reset_mock()
+
+    refresh_account_directory()
+
+    zoom_api['list_users'].assert_not_called()

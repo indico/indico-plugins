@@ -5,9 +5,12 @@
 # them and/or modify them under the terms of the MIT License;
 # see the LICENSE file for more details.
 
+from collections import defaultdict
+
 from flask import after_this_request, flash, g, has_request_context, request, session
 from markupsafe import escape
 from requests.exceptions import HTTPError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import BooleanField, IntegerField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
@@ -18,11 +21,13 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
+from indico.modules.auth.models.identities import Identity
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.modules.users.util import get_user_by_email
 from indico.modules.vc import VCPluginMixin, VCPluginSettingsFormBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
@@ -47,10 +52,11 @@ from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_mee
                                  process_alternative_hosts, update_zoom_meeting)
 
 
+# the user scope backs the account directory registrant emails are resolved against
 AUTO_REGISTRATION_MEETING_SCOPES = ('meeting:read:list_registrants:admin', 'meeting:write:registrant:admin',
                                     'meeting:write:batch_registrants:admin',
-                                    'meeting:update:registrant_status:admin')
-AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin')
+                                    'meeting:update:registrant_status:admin', 'user:read:list_users:admin')
+AUTO_REGISTRATION_LEGACY_MEETING_SCOPES = ('meeting:read:admin', 'meeting:write:admin', 'user:read:admin')
 AUTO_REGISTRATION_WEBINAR_SCOPES = ('webinar:read:list_registrants:admin', 'webinar:write:registrant:admin',
                                     'webinar:write:batch_registrants:admin',
                                     'webinar:update:registrant_status:admin')
@@ -985,6 +991,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         pending_remove_ids = {reg.id for reg, remove in pending.values() if remove}
         pending_add_ids = {reg.id for reg, remove in pending.values() if not remove}
         room_ops = {}
+        active_email_index = {}
         for registration, remove in pending.values():
             event = registration.event or registration.registration_form.event
             if event is None:
@@ -1000,9 +1007,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             email = self._get_registrant_email(registration)
 
             for vc_room in zoom_rooms:
-                if should_add and self._has_other_active_room_registration(vc_room, email, pending_add_ids):
-                    continue
-                if not should_add and self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
+                if should_add:
+                    if self._has_other_active_room_registration(vc_room, email, pending_add_ids, active_email_index):
+                        continue
+                elif remove:
+                    if self._has_other_active_room_registration(vc_room, email, pending_remove_ids, active_email_index):
+                        continue
+                else:
+                    # a freshly created registration that is not complete yet (e.g. pending
+                    # moderation) was never pushed to Zoom, so there is nothing to cancel
                     continue
 
                 zoom_id = vc_room.data['zoom_id']
@@ -1025,21 +1038,28 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             ops['add'] = [e for e in ops['add'].values() if e['data']['email'].lower() not in skip]
         return room_ops
 
-    def _has_other_active_room_registration(self, vc_room, email, exclude_ids):
-        if not (event_ids := {assoc.event_id for assoc in vc_room.events}):
+    def _has_other_active_room_registration(self, vc_room, email, exclude_ids, index):
+        if not (event_ids := frozenset(assoc.event_id for assoc in vc_room.events)):
             return False
+        if event_ids not in index:
+            index[event_ids] = self._build_active_email_index(event_ids)
+        return bool(index[event_ids].get(email, frozenset()) - exclude_ids)
 
-        query = (Registration.query
-                 .join(Registration.registration_form)
-                 .join(RegistrationForm.event)
-                 .filter(RegistrationForm.event_id.in_(event_ids),
-                         Registration.state == RegistrationState.complete,
-                         ~Registration.is_deleted,
-                         ~RegistrationForm.is_deleted,
-                         ~Event.is_deleted))
-        if exclude_ids:
-            query = query.filter(Registration.id.notin_(exclude_ids))
-        return any(self._get_registrant_email(registration) == email for registration in query)
+    def _build_active_email_index(self, event_ids):
+        registrations = (Registration.query
+                         .join(Registration.registration_form)
+                         .join(RegistrationForm.event)
+                         .filter(RegistrationForm.event_id.in_(event_ids),
+                                 Registration.state == RegistrationState.complete,
+                                 ~Registration.is_deleted,
+                                 ~RegistrationForm.is_deleted,
+                                 ~Event.is_deleted)
+                         .options(joinedload(Registration.user))
+                         .all())
+        index = defaultdict(set)
+        for registration in registrations:
+            index[self._get_registrant_email(registration)].add(registration.id)
+        return index
 
     @make_interceptable
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
@@ -1088,14 +1108,32 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         event_ids = {assoc.event_id for assoc in vc_room.events}
         if not event_ids:
             return []
-        candidates = (Registration.query
-                      .join(Registration.registration_form)
-                      .filter(RegistrationForm.event_id.in_(event_ids),
-                              Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
-                              ~Registration.is_deleted,
-                              ~RegistrationForm.is_deleted))
-        email_lower = email.lower()
-        return [c for c in candidates if self._get_registrant_email(c).lower() == email_lower]
+        email = email.lower()
+        conditions = [Registration.email == email]
+        if user_ids := [u.id for u in self._users_for_zoom_email(email)]:
+            conditions.append(Registration.user_id.in_(user_ids))
+        return (Registration.query
+                .join(Registration.registration_form)
+                .filter(RegistrationForm.event_id.in_(event_ids),
+                        Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
+                        ~Registration.is_deleted,
+                        ~RegistrationForm.is_deleted,
+                        db.or_(*conditions))
+                .all())
+
+    def _users_for_zoom_email(self, email):
+        users = set()
+        if (user := get_user_by_email(email)) is not None:
+            users.add(user)
+        if self.settings.get('user_lookup_mode') == UserLookupMode.authenticators:
+            domain = self.settings.get('enterprise_domain')
+            providers = self.settings.get('authenticators')
+            if providers and domain and email.endswith(f'@{domain}'):
+                username = email.split('@')[0]
+                users.update(identity.user for identity
+                             in Identity.query.filter(Identity.provider.in_(providers),
+                                                      Identity.identifier == username))
+        return users
 
     def _remove_registrants(self, client, zoom_id, vc_room, email_ids, is_webinar):
         if not email_ids:
