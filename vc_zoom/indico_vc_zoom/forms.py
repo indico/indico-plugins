@@ -55,6 +55,7 @@ class VCRoomForm(VCRoomFormBase):
     """Contains all information concerning a Zoom booking."""
 
     advanced_fields = [
+        'audio',
         'mute_audio',
         'mute_host_video',
         'mute_participant_video',
@@ -95,6 +96,13 @@ class VCRoomForm(VCRoomFormBase):
                                                ('logged_in', _('Logged-in users')),
                                                ('registered', _('Registered participants')),
                                                ('no_one', _('No one'))])
+
+    audio = IndicoRadioField(_('Audio'),
+                             choices=[
+                                 ('both', _('Telephone and computer audio')),
+                                 ('voip', _('Computer audio')),
+                                 ('telephony', _('Telephone'))],
+                             description=_('How participants can join the audio of the meeting'))
 
     mute_audio = BooleanField(_('Mute audio'),
                               widget=SwitchWidget(),
@@ -156,6 +164,8 @@ class VCRoomForm(VCRoomFormBase):
 
     def __init__(self, *args, **kwargs):
         defaults = kwargs['obj']
+        if defaults.audio is None:
+            defaults.audio = 'both'
         if defaults.host_user is None and defaults.host is not None:
             host = principal_from_identifier(defaults.host, require_user_token=False)
             defaults.host_choice = 'myself' if host == session.user else 'someone_else'

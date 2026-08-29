@@ -48,6 +48,7 @@ def _aligned_meeting(meeting_id, *, approval_type):
         'topic': 'Zoom Meeting',
         'agenda': 'nothing to add',
         'settings': {
+            'audio': 'both',
             'host_video': False,
             'mute_upon_entry': True,
             'participant_video': False,
@@ -95,6 +96,7 @@ def test_password_change(create_user, mocker, create_event, create_zoom_meeting,
             'topic': 'Zoom Meeting',
             'agenda': 'nothing to add',
             'settings': {
+                'audio': 'both',
                 'host_video': False,
                 'mute_upon_entry': True,
                 'participant_video': False,
@@ -242,6 +244,91 @@ def test_create_room_with_auto_register_uses_manual_approval(
     zoom_api['create_meeting'].assert_called_once()
     settings = zoom_api['create_meeting'].call_args.kwargs['settings']
     assert settings['approval_type'] == 1
+
+
+@pytest.mark.parametrize(('submitted_audio', 'expected'), ((None, 'both'), ('voip', 'voip')))
+def test_create_room_audio_comes_from_the_form(
+    create_event, create_zoom_meeting, zoom_api, submitted_audio, expected,
+):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event', **({'audio': submitted_audio} if submitted_audio else {}))
+
+    assert vc_room.data['audio'] == expected
+    assert zoom_api['create_meeting'].call_args.kwargs['settings']['audio'] == expected
+
+
+@pytest.mark.parametrize(('meeting_type', 'api_method'),
+                         (('regular', 'create_meeting'), ('webinar', 'create_webinar')))
+def test_create_room_sends_audio(
+    create_event, create_zoom_meeting, zoom_plugin, zoom_api, meeting_type, api_method,
+):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['meeting_type'] = meeting_type
+    vc_room.data['audio'] = 'telephony'
+    zoom_api[api_method].reset_mock()
+
+    zoom_plugin.create_room(vc_room, event)
+
+    zoom_api[api_method].assert_called_once()
+    assert zoom_api[api_method].call_args.kwargs['settings']['audio'] == 'telephony'
+
+
+@pytest.mark.parametrize(('is_webinar', 'api_method'),
+                         ((False, 'update_meeting'), (True, 'update_webinar')))
+def test_update_room_pushes_audio_change(
+    mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api, is_webinar, api_method,
+):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['audio'] = 'voip'
+    mocker.patch('indico_vc_zoom.plugin.fetch_zoom_meeting',
+                 return_value=(_aligned_meeting(100000, approval_type=2), is_webinar))
+    zoom_api[api_method].reset_mock()
+
+    zoom_plugin.update_room(vc_room, event)
+
+    zoom_api[api_method].assert_called_once_with(100000, {'settings': {'audio': 'voip'}})
+
+
+def test_refresh_room_syncs_audio(mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api):
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
+        end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
+        title='Test Event #1',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    zoom_meeting = _aligned_meeting(100000, approval_type=2)
+    zoom_meeting['settings']['audio'] = 'telephony'
+    mocker.patch('indico_vc_zoom.plugin.fetch_zoom_meeting', return_value=(zoom_meeting, False))
+
+    zoom_plugin.refresh_room(vc_room, event)
+
+    assert vc_room.data['audio'] == 'telephony'
 
 
 @pytest.mark.parametrize('is_webinar', (False, True))
