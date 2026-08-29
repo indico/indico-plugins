@@ -13,10 +13,11 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 from indico.modules.vc.forms import VCRoomAttachFormBase, VCRoomFormBase
 from indico.util.date_time import now_utc
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, natural_sort_key
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
-from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, PrincipalField
+from indico.web.forms.fields import (IndicoRadioField, IndicoSelectMultipleCheckboxField, MultipleItemsField,
+                                     PrincipalField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
@@ -125,6 +126,12 @@ class VCRoomForm(VCRoomFormBase):
                                    description=_('Automatically check in registrants when they join this '
                                                  'Zoom meeting/webinar'))
 
+    registration_forms = IndicoSelectMultipleCheckboxField(
+        _('Registration forms'),
+        [HiddenUnless('auto_register', preserve_data=True)],
+        coerce=int,
+        description=_('Only registrants of the selected forms are added to this Zoom meeting/webinar'))
+
     description = TextAreaField(_('Description'), description=_('Optional description for this meeting'))
 
     language_interpretation = BooleanField(_('Language interpretation'), widget=SwitchWidget(),
@@ -175,6 +182,9 @@ class VCRoomForm(VCRoomFormBase):
         if not current_plugin.settings.get('allow_auto_register'):
             del self.auto_register
             del self.auto_checkin
+            del self.registration_forms
+        else:
+            self._setup_registration_forms()
 
         self._auto_register_locked = False
         if getattr(self, 'auto_register', None) is not None and self._is_link_target_in_past():
@@ -189,6 +199,24 @@ class VCRoomForm(VCRoomFormBase):
         if not current_plugin.settings.get('allow_language_interpretation'):
             del self.language_interpretation
             del self.interpreters
+
+    def _setup_registration_forms(self):
+        regforms = sorted(self.event.registration_forms, key=lambda rf: natural_sort_key(rf.title))
+        if not regforms:
+            del self.registration_forms
+            return
+        selection = self.registration_forms.data
+        self.registration_forms.choices = [(rf.id, rf.title) for rf in regforms]
+        if not self.is_submitted() and not selection:
+            self.registration_forms.data = [rf.id for rf in regforms]
+
+    def _other_event_regform_ids(self):
+        if self.vc_room is None or not (stored := set(self.vc_room.data.get('registration_forms') or ())):
+            return set()
+        return stored & {rf.id
+                         for assoc in self.vc_room.events
+                         if assoc.event != self.event
+                         for rf in assoc.event.registration_forms}
 
     def _is_link_target_in_past(self):
         """Return True if the form's link target is in the past.
@@ -213,6 +241,10 @@ class VCRoomForm(VCRoomFormBase):
             else:
                 field.data = False
 
+    def validate_registration_forms(self, field):
+        if not field.data:
+            raise ValidationError(_('Select at least one registration form.'))
+
     def validate_host_choice(self, field):
         if field.data == 'myself':
             self._check_zoom_user(session.user)
@@ -231,6 +263,13 @@ class VCRoomForm(VCRoomFormBase):
                 raise ValidationError(_('Invalid email address'))
             if src_lang == target_lang:
                 raise ValidationError(_('Source and target languages must be different.'))
+
+    def post_validate(self):
+        field = getattr(self, 'registration_forms', None)
+        if field is not None and field.data:
+            # the widget only offers this event's forms, so a meeting shared with another
+            # event would lose that event's selection on save
+            field.data = sorted(set(field.data) | self._other_event_regform_ids())
 
     def _check_zoom_user(self, user):
         if find_enterprise_email(user) is None:

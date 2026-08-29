@@ -423,8 +423,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def update_data_vc_room(self, vc_room, data, is_new=False):
         auto_register_before = vc_room.data.get('auto_register') if not is_new else None
+        regform_ids_before = self._get_synced_regform_ids(vc_room) if not is_new else None
         super().update_data_vc_room(vc_room, data, is_new=is_new)
-        fields = {'description', 'password', 'auto_register', 'auto_checkin'}
+        fields = {'description', 'password', 'auto_register', 'auto_checkin', 'registration_forms'}
 
         # we may end up not getting a meeting_type from the form
         # (i.e. webinars are disabled)
@@ -450,32 +451,56 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # registration page gated (self-registrants stay "pending"); Indico-pushed registrants are
         # auto-approved via auto_approve. On enable we also sync any existing registrants so the
         # initial backfill can hit the registrants endpoint.
-        if not is_new and auto_register_before != vc_room.data.get('auto_register'):
+        if is_new:
+            return
+        if auto_register_before != vc_room.data.get('auto_register'):
             is_webinar = vc_room.data.get('meeting_type') == 'webinar'
             desired_approval_type = 1 if vc_room.data.get('auto_register') else 2
             self._push_approval_type(vc_room, desired_approval_type, is_webinar=is_webinar)
             if vc_room.data.get('auto_register'):
-                candidates = [
-                    registration
-                    for event_assoc in vc_room.events
-                    for regform in event_assoc.event.registration_forms
-                    for registration in regform.active_registrations
-                    if registration.state == RegistrationState.complete
-                ]
-                if candidates:
-                    candidate_emails = {self._get_registrant_email(r) for r in candidates}
-                    try:
-                        already_registered = set(
-                            self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails)
-                        )
-                    except HTTPError:
-                        zoom_type = 'webinar' if is_webinar else 'meeting'
-                        self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
-                                            'syncing all existing registrants', vc_room.data['zoom_id'])
-                        already_registered = set()
-                    for registration in candidates:
-                        if self._get_registrant_email(registration).lower() not in already_registered:
-                            self._queue_registration_sync(registration, remove=False)
+                regform_ids = self._get_synced_regform_ids(vc_room)
+                self._backfill_registrants(vc_room, self._get_syncable_registrations(vc_room, regform_ids))
+        elif vc_room.data.get('auto_register'):
+            self._sync_regform_selection_change(vc_room, regform_ids_before)
+
+    def _get_synced_regform_ids(self, vc_room):
+        return set(ids) if (ids := vc_room.data.get('registration_forms')) else None
+
+    def _get_syncable_registrations(self, vc_room, regform_ids):
+        registrations = []
+        for event_assoc in vc_room.events:
+            for regform in event_assoc.event.registration_forms:
+                if regform_ids is not None and regform.id not in regform_ids:
+                    continue
+                registrations.extend(registration for registration in regform.active_registrations
+                                     if registration.state == RegistrationState.complete)
+        return registrations
+
+    def _backfill_registrants(self, vc_room, candidates):
+        if not candidates:
+            return
+        candidate_emails = {self._get_registrant_email(r) for r in candidates}
+        try:
+            already_registered = set(self._find_zoom_registrants(ZoomIndicoClient(), vc_room, candidate_emails))
+        except HTTPError:
+            zoom_type = 'webinar' if vc_room.data.get('meeting_type') == 'webinar' else 'meeting'
+            self.logger.warning(f'Could not fetch registrants for Zoom {zoom_type} %s; '  # noqa: G004
+                                'syncing all existing registrants', vc_room.data['zoom_id'])
+            already_registered = set()
+        for registration in candidates:
+            if self._get_registrant_email(registration).lower() not in already_registered:
+                self._queue_registration_sync(registration, remove=False)
+
+    def _sync_regform_selection_change(self, vc_room, regform_ids_before):
+        regform_ids_now = self._get_synced_regform_ids(vc_room)
+        if regform_ids_before == regform_ids_now:
+            return
+        before = {r.id: r for r in self._get_syncable_registrations(vc_room, regform_ids_before)}
+        now = {r.id: r for r in self._get_syncable_registrations(vc_room, regform_ids_now)}
+        self._backfill_registrants(vc_room, [r for rid, r in now.items() if rid not in before])
+        for rid, registration in before.items():
+            if rid not in now:
+                self._queue_registration_sync(registration, remove=True)
 
     def create_room(self, vc_room, event):
         """Create a new Zoom meeting for an event, given a VC room.
@@ -887,15 +912,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         for registration in registration_form.active_registrations:
             self._queue_registration_sync(registration, remove=True)
 
-    def _vc_room_created(self, vc_room, event, **kwargs):
+    def _vc_room_created(self, vc_room, **kwargs):
         if vc_room.type != self.service_name or not self.settings.get('allow_auto_register'):
             return
         if not vc_room.data.get('auto_register'):
             return
-        for regform in event.registration_forms:
-            for registration in regform.active_registrations:
-                if registration.state == RegistrationState.complete:
-                    self._queue_registration_sync(registration, remove=False)
+        regform_ids = self._get_synced_regform_ids(vc_room)
+        for registration in self._get_syncable_registrations(vc_room, regform_ids):
+            self._queue_registration_sync(registration, remove=False)
 
     def _get_registrant_email(self, registration):
         if registration.user:
@@ -913,14 +937,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 emails.add(email.lower())
         return emails
 
-    def _get_user_registration(self, event, user):
-        return (Registration.query.with_parent(event)
-                .join(Registration.registration_form)
-                .filter(Registration.user == user,
-                        Registration.state == RegistrationState.complete,
-                        ~Registration.is_deleted,
-                        ~RegistrationForm.is_deleted)
-                .first())
+    def _get_user_registration(self, event, user, regform_ids):
+        query = (Registration.query.with_parent(event)
+                 .join(Registration.registration_form)
+                 .filter(Registration.user == user,
+                         Registration.state == RegistrationState.complete,
+                         ~Registration.is_deleted,
+                         ~RegistrationForm.is_deleted))
+        if regform_ids is not None:
+            query = query.filter(Registration.registration_form_id.in_(regform_ids))
+        return query.first()
 
     @memoize_request
     def get_personalized_join_url(self, vc_room, event_vc_room, user=None, *, registration=None):
@@ -929,12 +955,15 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if not vc_room.data.get('auto_register'):
             return None
 
+        regform_ids = self._get_synced_regform_ids(vc_room)
         if registration is None:
             if user is None:
                 return None
-            registration = self._get_user_registration(event_vc_room.event, user)
+            registration = self._get_user_registration(event_vc_room.event, user, regform_ids)
             if registration is None:
                 return None
+        elif regform_ids is not None and registration.registration_form_id not in regform_ids:
+            return None
 
         email = self._get_registrant_email(registration)
         is_webinar = vc_room.data.get('meeting_type') == 'webinar'
@@ -1000,6 +1029,9 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             email = self._get_registrant_email(registration)
 
             for vc_room in zoom_rooms:
+                regform_ids = self._get_synced_regform_ids(vc_room)
+                if should_add and regform_ids is not None and registration.registration_form_id not in regform_ids:
+                    continue
                 if should_add and self._has_other_active_room_registration(vc_room, email, pending_add_ids):
                     continue
                 if not should_add and self._has_other_active_room_registration(vc_room, email, pending_remove_ids):
@@ -1037,6 +1069,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                          ~Registration.is_deleted,
                          ~RegistrationForm.is_deleted,
                          ~Event.is_deleted))
+        if (regform_ids := self._get_synced_regform_ids(vc_room)) is not None:
+            query = query.filter(Registration.registration_form_id.in_(regform_ids))
         if exclude_ids:
             query = query.filter(Registration.id.notin_(exclude_ids))
         return any(self._get_registrant_email(registration) == email for registration in query)
@@ -1094,6 +1128,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                               Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
                               ~Registration.is_deleted,
                               ~RegistrationForm.is_deleted))
+        if (regform_ids := self._get_synced_regform_ids(vc_room)) is not None:
+            candidates = candidates.filter(Registration.registration_form_id.in_(regform_ids))
         email_lower = email.lower()
         return [c for c in candidates if self._get_registrant_email(c).lower() == email_lower]
 

@@ -42,19 +42,26 @@ def zoom_user(zoom_api):
 
 
 @pytest.fixture
-def reg_form(create_event, db):
+def create_reg_form(db):
+    """Return a callable which adds a registration form to an existing event."""
+    def _create(event, title):
+        regform = RegistrationForm(event=event, title=title, currency='EUR')
+        section = RegistrationFormSection(registration_form=regform, title='Personal Data',
+                                          type=RegistrationFormItemType.section_pd)
+        regform.sections.append(section)
+        create_personal_data_fields(regform)
+        db.session.flush()
+        return regform
+    return _create
+
+
+@pytest.fixture
+def reg_form(create_event, create_reg_form):
     event = create_event(
         start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
         end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
     )
-    regform = RegistrationForm(event=event, title='Test Form', currency='EUR')
-    section = RegistrationFormSection(registration_form=regform, title='Personal Data',
-                                      type=RegistrationFormItemType.section_pd)
-    regform.sections.append(section)
-    create_personal_data_fields(regform)
-    event.registration_forms.append(regform)
-    db.session.flush()
-    return regform
+    return create_reg_form(event, 'Test Form')
 
 
 @pytest.fixture
@@ -168,7 +175,7 @@ def zoom_api(zoom_plugin, create_user, mocker):
 @pytest.fixture
 def create_vc_room_with_assoc(db):
     """Create a Zoom VCRoom + association for an event without going through the HTTP endpoint."""
-    def _create(event, zoom_user, *, auto_register=True, auto_checkin=False):
+    def _create(event, zoom_user, *, auto_register=True, auto_checkin=False, registration_forms=None):
         vc_room = VCRoom(name='Test Meeting', type='zoom', status=VCRoomStatus.created, created_by_user=zoom_user)
         vc_room.data = {
             'zoom_id': 26262600,
@@ -176,6 +183,7 @@ def create_vc_room_with_assoc(db):
             'host': 'User:1',
             'auto_register': auto_register,
             'auto_checkin': auto_checkin,
+            'registration_forms': registration_forms,
         }
         assoc = VCRoomEventAssociation(link_object=event, vc_room=vc_room, show=True,
                                        data={'password_visibility': 'everyone'})
