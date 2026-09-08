@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
-from wtforms.validators import ValidationError
 
 from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
@@ -451,7 +450,7 @@ def test_regform_field_drops_selection_of_gone_regform(db, zoom_plugin, app, reg
 def test_regform_field_requires_a_selection(zoom_plugin, app, reg_form, create_regform):
     create_regform(reg_form.event, 'Second Form')
     form = _make_zoom_form(zoom_plugin, app, reg_form.event)
+    form.auto_register.data = True
     form.registration_forms.data = []
 
-    with pytest.raises(ValidationError):
-        form.validate_registration_forms(form.registration_forms)
+    assert not form.registration_forms.validate(form)

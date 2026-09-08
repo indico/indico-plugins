@@ -128,7 +128,8 @@ class VCRoomForm(VCRoomFormBase):
 
     registration_forms = IndicoSelectMultipleCheckboxField(
         _('Registration forms'),
-        [HiddenUnless('auto_register', preserve_data=True)],
+        [HiddenUnless('auto_register', preserve_data=True),
+         DataRequired(_('Select at least one registration form.'))],
         coerce=int,
         description=_('Only registrants of the selected forms are added to this Zoom meeting/webinar'))
 
@@ -240,10 +241,6 @@ class VCRoomForm(VCRoomFormBase):
                 field.data = self.vc_room.data.get('auto_register', False)
             else:
                 field.data = False
-
-    def validate_registration_forms(self, field):
-        if not field.data:
-            raise ValidationError(_('Select at least one registration form.'))
 
     def validate_host_choice(self, field):
         if field.data == 'myself':
