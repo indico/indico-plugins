@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.7
+
+- Allow restricting automatic registration to specific registration forms
+
 ### 3.3.6
 
 - Compare webhook HMAC token in a more secure manner
@@ -21,7 +25,6 @@
   Indico participants in the corresponding Zoom meeting or webinar
 - Automatically check in Indico registrations when a participant joins the corresponding Zoom
   meeting or webinar (opt-in per room, requires automatic registration to be enabled on the room)
-- Restrict automatic registration to specific registration forms of the event
 - Zoom meeting names can now be up to 200 characters long
 - Update translations
 
