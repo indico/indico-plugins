@@ -12,8 +12,8 @@ from indico.modules.events.registration.models.registrations import Registration
 
 
 @pytest.fixture
-def two_regforms(reg_form, create_reg_form):
-    return reg_form, create_reg_form(reg_form.event, 'Second Form')
+def two_regforms(reg_form, create_regform):
+    return reg_form, create_regform(reg_form.event, 'Second Form')
 
 
 @pytest.mark.usefixtures('smtp')

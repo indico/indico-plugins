@@ -176,12 +176,12 @@ def test_participant_joined_skipped_when_auto_checkin_disabled(db, zoom_plugin, 
 
 
 @pytest.mark.usefixtures('request_context', 'smtp')
-def test_participant_joined_skipped_for_unselected_regform(db, zoom_plugin, reg_form, create_reg_form, zoom_user,
+def test_participant_joined_skipped_for_unselected_regform(db, zoom_plugin, reg_form, create_regform, zoom_user,
                                                            webhook_client, create_vc_room_with_assoc,
                                                            make_complete_registration):
     zoom_plugin.settings.set('allow_auto_register', True)
     event = reg_form.event
-    other_form = create_reg_form(event, 'Second Form')
+    other_form = create_regform(event, 'Second Form')
     vc_room, _assoc = create_vc_room_with_assoc(event, zoom_user, auto_register=True, auto_checkin=True,
                                                 registration_forms=[reg_form.id])
 

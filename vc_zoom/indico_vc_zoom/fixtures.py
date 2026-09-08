@@ -12,10 +12,8 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from indico.core.plugins import plugin_engine
-from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.registration.util import create_personal_data_fields, create_registration
+from indico.modules.events.registration.util import create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
 
@@ -42,26 +40,12 @@ def zoom_user(zoom_api):
 
 
 @pytest.fixture
-def create_reg_form(db):
-    """Return a callable which adds a registration form to an existing event."""
-    def _create(event, title):
-        regform = RegistrationForm(event=event, title=title, currency='EUR')
-        section = RegistrationFormSection(registration_form=regform, title='Personal Data',
-                                          type=RegistrationFormItemType.section_pd)
-        regform.sections.append(section)
-        create_personal_data_fields(regform)
-        db.session.flush()
-        return regform
-    return _create
-
-
-@pytest.fixture
-def reg_form(create_event, create_reg_form):
+def reg_form(create_event, create_regform):
     event = create_event(
         start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
         end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
     )
-    return create_reg_form(event, 'Test Form')
+    return create_regform(event, 'Test Form')
 
 
 @pytest.fixture

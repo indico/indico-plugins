@@ -368,8 +368,8 @@ def test_regform_field_shown_with_a_single_regform(zoom_plugin, app, reg_form):
     assert form.registration_forms.data == [reg_form.id]
 
 
-def test_regform_field_defaults_to_every_regform(zoom_plugin, app, reg_form, create_reg_form):
-    second_form = create_reg_form(reg_form.event, 'Second Form')
+def test_regform_field_defaults_to_every_regform(zoom_plugin, app, reg_form, create_regform):
+    second_form = create_regform(reg_form.event, 'Second Form')
 
     form = _make_zoom_form(zoom_plugin, app, reg_form.event)
 
@@ -377,9 +377,9 @@ def test_regform_field_defaults_to_every_regform(zoom_plugin, app, reg_form, cre
     assert form.registration_forms.choices == [(second_form.id, 'Second Form'), (reg_form.id, 'Test Form')]
 
 
-def test_regform_field_keeps_stored_selection(db, zoom_plugin, app, reg_form, create_reg_form, create_zoom_meeting,
+def test_regform_field_keeps_stored_selection(db, zoom_plugin, app, reg_form, create_regform, create_zoom_meeting,
                                               zoom_user):
-    create_reg_form(reg_form.event, 'Second Form')
+    create_regform(reg_form.event, 'Second Form')
     reg_form.event.update_principal(zoom_user, full_access=True)
     db.session.flush()
     vc_room = create_zoom_meeting(reg_form.event, 'event')
@@ -401,8 +401,8 @@ def test_regform_field_shown_when_a_selected_regform_is_gone(db, zoom_plugin, ap
     assert form.registration_forms.data == [reg_form.id + 100]
 
 
-def test_regform_field_lists_only_active_regforms(db, zoom_plugin, app, reg_form, create_reg_form):
-    gone = create_reg_form(reg_form.event, 'Gone Form')
+def test_regform_field_lists_only_active_regforms(db, zoom_plugin, app, reg_form, create_regform):
+    gone = create_regform(reg_form.event, 'Gone Form')
     gone.is_deleted = True
     db.session.flush()
 
@@ -412,14 +412,14 @@ def test_regform_field_lists_only_active_regforms(db, zoom_plugin, app, reg_form
     assert form.registration_forms.data == [reg_form.id]
 
 
-def test_regform_field_keeps_selection_of_other_events(db, zoom_plugin, app, reg_form, create_event, create_reg_form,
+def test_regform_field_keeps_selection_of_other_events(db, zoom_plugin, app, reg_form, create_event, create_regform,
                                                        zoom_user, create_vc_room_with_assoc):
     """Editing from one event must not drop the forms selected in another event sharing the meeting."""
     other_event = create_event(
         start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
         end_dt=datetime(2024, 3, 1, 18, 0, tzinfo=TZ),
     )
-    other_form = create_reg_form(other_event, 'Other Form')
+    other_form = create_regform(other_event, 'Other Form')
     vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user,
                                                 registration_forms=[reg_form.id, other_form.id])
     db.session.add(VCRoomEventAssociation(link_object=other_event, vc_room=vc_room, show=True,
@@ -433,9 +433,9 @@ def test_regform_field_keeps_selection_of_other_events(db, zoom_plugin, app, reg
     assert form.registration_forms.data == sorted([reg_form.id, other_form.id])
 
 
-def test_regform_field_drops_selection_of_gone_regform(db, zoom_plugin, app, reg_form, create_reg_form, zoom_user,
+def test_regform_field_drops_selection_of_gone_regform(db, zoom_plugin, app, reg_form, create_regform, zoom_user,
                                                        create_vc_room_with_assoc):
-    gone = create_reg_form(reg_form.event, 'Gone Form')
+    gone = create_regform(reg_form.event, 'Gone Form')
     vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user,
                                                 registration_forms=[reg_form.id, gone.id])
     gone.is_deleted = True
@@ -448,8 +448,8 @@ def test_regform_field_drops_selection_of_gone_regform(db, zoom_plugin, app, reg
     assert form.registration_forms.data == [reg_form.id]
 
 
-def test_regform_field_requires_a_selection(zoom_plugin, app, reg_form, create_reg_form):
-    create_reg_form(reg_form.event, 'Second Form')
+def test_regform_field_requires_a_selection(zoom_plugin, app, reg_form, create_regform):
+    create_regform(reg_form.event, 'Second Form')
     form = _make_zoom_form(zoom_plugin, app, reg_form.event)
     form.registration_forms.data = []
 
