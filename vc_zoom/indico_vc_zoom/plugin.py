@@ -195,6 +195,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
             if getattr(ZoomPlugin.plugin_config, name.upper()):
                 self[name].render_kw = {'disabled': True}
                 self[name].description = _('This value has been provided by the system administrator.')
+                self[name]._value = lambda: '*****'
 
     def validate_authenticators(self, field):
         invalid = set(field.data) - set(multipass.identity_providers)

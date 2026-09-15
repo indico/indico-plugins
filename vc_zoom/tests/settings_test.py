@@ -21,17 +21,22 @@ PROVIDED_BY_ADMIN = 'This value has been provided by the system administrator.'
 @pytest.mark.parametrize('field', ('client_secret', 'webhook_token'))
 @pytest.mark.usefixtures('request_context')
 def test_settings_form_editable_secret_when_not_in_config(field):
-    assert 'disabled' not in str(PluginSettingsForm()[field])
-    assert PROVIDED_BY_ADMIN not in (PluginSettingsForm()[field].description or '')
+    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-secret'}))[field]
+    assert 'disabled' not in str(form_field)
+    assert 'db-secret' in str(form_field)
+    assert PROVIDED_BY_ADMIN not in (form_field.description or '')
 
 
 @pytest.mark.parametrize('field', ('client_secret', 'webhook_token'))
 @pytest.mark.usefixtures('request_context')
-def test_settings_form_disables_secret_when_in_config(field, patch_indico_config):
+def test_settings_form_hides_secret_when_in_config(field, patch_indico_config):
     patch_indico_config(f'PLUGIN_VC_ZOOM_{field.upper()}', 'config-value')
-    form_field = PluginSettingsForm()[field]
+    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-secret'}))[field]
     assert 'disabled' in str(form_field)
     assert form_field.description == PROVIDED_BY_ADMIN
+    assert 'db-secret' not in str(form_field)
+    assert 'config-value' not in str(form_field)
+    assert '*****' in str(form_field)
 
 
 @pytest.mark.usefixtures('request_context')
