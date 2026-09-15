@@ -189,22 +189,22 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
     phone_link = URLField(_('Join via phone'), [Optional(), URL()],
                           description=_('Link to instructions on joining a meeting via phone'))
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in ('client_secret', 'webhook_token'):
+            if getattr(ZoomPlugin.plugin_config, name.upper()):
+                self[name].render_kw = {'disabled': True}
+                self[name].description = _('This value has been provided by the system administrator.')
+
     def validate_authenticators(self, field):
         invalid = set(field.data) - set(multipass.identity_providers)
         if invalid:
             raise ValidationError(_('Invalid identity providers: {}').format(escape(', '.join(invalid))))
 
-    def _get_zoom_config(self):
-        return {
-            'account_id': self.account_id.data,
-            'client_id': self.client_id.data,
-            'client_secret': self.client_secret.data,
-        }
-
     def validate_allow_auto_register(self, field):
         if not field.data:
             return
-        config = self._get_zoom_config()
+        config = ZoomPlugin.get_zoom_config(self.data)
         if not all(config.values()):
             return
         if not (scopes := get_zoom_scopes(config)):
@@ -216,7 +216,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
             )
 
     def validate_client_secret(self, field):
-        config = self._get_zoom_config()
+        config = ZoomPlugin.get_zoom_config(self.data)
         if not all(config.values()):
             flash(_('Zoom credentials not set; the plugin will not work correctly'), 'error')
             return
@@ -239,6 +239,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
+    plugin_config_defaults = {'CLIENT_SECRET': None, 'WEBHOOK_TOKEN': None}
     default_settings = VCPluginMixin.default_settings | {
         'account_id': '',
         'client_id': '',
@@ -261,6 +262,20 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         'send_host_url': False,
         'phone_link': '',
     }
+
+    @classmethod
+    def get_zoom_config(cls, settings=None):
+        if settings is None:
+            settings = cls.settings.get_all()
+        return {
+            'account_id': settings['account_id'],
+            'client_id': settings['client_id'],
+            'client_secret': cls.plugin_config.CLIENT_SECRET or settings['client_secret'],
+        }
+
+    @classmethod
+    def get_webhook_token(cls):
+        return cls.plugin_config.WEBHOOK_TOKEN or cls.settings.get('webhook_token')
 
     def init(self):
         super().init()

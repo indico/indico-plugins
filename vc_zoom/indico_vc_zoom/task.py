@@ -49,9 +49,8 @@ def refresh_meetings(vc_rooms, obj, log_entry=None):
 def refresh_token(threshold=600):
     from indico_vc_zoom.plugin import ZoomPlugin
 
-    config = ZoomPlugin.settings.get_all()
-    if not all(config[x] for x in ('account_id', 'client_id', 'client_secret')):
-        # not using oauth -> nothing to do
+    config = ZoomPlugin.get_zoom_config()
+    if not all(config.values()):
         return
 
     expires_at = get_zoom_token(config)[2]

@@ -54,7 +54,7 @@ class RHWebhook(RH):
         return event == 'endpoint.url_validation'
 
     def _get_hmac(self, data):
-        webhook_token = current_plugin.settings.get('webhook_token')
+        webhook_token = current_plugin.get_webhook_token()
         if not webhook_token:
             current_plugin.logger.warning('Tried to validate Zoom webhook, but no secret token has been configured')
             raise ServiceUnavailable('No Zoom Webhook Secret Token configured')

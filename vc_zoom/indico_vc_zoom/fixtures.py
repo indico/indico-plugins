@@ -21,11 +21,9 @@ TZ = ZoneInfo('Europe/Zurich')
 
 
 @pytest.fixture
-def zoom_plugin(app):
+def zoom_plugin():
     """Return a callable which lets you create dummy Zoom meeting occurrences."""
-    from indico_vc_zoom.plugin import ZoomPlugin
-
-    plugin = ZoomPlugin(plugin_engine, app)
+    plugin = plugin_engine.get_plugin('vc_zoom')
     plugin.settings.set_multi({
         'email_domains': ('megacorp.xyz',),
         'user_lookup_mode': 'email_domains',
