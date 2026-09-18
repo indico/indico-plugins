@@ -36,19 +36,29 @@ def test_api_client_uses_db_secret_when_config_unset(zoom_oauth):
     assert zoom_oauth.calls[0].request.headers['Authorization'] == _basic_auth('cid', 'db-secret')
 
 
-@pytest.mark.usefixtures('db', 'zoom_credentials')
-def test_api_client_prefers_config_secret(zoom_oauth, patch_indico_config):
+@pytest.fixture
+def config_credentials(patch_indico_config):
+    patch_indico_config('PLUGIN_VC_ZOOM_ACCOUNT_ID', 'config-acc')
+    patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_ID', 'config-cid')
     patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_SECRET', 'config-secret')
+
+
+def _assert_config_credentials_used(request):
+    assert request.headers['Authorization'] == _basic_auth('config-cid', 'config-secret')
+    assert 'account_id=config-acc' in request.url
+
+
+@pytest.mark.usefixtures('db', 'zoom_credentials', 'config_credentials')
+def test_api_client_prefers_config_credentials(zoom_oauth):
     zoom_oauth.get('https://api.zoom.us/v2/users/someone', json={})
     ZoomIndicoClient().get_user('someone')
-    assert zoom_oauth.calls[0].request.headers['Authorization'] == _basic_auth('cid', 'config-secret')
+    _assert_config_credentials_used(zoom_oauth.calls[0].request)
 
 
-@pytest.mark.usefixtures('db', 'zoom_credentials')
-def test_token_refresh_prefers_config_secret(zoom_oauth, patch_indico_config):
-    patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_SECRET', 'config-secret')
+@pytest.mark.usefixtures('db', 'zoom_credentials', 'config_credentials')
+def test_token_refresh_prefers_config_credentials(zoom_oauth):
     refresh_token()
-    assert zoom_oauth.calls[0].request.headers['Authorization'] == _basic_auth('cid', 'config-secret')
+    _assert_config_credentials_used(zoom_oauth.calls[0].request)
 
 
 @pytest.mark.usefixtures('db', 'zoom_plugin')

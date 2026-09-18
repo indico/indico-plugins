@@ -191,7 +191,7 @@ class PluginSettingsForm(VCPluginSettingsFormBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for name in ('client_secret', 'webhook_token'):
+        for name in ('account_id', 'client_id', 'client_secret', 'webhook_token'):
             if getattr(ZoomPlugin.plugin_config, name.upper()):
                 self[name].render_kw = {'disabled': True}
                 self[name].description = _('This value has been provided by the system administrator.')
@@ -240,7 +240,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     vc_room_form = VCRoomForm
     vc_room_attach_form = VCRoomAttachForm
     friendly_name = 'Zoom'
-    plugin_config_defaults = {'CLIENT_SECRET': None, 'WEBHOOK_TOKEN': None}
+    plugin_config_defaults = {'ACCOUNT_ID': None, 'CLIENT_ID': None, 'CLIENT_SECRET': None, 'WEBHOOK_TOKEN': None}
     default_settings = VCPluginMixin.default_settings | {
         'account_id': '',
         'client_id': '',
@@ -268,11 +268,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def get_zoom_config(cls, settings=None):
         if settings is None:
             settings = cls.settings.get_all()
-        return {
-            'account_id': settings['account_id'],
-            'client_id': settings['client_id'],
-            'client_secret': cls.plugin_config.CLIENT_SECRET or settings['client_secret'],
-        }
+        return {name: getattr(cls.plugin_config, name.upper()) or settings[name]
+                for name in ('account_id', 'client_id', 'client_secret')}
 
     @classmethod
     def get_webhook_token(cls):

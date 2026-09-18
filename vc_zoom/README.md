@@ -15,9 +15,10 @@
 
 - Allow restricting automatic registration to specific registration forms
 - Allow managing co-hosts via Indico
-- Allow setting the client secret and the webhook secret token in `indico.conf`
-  (`PLUGIN_VC_ZOOM_CLIENT_SECRET`, `PLUGIN_VC_ZOOM_WEBHOOK_TOKEN`); when set, they take precedence over
-  the plugin settings, which can then no longer be changed from the settings page
+- Allow setting the Zoom credentials and the webhook secret token in `indico.conf`
+  (`PLUGIN_VC_ZOOM_ACCOUNT_ID`, `PLUGIN_VC_ZOOM_CLIENT_ID`, `PLUGIN_VC_ZOOM_CLIENT_SECRET`,
+  `PLUGIN_VC_ZOOM_WEBHOOK_TOKEN`); when set, they take precedence over the plugin settings, which can
+  then no longer be changed from the settings page
 
 ### 3.3.6
 
@@ -206,9 +207,12 @@ These are the most relevant configuration options:
 
 See the [zoom documentation](https://marketplace.zoom.us/docs/guides/build/server-to-server-oauth-app/#create-a-server-to-server-oauth-app) on how to get the credentials for authenticating with the Zoom servers.
 
-The client secret can also be set in `indico.conf`, in which case the plugin setting is disabled:
+The credentials can also be set in `indico.conf`, in which case the corresponding plugin settings are
+disabled:
 
 ```python
+PLUGIN_VC_ZOOM_ACCOUNT_ID = 'your-account-id'
+PLUGIN_VC_ZOOM_CLIENT_ID = 'your-client-id'
 PLUGIN_VC_ZOOM_CLIENT_SECRET = 'your-client-secret'
 ```
 

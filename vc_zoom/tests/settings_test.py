@@ -18,43 +18,51 @@ from indico_vc_zoom.plugin import PluginSettingsForm
 PROVIDED_BY_ADMIN = 'This value has been provided by the system administrator.'
 
 
-@pytest.mark.parametrize('field', ('client_secret', 'webhook_token'))
+CONFIG_FIELDS = ('account_id', 'client_id', 'client_secret', 'webhook_token')
+
+
+@pytest.mark.parametrize('field', CONFIG_FIELDS)
 @pytest.mark.usefixtures('request_context')
-def test_settings_form_editable_secret_when_not_in_config(field):
-    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-secret'}))[field]
+def test_settings_form_editable_when_not_in_config(field):
+    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-value'}))[field]
     assert 'disabled' not in str(form_field)
-    assert 'db-secret' in str(form_field)
+    assert 'db-value' in str(form_field)
     assert PROVIDED_BY_ADMIN not in (form_field.description or '')
 
 
-@pytest.mark.parametrize('field', ('client_secret', 'webhook_token'))
+@pytest.mark.parametrize('field', CONFIG_FIELDS)
 @pytest.mark.usefixtures('request_context')
-def test_settings_form_hides_secret_when_in_config(field, patch_indico_config):
+def test_settings_form_hides_value_when_in_config(field, patch_indico_config):
     patch_indico_config(f'PLUGIN_VC_ZOOM_{field.upper()}', 'config-value')
-    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-secret'}))[field]
+    form_field = PluginSettingsForm(obj=FormDefaults(**{field: 'db-value'}))[field]
     assert 'disabled' in str(form_field)
     assert form_field.description == PROVIDED_BY_ADMIN
-    assert 'db-secret' not in str(form_field)
+    assert 'db-value' not in str(form_field)
     assert 'config-value' not in str(form_field)
     assert '*****' in str(form_field)
 
 
+@pytest.mark.parametrize('field', CONFIG_FIELDS)
 @pytest.mark.usefixtures('request_context')
-def test_settings_form_keeps_stored_secret_when_in_config(patch_indico_config):
-    patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_SECRET', 'config-secret')
-    form = PluginSettingsForm(formdata=MultiDict({'account_id': 'acc', 'client_id': 'cid'}),
-                              obj=FormDefaults(client_secret='db-secret'), csrf_enabled=False)
-    assert form.data['client_secret'] == 'db-secret'
+def test_settings_form_keeps_stored_value_when_in_config(field, patch_indico_config):
+    patch_indico_config(f'PLUGIN_VC_ZOOM_{field.upper()}', 'config-value')
+    form = PluginSettingsForm(formdata=MultiDict({'passcode_length': '8'}), obj=FormDefaults(**{field: 'db-value'}),
+                              csrf_enabled=False)
+    assert form.data[field] == 'db-value'
 
 
 @pytest.mark.usefixtures('request_context')
-def test_settings_form_checks_credentials_with_config_secret(patch_indico_config, mocked_responses):
+def test_settings_form_checks_credentials_with_config_credentials(patch_indico_config, mocked_responses):
+    patch_indico_config('PLUGIN_VC_ZOOM_ACCOUNT_ID', 'config-acc')
+    patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_ID', 'config-cid')
     patch_indico_config('PLUGIN_VC_ZOOM_CLIENT_SECRET', 'config-secret')
     mocked_responses.post('https://zoom.us/oauth/token', status=401, json={'reason': 'Invalid client'})
-    form = PluginSettingsForm(formdata=MultiDict({'account_id': 'acc', 'client_id': 'cid', 'passcode_length': '8'}),
-                              csrf_enabled=False)
+    form = PluginSettingsForm(formdata=MultiDict({'passcode_length': '8'}), csrf_enabled=False)
     assert not form.validate()
     assert 'Could not get Zoom token: {"reason": "Invalid client"}' in form.client_secret.errors
+    request = mocked_responses.calls[0].request
+    assert request.headers['Authorization'] == 'Basic ' + base64.b64encode(b'config-cid:config-secret').decode()
+    assert 'account_id=config-acc' in request.url
 
 
 @pytest.mark.usefixtures('request_context')
