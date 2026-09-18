@@ -7,6 +7,7 @@
 
 from flask import session
 from flask_pluginengine import current_plugin
+from markupsafe import escape
 from wtforms.fields import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
@@ -263,7 +264,7 @@ class VCRoomForm(VCRoomFormBase):
         users = field.data or ()
         # unlike the host field, this one holds several users, so the error has to name them
         if invalid := sorted(user.full_name for user in users if find_enterprise_email(user) is None):
-            raise ValidationError(_('No Zoom account: {}').format(', '.join(invalid)))
+            raise ValidationError(_('No Zoom account: {}').format(escape(', '.join(invalid))))
         if any(user.persistent_identifier == self.host.data for user in users):
             raise ValidationError(_('The meeting host cannot be an alternative host'))
 
