@@ -323,6 +323,22 @@ def test_vc_room_created_syncs_existing_registrations(zoom_plugin, zoom_api_regi
     assert reg_data['first_name'] == 'John'
 
 
+@pytest.mark.usefixtures('db', 'smtp', 'zoom_directory_cache')
+def test_flush_never_walks_account_directory(zoom_plugin, zoom_api, zoom_api_registrants, reg_form, zoom_user,
+                                             create_vc_room_with_assoc, make_complete_registration):
+    event = reg_form.event
+    make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
+    zoom_api['list_users'].reset_mock()
+
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api['list_users'].assert_not_called()
+
+
 @pytest.mark.usefixtures('db', 'smtp')
 def test_vc_room_created_auto_register_disabled(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                 create_vc_room_with_assoc, make_complete_registration):
@@ -365,6 +381,60 @@ def test_vc_room_created_skips_non_complete_registrations(db, zoom_plugin, zoom_
     zoom_plugin._flush_pending_registrations(None)
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+
+
+@pytest.mark.usefixtures('smtp')
+def test_pending_registration_created_does_not_cancel(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                      create_vc_room_with_assoc):
+    """A newly created registration still awaiting moderation was never pushed to Zoom, so it must not be cancelled."""
+    event = reg_form.event
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(event, zoom_user, auto_register=True)
+
+    data = {'email': 'pending@example.com', 'first_name': 'Pending', 'last_name': 'User', 'affiliation': 'MegaCorp'}
+    form_data = {f.html_field_name: data[f.personal_data_type.name]
+                 for f in reg_form.active_fields if f.personal_data_type and f.personal_data_type.name in data}
+    form_data['email'] = data['email']
+
+    zoom_plugin.settings.set('allow_auto_register', False)
+    registration = create_registration(reg_form, form_data)
+    db.session.flush()
+    registration.state = RegistrationState.pending
+    db.session.flush()
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    zoom_api_registrants['list_meeting_registrants'].reset_mock()
+    zoom_api_registrants['update_meeting_registrants_status'].reset_mock()
+
+    signals.event.registration_created.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
+@pytest.mark.usefixtures('db', 'smtp')
+def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                   create_vc_room_with_assoc, make_complete_registration, mocker):
+    """The active-registration lookup is built once per flush, not once per pending registration."""
+    event = reg_form.event
+    for i in range(5):
+        make_complete_registration(reg_form, f'user{i}@example.com', 'User', str(i))
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
+    spy = mocker.spy(zoom_plugin, '_build_active_email_index')
+
+    signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert spy.call_count == 1
+    assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
+    batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
+    batch_emails = {r['email'] for r in batch_data['registrants']}
+    assert batch_emails == {f'user{i}@example.com' for i in range(5)}
 
 
 @pytest.mark.usefixtures('request_context', 'db', 'smtp')
@@ -702,6 +772,9 @@ def test_batch_excludes_host_and_alt_host(
 
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     vc_room.data['alternative_hosts'] = [alt_host.persistent_identifier]
+    zoom_api_registrants['list_users'].return_value = {
+        'users': [{'email': zoom_user.email}, {'email': alt_host.email}], 'next_page_token': ''
+    }
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
 
