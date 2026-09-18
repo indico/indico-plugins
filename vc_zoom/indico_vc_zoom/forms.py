@@ -7,6 +7,7 @@
 
 from flask import session
 from flask_pluginengine import current_plugin
+from markupsafe import escape
 from wtforms.fields import BooleanField, StringField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
@@ -17,7 +18,7 @@ from indico.util.string import is_valid_mail, natural_sort_key
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import generated_data
 from indico.web.forms.fields import (IndicoRadioField, IndicoSelectMultipleCheckboxField, MultipleItemsField,
-                                     PrincipalField)
+                                     PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
@@ -82,6 +83,10 @@ class VCRoomForm(VCRoomFormBase):
 
     host_user = PrincipalField(_('User'),
                                [HiddenUnless('host_choice', 'someone_else'), DataRequired()])
+
+    alternative_host_users = PrincipalListField(_('Alternative hosts'),
+                                                description=_('These users can start the meeting in the absence of '
+                                                              'the host. They need a Zoom account as well.'))
 
     password = StringField(_('Passcode'),
                            [DataRequired(), IndicoRegexp(r'^\d{8,10}$')],
@@ -169,6 +174,11 @@ class VCRoomForm(VCRoomFormBase):
             defaults.host_choice = 'myself' if host == session.user else 'someone_else'
             defaults.host_user = None if host == session.user else host
 
+        if defaults.alternative_host_users is None:
+            defaults.alternative_host_users = {principal_from_identifier(ident, require_user_token=False)
+                                               for ident in (defaults.alternative_hosts or [])
+                                               if ident != defaults.host}
+
         allow_webinars = current_plugin.settings.get('allow_webinars')
 
         if allow_webinars:
@@ -250,6 +260,14 @@ class VCRoomForm(VCRoomFormBase):
         if self.host_choice.data == 'someone_else':
             self._check_zoom_user(field.data)
 
+    def validate_alternative_host_users(self, field):
+        users = field.data or ()
+        # unlike the host field, this one holds several users, so the error has to name them
+        if invalid := sorted(user.full_name for user in users if find_enterprise_email(user) is None):
+            raise ValidationError(_('No Zoom account: {}').format(escape(', '.join(invalid))))
+        if any(user.persistent_identifier == self.host.data for user in users):
+            raise ValidationError(_('The meeting host cannot be an alternative host'))
+
     def validate_interpreters(self, field):
         items = field.serialized_data or field.data or []
         for item in items:
@@ -284,3 +302,7 @@ class VCRoomForm(VCRoomFormBase):
             return session.user.persistent_identifier
         else:
             return self.host_user.data.persistent_identifier if self.host_user.data else None
+
+    @generated_data
+    def alternative_hosts(self):
+        return sorted(u.persistent_identifier for u in (self.alternative_host_users.data or ()))

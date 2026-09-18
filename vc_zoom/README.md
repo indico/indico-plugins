@@ -14,6 +14,7 @@
 ### 3.3.7
 
 - Allow restricting automatic registration to specific registration forms
+- Allow managing co-hosts via Indico
 
 ### 3.3.6
 
