@@ -267,11 +267,7 @@ class ZoomClient:
 class ZoomIndicoClient:
     def __init__(self):
         from indico_vc_zoom.plugin import ZoomPlugin
-        self.client = ZoomClient(
-            ZoomPlugin.settings.get('account_id'),
-            ZoomPlugin.settings.get('client_id'),
-            ZoomPlugin.settings.get('client_secret'),
-        )
+        self.client = ZoomClient(**ZoomPlugin.get_zoom_config())
 
     def create_meeting(self, user_id, **kwargs):
         return _handle_response(self.client.meeting.create(user_id, **kwargs), 201)

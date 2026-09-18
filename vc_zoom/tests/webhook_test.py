@@ -35,14 +35,12 @@ def _add_registration_form(db, event, title):
 
 
 @pytest.fixture
-def webhook_client(test_client, zoom_plugin):
-    zoom_plugin.settings.set('webhook_token', TOKEN)
-
-    def _post(payload, *, timestamp=None):
+def post_webhook(test_client):
+    def _post(payload, *, token=TOKEN, timestamp=None):
         if timestamp is None:
             timestamp = str(int(time.time()))
         body = json.dumps(payload).encode()
-        sig = hmac.new(TOKEN.encode(), b'v0:' + timestamp.encode() + b':' + body, hashlib.sha256).hexdigest()
+        sig = hmac.new(token.encode(), b'v0:' + timestamp.encode() + b':' + body, hashlib.sha256).hexdigest()
         return test_client.post(
             '/api/plugin/zoom/webhook',
             data=body,
@@ -54,6 +52,22 @@ def webhook_client(test_client, zoom_plugin):
         )
 
     return _post
+
+
+@pytest.fixture
+def webhook_client(post_webhook, zoom_plugin):
+    zoom_plugin.settings.set('webhook_token', TOKEN)
+    return post_webhook
+
+
+def _url_validation(post_webhook, token):
+    resp = post_webhook({'event': 'endpoint.url_validation', 'payload': {'plainToken': 'plain'}}, token=token)
+    assert resp.status_code == 200
+    return resp.json['encryptedToken']
+
+
+def _expected_signature(token):
+    return hmac.new(token.encode(), b'plain', hashlib.sha256).hexdigest()
 
 
 # ── Security tests ────────────────────────────────────────────────────────────
@@ -68,6 +82,28 @@ def test_webhook_bad_signature_returns_403(test_client, zoom_plugin):
         headers={'x-zm-request-timestamp': ts, 'x-zm-signature': 'v0=badsig'},
     )
     assert resp.status_code == 403
+
+
+@pytest.mark.usefixtures('db')
+def test_webhook_without_token_returns_503(test_client):
+    ts = str(int(time.time()))
+    resp = test_client.post(
+        '/api/plugin/zoom/webhook',
+        json={'event': 'meeting.updated', 'payload': {'object': {'id': 100000}}},
+        headers={'x-zm-request-timestamp': ts, 'x-zm-signature': 'v0=badsig'},
+    )
+    assert resp.status_code == 503
+
+
+@pytest.mark.usefixtures('db')
+def test_webhook_uses_db_token_when_config_unset(webhook_client):
+    assert _url_validation(webhook_client, TOKEN) == _expected_signature(TOKEN)
+
+
+@pytest.mark.usefixtures('db')
+def test_webhook_config_token_takes_precedence(webhook_client, patch_indico_config):
+    patch_indico_config('PLUGIN_VC_ZOOM_WEBHOOK_TOKEN', 'config-token')
+    assert _url_validation(webhook_client, 'config-token') == _expected_signature('config-token')
 
 
 # ── participant_joined check-in tests ─────────────────────────────────────────

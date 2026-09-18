@@ -15,7 +15,7 @@ from indico_vc_zoom.fixtures import JSON_DATA
 TZ = ZoneInfo('Europe/Zurich')
 
 
-def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp, app, mocker):
+def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp, mocker):
     event = create_event(
         creator=zoom_api['user'],
         start_dt=datetime(2024, 3, 1, 16, 0, tzinfo=TZ),
@@ -86,9 +86,7 @@ def test_interpretation_split_join(db, test_client, zoom_api, create_event, smtp
     }, False))
 
     from indico.core.plugins import plugin_engine
-
-    from indico_vc_zoom.plugin import ZoomPlugin
-    plugin = ZoomPlugin(plugin_engine, app)
+    plugin = plugin_engine.get_plugin('vc_zoom')
     plugin.refresh_room(vc_room, event)
 
     assert vc_room.data['interpreters'] == [
