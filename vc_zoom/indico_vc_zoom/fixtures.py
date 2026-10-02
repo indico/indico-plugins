@@ -17,7 +17,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
-from indico_vc_zoom.util import ZOOM_DIRECTORY_CACHE_KEY, _zoom_directory_cache
+from indico_vc_zoom.plugin import ZoomPlugin
+from indico_vc_zoom.util import ZOOM_DIRECTORY_CACHE_KEY
 
 
 TZ = ZoneInfo('Europe/Zurich')
@@ -26,10 +27,10 @@ TZ = ZoneInfo('Europe/Zurich')
 @pytest.fixture
 def zoom_directory_cache():
     """Isolate the cached Zoom account directory, which outlives a single test."""
-    _zoom_directory_cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
+    ZoomPlugin.cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
     g.pop('zoom_account_emails', None)
-    yield _zoom_directory_cache
-    _zoom_directory_cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
+    yield ZoomPlugin.cache
+    ZoomPlugin.cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
 
 
 @pytest.fixture

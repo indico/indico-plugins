@@ -13,7 +13,6 @@ from datetime import timedelta
 from flask import g
 from requests.exceptions import HTTPError
 
-from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.modules.auth.models.identities import Identity
 from indico.modules.users.models.emails import UserEmail
@@ -27,6 +26,9 @@ from indico.util.user import principal_from_identifier
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
+
+
+ZOOM_DIRECTORY_CACHE_KEY = 'account-emails'
 
 
 class ZoomMeetingType(IndicoIntEnum):
@@ -98,27 +100,18 @@ def iter_user_emails(user):
             yield f'{username}@{domain}'
 
 
-# List Users returns up to 2000 per page.
-# See https://developers.zoom.us/docs/api/users/#tag/users/get/users
-LIST_USERS_MAX_PAGE_SIZE = 2000
-
-_zoom_directory_cache = make_scoped_cache('vc-zoom')
-ZOOM_DIRECTORY_CACHE_KEY = 'account-emails'
-# Kept well above the refresh interval of the task populating it, so a failed run does not leave
-# the directory unavailable until the next one.
-ZOOM_DIRECTORY_CACHE_TTL = timedelta(days=2)
-
-
 def _iter_zoom_account_emails(client):
-    params = {'page_size': LIST_USERS_MAX_PAGE_SIZE, 'status': 'active'}
+    # List Users returns up to 2000 per page.
+    # See https://developers.zoom.us/docs/api/users/#tag/users/get/users
+    params = {'page_size': 2000, 'status': 'active'}
     while True:
         resp = client.list_users(**params)
         for user in resp.get('users', []):
             if email := user.get('email'):
                 yield email.lower()
-        if not (token := resp.get('next_page_token')):
+        if not (page_token := resp.get('next_page_token')):
             break
-        params['next_page_token'] = token
+        params['next_page_token'] = page_token
 
 
 def refresh_zoom_account_directory():
@@ -127,15 +120,19 @@ def refresh_zoom_account_directory():
     Walking the whole account is far too slow to do while serving a request, so this is meant to
     be called from a periodic task.
     """
+    from indico_vc_zoom.plugin import ZoomPlugin
     emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
-    _zoom_directory_cache.set(ZOOM_DIRECTORY_CACHE_KEY, emails, ZOOM_DIRECTORY_CACHE_TTL)
+    # TTL kept well above the refresh interval of the task populating it, so a failed run does
+    # not leave the cached directory unavailable until the next run
+    ZoomPlugin.cache.set(ZOOM_DIRECTORY_CACHE_KEY, emails, timedelta(days=2))
     return emails
 
 
 def get_zoom_account_directory():
     """Get the cached Zoom account email directory, or `None` if it has not been cached yet."""
+    from indico_vc_zoom.plugin import ZoomPlugin
     if 'zoom_account_emails' not in g:
-        g.zoom_account_emails = _zoom_directory_cache.get(ZOOM_DIRECTORY_CACHE_KEY)
+        g.zoom_account_emails = ZoomPlugin.cache.get(ZOOM_DIRECTORY_CACHE_KEY)
     return g.zoom_account_emails
 
 

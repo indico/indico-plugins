@@ -18,6 +18,7 @@ from wtforms.validators import URL, DataRequired, NumberRange, Optional, Validat
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
@@ -33,6 +34,7 @@ from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomStatus
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent
 from indico.util.caching import memoize_request
+from indico.util.decorators import classproperty
 from indico.util.signals import make_interceptable
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import IndicoEnumSelectField, IndicoPasswordField, TextListField
@@ -280,6 +282,11 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     @classmethod
     def get_webhook_token(cls):
         return cls.plugin_config.WEBHOOK_TOKEN or cls.settings.get('webhook_token')
+
+    @classproperty
+    @classmethod
+    def cache(cls):
+        return make_scoped_cache(f'plugin/{cls.name}')
 
     def init(self):
         super().init()
