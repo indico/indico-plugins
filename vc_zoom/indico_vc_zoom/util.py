@@ -8,7 +8,9 @@
 import re
 import secrets
 import string
+from datetime import timedelta
 
+from flask import g
 from requests.exceptions import HTTPError
 
 from indico.core.db import db
@@ -24,6 +26,9 @@ from indico.util.user import principal_from_identifier
 
 from indico_vc_zoom import _
 from indico_vc_zoom.api import ZoomIndicoClient
+
+
+ZOOM_DIRECTORY_CACHE_KEY = 'account-emails'
 
 
 class ZoomMeetingType(IndicoIntEnum):
@@ -95,11 +100,52 @@ def iter_user_emails(user):
             yield f'{username}@{domain}'
 
 
+def _iter_zoom_account_emails(client):
+    # List Users returns up to 2000 per page.
+    # See https://developers.zoom.us/docs/api/users/#tag/users/get/users
+    params = {'page_size': 2000, 'status': 'active'}
+    while True:
+        resp = client.list_users(**params)
+        for user in resp.get('users', []):
+            if email := user.get('email'):
+                yield email.lower()
+        if not (page_token := resp.get('next_page_token')):
+            break
+        params['next_page_token'] = page_token
+
+
+def refresh_zoom_account_directory():
+    """Fetch the Zoom account email directory and cache it.
+
+    Walking the whole account is far too slow to do while serving a request, so this is meant to
+    be called from a periodic task.
+    """
+    from indico_vc_zoom.plugin import ZoomPlugin
+    emails = set(_iter_zoom_account_emails(ZoomIndicoClient()))
+    # TTL kept well above the refresh interval of the task populating it, so a failed run does
+    # not leave the cached directory unavailable until the next run
+    ZoomPlugin.cache.set(ZOOM_DIRECTORY_CACHE_KEY, emails, timedelta(days=2))
+    return emails
+
+
+def get_zoom_account_directory():
+    """Get the cached Zoom account email directory, or `None` if it has not been cached yet."""
+    from indico_vc_zoom.plugin import ZoomPlugin
+    if 'zoom_account_emails' not in g:
+        g.zoom_account_emails = ZoomPlugin.cache.get(ZOOM_DIRECTORY_CACHE_KEY)
+    return g.zoom_account_emails
+
+
 @memoize_request
 def find_enterprise_email(user):
     """Get the email address of a user that has a zoom account."""
+    emails = list(iter_user_emails(user))
+    directory = get_zoom_account_directory()
+    if directory and (email := next((e for e in emails if e.lower() in directory), None)):
+        return email
+    # the directory may be unavailable or predate the Zoom account, so fall back to asking Zoom
     client = ZoomIndicoClient()
-    return next((email for email in iter_user_emails(user) if client.get_user(email, silent=True)), None)
+    return next((email for email in emails if client.get_user(email, silent=True)), None)
 
 
 def gen_random_passcode(length=8):

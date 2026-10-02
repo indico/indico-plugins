@@ -13,11 +13,7 @@ from pytz import utc
 from requests import Session
 from requests.exceptions import HTTPError
 
-from indico.core.cache import make_scoped_cache
 from indico.util.string import crc32
-
-
-token_cache = make_scoped_cache('zoom-api-token')
 
 
 def _get_token_cache_key(config):
@@ -72,6 +68,8 @@ class ZoomSession(Session):
             ZoomPlugin.logger.warning('Request failed with invalid token; getting a new one')
             self.__configure_zoom_api(force=True)
             resp = super().request(method, url, *args, **kwargs)
+        ZoomPlugin.logger.debug('[zoom-api] %s %s params=%s json=%s -> %s', method, url,
+                                kwargs.get('params'), kwargs.get('json'), resp.status_code)
         return resp
 
 
@@ -328,6 +326,9 @@ class ZoomIndicoClient:
             return None
         return _handle_response(resp)
 
+    def list_users(self, **kwargs):
+        return _handle_response(self.client.user.list(**kwargs))
+
 
 def get_zoom_scopes(config):
     """Get the set of OAuth scopes for the given Zoom credentials."""
@@ -360,7 +361,7 @@ def get_zoom_token(config, *, force=False, for_config_check=False, full=False):
 
     ZoomPlugin.logger.debug(f'Using Server-to-Server-OAuth ({force=})')
     cache_key = _get_token_cache_key(config)
-    if not force and (token_data := token_cache.get(cache_key)):
+    if not force and (token_data := ZoomPlugin.cache.get(cache_key)):
         expires_in = int(token_data['expires_at'] - time.time())
         ZoomPlugin.logger.debug('Using token from cache (%s, %ds remaining)', cache_key, expires_in)
         if full:
@@ -388,7 +389,7 @@ def get_zoom_token(config, *, force=False, for_config_check=False, full=False):
                             token_data['scope'], token_data['api_url'])
     expires_at = int(time.time() + token_data['expires_in'])
     token_data.setdefault('expires_at', expires_at)  # zoom doesn't include this. wtf.
-    token_cache.set(cache_key, token_data, token_data['expires_in'])
+    ZoomPlugin.cache.set(cache_key, token_data, token_data['expires_in'])
     if full:
         return token_data
     if for_config_check:

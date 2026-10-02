@@ -10,14 +10,27 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
+from flask import g
 
 from indico.core.plugins import plugin_engine
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 
+from indico_vc_zoom.plugin import ZoomPlugin
+from indico_vc_zoom.util import ZOOM_DIRECTORY_CACHE_KEY
+
 
 TZ = ZoneInfo('Europe/Zurich')
+
+
+@pytest.fixture
+def zoom_directory_cache():
+    """Isolate the cached Zoom account directory, which outlives a single test."""
+    ZoomPlugin.cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
+    g.pop('zoom_account_emails', None)
+    yield ZoomPlugin.cache
+    ZoomPlugin.cache.delete(ZOOM_DIRECTORY_CACHE_KEY)
 
 
 @pytest.fixture
@@ -134,6 +147,9 @@ def zoom_api(zoom_plugin, create_user, mocker):
     api_get_user = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_user')
     api_get_user.return_value = {'id': '7890abcd', 'email': 'don.orange@megacorp.xyz'}
 
+    api_list_users = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.list_users')
+    api_list_users.return_value = {'users': [{'email': user.email}], 'next_page_token': ''}
+
     def _get_meeting(id_, *args, **kwargs):
         return dict(JSON_DATA, id=id_)
 
@@ -151,6 +167,7 @@ def zoom_api(zoom_plugin, create_user, mocker):
         'update_webinar': api_update_webinar,
         'api_delete_meeting': api_delete_meeting,
         'get_user': api_get_user,
+        'list_users': api_list_users,
     }
 
 
