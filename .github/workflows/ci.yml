@@ -46,7 +46,9 @@ jobs:
         run: python .github/utils/get_core_repo.py indico/indico INDICO
 
       - name: Install system dependencies
-        run: sudo apt-get install postgresql-client libpq-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install postgresql-client libpq-dev
 
       - name: Create virtualenv
         run: |
@@ -213,7 +215,9 @@ jobs:
           uv pip install -e .
 
       - name: Install redis
-        run: sudo apt-get install redis-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install redis-server
 
       - name: Setup database
         run: |
