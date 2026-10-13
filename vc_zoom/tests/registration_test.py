@@ -8,7 +8,7 @@
 from datetime import timedelta
 
 import pytest
-from flask import session
+from flask import get_flashed_messages, session
 
 from indico.core import signals
 from indico.modules.events.features.util import set_feature_enabled
@@ -532,6 +532,30 @@ def test_enable_auto_register_backfills_after_commit(zoom_plugin, zoom_api_regis
     delay.assert_not_called()
     signals.core.after_commit.send()
     delay.assert_called_once_with(vc_room, [registration.id])
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_enable_auto_register_announces_background_sync(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                        create_vc_room_with_assoc, make_complete_registration, mocker):
+    make_complete_registration(reg_form, 'new@example.com', 'Brand', 'New')
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user, auto_register=False)
+    mocker.patch('indico_vc_zoom.task.backfill_registrants.delay')
+
+    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True}, is_new=False)
+
+    assert [category for category, _msg in get_flashed_messages(with_categories=True)] == ['info']
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_enable_auto_register_without_registrants_announces_nothing(zoom_plugin, zoom_api_registrants, reg_form,
+                                                                    zoom_user, create_vc_room_with_assoc):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user, auto_register=False)
+
+    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True}, is_new=False)
+
+    assert get_flashed_messages() == []
 
 
 @pytest.mark.usefixtures('request_context', 'db', 'smtp')
