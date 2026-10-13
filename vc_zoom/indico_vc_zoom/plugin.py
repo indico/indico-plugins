@@ -509,9 +509,13 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _schedule_backfill(self, vc_room, registrations):
         # resolving and pushing every registrant of a large event takes far longer than a request may,
         # so the backfill runs in a task once the change that triggered it has been committed
-        if registrations:
-            pending = g.setdefault('zoom_pending_backfills', {})
-            pending.setdefault(vc_room, set()).update(r.id for r in registrations)
+        if not registrations:
+            return
+        pending = g.setdefault('zoom_pending_backfills', {})
+        pending.setdefault(vc_room, set()).update(r.id for r in registrations)
+        if has_request_context():
+            flash(_('Registrants are being added to the Zoom meeting in the background. This may take a few '
+                    'minutes.'), 'info')
 
     def _launch_pending_backfills(self, sender, **kwargs):
         for vc_room, registration_ids in g.pop('zoom_pending_backfills', {}).items():
