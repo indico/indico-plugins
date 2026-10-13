@@ -18,6 +18,7 @@ from wtforms.validators import URL, DataRequired, NumberRange, Optional, Validat
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.core.plugins import IndicoPlugin, render_plugin_template, url_for_plugin
@@ -72,6 +73,8 @@ AUTO_REGISTRATION_SCOPE_OPTIONS = {
 # Limited to 30 by Zoom API.
 # See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
 BATCH_REGISTRANTS_MAX = 30
+# Fewer registrants are synced within the request
+BACKGROUND_BACKFILL_MIN = 5
 
 
 def _exclude_host(identifiers, host_identifier):
@@ -508,8 +511,12 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
 
     def _schedule_backfill(self, vc_room, registrations):
         # resolving and pushing every registrant of a large event takes far longer than a request may,
-        # so the backfill runs in a task once the change that triggered it has been committed
+        # so larger backfills run in a task once the change that triggered them has been committed
         if not registrations:
+            return
+        # developers usually run without a celery worker
+        if len(registrations) < BACKGROUND_BACKFILL_MIN or config.DEBUG:
+            self._backfill_registrants(vc_room, registrations)
             return
         pending = g.setdefault('zoom_pending_backfills', {})
         pending.setdefault(vc_room, set()).update(r.id for r in registrations)
