@@ -301,7 +301,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.registration_form_deleted, self._registration_form_deleted)
         self.connect(signals.vc.vc_room_created, self._vc_room_created)
         self.connect(signals.core.after_process, self._flush_pending_registrations)
-        self.connect(signals.core.after_commit, self._launch_pending_backfills)
+        self.connect(signals.core.after_commit, self._launch_pending_backfill)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.template_hook('before-render-registration-info', self._render_registration_zoom_link)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
@@ -518,15 +518,14 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if len(registrations) < BACKGROUND_BACKFILL_MIN or config.DEBUG:
             self._backfill_registrants(vc_room, registrations)
             return
-        pending = g.setdefault('zoom_pending_backfills', {})
-        pending.setdefault(vc_room, set()).update(r.id for r in registrations)
+        g.zoom_pending_backfill = (vc_room, sorted(r.id for r in registrations))
         if has_request_context():
             flash(_('Registrants are being added to the Zoom meeting in the background. This may take a few '
                     'minutes.'), 'info')
 
-    def _launch_pending_backfills(self, sender, **kwargs):
-        for vc_room, registration_ids in g.pop('zoom_pending_backfills', {}).items():
-            backfill_registrants.delay(vc_room, sorted(registration_ids))
+    def _launch_pending_backfill(self, sender, **kwargs):
+        if pending := g.pop('zoom_pending_backfill', None):
+            backfill_registrants.delay(*pending)
 
     def run_backfill(self, vc_room, registration_ids):
         if not self.settings.get('allow_auto_register') or not vc_room.data.get('auto_register'):
