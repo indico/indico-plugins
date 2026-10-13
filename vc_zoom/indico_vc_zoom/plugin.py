@@ -47,7 +47,7 @@ from indico_vc_zoom.blueprint import blueprint
 from indico_vc_zoom.cli import cli
 from indico_vc_zoom.forms import VCRoomAttachForm, VCRoomForm
 from indico_vc_zoom.notifications import notify_host_start_url
-from indico_vc_zoom.task import refresh_meetings
+from indico_vc_zoom.task import backfill_registrants, refresh_meetings
 from indico_vc_zoom.util import (UserLookupMode, ZoomMeetingType, fetch_zoom_meeting, find_enterprise_email,
                                  gen_random_passcode, get_alt_host_emails, get_schedule_args, get_url_data_args,
                                  process_alternative_hosts, resolve_alternative_hosts, update_zoom_meeting)
@@ -298,6 +298,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         self.connect(signals.event.registration_form_deleted, self._registration_form_deleted)
         self.connect(signals.vc.vc_room_created, self._vc_room_created)
         self.connect(signals.core.after_process, self._flush_pending_registrations)
+        self.connect(signals.core.after_commit, self._launch_pending_backfills)
         self.template_hook('event-vc-room-list-item-labels', self._render_vc_room_labels)
         self.template_hook('before-render-registration-info', self._render_registration_zoom_link)
         for wp in (WPSimpleEventDisplay, WPVCEventPage, WPVCManageEvent, WPConferenceDisplay):
@@ -488,7 +489,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             self._push_approval_type(vc_room, desired_approval_type, is_webinar=is_webinar)
             if vc_room.data.get('auto_register'):
                 regform_ids = self._get_synced_regform_ids(vc_room)
-                self._backfill_registrants(vc_room, self._get_syncable_registrations(vc_room, regform_ids))
+                self._schedule_backfill(vc_room, self._get_syncable_registrations(vc_room, regform_ids))
         elif vc_room.data.get('auto_register'):
             self._sync_regform_selection_change(vc_room, regform_ids_before)
 
@@ -504,6 +505,26 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
                 registrations.extend(registration for registration in regform.active_registrations
                                      if registration.state == RegistrationState.complete)
         return registrations
+
+    def _schedule_backfill(self, vc_room, registrations):
+        # resolving and pushing every registrant of a large event takes far longer than a request may,
+        # so the backfill runs in a task once the change that triggered it has been committed
+        if registrations:
+            pending = g.setdefault('zoom_pending_backfills', {})
+            pending.setdefault(vc_room, set()).update(r.id for r in registrations)
+
+    def _launch_pending_backfills(self, sender, **kwargs):
+        for vc_room, registration_ids in g.pop('zoom_pending_backfills', {}).items():
+            backfill_registrants.delay(vc_room, sorted(registration_ids))
+
+    def run_backfill(self, vc_room, registration_ids):
+        if not self.settings.get('allow_auto_register') or not vc_room.data.get('auto_register'):
+            return
+        registration_ids = set(registration_ids)
+        regform_ids = self._get_synced_regform_ids(vc_room)
+        self._backfill_registrants(vc_room, [r for r in self._get_syncable_registrations(vc_room, regform_ids)
+                                             if r.id in registration_ids])
+        self._flush_pending_registrations(None)
 
     def _backfill_registrants(self, vc_room, candidates):
         if not candidates:
@@ -526,7 +547,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             return
         before = {r.id: r for r in self._get_syncable_registrations(vc_room, regform_ids_before)}
         now = {r.id: r for r in self._get_syncable_registrations(vc_room, regform_ids_now)}
-        self._backfill_registrants(vc_room, [r for rid, r in now.items() if rid not in before])
+        self._schedule_backfill(vc_room, [r for rid, r in now.items() if rid not in before])
         for rid, registration in before.items():
             if rid not in now:
                 self._queue_registration_sync(registration, remove=True)
@@ -966,8 +987,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         if not vc_room.data.get('auto_register'):
             return
         regform_ids = self._get_synced_regform_ids(vc_room)
-        for registration in self._get_syncable_registrations(vc_room, regform_ids):
-            self._queue_registration_sync(registration, remove=False)
+        self._schedule_backfill(vc_room, self._get_syncable_registrations(vc_room, regform_ids))
 
     def _get_registrant_email(self, registration):
         if registration.user:

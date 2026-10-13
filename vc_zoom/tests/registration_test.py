@@ -303,7 +303,7 @@ def test_event_clone_skips_zoom_room_when_auto_register_enabled(
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
-@pytest.mark.usefixtures('db', 'smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'db', 'smtp')
 def test_vc_room_created_syncs_existing_registrations(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                       create_vc_room_with_assoc, make_complete_registration):
     """Creating a Zoom meeting should sync pre-existing completed registrations."""
@@ -312,10 +312,11 @@ def test_vc_room_created_syncs_existing_registrations(zoom_plugin, zoom_api_regi
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
+    zoom_api_registrants['list_meeting_registrants'].return_value = {'registrants': []}
 
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
     reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
@@ -415,7 +416,7 @@ def test_pending_registration_created_does_not_cancel(db, zoom_plugin, zoom_api_
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
-@pytest.mark.usefixtures('db', 'smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'db', 'smtp')
 def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                    create_vc_room_with_assoc, make_complete_registration, mocker):
     """The active-registration lookup is built once per flush, not once per pending registration."""
@@ -428,7 +429,7 @@ def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registr
     spy = mocker.spy(zoom_plugin, '_build_active_registration_index')
 
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     assert spy.call_count == 1
     assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
@@ -489,7 +490,7 @@ def test_removal_skipped_if_same_zoom_user_registered_with_other_email(zoom_plug
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
-@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'request_context', 'db', 'smtp')
 def test_enable_auto_register_skips_existing_zoom_registrants(
     zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
     create_vc_room_with_assoc, make_complete_registration,
@@ -508,11 +509,60 @@ def test_enable_auto_register_skips_existing_zoom_registrants(
     zoom_api_registrants['add_meeting_registrant'].reset_mock()
 
     zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True}, is_new=False)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
     reg_data = zoom_api_registrants['add_meeting_registrant'].call_args[0][1]
     assert reg_data['email'] == 'new@example.com'
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_enable_auto_register_backfills_after_commit(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                     create_vc_room_with_assoc, make_complete_registration, mocker):
+    registration = make_complete_registration(reg_form, 'new@example.com', 'Brand', 'New')
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user, auto_register=False)
+    delay = mocker.patch('indico_vc_zoom.task.backfill_registrants.delay')
+
+    zoom_plugin.update_data_vc_room(vc_room, {'auto_register': True}, is_new=False)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    delay.assert_not_called()
+    signals.core.after_commit.send()
+    delay.assert_called_once_with(vc_room, [registration.id])
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_vc_room_created_backfills_after_commit(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                create_vc_room_with_assoc, make_complete_registration, mocker):
+    registration = make_complete_registration(reg_form, 'new@example.com', 'Brand', 'New')
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = create_vc_room_with_assoc(reg_form.event, zoom_user)
+    delay = mocker.patch('indico_vc_zoom.task.backfill_registrants.delay')
+
+    signals.vc.vc_room_created.send(vc_room, event=reg_form.event, assoc=assoc)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    delay.assert_not_called()
+    signals.core.after_commit.send()
+    delay.assert_called_once_with(vc_room, [registration.id])
+
+
+@pytest.mark.usefixtures('db', 'smtp')
+def test_backfill_task_skips_room_without_auto_register(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                        create_vc_room_with_assoc, make_complete_registration):
+    from indico_vc_zoom.task import backfill_registrants
+    registration = make_complete_registration(reg_form, 'new@example.com', 'Brand', 'New')
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, _assoc = create_vc_room_with_assoc(reg_form.event, zoom_user, auto_register=False)
+
+    backfill_registrants(vc_room, [registration.id])
+
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -580,7 +630,7 @@ def test_get_personalized_join_url_email_case_insensitive(zoom_plugin, zoom_api_
     assert join_url == 'https://example.com/personal2'
 
 
-@pytest.mark.usefixtures('smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'smtp')
 def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                 create_vc_room_with_assoc, make_complete_registration):
     """Two registrations with the same email (from different forms) should produce one Zoom registrant."""
@@ -605,7 +655,7 @@ def test_collect_room_ops_deduplicates_by_email(db, zoom_plugin, zoom_api_regist
 
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     # Should only call once despite two registrations with the same email
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
@@ -638,7 +688,7 @@ def test_single_registrant_uses_individual_api(db, zoom_plugin, zoom_api_registr
     zoom_api_registrants['batch_meeting_registrants'].assert_not_called()
 
 
-@pytest.mark.usefixtures('smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'smtp')
 def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                              create_vc_room_with_assoc, make_complete_registration):
     """Two or more registrants should use batch_meeting_registrants."""
@@ -660,7 +710,7 @@ def test_multiple_registrants_uses_batch_api(db, zoom_plugin, zoom_api_registran
 
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
     assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
@@ -799,7 +849,7 @@ def test_registration_summary_hides_zoom_link_if_not_registered_in_zoom(
     assert html == ''
 
 
-@pytest.mark.usefixtures('smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'smtp')
 def test_batch_excludes_host_and_alt_host(
     db,
     zoom_plugin,
@@ -828,7 +878,7 @@ def test_batch_excludes_host_and_alt_host(
         'users': [{'email': zoom_user.email}, {'email': alt_host.email}], 'next_page_token': ''
     }
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     zoom_api_registrants['add_meeting_registrant'].assert_not_called()
     assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
