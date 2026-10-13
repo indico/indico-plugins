@@ -8,6 +8,13 @@ a single package that can be installed and updated easily.
 
 ## Changelog
 
+### 3.3.8
+
+- Require Indico v3.3.14
+- Update `indico-plugin-previewer-jupyter`
+- Update `indico-plugin-ursh`
+- Update `indico-plugin-vc-zoom`
+
 ### 3.3.7
 
 - Require Indico v3.3.13
@@ -79,7 +86,7 @@ a single package that can be installed and updated easily.
 ### 3.3.1
 
 - Update `indico-plugin-piwik`
-- Update `indico-plugin-jupyter`
+- Update `indico-plugin-previewer-jupyter`
 
 ### 3.3
 
