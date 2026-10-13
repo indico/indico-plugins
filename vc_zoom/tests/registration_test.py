@@ -425,7 +425,7 @@ def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registr
 
     zoom_plugin.settings.set('allow_auto_register', True)
     vc_room, assoc = create_vc_room_with_assoc(event, zoom_user)
-    spy = mocker.spy(zoom_plugin, '_build_active_email_index')
+    spy = mocker.spy(zoom_plugin, '_build_active_registration_index')
 
     signals.vc.vc_room_created.send(vc_room, event=event, assoc=assoc)
     zoom_plugin._flush_pending_registrations(None)
@@ -435,6 +435,58 @@ def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registr
     batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
     batch_emails = {r['email'] for r in batch_data['registrants']}
     assert batch_emails == {f'user{i}@example.com' for i in range(5)}
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp', 'zoom_directory_cache')
+def test_approval_does_not_look_up_other_registrants_in_zoom(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                             create_user, create_vc_room_with_assoc,
+                                                             make_complete_registration):
+    event = reg_form.event
+    for i in range(5):
+        registration = make_complete_registration(reg_form, f'user{i}@megacorp.xyz', 'User', str(i))
+        registration.user = create_user(100 + i, email=f'user{i}@megacorp.xyz')
+    approved = make_complete_registration(reg_form, 'new@megacorp.xyz', 'New', 'User')
+    approved.user = create_user(200, email='new@megacorp.xyz')
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(event, zoom_user)
+    zoom_api_registrants['get_user'].reset_mock()
+
+    signals.event.registration_state_updated.send(approved, previous_state=RegistrationState.pending)
+    zoom_plugin._flush_pending_registrations(None)
+
+    looked_up = {args[0] for args, _kwargs in zoom_api_registrants['get_user'].call_args_list}
+    assert looked_up <= {'new@megacorp.xyz', 'don.orange@megacorp.xyz'}
+    assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'new@megacorp.xyz'
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp', 'zoom_directory_cache')
+def test_removal_skipped_if_same_zoom_user_registered_with_other_email(zoom_plugin, zoom_api_registrants, reg_form,
+                                                                       zoom_user, create_user,
+                                                                       create_vc_room_with_assoc,
+                                                                       make_complete_registration):
+    event = reg_form.event
+    reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
+    reg_form_2.sections.append(RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
+                                                       type=RegistrationFormItemType.section_pd))
+    create_personal_data_fields(reg_form_2)
+    event.registration_forms.append(reg_form_2)
+    user = create_user(100, email='alice@megacorp.xyz')
+    withdrawn = make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith')
+    withdrawn.user = user
+    make_complete_registration(reg_form_2, 'alice.smith@example.com', 'Alice', 'Smith').user = user
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg_alice', 'email': 'alice@megacorp.xyz'}]
+    }
+
+    withdrawn.state = RegistrationState.withdrawn
+    signals.event.registration_state_updated.send(withdrawn, previous_state=RegistrationState.complete)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
 @pytest.mark.usefixtures('request_context', 'db', 'smtp')
