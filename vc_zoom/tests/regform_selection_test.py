@@ -16,7 +16,7 @@ def two_regforms(reg_form, create_regform):
     return reg_form, create_regform(reg_form.event, 'Second Form')
 
 
-@pytest.mark.usefixtures('smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'smtp')
 def test_room_creation_syncs_only_selected_regforms(zoom_plugin, zoom_api_registrants, two_regforms, zoom_user,
                                                     create_vc_room_with_assoc, make_complete_registration):
     selected, other = two_regforms
@@ -28,14 +28,14 @@ def test_room_creation_syncs_only_selected_regforms(zoom_plugin, zoom_api_regist
 
     vc_room, assoc = create_vc_room_with_assoc(selected.event, zoom_user, registration_forms=[selected.id])
     signals.vc.vc_room_created.send(vc_room, event=selected.event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     zoom_api_registrants['batch_meeting_registrants'].assert_not_called()
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
     assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'alice@example.com'
 
 
-@pytest.mark.usefixtures('smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'smtp')
 def test_room_creation_syncs_every_regform_when_unset(zoom_plugin, zoom_api_registrants, two_regforms, zoom_user,
                                                       create_vc_room_with_assoc, make_complete_registration):
     first, second = two_regforms
@@ -47,7 +47,7 @@ def test_room_creation_syncs_every_regform_when_unset(zoom_plugin, zoom_api_regi
 
     vc_room, assoc = create_vc_room_with_assoc(first.event, zoom_user, registration_forms=None)
     signals.vc.vc_room_created.send(vc_room, event=first.event, assoc=assoc)
-    zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
     batch_data = zoom_api_registrants['batch_meeting_registrants'].call_args[0][1]
@@ -80,7 +80,7 @@ def test_removal_ignores_registration_in_unselected_regform(db, zoom_plugin, zoo
     assert {r['email'] for r in status_data['registrants']} == {'shared@example.com'}
 
 
-@pytest.mark.usefixtures('request_context', 'smtp')
+@pytest.mark.usefixtures('run_backfill_inline', 'request_context', 'smtp')
 def test_selection_change_adds_and_removes_registrants(zoom_plugin, zoom_api_registrants, two_regforms, zoom_user,
                                                        create_vc_room_with_assoc, make_complete_registration):
     dropped, added = two_regforms
@@ -97,6 +97,7 @@ def test_selection_change_adds_and_removes_registrants(zoom_plugin, zoom_api_reg
 
     zoom_plugin.update_data_vc_room(vc_room, {'registration_forms': [added.id]}, is_new=False)
     zoom_plugin._flush_pending_registrations(None)
+    signals.core.after_commit.send()
 
     assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
     assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'bob@example.com'
