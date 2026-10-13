@@ -5,6 +5,10 @@ material to an Indico event.
 
 ## Changelog
 
+### 3.3.2
+
+- Use the latest `nbconvert` + Katex versions
+
 ### 3.3.1
 
 - Use the latest `nbconvert` version
