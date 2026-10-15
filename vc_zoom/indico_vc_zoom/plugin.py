@@ -534,7 +534,16 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         regform_ids = self._get_synced_regform_ids(vc_room)
         self._backfill_registrants(vc_room, [r for r in self._get_syncable_registrations(vc_room, regform_ids)
                                              if r.id in registration_ids])
+        g.zoom_backfill_room = vc_room
         self._flush_pending_registrations(None)
+        g.pop('zoom_backfill_room')
+
+    def _is_backfill_cancelled(self):
+        # auto-registration may be disabled while a long backfill is running
+        if (vc_room := g.get('zoom_backfill_room')) is None:
+            return False
+        db.session.refresh(vc_room)
+        return not vc_room.data.get('auto_register')
 
     def _backfill_registrants(self, vc_room, candidates):
         if not candidates:
@@ -1207,6 +1216,10 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         zoom_type = 'webinar' if is_webinar else 'meeting'
         batch_func = client.batch_webinar_registrants if is_webinar else client.batch_meeting_registrants
         for i in range(0, len(entries), BATCH_REGISTRANTS_MAX):
+            if self._is_backfill_cancelled():
+                self.logger.info(f'Auto-registration disabled for Zoom {zoom_type} %s; stopping backfill',  # noqa: G004
+                                 zoom_id)
+                return
             chunk = entries[i:i + BATCH_REGISTRANTS_MAX]
             data = {'auto_approve': True, 'registrants': [e['data'] for e in chunk]}
             if not is_webinar:
