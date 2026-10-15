@@ -547,6 +547,7 @@ def test_enable_auto_register_syncs_few_registrants_live(zoom_plugin, zoom_api_r
     zoom_plugin._flush_pending_registrations(None)
     signals.core.after_commit.send()
 
+    zoom_api_registrants['add_meeting_registrant'].assert_called_once()
     assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'new@example.com'
     delay.assert_not_called()
     assert get_flashed_messages() == []
@@ -629,7 +630,7 @@ def test_backfill_task_skips_room_without_auto_register(zoom_plugin, zoom_api_re
 
 
 @pytest.mark.usefixtures('smtp', 'run_backfill_inline')
-def test_backfill_task_stops_once_auto_register_is_disabled(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+def test_backfill_task_stops_once_auto_register_is_disabled(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                             create_vc_room_with_assoc, make_complete_registration,
                                                             mocker):
     for i in range(5):
@@ -640,8 +641,9 @@ def test_backfill_task_stops_once_auto_register_is_disabled(db, zoom_plugin, zoo
     mocker.patch('indico_vc_zoom.plugin.BATCH_REGISTRANTS_MAX', 2)
 
     def _disable_auto_register(*args, **kwargs):
-        vc_room.data = {**vc_room.data, 'auto_register': False}
-        db.session.flush()
+        (VCRoom.query
+         .filter_by(id=vc_room.id)
+         .update({VCRoom.data: {**vc_room.data, 'auto_register': False}}, synchronize_session=False))
 
     zoom_api_registrants['batch_meeting_registrants'].side_effect = _disable_auto_register
 
@@ -649,6 +651,57 @@ def test_backfill_task_stops_once_auto_register_is_disabled(db, zoom_plugin, zoo
     signals.core.after_commit.send()
 
     assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
+
+
+@pytest.mark.usefixtures('smtp', 'run_backfill_inline')
+def test_backfill_task_stops_once_room_is_deleted(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                  create_vc_room_with_assoc, make_complete_registration, mocker):
+    for i in range(5):
+        make_complete_registration(reg_form, f'user{i}@example.com', 'User', str(i))
+    zoom_plugin.settings.set('allow_auto_register', True)
+    vc_room, assoc = create_vc_room_with_assoc(reg_form.event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {'registrants': []}
+    mocker.patch('indico_vc_zoom.plugin.BATCH_REGISTRANTS_MAX', 2)
+
+    def _delete_room(*args, **kwargs):
+        (VCRoom.query
+         .filter_by(id=vc_room.id)
+         .update({VCRoom.status: VCRoomStatus.deleted}, synchronize_session=False))
+
+    zoom_api_registrants['batch_meeting_registrants'].side_effect = _delete_room
+
+    signals.vc.vc_room_created.send(vc_room, event=reg_form.event, assoc=assoc)
+    signals.core.after_commit.send()
+
+    assert zoom_api_registrants['batch_meeting_registrants'].call_count == 1
+
+
+@pytest.mark.usefixtures('smtp', 'run_backfill_inline')
+def test_backfill_task_keeps_syncing_other_rooms(db, zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                 create_vc_room_with_assoc, make_complete_registration, mocker):
+    for i in range(5):
+        make_complete_registration(reg_form, f'user{i}@example.com', 'User', str(i))
+    zoom_plugin.settings.set('allow_auto_register', True)
+    other_room, _other_assoc = create_vc_room_with_assoc(reg_form.event, zoom_user)
+    other_room.data = {**other_room.data, 'zoom_id': 11111111}
+    db.session.flush()
+    vc_room, assoc = create_vc_room_with_assoc(reg_form.event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {'registrants': []}
+    mocker.patch('indico_vc_zoom.plugin.BATCH_REGISTRANTS_MAX', 2)
+
+    def _disable_auto_register(*args, **kwargs):
+        (VCRoom.query
+         .filter_by(id=vc_room.id)
+         .update({VCRoom.data: {**vc_room.data, 'auto_register': False}}, synchronize_session=False))
+
+    zoom_api_registrants['batch_meeting_registrants'].side_effect = _disable_auto_register
+
+    signals.vc.vc_room_created.send(vc_room, event=reg_form.event, assoc=assoc)
+    signals.core.after_commit.send()
+
+    zoom_ids = [c.args[0] for c in zoom_api_registrants['batch_meeting_registrants'].call_args_list]
+    assert zoom_ids.count(11111111) == 3
+    assert zoom_ids.count(vc_room.data['zoom_id']) <= 1
 
 
 @pytest.mark.parametrize(
