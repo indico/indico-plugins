@@ -11,6 +11,11 @@
 
 ## Changelog
 
+### 3.3.8
+
+- Sync existing registrants of large events in the background when enabling auto-registration and
+  avoid Zoom lookups for unrelated registrants when syncing a single registration
+
 ### 3.3.7
 
 - Allow restricting automatic registration to specific registration forms
