@@ -60,6 +60,8 @@ class S3StorageBase(Storage):
             self.session_kwargs['aws_secret_access_key'] = data['secret_key']
         if 'addressing_style' in data:
             self.client_kwargs['config'] = Config(s3={'addressing_style': data['addressing_style']})
+        if 'region' in data:
+            self.client_kwargs['region_name'] = data['region']
         self.bucket_policy_file = data.get('bucket_policy_file')
         self.bucket_versioning = data.get('bucket_versioning') in ('1', 'true', 'yes', 'on')
         if data.get('proxy') in ('1', 'true', 'yes', 'on'):
