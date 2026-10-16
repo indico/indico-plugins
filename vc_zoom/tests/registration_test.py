@@ -490,6 +490,35 @@ def test_removal_skipped_if_same_zoom_user_registered_with_other_email(zoom_plug
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
+@pytest.mark.usefixtures('request_context', 'db', 'smtp', 'zoom_directory_cache')
+def test_removal_skipped_if_unlinked_registration_matches_zoom_email_of_other_user(
+    zoom_plugin, zoom_api_registrants, reg_form, zoom_user, create_user, create_vc_room_with_assoc,
+    make_complete_registration
+):
+    event = reg_form.event
+    reg_form_2 = RegistrationForm(event=event, title='Second Form', currency='EUR')
+    reg_form_2.sections.append(RegistrationFormSection(registration_form=reg_form_2, title='Personal Data',
+                                                       type=RegistrationFormItemType.section_pd))
+    create_personal_data_fields(reg_form_2)
+    event.registration_forms.append(reg_form_2)
+    make_complete_registration(reg_form, 'alice@example.com', 'Alice', 'Smith').user = create_user(
+        100, email='alice@megacorp.xyz')
+    withdrawn = make_complete_registration(reg_form_2, 'alice@megacorp.xyz', 'Alice', 'Smith')
+    withdrawn.user = None
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': 'reg_alice', 'email': 'alice@megacorp.xyz'}]
+    }
+
+    withdrawn.state = RegistrationState.withdrawn
+    signals.event.registration_state_updated.send(withdrawn, previous_state=RegistrationState.complete)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
 @pytest.mark.usefixtures('request_context', 'db', 'smtp')
 def test_enable_auto_register_skips_existing_zoom_registrants(
     zoom_plugin, zoom_api_registrants, reg_form, zoom_user,

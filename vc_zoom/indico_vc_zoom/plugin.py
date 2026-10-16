@@ -1168,6 +1168,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         # user with a Zoom account all resolve to that account's email, so matching the user is equivalent
         if registration.user and find_enterprise_email(registration.user):
             matches |= ids_by_user.get(registration.user_id, set())
+        for user in self._users_for_zoom_email(email):
+            matches |= ids_by_user.get(user.id, set())
         return bool(matches - exclude_ids)
 
     def _build_active_registration_index(self, event_ids, regform_ids):
