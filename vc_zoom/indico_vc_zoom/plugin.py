@@ -1221,8 +1221,8 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         batch_func = client.batch_webinar_registrants if is_webinar else client.batch_meeting_registrants
         for i in range(0, len(entries), BATCH_REGISTRANTS_MAX):
             if self._is_backfill_cancelled(zoom_id):
-                self.logger.info(f'Auto-registration no longer active for Zoom {zoom_type} %s; stopping backfill',  # noqa: G004
-                                 zoom_id)
+                self.logger.info('Auto-registration no longer active for Zoom %s %s; stopping backfill',
+                                 zoom_type, zoom_id)
                 return
             chunk = entries[i:i + BATCH_REGISTRANTS_MAX]
             data = {'auto_approve': True, 'registrants': [e['data'] for e in chunk]}
