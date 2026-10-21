@@ -214,6 +214,13 @@ def make_complete_registration(db, zoom_plugin):
 
 
 @pytest.fixture
+def run_backfill_inline(mocker):
+    """Run the registrant backfill task inline instead of sending it to Celery."""
+    from indico_vc_zoom.task import backfill_registrants
+    return mocker.patch.object(backfill_registrants, 'delay', side_effect=backfill_registrants)
+
+
+@pytest.fixture
 def zoom_api_registrants(zoom_api, mocker):
     zoom_api['add_meeting_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_meeting_registrant')
     zoom_api['add_webinar_registrant'] = mocker.patch('indico_vc_zoom.plugin.ZoomIndicoClient.add_webinar_registrant')

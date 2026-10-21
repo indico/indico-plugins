@@ -46,6 +46,12 @@ def refresh_meetings(vc_rooms, obj, log_entry=None):
             db.session.commit()
 
 
+@celery.task(plugin='vc_zoom', request_context=True, autoretry_for=(HTTPError,))
+def backfill_registrants(vc_room, registration_ids):
+    from indico_vc_zoom.plugin import ZoomPlugin
+    ZoomPlugin.instance.run_backfill(vc_room, registration_ids)
+
+
 @celery.periodic_task(run_every=crontab(minute='*/5'), plugin='vc_zoom')
 def refresh_token(threshold=600):
     from indico_vc_zoom.plugin import ZoomPlugin
