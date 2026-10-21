@@ -70,7 +70,7 @@ AUTO_REGISTRATION_SCOPE_OPTIONS = {
     'webinar': (frozenset(AUTO_REGISTRATION_WEBINAR_SCOPES), frozenset(AUTO_REGISTRATION_LEGACY_WEBINAR_SCOPES),
                 frozenset(AUTO_REGISTRATION_BROAD_WEBINAR_SCOPES)),
 }
-# Limited to 30 by Zoom API.
+# Limited to 30 by the Zoom API (batch registration and registrant status updates).
 # See https://developers.zoom.us/docs/api/meetings/#tag/invitation--registration/post/meetings/{meetingId}/registrants
 BATCH_REGISTRANTS_MAX = 30
 # Fewer registrants are synced within the request
@@ -1278,25 +1278,25 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         emails = set(email_ids)
         try:
             registrant_map = self._find_zoom_registrant_ids(client, vc_room, emails)
-            if not registrant_map:
-                return
-            status_data = {
-                'action': 'cancel',
-                'registrants': [{'id': rid, 'email': email}
-                                for email, rid in registrant_map.items()]
-            }
-            if is_webinar:
-                client.update_webinar_registrants_status(zoom_id, status_data)
-            else:
-                client.update_meeting_registrants_status(zoom_id, status_data)
         except HTTPError:
-            self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
+            self.logger.warning(f'Could not fetch registrants to remove from Zoom {zoom_type} %s: %s',  # noqa: G004
                                 zoom_id, ', '.join(sorted(emails)))
-        else:
-            removed = ', '.join(f'{email} (indico_id={email_ids[email]}, zoom_id={rid})'
-                                for email, rid in registrant_map.items())
-            self.logger.info(f'Removed registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
-                             zoom_id, removed)
+            return
+        status_func = (client.update_webinar_registrants_status if is_webinar
+                       else client.update_meeting_registrants_status)
+        registrants = list(registrant_map.items())
+        for i in range(0, len(registrants), BATCH_REGISTRANTS_MAX):
+            chunk = registrants[i:i + BATCH_REGISTRANTS_MAX]
+            status_data = {'action': 'cancel', 'registrants': [{'id': rid, 'email': email} for email, rid in chunk]}
+            try:
+                status_func(zoom_id, status_data)
+            except HTTPError:
+                self.logger.warning(f'Could not remove registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
+                                    zoom_id, ', '.join(sorted(email for email, _ in chunk)))
+            else:
+                removed = ', '.join(f'{email} (indico_id={email_ids[email]}, zoom_id={rid})' for email, rid in chunk)
+                self.logger.info(f'Removed registrants from Zoom {zoom_type} %s: %s',  # noqa: G004
+                                 zoom_id, removed)
 
     def _find_zoom_registrant_ids(self, client, vc_room, emails):
         registrants = self._find_zoom_registrants(client, vc_room, emails)

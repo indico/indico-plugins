@@ -15,6 +15,7 @@
 
 - Sync existing registrants of large events in the background when enabling auto-registration and
   avoid Zoom lookups for unrelated registrants when syncing a single registration
+- Fix removing more than 30 registrants from Zoom at once
 
 ### 3.3.7
 
