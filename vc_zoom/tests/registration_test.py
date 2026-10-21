@@ -9,6 +9,7 @@ from datetime import timedelta
 
 import pytest
 from flask import get_flashed_messages, session
+from requests.exceptions import HTTPError
 
 from indico.core import signals
 from indico.modules.events.features.util import set_feature_enabled
@@ -18,6 +19,8 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_personal_data_fields, create_registration
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+
+from indico_vc_zoom.plugin import BATCH_REGISTRANTS_MAX
 
 
 def test_registration_sync_meeting(db, zoom_plugin, zoom_api_registrants, reg_form, create_zoom_meeting, test_client,
@@ -488,6 +491,30 @@ def test_removal_skipped_if_same_zoom_user_registered_with_other_email(zoom_plug
     zoom_plugin._flush_pending_registrations(None)
 
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_removal_cancels_registrants_in_chunks(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                               create_vc_room_with_assoc, make_complete_registration):
+    emails = [f'user{i}@example.com' for i in range(BATCH_REGISTRANTS_MAX + 1)]
+    registrations = [make_complete_registration(reg_form, email, 'User', str(i)) for i, email in enumerate(emails)]
+
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(reg_form.event, zoom_user)
+    zoom_api_registrants['list_meeting_registrants'].return_value = {
+        'registrants': [{'id': f'reg{i}', 'email': email} for i, email in enumerate(emails)]
+    }
+    zoom_api_registrants['update_meeting_registrants_status'].side_effect = [HTTPError(), None]
+
+    for registration in registrations:
+        registration.state = RegistrationState.withdrawn
+        signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.complete)
+    zoom_plugin._flush_pending_registrations(None)
+
+    chunks = [args[1]['registrants']
+              for args, _kwargs in zoom_api_registrants['update_meeting_registrants_status'].call_args_list]
+    assert [len(chunk) for chunk in chunks] == [BATCH_REGISTRANTS_MAX, 1]
+    assert {r['email'] for chunk in chunks for r in chunk} == set(emails)
 
 
 @pytest.mark.usefixtures('request_context', 'db', 'smtp', 'zoom_directory_cache')
