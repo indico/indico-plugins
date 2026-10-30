@@ -14,6 +14,8 @@ from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.web.forms.base import FormDefaults
 
+from indico_vc_zoom.fixtures import JSON_DATA
+
 
 TZ = ZoneInfo('Europe/Zurich')
 
@@ -243,6 +245,30 @@ def test_create_room_with_auto_register_uses_manual_approval(
 
     zoom_api['create_meeting'].assert_called_once()
     settings = zoom_api['create_meeting'].call_args.kwargs['settings']
+    assert settings['approval_type'] == 1
+
+
+def test_create_room_webinar_with_auto_register_uses_manual_approval(
+    mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
+):
+    create_webinar = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.create_webinar',
+                                  return_value={**JSON_DATA, 'id': 200000})
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime.now(TZ) + timedelta(days=30),
+        end_dt=datetime.now(TZ) + timedelta(days=30, hours=2),
+        title='Future Event',
+        creator_has_privileges=True,
+    )
+
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['meeting_type'] = 'webinar'
+    vc_room.data['auto_register'] = True
+
+    zoom_plugin.create_room(vc_room, event)
+
+    create_webinar.assert_called_once()
+    settings = create_webinar.call_args.kwargs['settings']
     assert settings['approval_type'] == 1
 
 
