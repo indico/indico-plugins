@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 3.3.8
+
+- Fix automatic registration not working for webinars created with it enabled
+
 ### 3.3.7
 
 - Allow restricting automatic registration to specific registration forms
