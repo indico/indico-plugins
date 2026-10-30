@@ -1,0 +1,111 @@
+# This file is part of the Indico plugins.
+# Copyright (C) 2002 - 2025 CERN
+#
+# The Indico plugins are free software; you can redistribute
+# them and/or modify them under the terms of the MIT License;
+# see the LICENSE file for more details.
+
+from flask import Response, jsonify, stream_with_context
+from flask_pluginengine import current_plugin
+from webargs import fields
+from webargs.flaskparser import use_kwargs
+
+from indico.core.db import db
+from indico.core.errors import IndicoError
+from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.modules.events.notes.util import get_scheduled_notes
+from indico.util.string import sanitize_html
+
+from indico_ai_summary.llm_interface import LLMInterface
+from indico_ai_summary.models.llm_prompt import LLMPrompt
+from indico_ai_summary.schemas import PromptSchema
+from indico_ai_summary.utils import (chunk_text, generate_chunk_stream, get_all_prompts, html_to_markdown,
+                                     markdown_to_html)
+from indico_ai_summary.views import WPCategoryManagePrompts
+
+
+CATEGORY_SIDEMENU_ITEM = 'plugin_ai_summary_prompts'
+
+
+class RHLLMPrompts(RHManageEventBase):
+    def _process(self):
+        global_prompts = current_plugin.settings.get('prompts')
+        category_prompts = get_all_prompts(self.event.category)
+        return global_prompts + PromptSchema(many=True).dump(category_prompts)
+
+
+class RHManageCategoryPrompts(RHManageCategoryBase):
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
+
+    def _process_GET(self):
+        prompts = LLMPrompt.query.with_parent(self.category).all()
+        serialized_prompts = PromptSchema(many=True).dump(prompts)
+        return WPCategoryManagePrompts.render_template('manage_category_prompts.html', category=self.category,
+                                                       active_menu_item=CATEGORY_SIDEMENU_ITEM,
+                                                       stored_prompts=serialized_prompts)
+
+    @use_kwargs({'prompts': fields.List(fields.Nested(PromptSchema), required=True)}, location='json')
+    def _process_POST(self, prompts):
+        LLMPrompt.query.with_parent(self.category).delete()
+        for prompt_data in prompts:
+            prompt = LLMPrompt(category_id=self.category.id, name=prompt_data['name'], text=prompt_data['text'])
+            db.session.add(prompt)
+        return '', 204
+
+
+class RHSummarizeEvent(RHManageEventBase):
+    @use_kwargs({'prompt': fields.Str(required=True)})
+    def _process(self, prompt):
+        prompt_template = prompt
+        notes = get_scheduled_notes(self.event)
+        meeting_notes = '\n\n'.join(note.html for note in notes if hasattr(note, 'html'))
+
+        if not meeting_notes.strip():
+            current_plugin.logger.error("No meeting notes found from this event's contributions.")
+            return jsonify({'error': "No meeting notes found from this event's contributions."}), 400
+
+        cleaned_text = html_to_markdown(meeting_notes)
+        chunks = chunk_text(cleaned_text)
+        summaries = []
+
+        if not current_plugin.settings.get('llm_auth_token'):
+            current_plugin.logger.error('LLM Auth Token is not set in plugin settings.')
+            return jsonify({'error': 'LLM Auth Token is not set in plugin settings.'}), 400
+
+        llm_model = LLMInterface(
+            model_name=current_plugin.settings.get('llm_model_name'),
+            host=current_plugin.settings.get('llm_host_header'),
+            url=current_plugin.settings.get('llm_provider_url'),
+            auth_token=current_plugin.settings.get('llm_auth_token'),
+            max_tokens=current_plugin.settings.get('llm_max_tokens'),
+            temperature=current_plugin.settings.get('llm_temperature'),
+            system_prompt=current_plugin.settings.get('llm_system_prompt'),
+        )
+
+        if current_plugin.settings.get('llm_stream_response'):
+            return Response(
+                stream_with_context(generate_chunk_stream(chunks, prompt_template, llm_model)),
+                content_type='text/event-stream',
+                headers={
+                    'Cache-Control': 'no-cache',
+                    'X-Accel-Buffering': 'no'  # Disable buffering for nginx
+                }
+            )
+
+        for chunk in chunks:
+            full_prompt = f'{prompt_template}\n\n{chunk}'
+            response = llm_model.execute(full_prompt)
+            if not response:
+                current_plugin.logger.error('Empty response during summarization. Check the token or model.')
+                raise IndicoError('An error occurred during summarization.')
+
+            summaries.append(response)
+
+        combined_summary = '\n'.join(summaries)
+
+        return {
+            'summary_html': sanitize_html(markdown_to_html(combined_summary)),
+            'summary_markdown': combined_summary,
+        }
