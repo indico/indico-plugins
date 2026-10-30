@@ -251,9 +251,6 @@ def test_create_room_with_auto_register_uses_manual_approval(
 def test_create_room_webinar_with_auto_register_uses_manual_approval(
     mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api,
 ):
-    """Webinars need approval_type=1 at creation too: Zoom defaults to 'no registration' and rejects
-    every registrant push until the setting is changed.
-    """
     create_webinar = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.create_webinar',
                                   return_value={**JSON_DATA, 'id': 200000})
     event = create_event(
