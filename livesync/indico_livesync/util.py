@@ -16,6 +16,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
@@ -38,6 +39,8 @@ def obj_ref(obj):
         ref = {'type': EntryType.note, 'note_id': obj.id}
     elif isinstance(obj, Attachment):
         ref = {'type': EntryType.attachment, 'attachment_id': obj.id}
+    elif isinstance(obj, Registration):
+        ref = {'type': EntryType.registration, 'registration_id': obj.id}
     else:
         raise TypeError(f'Unexpected object: {obj.__class__.__name__}')
     return ImmutableDict(ref)
@@ -61,6 +64,8 @@ def obj_deref(ref):
         return EventNote.get_or_404(ref['note_id'])
     elif ref['type'] == EntryType.attachment:
         return Attachment.get_or_404(ref['attachment_id'])
+    elif ref['type'] == EntryType.registration:
+        return Attachment.get_or_404(ref['registration_id'])
     else:
         raise ValueError('Unexpected object type: {}'.format(ref['type']))
 
