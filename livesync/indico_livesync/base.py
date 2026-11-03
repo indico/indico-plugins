@@ -16,12 +16,13 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 
 from indico_livesync.forms import AgentForm
 from indico_livesync.initial import (apply_acl_entry_strategy, query_attachments, query_contributions, query_events,
-                                     query_notes, query_subcontributions)
+                                     query_notes, query_registrations, query_subcontributions)
 from indico_livesync.models.queue import EntryType, LiveSyncQueueEntry
 from indico_livesync.plugin import LiveSyncPlugin
 
@@ -140,6 +141,7 @@ class LiveSyncBackendBase:
         """
         fn = {
             Event: query_events,
+            Registration: query_registrations,
             Contribution: query_contributions,
             SubContribution: query_subcontributions,
             Attachment: query_attachments,
@@ -161,6 +163,7 @@ class LiveSyncBackendBase:
         """
         fn = {
             Event: query_events,
+            Registration: query_registrations,
             Contribution: query_contributions,
             SubContribution: query_subcontributions,
             Attachment: query_attachments,
@@ -181,6 +184,7 @@ class LiveSyncBackendBase:
         self._precache_categories()
 
         events = self.get_initial_query(Event, force)
+        registrations = self.get_initial_query(Registration, force)
         contributions = self.get_initial_query(Contribution, force)
         subcontributions = self.get_initial_query(SubContribution, force)
         attachments = self.get_initial_query(Attachment, force)
@@ -189,6 +193,10 @@ class LiveSyncBackendBase:
         print('Exporting events')
         if not uploader.run_initial(events.yield_per(batch_size), events.count()):
             print('Initial export of events failed')
+            return False
+        print('Exporting registrations')
+        if not uploader.run_initial(registrations.yield_per(batch_size), registrations.count()):
+            print('Initial export of registrations failed')
             return False
         print('Exporting contributions')
         if not uploader.run_initial(contributions.yield_per(batch_size), contributions.count()):
