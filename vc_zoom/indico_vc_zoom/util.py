@@ -153,13 +153,16 @@ def gen_random_passcode(length=8):
     return ''.join(secrets.choice(string.digits) for _ in range(length))
 
 
-def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=False):
+def fetch_zoom_meeting(vc_room, client=None, *, _is_webinar=None):
     """Fetch a Zoom meeting from the Zoom API.
 
     :param vc_room: The `VCRoom` object
     :param client: a `ZoomIndicoClient` object, otherwise a fresh one will be created
-    :param _is_webinar: whether the call concerns a webinar (used to call the correct endpoint)
+    :param _is_webinar: whether the call concerns a webinar (used to call the correct endpoint);
+                        defaults to the meeting type stored in the room
     """
+    if _is_webinar is None:
+        _is_webinar = vc_room.data.get('meeting_type') == 'webinar'
     try:
         client = client or ZoomIndicoClient()
         if _is_webinar:
