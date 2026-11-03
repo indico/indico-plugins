@@ -75,4 +75,4 @@ def test_get_meeting_logs_error_unless_id_is_a_webinar(zoom_oauth, caplog, code,
     zoom_oauth.get('https://api.zoom.us/v2/meetings/123', status=400, json={'code': code, 'message': 'nope'})
     with caplog.at_level(logging.DEBUG), pytest.raises(HTTPError):
         ZoomIndicoClient().get_meeting(123)
-    assert any(r.levelno >= logging.ERROR for r in caplog.records) is logged
+    assert any(r.levelno >= logging.ERROR for r in caplog.records) == logged

@@ -275,7 +275,7 @@ def test_create_room_webinar_with_auto_register_uses_manual_approval(
 
 @pytest.mark.parametrize(('meeting_type', 'is_webinar'), (('regular', False), ('webinar', True)))
 def test_fetch_zoom_meeting_uses_stored_meeting_type(
-    mocker, create_event, create_zoom_meeting, zoom_plugin, zoom_api, meeting_type, is_webinar,
+    mocker, create_event, create_zoom_meeting, zoom_api, meeting_type, is_webinar,
 ):
     get_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_meeting', return_value=JSON_DATA)
     get_webinar = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_webinar', return_value=JSON_DATA)
@@ -291,7 +291,7 @@ def test_fetch_zoom_meeting_uses_stored_meeting_type(
 
     __, actual_is_webinar = fetch_zoom_meeting(vc_room)
 
-    assert actual_is_webinar is is_webinar
+    assert actual_is_webinar == is_webinar
     called, not_called = (get_webinar, get_meeting) if is_webinar else (get_meeting, get_webinar)
     called.assert_called_once()
     not_called.assert_not_called()
