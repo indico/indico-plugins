@@ -14,6 +14,7 @@
 ### 3.3.8
 
 - Fix automatic registration not working for webinars created with it enabled
+- Stop logging an error each time a webinar is looked up in Zoom
 
 ### 3.3.7
 

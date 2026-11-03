@@ -15,6 +15,7 @@ from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.web.forms.base import FormDefaults
 
 from indico_vc_zoom.fixtures import JSON_DATA
+from indico_vc_zoom.util import fetch_zoom_meeting
 
 
 TZ = ZoneInfo('Europe/Zurich')
@@ -270,6 +271,30 @@ def test_create_room_webinar_with_auto_register_uses_manual_approval(
     create_webinar.assert_called_once()
     settings = create_webinar.call_args.kwargs['settings']
     assert settings['approval_type'] == 1
+
+
+@pytest.mark.parametrize(('meeting_type', 'is_webinar'), (('regular', False), ('webinar', True)))
+def test_fetch_zoom_meeting_uses_stored_meeting_type(
+    mocker, create_event, create_zoom_meeting, zoom_api, meeting_type, is_webinar,
+):
+    get_meeting = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_meeting', return_value=JSON_DATA)
+    get_webinar = mocker.patch('indico_vc_zoom.api.ZoomIndicoClient.get_webinar', return_value=JSON_DATA)
+    event = create_event(
+        creator=zoom_api['user'],
+        start_dt=datetime.now(TZ) + timedelta(days=30),
+        end_dt=datetime.now(TZ) + timedelta(days=30, hours=2),
+        title='Future Event',
+        creator_has_privileges=True,
+    )
+    vc_room = create_zoom_meeting(event, 'event')
+    vc_room.data['meeting_type'] = meeting_type
+
+    __, actual_is_webinar = fetch_zoom_meeting(vc_room)
+
+    assert actual_is_webinar == is_webinar
+    called, not_called = (get_webinar, get_meeting) if is_webinar else (get_meeting, get_webinar)
+    called.assert_called_once()
+    not_called.assert_not_called()
 
 
 @pytest.mark.parametrize('is_webinar', (False, True))

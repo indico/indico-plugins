@@ -30,14 +30,19 @@ def format_iso_dt(d):
     return d.astimezone(utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def _handle_response(resp, expected_code=200, expects_json=True):
+def _handle_response(resp, expected_code=200, expects_json=True, *, expected_error_codes=()):
     try:
         resp.raise_for_status()
         if resp.status_code != expected_code:
             raise HTTPError(f'Unexpected status code {resp.status_code}', response=resp)
     except HTTPError:
         from indico_vc_zoom.plugin import ZoomPlugin
-        ZoomPlugin.logger.error('Error in API call to %s: %s', resp.url, resp.content)
+        try:
+            error_code = resp.json().get('code')
+        except (ValueError, AttributeError):
+            error_code = None
+        log = ZoomPlugin.logger.debug if error_code in expected_error_codes else ZoomPlugin.logger.error
+        log('Error in API call to %s: %s', resp.url, resp.content)
         raise
     return resp.json() if expects_json else resp
 
@@ -271,7 +276,8 @@ class ZoomIndicoClient:
         return _handle_response(self.client.meeting.create(user_id, **kwargs), 201)
 
     def get_meeting(self, meeting_id):
-        return _handle_response(self.client.meeting.get(meeting_id))
+        # 3000 means the id belongs to a webinar, which `fetch_zoom_meeting` handles by retrying
+        return _handle_response(self.client.meeting.get(meeting_id), expected_error_codes=(3000,))
 
     def update_meeting(self, meeting_id, data):
         return _handle_response(self.client.meeting.update(meeting_id, **data), 204, expects_json=False)
