@@ -6,8 +6,10 @@
 # see the LICENSE file for more details.
 
 import base64
+import logging
 
 import pytest
+from requests.exceptions import HTTPError
 
 from indico_vc_zoom.api import ZoomIndicoClient
 from indico_vc_zoom.task import refresh_token
@@ -65,3 +67,12 @@ def test_token_refresh_prefers_config_credentials(zoom_oauth):
 def test_token_refresh_skips_without_credentials(mocked_responses):
     refresh_token()
     assert not mocked_responses.calls
+
+
+@pytest.mark.usefixtures('db', 'zoom_credentials')
+@pytest.mark.parametrize(('code', 'logged'), ((3000, False), (3001, True)))
+def test_get_meeting_logs_error_unless_id_is_a_webinar(zoom_oauth, caplog, code, logged):
+    zoom_oauth.get('https://api.zoom.us/v2/meetings/123', status=400, json={'code': code, 'message': 'nope'})
+    with caplog.at_level(logging.DEBUG), pytest.raises(HTTPError):
+        ZoomIndicoClient().get_meeting(123)
+    assert any(r.levelno >= logging.ERROR for r in caplog.records) is logged
