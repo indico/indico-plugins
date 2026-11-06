@@ -15,6 +15,9 @@
 
 - Fix automatic registration not working for webinars created with it enabled
 - Stop logging an error each time a webinar is looked up in Zoom
+- Sync existing registrants of large events in the background when enabling auto-registration and
+  avoid Zoom lookups for unrelated registrants when syncing a single registration
+- Fix removing more than 30 registrants from Zoom at once
 
 ### 3.3.7
 
