@@ -1145,25 +1145,21 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
     def _add_registrants(self, client, zoom_id, registrants, is_webinar):
         if not registrants:
             return
-        if len(registrants) == 1:
-            self._add_single_registrant(client, zoom_id, registrants[0], is_webinar)
+        # Zoom ignores auto_approve on the single webinar registrant endpoint and leaves the registrant pending
+        if len(registrants) == 1 and not is_webinar:
+            self._add_single_meeting_registrant(client, zoom_id, registrants[0])
         else:
             self._add_batch_registrants(client, zoom_id, registrants, is_webinar)
 
-    def _add_single_registrant(self, client, zoom_id, entry, is_webinar):
-        zoom_type = 'webinar' if is_webinar else 'meeting'
+    def _add_single_meeting_registrant(self, client, zoom_id, entry):
         email = entry['data']['email']
         data = {**entry['data'], 'auto_approve': True}
         try:
-            if is_webinar:
-                resp = client.add_webinar_registrant(zoom_id, data)
-            else:
-                resp = client.add_meeting_registrant(zoom_id, data)
+            resp = client.add_meeting_registrant(zoom_id, data)
         except HTTPError:
-            self.logger.warning(f'Could not add registrant %s to Zoom {zoom_type} %s',  # noqa: G004
-                                email, zoom_id)
+            self.logger.warning('Could not add registrant %s to Zoom meeting %s', email, zoom_id)
         else:
-            self.logger.info(f'Added registrant %s (indico_id=%s, zoom_id=%s) to Zoom {zoom_type} %s',  # noqa: G004
+            self.logger.info('Added registrant %s (indico_id=%s, zoom_id=%s) to Zoom meeting %s',
                              email, entry['indico_id'], resp.get('registrant_id'), zoom_id)
 
     def _add_batch_registrants(self, client, zoom_id, entries, is_webinar):
