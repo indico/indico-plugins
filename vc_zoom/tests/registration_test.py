@@ -209,12 +209,16 @@ def test_registration_sync_webinar(db, zoom_plugin, zoom_api_registrants, reg_fo
 
     zoom_plugin.settings.set('allow_auto_register', True)
     zoom_api_registrants['add_webinar_registrant'].reset_mock()
+    zoom_api_registrants['batch_webinar_registrants'].reset_mock()
     zoom_plugin._queue_registration_sync(registration, remove=False)
     zoom_plugin._flush_pending_registrations(None)
 
-    assert zoom_api_registrants['add_webinar_registrant'].called
-    assert any(args[1]['email'] == 'test@example.com' and args[1]['first_name'] == 'John'
-               for args, _kwargs in zoom_api_registrants['add_webinar_registrant'].call_args_list)
+    # Zoom ignores auto_approve on the single webinar registrant endpoint, so even one registrant goes through batch
+    zoom_api_registrants['add_webinar_registrant'].assert_not_called()
+    assert zoom_api_registrants['batch_webinar_registrants'].call_count == 1
+    batch_data = zoom_api_registrants['batch_webinar_registrants'].call_args[0][1]
+    assert batch_data['auto_approve'] is True
+    assert [(r['email'], r['first_name']) for r in batch_data['registrants']] == [('test@example.com', 'John')]
 
 
 def test_registration_form_deleted_batches_removals(db, zoom_plugin, zoom_api_registrants, reg_form,
