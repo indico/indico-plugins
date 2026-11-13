@@ -16,6 +16,7 @@
 - Fix automatic registration not working for webinars created with it enabled
 - Stop logging an error each time a webinar is looked up in Zoom
 - Fix webinar registrants synced one at a time staying pending approval in Zoom
+- Do not cancel a Zoom registrant when a new registration leaves the complete state right after being created
 
 ### 3.3.7
 
