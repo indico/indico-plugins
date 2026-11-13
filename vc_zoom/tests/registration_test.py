@@ -419,6 +419,98 @@ def test_pending_registration_created_does_not_cancel(db, zoom_plugin, zoom_api_
     zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
 
 
+def _hold_for_moderation(registration):
+    # what another plugin does when it holds a new registration for moderation
+    registration.state = RegistrationState.pending
+    signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.complete,
+                                                  silent=True)
+
+
+def _withdraw(registration):
+    registration.state = RegistrationState.withdrawn
+    signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.complete)
+
+
+def _delete(registration):
+    registration.is_deleted = True
+    signals.event.registration_deleted.send(registration)
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+@pytest.mark.parametrize('leave_complete', (_hold_for_moderation, _withdraw, _delete))
+def test_new_registration_leaving_complete_does_not_cancel(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                                           create_vc_room_with_assoc, make_complete_registration,
+                                                           leave_complete):
+    """A registration leaving complete in the request that created it was never pushed to Zoom."""
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(reg_form.event, zoom_user)
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
+
+    signals.event.registration_created.send(registration)
+    leave_complete(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    zoom_api_registrants['add_meeting_registrant'].assert_not_called()
+    zoom_api_registrants['list_meeting_registrants'].assert_not_called()
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+@pytest.mark.parametrize('leave_complete', (_hold_for_moderation, _withdraw, _delete))
+def test_registration_created_earlier_leaving_complete_cancels(zoom_plugin, zoom_api_registrants, reg_form,
+                                                               zoom_user, create_vc_room_with_assoc,
+                                                               make_complete_registration, leave_complete):
+    """A registration synced in an earlier request is cancelled in Zoom once it leaves complete."""
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(reg_form.event, zoom_user)
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
+    signals.event.registration_created.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+
+    leave_complete(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['update_meeting_registrants_status'].call_count == 1
+    status_data = zoom_api_registrants['update_meeting_registrants_status'].call_args[0][1]
+    assert status_data['action'] == 'cancel'
+    assert [r['email'] for r in status_data['registrants']] == ['test@example.com']
+
+
+@pytest.mark.usefixtures('request_context', 'db', 'smtp')
+def test_new_pending_registration_approved_in_same_request_is_added(zoom_plugin, zoom_api_registrants, reg_form,
+                                                                    zoom_user, create_vc_room_with_assoc,
+                                                                    make_complete_registration):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(reg_form.event, zoom_user)
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
+    registration.state = RegistrationState.pending
+
+    signals.event.registration_created.send(registration)
+    registration.state = RegistrationState.complete
+    signals.event.registration_state_updated.send(registration, previous_state=RegistrationState.pending)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'test@example.com'
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
+@pytest.mark.usefixtures('db', 'smtp')
+def test_new_complete_registration_is_added(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
+                                            create_vc_room_with_assoc, make_complete_registration):
+    zoom_plugin.settings.set('allow_auto_register', True)
+    create_vc_room_with_assoc(reg_form.event, zoom_user)
+    registration = make_complete_registration(reg_form, 'test@example.com', 'John', 'Doe')
+
+    signals.event.registration_created.send(registration)
+    zoom_plugin._flush_pending_registrations(None)
+
+    assert zoom_api_registrants['add_meeting_registrant'].call_count == 1
+    assert zoom_api_registrants['add_meeting_registrant'].call_args[0][1]['email'] == 'test@example.com'
+    zoom_api_registrants['update_meeting_registrants_status'].assert_not_called()
+
+
 @pytest.mark.usefixtures('db', 'smtp')
 def test_collect_room_ops_builds_active_index_once(zoom_plugin, zoom_api_registrants, reg_form, zoom_user,
                                                    create_vc_room_with_assoc, make_complete_registration, mocker):

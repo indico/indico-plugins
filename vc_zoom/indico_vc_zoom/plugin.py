@@ -947,7 +947,7 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
         return {'description': (data['description'] + '\n\n' + desc).strip()}
 
     def _registration_created(self, registration, **kwargs):
-        self._queue_registration_sync(registration, remove=False)
+        self._queue_registration_sync(registration, remove=False, created=True)
 
     def _registration_deleted(self, registration, **kwargs):
         self._queue_registration_sync(registration, remove=True)
@@ -1041,13 +1041,21 @@ class ZoomPlugin(VCPluginMixin, IndicoPlugin):
             return ''
         return render_plugin_template('vc_zoom:registration_zoom_link.html', join_urls=join_urls)
 
-    def _queue_registration_sync(self, registration, *, remove):
+    def _queue_registration_sync(self, registration, *, remove, created=False):
         if not self.settings.get('allow_auto_register'):
             return
         pending = g.setdefault('zoom_pending_registrations', {})
+        created_ids = g.setdefault('zoom_created_registration_ids', set())
+        if created:
+            created_ids.add(registration.id)
+        elif remove and registration.id in created_ids:
+            # a registration created in this request has not been pushed to Zoom yet, so there is nothing to cancel
+            pending.pop(registration.id, None)
+            return
         pending[registration.id] = (registration, remove)
 
     def _flush_pending_registrations(self, sender, **kwargs):
+        g.pop('zoom_created_registration_ids', None)
         if not (pending := g.pop('zoom_pending_registrations', None)):
             return
 
